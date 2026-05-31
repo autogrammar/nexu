@@ -1,52 +1,52 @@
-# nexu | 116 func | 33f | 3842L | python | 2026-05-30
+# nexu | 253 func | 55f | 7670L | python | 2026-05-31
 # generated in 0.00s
 
 HEALTH:
-  CC̄=3.7  critical=6 (limit:10)  dup=0  cycles=0
+  CC̄=3.7  critical=18 (limit:10)  dup=0  cycles=0
 
 ALERTS[20]:
-  !!! cc_exceeded      verify_capsule = 45 (limit:15)
-  !!! high_fan_out     verify_capsule = 24 (limit:10)
+  !!! high_fan_out     publish_project_service = 27 (limit:10)
   !!! high_fan_out     run_example = 23 (limit:10)
+  !!! high_fan_out     start_published_service = 22 (limit:10)
   !!! high_fan_out     build_review_packet = 21 (limit:10)
   !!! high_fan_out     build_capsule_report = 21 (limit:10)
   !!! high_fan_out     create_capsule = 21 (limit:10)
-  !!! high_fan_out     _tool_map = 20 (limit:10)
-  !!  high_fan_out     build_capsule_orchestration = 16 (limit:10)
-  !!  high_fan_out     load_config = 16 (limit:10)
-  !!  high_fan_out     build_iteration_plan = 15 (limit:10)
+  !!! high_fan_out     activate_example_project = 21 (limit:10)
+  !!  cc_exceeded      effective_ui_constraints_from_ledger = 24 (limit:15)
+  !!  cc_exceeded      publish_project_service = 21 (limit:15)
+  !!  high_fan_out     main = 19 (limit:10)
 
-MODULES[42] (top by size):
+MODULES[77] (top by size):
+  M[src/nexu/cinema_policy.py] 624L C:0 F:29 CC↑24 D:3 (python)
+  M[src/nexu/cinema_scripts.py] 545L C:0 F:5 CC↑6 D:3 (python)
   M[goal.yaml] 512L C:0 F:0 CC↑0 D:0 (yaml)
-  M[src/nexu/cli.py] 357L C:0 F:21 CC↑4 D:0 (python)
-  M[src/nexu/mcp_server.py] 355L C:0 F:10 CC↑14 D:1 (python)
-  M[src/nexu/verify.py] 236L C:0 F:5 CC↑45 D:7 (python)
-  M[src/nexu/orchestrate.py] 232L C:0 F:6 CC↑13 D:3 (python)
+  M[src/nexu/mcp_server.py] 393L C:0 F:13 CC↑6 D:1 (python)
+  M[src/nexu/cli.py] 379L C:0 F:23 CC↑4 D:0 (python)
+  M[src/nexu/cinema_projects.py] 359L C:1 F:9 CC↑16 D:0 (python)
+  M[src/nexu/cinema_publish.py] 339L C:0 F:15 CC↑21 D:0 (python)
+  M[src/nexu/verify.py] 317L C:0 F:14 CC↑12 D:7 (python)
+  M[src/nexu/cinema_history.py] 244L C:0 F:13 CC↑8 D:1 (python)
+  M[src/nexu/orchestrate.py] 232L C:0 F:6 CC↑13 D:2 (python)
+  M[src/nexu/cinema.py] 186L C:0 F:9 CC↑11 D:2 (python)
   M[src/nexu/llm.py] 165L C:0 F:5 CC↑8 D:2 (python)
-  M[src/nexu/review.py] 157L C:0 F:2 CC↑5 D:3 (python)
-  M[src/nexu/models.py] 154L C:9 F:10 CC↑3 D:19 (python)
-  M[src/nexu/runtime.py] 131L C:0 F:4 CC↑9 D:3 (python)
-  M[src/nexu/intract.py] 125L C:1 F:6 CC↑12 D:6 (python)
-  M[src/nexu/capsule.py] 124L C:0 F:5 CC↑8 D:14 (python)
-  M[src/nexu/export_prompt.py] 100L C:0 F:2 CC↑3 D:4 (python)
-  M[src/nexu/report.py] 94L C:0 F:3 CC↑2 D:3 (python)
-  M[src/nexu/init_project.py] 86L C:0 F:1 CC↑3 D:3 (python)
-  M[pyproject.toml] 84L C:0 F:0 CC↑0 D:0 (toml)
-  LANGS: python:35/yaml:3/shell:2/other:1/toml:1
+  M[src/nexu/export_prompt.py] 160L C:0 F:3 CC↑12 D:4 (python)
+  M[src/nexu/review.py] 157L C:0 F:2 CC↑5 D:2 (python)
+  M[src/nexu/intract_adapter.py] 133L C:0 F:6 CC↑9 D:1 (python)
+  LANGS: python:57/yaml:10/shell:3/other:2/json:2/txt:1/yml:1/toml:1
 
 HOTSPOTS[10]:
-  ★ verify_capsule fan=24  // Orchestrates 24 calls
+  ★ publish_project_service fan=27  // Package active stage HTML as a published service under cinema/services/.
   ★ run_example fan=23  // Orchestrates 23 calls
+  ★ start_published_service fan=22  // Orchestrates 22 calls
   ★ build_review_packet fan=21  // Orchestrates 21 calls
   ★ build_capsule_report fan=21  // Orchestrates 21 calls
-  ★ create_capsule fan=21  // Orchestrates 21 calls
 
-REFACTOR[5]:
-  [1] H/L Split verify_capsule (CC=45)
-  [2] H/H Split god module goal.yaml (512L, 0 classes)
-  [3] M/M Reduce verify_capsule fan-out (currently 24)
-  [4] M/M Reduce run_example fan-out (currently 23)
-  [5] M/M Reduce build_review_packet fan-out (currently 21)
+REFACTOR[10]:
+  [1] H/H Split god module src/nexu/cinema_policy.py (624L, 0 classes)
+  [2] H/H Split god module src/nexu/cinema_scripts.py (545L, 0 classes)
+  [3] H/H Split god module goal.yaml (512L, 0 classes)
+  [4] M/L Split activate_example_project (CC=16)
+  [5] M/L Split effective_ui_constraints_from_ledger (CC=24)
 
 EVOLUTION:
-  2026-05-30 CC̄=3.7 crit=6 3842L // Automated analysis
+  2026-05-31 CC̄=3.7 crit=18 7670L // Automated analysis

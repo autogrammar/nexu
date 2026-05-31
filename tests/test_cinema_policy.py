@@ -3,20 +3,27 @@ from pathlib import Path
 
 from nexu.cinema_policy import (
     apply_ledger_from_cinema,
+    ensure_option_previews_from_stages,
+    option_previews_are_distinct,
+    effective_ui_constraints_from_ledger,
+    enforce_deletes_on_option_previews,
+    merge_ui_constraint_lists,
     normalize_manifest_target,
     normalize_proposals_for_ledger,
     propose_ui_delta_contract_dicts,
     resolve_iteration_mode,
+    sync_option_previews_from_workspace,
     validate_intract_artifact,
 )
 
 
 def test_resolve_iteration_mode():
-    assert resolve_iteration_mode(pending_goal=True, delete_count=2) == "goal_options"
-    assert resolve_iteration_mode(has_hints=True, delete_count=0, keep_count=1) == "goal_options"
+    assert resolve_iteration_mode(pending_goal=True, delete_count=2) == "active_workspace"
+    assert resolve_iteration_mode(has_hints=True, delete_count=0, keep_count=1) == "active_workspace"
     assert resolve_iteration_mode(has_hints=True, delete_count=1) == "active_workspace"
     assert resolve_iteration_mode(has_hints=False, delete_count=0, keep_count=2) == "active_workspace"
     assert resolve_iteration_mode(has_hints=False, delete_count=0, keep_count=0) == "none"
+    assert resolve_iteration_mode(pending_goal=True, has_hints=True) == "goal_options"
 
 
 def test_normalize_manifest_target_defaults_invalid():
@@ -56,6 +63,114 @@ def test_apply_ledger_from_cinema_project_only(tmp_path: Path):
     result = apply_ledger_from_cinema(workspace, "demo", target="project", dry_run=True)
     assert result["added_total"] == 1
     assert "cinema.demo.S0.ui.remove.A" not in (workspace / "intract.yaml").read_text(encoding="utf-8")
+
+
+def test_effective_ui_constraints_from_ledger_last_wins():
+    ledger = [
+        {"stage": 0, "keep": ["sin", "cos"], "delete": []},
+        {"stage": 0, "keep": [], "delete": ["cos"]},
+        {"stage": 1, "keep": ["H"], "delete": []},
+    ]
+    effective = effective_ui_constraints_from_ledger(ledger, stage=0)
+    assert effective["keep"] == ["sin"]
+    assert effective["delete"] == ["cos"]
+
+
+def test_merge_ui_constraint_lists_session_overrides_ledger():
+    keep, delete = merge_ui_constraint_lists(
+        ledger_keep=["sin"],
+        ledger_delete=["Mod"],
+        session_keep=["cos"],
+        session_delete=["sin"],
+    )
+    assert keep == ["cos"]
+    assert delete == ["Mod", "sin"]
+
+
+def test_sync_option_previews_empty_delete_ids_mirrors_workspace(tmp_path: Path):
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    html = """<!DOCTYPE html><html><body>
+    <div class="btn btn-sci" id="btn-sin">sin</div>
+    <div class="btn btn-sci" id="btn-cos">cos</div>
+    <div class="btn btn-sci-excess" id="btn-Mod">Mod</div>
+    </body></html>"""
+    (cinema / "stage0.html").write_text(html, encoding="utf-8")
+    ledger = [{"stage": 0, "keep": [], "delete": ["cos", "Mod"]}]
+    (cinema / "intract_policy_ledger.json").write_text(
+        json.dumps(ledger), encoding="utf-8"
+    )
+
+    result = sync_option_previews_from_workspace(
+        cinema,
+        stage=0,
+        delete_ids=[],
+        root=tmp_path,
+        capsule_name="demo",
+    )
+    assert result["status"] == "options_synced_from_workspace"
+    assert result["spatial_removed"] == []
+
+    alt_a = (cinema / "alt_a.html").read_text(encoding="utf-8")
+    assert "btn-cos" in alt_a and "btn-Mod" in alt_a
+
+
+def test_sync_option_previews_from_workspace(tmp_path: Path):
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    html = """<!DOCTYPE html><html><head><title>Base</title></head><body>
+    <div class="btn btn-sci" id="btn-sin">sin</div>
+    <div class="btn btn-sci" id="btn-cos">cos</div>
+    <div class="btn" id="btn-7">7</div>
+    </body></html>"""
+    (cinema / "stage0.html").write_text(html, encoding="utf-8")
+
+    result = sync_option_previews_from_workspace(
+        cinema, stage=0, delete_ids=["cos"]
+    )
+    assert result["status"] == "options_synced_from_workspace"
+    assert "cos" in result["spatial_removed"]
+
+    alt_a = (cinema / "alt_a.html").read_text(encoding="utf-8")
+    assert "btn-sin" in alt_a and "btn-cos" not in alt_a
+    assert "Option A (minimal)" in alt_a
+    assert (cinema / "alt_b.html").exists() and (cinema / "alt_c.html").exists()
+
+
+def test_enforce_deletes_on_option_previews(tmp_path: Path):
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    html = """<!DOCTYPE html><html><body>
+    <div class="btn btn-sci" id="btn-sin">sin</div>
+    <div class="btn btn-sci" id="btn-tan">tan</div>
+    </body></html>"""
+    for name in ("alt_a.html", "alt_b.html", "alt_c.html"):
+        (cinema / name).write_text(html, encoding="utf-8")
+
+    result = enforce_deletes_on_option_previews(cinema, ["tan"])
+    assert result["status"] == "options_patched"
+    assert "tan" in result["spatial_removed"]
+    assert "btn-tan" not in (cinema / "alt_b.html").read_text(encoding="utf-8")
+
+
+def test_ensure_option_previews_from_stages(tmp_path: Path):
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    (cinema / "stage0.html").write_text(
+        "<html><head><title>S0</title></head><body><button>7</button></body></html>",
+        encoding="utf-8",
+    )
+    (cinema / "stage1.html").write_text(
+        "<html><head><title>S1</title></head><body><button>sin</button></body></html>",
+        encoding="utf-8",
+    )
+    (cinema / "stage2.html").write_text(
+        "<html><head><title>S2</title></head><body><button>sin</button><button>cos</button></body></html>",
+        encoding="utf-8",
+    )
+    result = ensure_option_previews_from_stages(cinema)
+    assert result["status"] == "options_built_from_stages"
+    assert option_previews_are_distinct(cinema)
 
 
 def test_propose_ui_delta_and_validate(tmp_path: Path):

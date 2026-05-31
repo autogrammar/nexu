@@ -25,6 +25,41 @@
 - `tests/test_cinema_policy.py`, `tests/test_export_prompt_ledger.py`, `tests/test_verify_intract.py`; `tests/conftest.py` adds sibling intract.
 - Full suite: `pytest -q` (16 passed); `make ci-cinema-smoke`.
 
+## [0.5.14] - 2026-05-31
+
+### Docs
+- Update README.md
+- Update SUMD.md
+- Update SUMR.md
+- Update docs/architecture.md
+- Update docs/examples.md
+- Update docs/mcp-service.md
+- Update docs/roadmap.md
+- Update docs/verification.md
+- Update examples/backend_service/.tmp_nexu_run/.nexu/capsules/demo/iterations/S1/prompt.md
+- Update examples/backend_service/.tmp_nexu_run/.nexu/capsules/demo/iterations/S2/prompt.md
+- ... and 38 more files
+
+### Test
+- Update tests/test_cinema_markpact.py
+- Update tests/test_cinema_policy.py
+- Update tests/test_cinema_projects.py
+- Update tests/test_cinema_publish.py
+- Update tests/test_cinema_server.py
+
+### Other
+- Update Makefile
+- Update app.doql.less
+- Update examples/backend_service/.tmp_nexu_run/.nexu/capsules/demo/blueprints/blueprint.yaml
+- Update examples/backend_service/.tmp_nexu_run/.nexu/capsules/demo/bundles/bundle.yaml
+- Update examples/backend_service/.tmp_nexu_run/.nexu/capsules/demo/bundles/demo-review-bundle.zip
+- Update examples/backend_service/.tmp_nexu_run/.nexu/capsules/demo/capsule.yaml
+- Update examples/backend_service/.tmp_nexu_run/.nexu/capsules/demo/evidence/diff.yaml
+- Update examples/backend_service/.tmp_nexu_run/.nexu/capsules/demo/evidence/source-drift.yaml
+- Update examples/backend_service/.tmp_nexu_run/.nexu/capsules/demo/evidence/verification.yaml
+- Update examples/backend_service/.tmp_nexu_run/.nexu/capsules/demo/intract.yaml
+- ... and 134 more files
+
 ## [0.5.13] - 2026-05-31
 
 ### Docs

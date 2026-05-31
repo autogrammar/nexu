@@ -80,7 +80,7 @@ Run live Cinema from the repository root:
 make cinema
 ```
 
-Open the URL printed in logs (`Live HTTP Server started for Cinema Player: http://127.0.0.1:...`).
+Open the URL printed in logs (`Live HTTP Server started for Nexu: http://127.0.0.1:...`).
 
 Live workflow:
 
@@ -108,12 +108,34 @@ NEXU_CINEMA_NO_OPEN=1 make cinema
 python examples/run_examples.py
 ```
 
+The smoke runner covers `frontend_view`, `backend_service`, `vertical_slice` and `mcp_service`.
+
+The visual examples can also be run directly:
+
+```bash
+python examples/web_app_calculator/run.py
+python examples/web_app_dashboard/run.py
+```
+
+The Pactown examples require `uv`, `pactown`, `requests` and free local ports:
+
+```bash
+python examples/web_app_pactown_ecosystem/run.py
+python examples/web_app_event_monitor/run.py
+```
+
+The Docker Compose variant can be syntax-checked with:
+
+```bash
+docker compose -f examples/web_app_event_monitor/docker/docker-compose.yml config --quiet
+```
+
 ## MCP service
 
 Folder: `examples/mcp_service/`
 
-Shows how to expose nexu tools to an MCP-capable IDE/agent through `nexu mcp serve --path .`. In addition, this covers the `nexu_capsule_promote_apply` command allowing direct remote workspaces synchronization.
+Shows how to expose nexu tools to an MCP-capable IDE/agent through `nexu mcp serve --path .`. The MCP service exposes both dry-run promotion planning and the explicit write-capable `nexu_capsule_promote_apply` tool.
 
 ## Intract Policy Integration
 
-Nexu dynamically integrates with the sibling `intract` validation package. When `verify_capsule` is executed, the full AST-scanning, project graph analysis, and policy engine validations from `intract` are applied to the capsule files to verify if the future iteration satisfies the intent contracts.
+Nexu dynamically integrates with a sibling or installed `intract` validation package through `src/nexu/intract_adapter.py`. When `verify_capsule` is executed, Intract policy validation is added to the deterministic nexu gates when available; integration failures are reported as warnings.

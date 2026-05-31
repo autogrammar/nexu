@@ -5,27 +5,65 @@
 
 - **Project**: /home/tom/github/semcod/nexu
 - **Primary Language**: python
-- **Languages**: python: 35, yaml: 3, shell: 2, toml: 1
+- **Languages**: python: 57, yaml: 10, shell: 3, json: 2, toml: 1
 - **Analysis Mode**: static
-- **Total Functions**: 116
-- **Total Classes**: 13
-- **Modules**: 42
-- **Entry Points**: 35
+- **Total Functions**: 253
+- **Total Classes**: 14
+- **Modules**: 77
+- **Entry Points**: 69
 
 ## Architecture by Module
 
+### src.nexu.cinema_policy
+- **Functions**: 29
+- **File**: `cinema_policy.py`
+
 ### src.nexu.cli
-- **Functions**: 21
+- **Functions**: 23
 - **File**: `cli.py`
 
+### src.nexu.cinema_publish
+- **Functions**: 15
+- **File**: `cinema_publish.py`
+
+### src.nexu.verify
+- **Functions**: 14
+- **File**: `verify.py`
+
+### src.nexu.cinema_history
+- **Functions**: 13
+- **File**: `cinema_history.py`
+
 ### src.nexu.mcp_server
-- **Functions**: 10
+- **Functions**: 13
 - **File**: `mcp_server.py`
 
-### src.nexu.models
+### src.vico.models
 - **Functions**: 10
 - **Classes**: 9
 - **File**: `models.py`
+
+### src.nexu.cinema
+- **Functions**: 9
+- **File**: `cinema.py`
+
+### src.nexu.cinema_projects
+- **Functions**: 9
+- **Classes**: 1
+- **File**: `cinema_projects.py`
+
+### src.nexu.cinema_server
+- **Functions**: 8
+- **File**: `cinema_server.py`
+
+### scripts.check-doc-links
+- **Functions**: 8
+- **File**: `check-doc-links.py`
+
+### src.vico.intract
+- **Functions**: 6
+- **Classes**: 1
+- **File**: `intract.py`
 
 ### src.nexu.paths
 - **Functions**: 6
@@ -35,94 +73,111 @@
 - **Functions**: 6
 - **File**: `orchestrate.py`
 
-### src.nexu.intract
+### src.nexu.intract_adapter
 - **Functions**: 6
-- **Classes**: 1
-- **File**: `intract.py`
+- **File**: `intract_adapter.py`
+
+### src.nexu.config
+- **Functions**: 5
+- **Classes**: 3
+- **File**: `config.py`
 
 ### src.nexu.llm
 - **Functions**: 5
 - **File**: `llm.py`
 
+### src.nexu.cinema_scripts
+- **Functions**: 5
+- **File**: `cinema_scripts.py`
+
 ### src.nexu.capsule
 - **Functions**: 5
 - **File**: `capsule.py`
-
-### src.nexu.verify
-- **Functions**: 5
-- **File**: `verify.py`
-
-### src.nexu.files
-- **Functions**: 4
-- **File**: `files.py`
 
 ### src.nexu.runtime
 - **Functions**: 4
 - **File**: `runtime.py`
 
-### src.nexu.journal
-- **Functions**: 3
-- **File**: `journal.py`
-
-### src.nexu.report
-- **Functions**: 3
-- **File**: `report.py`
-
-### src.nexu.plan
-- **Functions**: 2
-- **File**: `plan.py`
-
-### src.nexu.review
-- **Functions**: 2
-- **File**: `review.py`
-
-### src.nexu.hashing
-- **Functions**: 2
-- **File**: `hashing.py`
-
-### src.nexu.export_prompt
-- **Functions**: 2
-- **File**: `export_prompt.py`
-
-### src.nexu.promote
-- **Functions**: 2
-- **File**: `promote.py`
-
-### src.nexu.bundle
-- **Functions**: 2
-- **File**: `bundle.py`
-
-### src.nexu.config
-- **Functions**: 2
-- **Classes**: 3
-- **File**: `config.py`
-
 ## Key Entry Points
 
 Main execution flows into the system:
 
+### examples.web_app_pactown_ecosystem.run.main
+- **Calls**: print, print, print, print, subprocess.Popen, print, range, print
+
+### examples.web_app_event_monitor.run.main
+- **Calls**: print, print, print, print, subprocess.Popen, print, range, print
+
+### examples.web_app_dashboard.run.main
+- **Calls**: work.exists, work.mkdir, src_dir.mkdir, shutil.copy, fixtures_dir.mkdir, shutil.copy, print, src.nexu.init_project.init_project
+
+### src.nexu.cinema_publish.publish_project_service
+> Package active stage HTML as a published service under cinema/services/.
+- **Calls**: src.nexu.cinema_publish._slug_service_id, service_dir.mkdir, stage_file.read_text, None.write_text, src.nexu.cinema_markpact.build_markpact_readme, None.write_text, src.nexu.cinema_publish._load_registry, list
+
+### src.nexu.cinema_projects.activate_example_project
+> Load example UI into the live cinema directory (no browser reload).
+- **Calls**: next, src.nexu.cinema_projects._resolve_source_cinema, src.nexu.cinema_scripts.write_cinema_inject_files, None.write_text, src.nexu.cinema_projects.find_nexu_repo_root, src.nexu.cinema_projects.find_nexu_repo_root, src.nexu.cinema_projects._copy_cinema_files, src.nexu.cinema_projects._write_seed_variants
+
+### examples.scientific_calculator_demo.main
+- **Calls**: work.exists, work.mkdir, None.mkdir, None.write_text, print, src.nexu.init_project.init_project, src.vico.freeze.freeze_project, src.nexu.capsule.create_capsule
+
+### examples.web_app_calculator.run.main
+- **Calls**: work.exists, work.mkdir, src_dir.mkdir, shutil.copy, fixtures_dir.mkdir, shutil.copy, src.nexu.init_project.init_project, src.vico.freeze.freeze_project
+
+### examples.nexu_markpact_exporter.main
+- **Calls**: print, src_file.read_text, print, print, output_dir.mkdir, readme_path.write_text, print, print
+
 ### src.nexu.cli.capsule_diff
 > Compare capsule src files against the frozen baseline lock.
-- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.diff.diff_capsule, Table, table.add_row, table.add_row, table.add_row, table.add_row
+- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.vico.diff.diff_capsule, Table, table.add_row, table.add_row, table.add_row, table.add_row
+
+### src.nexu.cinema_history.restore_history_checkpoint
+> Restore HTML + ledger from a checkpoint; optionally merge ledger into manifests.
+- **Calls**: src.nexu.paths.project_root, src.nexu.cinema_policy.cinema_dir_for, json.loads, ledger_path.exists, src.nexu.cinema_history._refresh_policy_snapshot, src.nexu.cinema_history.history_dir, meta_path.exists, meta_path.read_text
+
+### examples.scientific_calculator_demo2.main
+- **Calls**: work.exists, work.mkdir, None.mkdir, original_file.write_text, examples.scientific_calculator_demo2.print_code, src.nexu.init_project.init_project, src.vico.freeze.freeze_project, src.nexu.capsule.create_capsule
 
 ### src.nexu.cli.capsule_status_command
 > Show capsule status, latest iteration, diff counters and verification summary.
-- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.status.capsule_status, console.print, console.print, console.print, Table, files.items
+- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.vico.status.capsule_status, console.print, console.print, console.print, Table, files.items
 
 ### src.nexu.cli.capsule_journal
 > Show capsule event journal.
 - **Calls**: capsule_app.command, src.nexu.paths.project_root, Table, console.print, src.nexu.journal.read_journal, table.add_row, str, str
 
-### src.nexu.cli.capsule_orchestrate
-> Build an offline or LLM-assisted orchestration plan for capsule evolution.
-- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.orchestrate.build_capsule_orchestration, console.print, console.print, console.print, typer.Argument, typer.Option
+### src.nexu.cinema_policy.sync_option_previews_from_workspace
+> Refresh Options A–C (and stage1/stage2 templates) from the active workspace HTML.
 
-### src.nexu.models.Capsule.from_dict
+Called after window-1 changes so preview panels stay aligned with s
+- **Calls**: stage_file.read_text, src.nexu.cinema_scripts.apply_spatial_deletes_to_html, src.nexu.cinema_scripts.finalize_cinema_html, alt_b.exists, alt_c.exists, stage_file.exists, src.nexu.cinema_policy.load_effective_ui_constraints, list
+
+### src.nexu.cinema_history.ledger_archive_for_display
+> Ledger iterations without HTML snapshots (read-only in history UI).
+- **Calls**: src.nexu.cinema_history._ledger_snapshot, enumerate, reversed, archive.append, isinstance, entry.get, entry.get, entry.get
+
+### src.vico.models.Capsule.from_dict
 - **Calls**: CapsuleSelection, CapsuleRuntime, cls, data.get, data.get, data.get, data.get, data.get
 
 ### src.nexu.cli.capsule_create
 > Create an isolated capsule from selected project files.
 - **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.capsule.create_capsule, src.nexu.blueprint.build_blueprint, console.print, console.print, console.print, typer.Argument
+
+### src.nexu.cli.capsule_iterate
+> Create planned S1..Sn iteration folders and prompts.
+- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.iterate.iterate_capsule, src.nexu.journal.append_journal, console.print, src.nexu.cinema.generate_cinema_player, console.print, typer.Argument
+
+### src.nexu.cli.capsule_orchestrate
+> Build an offline or LLM-assisted orchestration plan for capsule evolution.
+- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.orchestrate.build_capsule_orchestration, console.print, console.print, console.print, typer.Argument, typer.Option
+
+### src.nexu.cli.capsule_promote
+> Build a promotion plan for copying capsule changes back to the source project.
+- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.promote.build_promotion_plan, console.print, console.print, src.nexu.promote.apply_promotion_plan, console.print, typer.Argument
+
+### src.nexu.cinema_policy.propose_llm_for_stage
+- **Calls**: src.nexu.cinema_policy.cinema_dir_for, stage_file.exists, src.nexu.cinema_policy.ensure_intract_on_path, stage_file.read_text, propose_contracts_llm, src.nexu.cinema_policy.append_policy_ledger_entry, None.isoformat, str
 
 ### src.nexu.cli.capsule_review
 > Build an evidence-based review packet for human or optional LLM review.
@@ -130,93 +185,60 @@ Main execution flows into the system:
 
 ### src.nexu.cli.capsule_plan
 > Create a deterministic S1..Sn capsule iteration plan.
-- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.plan.build_iteration_plan, console.print, console.print, console.print, Syntax, typer.Argument
+- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.plan.build_iteration_plan, console.print, console.print, src.nexu.cli._print_yaml, typer.Argument, typer.Option
 
-### src.nexu.cli.capsule_report
-> Build Markdown/HTML/YAML report with verification evidence.
-- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.report.build_capsule_report, console.print, console.print, console.print, typer.Argument, typer.Option
+### src.nexu.cinema_policy.merge_ui_constraint_lists
+> Ledger baseline; current session annotations override per element.
+- **Calls**: sorted, sorted, None.strip, None.strip, None.strip, None.strip, str, str
 
-### src.nexu.cli.capsule_iterate
-> Create planned S1..Sn iteration folders and prompts.
-- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.iterate.iterate_capsule, src.nexu.journal.append_journal, console.print, typer.Argument, typer.Option, typer.Option
-
-### src.nexu.cli.capsule_runtime
-> Build a static HTML runtime/mock for the isolated capsule.
-- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.runtime.build_capsule_runtime, console.print, console.print, typer.Argument, typer.Option, None.relative_to
+### examples.realtime_lane_nexu_sync.simulate_realtime_sync
+- **Calls**: print, print, print, print, print, print, analyze_project, print
 
 ### src.nexu.cli.freeze
 > Freeze a lightweight hash snapshot of the current project.
-- **Calls**: app.command, src.nexu.paths.project_root, src.nexu.freeze.freeze_project, console.print, console.print, console.print, typer.Argument, typer.Option
-
-### src.nexu.cli.capsule_blueprint
-> Generate a UI/API/test blueprint from capsule selection and Intract contracts.
-- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.blueprint.build_blueprint, console.print, console.print, Syntax, typer.Argument, typer.Option
+- **Calls**: app.command, src.nexu.paths.project_root, src.vico.freeze.freeze_project, console.print, console.print, console.print, typer.Argument, typer.Option
 
 ### src.nexu.cli.capsule_drift
 > Check whether the original source files changed since capsule creation.
-- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.drift.check_source_drift, console.print, console.print, console.print, typer.Argument, typer.Option
+- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.vico.drift.check_source_drift, console.print, console.print, console.print, typer.Argument, typer.Option
 
 ### src.nexu.cli.capsule_verify
 > Verify a capsule against basic intent-contract gates.
 - **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.verify.verify_capsule, console.print, console.print, Table, console.print, table.add_row
 
-### src.nexu.cli.capsule_bundle
-> Build a portable ZIP bundle with capsule context, evidence and prompts.
-- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.bundle.build_capsule_bundle, console.print, console.print, typer.Argument, typer.Option, typer.Option
+### src.nexu.cli.capsule_report
+> Build Markdown/HTML/YAML report with verification evidence.
+- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.report.build_capsule_report, console.print, console.print, console.print, typer.Argument, typer.Option
 
-### src.nexu.cli.capsule_promote
-> Build a promotion plan for copying capsule changes back to the source project.
-- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.promote.build_promotion_plan, console.print, console.print, console.print, typer.Argument, typer.Option
-
-### src.nexu.cli.capsule_export_prompt
-> Export an LLM-ready prompt constrained by capsule contracts and blueprint.
-- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.export_prompt.export_iteration_prompt, console.print, typer.Argument, typer.Option, typer.Option, None.relative_to
-
-### src.nexu.cli.capsule_list
-> List local capsules.
-- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.capsule.list_capsules, Table, console.print, console.print, table.add_row, typer.Argument
-
-### src.nexu.cli.init
-> Initialize nexu files in a project.
-- **Calls**: app.command, src.nexu.paths.project_root, src.nexu.init_project.init_project, console.print, console.print, typer.Argument, item.relative_to
-
-### src.nexu.cli.mcp_tools
-> List nexu MCP tools exposed by the stdio service.
-- **Calls**: mcp_app.command, Table, console.print, table.add_row, str, str, tool.get
-
-### src.nexu.cli.mcp_serve
-> Run a conservative MCP-compatible JSON-RPC stdio service for nexu tools.
-- **Calls**: mcp_app.command, src.nexu.paths.project_root, src.nexu.mcp_server.run_mcp_stdio, typer.BadParameter, typer.Option, typer.Option
-
-### src.nexu.models.FrozenSnapshot.from_dict
-- **Calls**: cls, FrozenFile, data.get, data.get, data.get, src.nexu.models.utc_now
-
-### examples.frontend_view.src.menu_icons.preview_menu_icons
-- **Calls**: item.get, mapping.get, changes.append
-
-### src.nexu.hashing.sha256_text
-- **Calls**: None.hexdigest, hashlib.sha256, text.encode
-
-### examples.backend_service.app.users.list_users
-- **Calls**: filters.get, user.get
-
-### src.nexu.models.FrozenSnapshot.to_dict
-- **Calls**: asdict
-
-### src.nexu.models.Capsule.to_dict
-- **Calls**: asdict
-
-### src.nexu.models.VerificationReport.to_dict
-- **Calls**: asdict
-
-### src.nexu.models.CapsuleDiff.to_dict
-- **Calls**: asdict
+### src.nexu.cinema_policy.manifest_paths_from_snapshot
+- **Calls**: resolve_manifest_paths, isinstance, snapshot.get, isinstance, snapshot.get, project.get, Path, capsule.get
 
 ## Process Flows
 
 Key execution flows identified:
 
-### Flow 1: capsule_diff
+### Flow 1: main
+```
+main [examples.web_app_pactown_ecosystem.run]
+```
+
+### Flow 2: publish_project_service
+```
+publish_project_service [src.nexu.cinema_publish]
+  └─> _slug_service_id
+  └─ →> build_markpact_readme
+      └─> _escape_markdown_fence
+```
+
+### Flow 3: activate_example_project
+```
+activate_example_project [src.nexu.cinema_projects]
+  └─> _resolve_source_cinema
+  └─> find_nexu_repo_root
+  └─ →> write_cinema_inject_files
+```
+
+### Flow 4: capsule_diff
 ```
 capsule_diff [src.nexu.cli]
   └─ →> project_root
@@ -226,7 +248,20 @@ capsule_diff [src.nexu.cli]
           └─ →> capsule_dir
 ```
 
-### Flow 2: capsule_status_command
+### Flow 5: restore_history_checkpoint
+```
+restore_history_checkpoint [src.nexu.cinema_history]
+  └─> _refresh_policy_snapshot
+      └─ →> write_intract_policy_files
+          └─> build_intract_policy_snapshot
+  └─ →> project_root
+  └─ →> cinema_dir_for
+      └─ →> capsule_dir
+          └─> capsules_dir
+      └─ →> project_root
+```
+
+### Flow 6: capsule_status_command
 ```
 capsule_status_command [src.nexu.cli]
   └─ →> project_root
@@ -236,7 +271,7 @@ capsule_status_command [src.nexu.cli]
           └─ →> capsule_dir
 ```
 
-### Flow 3: capsule_journal
+### Flow 7: capsule_journal
 ```
 capsule_journal [src.nexu.cli]
   └─ →> project_root
@@ -246,104 +281,54 @@ capsule_journal [src.nexu.cli]
       └─ →> read_yaml
 ```
 
-### Flow 4: capsule_orchestrate
+### Flow 8: sync_option_previews_from_workspace
 ```
-capsule_orchestrate [src.nexu.cli]
-  └─ →> project_root
-  └─ →> build_capsule_orchestration
-      └─> build_orchestration_context
-          └─ →> load_capsule
-          └─ →> capsule_dir
+sync_option_previews_from_workspace [src.nexu.cinema_policy]
+  └─ →> apply_spatial_deletes_to_html
+      └─> _delete_match_keys
+  └─ →> finalize_cinema_html
 ```
 
-### Flow 5: from_dict
+### Flow 9: ledger_archive_for_display
 ```
-from_dict [src.nexu.models.Capsule]
-```
-
-### Flow 6: capsule_create
-```
-capsule_create [src.nexu.cli]
-  └─ →> project_root
-  └─ →> create_capsule
-      └─ →> ensure_project_dirs
-          └─> nexu_dir
-          └─> snapshots_dir
-  └─ →> build_blueprint
-      └─ →> load_capsule
-          └─ →> read_yaml
-          └─ →> capsule_dir
+ledger_archive_for_display [src.nexu.cinema_history]
+  └─> _ledger_snapshot
 ```
 
-### Flow 7: capsule_review
+### Flow 10: from_dict
 ```
-capsule_review [src.nexu.cli]
-  └─ →> project_root
-  └─ →> build_review_packet
-      └─ →> load_config
-          └─ →> read_yaml
-      └─ →> capsule_dir
-```
-
-### Flow 8: capsule_plan
-```
-capsule_plan [src.nexu.cli]
-  └─ →> project_root
-  └─ →> build_iteration_plan
-      └─> _contract_summary
-      └─ →> load_capsule
-          └─ →> read_yaml
-```
-
-### Flow 9: capsule_report
-```
-capsule_report [src.nexu.cli]
-  └─ →> project_root
-  └─ →> build_capsule_report
-      └─ →> capsule_dir
-          └─> capsules_dir
-      └─ →> verify_capsule
-```
-
-### Flow 10: capsule_iterate
-```
-capsule_iterate [src.nexu.cli]
-  └─ →> project_root
-  └─ →> iterate_capsule
-      └─ →> load_capsule
-          └─ →> read_yaml
-          └─ →> capsule_dir
-  └─ →> append_journal
-      └─> read_journal
-          └─> journal_path
-          └─ →> read_yaml
+from_dict [src.vico.models.Capsule]
 ```
 
 ## Key Classes
 
-### src.nexu.models.FrozenSnapshot
+### src.vico.models.FrozenSnapshot
 - **Methods**: 2
-- **Key Methods**: src.nexu.models.FrozenSnapshot.to_dict, src.nexu.models.FrozenSnapshot.from_dict
+- **Key Methods**: src.vico.models.FrozenSnapshot.to_dict, src.vico.models.FrozenSnapshot.from_dict
 
-### src.nexu.models.Capsule
+### src.vico.models.Capsule
 - **Methods**: 2
-- **Key Methods**: src.nexu.models.Capsule.to_dict, src.nexu.models.Capsule.from_dict
+- **Key Methods**: src.vico.models.Capsule.to_dict, src.vico.models.Capsule.from_dict
 
-### src.nexu.intract.IntentContract
+### src.vico.intract.IntentContract
 - **Methods**: 1
-- **Key Methods**: src.nexu.intract.IntentContract.key
+- **Key Methods**: src.vico.intract.IntentContract.key
 
-### src.nexu.models.VerificationReport
+### src.vico.models.VerificationReport
 - **Methods**: 1
-- **Key Methods**: src.nexu.models.VerificationReport.to_dict
+- **Key Methods**: src.vico.models.VerificationReport.to_dict
 
-### src.nexu.models.CapsuleDiff
+### src.vico.models.CapsuleDiff
 - **Methods**: 1
-- **Key Methods**: src.nexu.models.CapsuleDiff.to_dict
+- **Key Methods**: src.vico.models.CapsuleDiff.to_dict
 
-### src.nexu.models.PromptExport
+### src.vico.models.PromptExport
 - **Methods**: 1
-- **Key Methods**: src.nexu.models.PromptExport.to_dict
+- **Key Methods**: src.vico.models.PromptExport.to_dict
+
+### src.nexu.cinema_projects.ExampleProject
+- **Methods**: 1
+- **Key Methods**: src.nexu.cinema_projects.ExampleProject.to_public_dict
 
 ### src.nexu.config.LLMConfig
 - **Methods**: 0
@@ -354,69 +339,75 @@ capsule_iterate [src.nexu.cli]
 ### src.nexu.config.nexuConfig
 - **Methods**: 0
 
-### src.nexu.models.FrozenFile
+### src.vico.models.FrozenFile
 - **Methods**: 0
 
-### src.nexu.models.CapsuleSelection
+### src.vico.models.CapsuleSelection
 - **Methods**: 0
 
-### src.nexu.models.CapsuleRuntime
+### src.vico.models.CapsuleRuntime
 - **Methods**: 0
 
-### src.nexu.models.VerificationFinding
+### src.vico.models.VerificationFinding
 - **Methods**: 0
 
 ## Data Transformation Functions
 
 Key functions that process and transform data:
 
-### src.nexu.intract.parse_intract_line
-- **Output to**: src.nexu.intract._tokenize_contract, line.strip, IntentContract, fields.get, fields.get
+### src.vico.intract.parse_intract_line
+- **Output to**: src.vico.intract._tokenize_contract, line.strip, IntentContract, fields.get, fields.get
+
+### src.nexu.cinema.format_intract_v1_line
+- **Output to**: contract.meaning.replace
+
+### src.nexu.cinema_policy.validate_intract_artifact
+- **Output to**: validate_artifact_with_proposals, src.nexu.cinema_policy.ensure_intract_on_path, src.nexu.cinema_policy.ensure_intract_on_path, Path, str
 
 ## Public API Surface
 
 Functions exposed as public API (no underscore prefix):
 
-- `src.nexu.verify.verify_capsule` - 59 calls
-- `src.nexu.config.load_config` - 41 calls
+- `src.nexu.config.load_config` - 42 calls
+- `examples.web_app_pactown_ecosystem.run.main` - 39 calls
+- `examples.web_app_event_monitor.run.main` - 37 calls
+- `examples.web_app_dashboard.run.main` - 35 calls
+- `src.nexu.cinema_publish.publish_project_service` - 34 calls
+- `src.vico.intract.read_manifest_contracts` - 32 calls
 - `src.nexu.report.build_capsule_report` - 32 calls
-- `src.nexu.intract.read_manifest_contracts` - 32 calls
+- `src.nexu.cinema.build_intract_policy_snapshot` - 29 calls
+- `src.nexu.cinema_publish.start_published_service` - 29 calls
 - `src.nexu.orchestrate.build_capsule_orchestration` - 28 calls
 - `examples.run_examples.run_example` - 26 calls
+- `src.nexu.verify.verify_capsule` - 26 calls
 - `src.nexu.review.build_review_packet` - 24 calls
 - `src.nexu.capsule.create_capsule` - 24 calls
+- `src.nexu.cinema_projects.activate_example_project` - 24 calls
+- `examples.scientific_calculator_demo.main` - 23 calls
+- `examples.web_app_calculator.run.main` - 23 calls
+- `examples.nexu_markpact_exporter.main` - 22 calls
+- `src.vico.intract.parse_intract_line` - 22 calls
 - `src.nexu.orchestrate.offline_orchestration_from_context` - 22 calls
-- `src.nexu.intract.parse_intract_line` - 22 calls
-- `src.nexu.mcp_server.handle_mcp_message` - 19 calls
+- `scripts.check-doc-links.check_links` - 21 calls
+- `src.nexu.cinema_history.save_history_checkpoint` - 19 calls
 - `src.nexu.cli.capsule_diff` - 19 calls
-- `src.nexu.export_prompt.export_iteration_prompt` - 17 calls
+- `src.nexu.cinema.generate_cinema_player` - 19 calls
+- `src.nexu.cinema_history.restore_history_checkpoint` - 18 calls
+- `src.nexu.export_prompt.export_iteration_prompt` - 18 calls
+- `examples.scientific_calculator_demo2.main` - 17 calls
 - `src.nexu.cli.capsule_status_command` - 17 calls
 - `src.nexu.cli.capsule_journal` - 17 calls
+- `src.nexu.cinema_policy.effective_ui_constraints_from_ledger` - 17 calls
+- `src.nexu.cinema_policy.sync_option_previews_from_workspace` - 17 calls
+- `src.nexu.cinema_policy.apply_ledger_from_cinema` - 17 calls
+- `src.nexu.cinema_markpact.build_markpact_readme` - 17 calls
 - `src.nexu.runtime.build_capsule_runtime` - 16 calls
+- `src.nexu.cinema_history.ledger_archive_for_display` - 16 calls
 - `src.nexu.promote.build_promotion_plan` - 16 calls
-- `src.nexu.cli.capsule_orchestrate` - 16 calls
-- `src.nexu.models.Capsule.from_dict` - 16 calls
+- `src.vico.models.Capsule.from_dict` - 16 calls
+- `src.nexu.bundle.build_capsule_bundle` - 15 calls
 - `src.nexu.plan.build_iteration_plan` - 15 calls
 - `src.nexu.cli.capsule_create` - 15 calls
-- `src.nexu.cli.capsule_review` - 15 calls
-- `src.nexu.bundle.build_capsule_bundle` - 15 calls
-- `src.nexu.diff.diff_capsule` - 14 calls
-- `src.nexu.iterate.iterate_capsule` - 14 calls
-- `src.nexu.cli.capsule_plan` - 14 calls
-- `src.nexu.llm.call_litellm_json` - 13 calls
-- `src.nexu.cli.capsule_report` - 12 calls
-- `src.nexu.freeze.freeze_project` - 12 calls
-- `src.nexu.orchestrate.build_orchestration_context` - 11 calls
-- `src.nexu.cli.capsule_iterate` - 11 calls
-- `src.nexu.cli.capsule_runtime` - 11 calls
-- `src.nexu.status.capsule_status` - 10 calls
-- `src.nexu.drift.check_source_drift` - 10 calls
-- `src.nexu.cli.freeze` - 10 calls
-- `src.nexu.cli.capsule_blueprint` - 10 calls
-- `src.nexu.cli.capsule_drift` - 10 calls
-- `src.nexu.cli.capsule_verify` - 10 calls
-- `src.nexu.cli.capsule_bundle` - 10 calls
-- `src.nexu.cli.capsule_promote` - 10 calls
 
 ## System Interactions
 
@@ -424,36 +415,36 @@ How components interact:
 
 ```mermaid
 graph TD
+    main --> print
+    main --> Popen
+    main --> exists
+    main --> mkdir
+    main --> copy
+    publish_project_serv --> _slug_service_id
+    publish_project_serv --> mkdir
+    publish_project_serv --> read_text
+    publish_project_serv --> write_text
+    publish_project_serv --> build_markpact_readm
+    activate_example_pro --> next
+    activate_example_pro --> _resolve_source_cine
+    activate_example_pro --> write_cinema_inject_
+    activate_example_pro --> write_text
+    activate_example_pro --> find_nexu_repo_root
+    main --> write_text
+    main --> read_text
     capsule_diff --> command
     capsule_diff --> project_root
     capsule_diff --> diff_capsule
     capsule_diff --> Table
     capsule_diff --> add_row
+    restore_history_chec --> project_root
+    restore_history_chec --> cinema_dir_for
+    restore_history_chec --> loads
+    restore_history_chec --> exists
+    restore_history_chec --> _refresh_policy_snap
+    main --> print_code
     capsule_status_comma --> command
     capsule_status_comma --> project_root
-    capsule_status_comma --> capsule_status
-    capsule_status_comma --> print
-    capsule_journal --> command
-    capsule_journal --> project_root
-    capsule_journal --> Table
-    capsule_journal --> print
-    capsule_journal --> read_journal
-    capsule_orchestrate --> command
-    capsule_orchestrate --> project_root
-    capsule_orchestrate --> build_capsule_orches
-    capsule_orchestrate --> print
-    from_dict --> CapsuleSelection
-    from_dict --> CapsuleRuntime
-    from_dict --> cls
-    from_dict --> get
-    capsule_create --> command
-    capsule_create --> project_root
-    capsule_create --> create_capsule
-    capsule_create --> build_blueprint
-    capsule_create --> print
-    capsule_review --> command
-    capsule_review --> project_root
-    capsule_review --> build_review_packet
 ```
 
 ## Reverse Engineering Guidelines

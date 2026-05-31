@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "nexu"
-version = "0.5.13"
+version = "0.5.14"
 description = "Visual Intent Contract Orchestrator: freeze project slices, evolve capsules, verify intent contracts."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -50,6 +50,7 @@ pythonpath = ["src"]
 [tool.ruff]
 line-length = 100
 target-version = "py310"
+extend-exclude = ["src/nexu/templates/**"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]

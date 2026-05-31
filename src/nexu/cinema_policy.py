@@ -8,8 +8,15 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Literal
 
+from .cinema_scripts import apply_spatial_deletes_to_html, finalize_cinema_html
 from .paths import capsule_dir, project_root
 from .verify import verify_capsule
+
+_OPTION_PREVIEW_FILES: tuple[tuple[str, str], ...] = (
+    ("alt_a.html", "Option A (minimal)"),
+    ("alt_b.html", "Option B (balanced)"),
+    ("alt_c.html", "Option C (expanded)"),
+)
 
 ManifestTarget = Literal["project", "capsule", "both"]
 
@@ -92,6 +99,147 @@ def merge_ui_constraint_lists(
     return keep, delete
 
 
+def _normalize_html_body(html: str) -> str:
+    import re
+
+    stripped = re.sub(r"<title[^>]*>.*?</title>", "", html, flags=re.I | re.S)
+    return stripped.strip()
+
+
+def _html_files_distinct(cinema_dir: Path, names: list[str]) -> bool:
+    bodies: list[str] = []
+    for name in names:
+        path = cinema_dir / name
+        if not path.exists():
+            return False
+        bodies.append(_normalize_html_body(path.read_text(encoding="utf-8")))
+    return len(set(bodies)) >= 2
+
+
+def option_previews_are_distinct(cinema_dir: Path) -> bool:
+    return _html_files_distinct(
+        cinema_dir, ["alt_a.html", "alt_b.html", "alt_c.html"]
+    )
+
+
+def stage_files_are_distinct(cinema_dir: Path) -> bool:
+    return _html_files_distinct(
+        cinema_dir, ["stage0.html", "stage1.html", "stage2.html"]
+    )
+
+
+def ensure_option_previews_from_stages(cinema_dir: Path) -> dict[str, Any]:
+    """Build Options A–C from stage0/1/2 when they represent different layouts."""
+    written: list[str] = []
+    for alt_name, stage_name, title in (
+        ("alt_a.html", "stage0.html", "Option A (minimal)"),
+        ("alt_b.html", "stage1.html", "Option B (balanced)"),
+        ("alt_c.html", "stage2.html", "Option C (expanded)"),
+    ):
+        stage_path = cinema_dir / stage_name
+        if not stage_path.exists():
+            continue
+        html = _replace_html_title(stage_path.read_text(encoding="utf-8"), title)
+        (cinema_dir / alt_name).write_text(html, encoding="utf-8")
+        written.append(alt_name)
+    return {"status": "options_built_from_stages", "files": written}
+
+
+def _replace_html_title(html: str, title: str) -> str:
+    import re
+
+    if re.search(r"<title[^>]*>", html, flags=re.I):
+        return re.sub(
+            r"<title[^>]*>.*?</title>",
+            f"<title>{title}</title>",
+            html,
+            count=1,
+            flags=re.I | re.S,
+        )
+    return html
+
+
+def sync_option_previews_from_workspace(
+    cinema_dir: Path,
+    *,
+    stage: int = 0,
+    delete_ids: list[str] | None = None,
+    root: Path | None = None,
+    capsule_name: str | None = None,
+) -> dict[str, Any]:
+    """
+    Refresh Options A–C (and stage1/stage2 templates) from the active workspace HTML.
+
+    Called after window-1 changes so preview panels stay aligned with stage{N}.html.
+    """
+    stage_file = cinema_dir / f"stage{stage}.html"
+    if not stage_file.exists():
+        return {"error": f"missing {stage_file.name}"}
+
+    html = stage_file.read_text(encoding="utf-8")
+    # delete_ids=None → apply ledger policy; delete_ids=[] → mirror workspace as-is.
+    if delete_ids is None and root is not None and capsule_name:
+        effective = load_effective_ui_constraints(root, capsule_name, stage=stage)
+        to_delete = list(effective.get("delete") or [])
+    else:
+        to_delete = list(delete_ids or [])
+
+    base, removed = apply_spatial_deletes_to_html(html, to_delete)
+    base = finalize_cinema_html(base)
+
+    written: list[str] = []
+    for filename, title in _OPTION_PREVIEW_FILES:
+        (cinema_dir / filename).write_text(_replace_html_title(base, title), encoding="utf-8")
+        written.append(filename)
+
+    stage1 = cinema_dir / "stage1.html"
+    stage2 = cinema_dir / "stage2.html"
+    alt_b = cinema_dir / "alt_b.html"
+    alt_c = cinema_dir / "alt_c.html"
+    if alt_b.exists():
+        stage1.write_text(alt_b.read_text(encoding="utf-8"), encoding="utf-8")
+    if alt_c.exists():
+        stage2.write_text(alt_c.read_text(encoding="utf-8"), encoding="utf-8")
+
+    return {
+        "status": "options_synced_from_workspace",
+        "stage": stage,
+        "files": written,
+        "spatial_removed": removed,
+        "delete_ids": to_delete,
+    }
+
+
+def enforce_deletes_on_option_previews(
+    cinema_dir: Path,
+    delete_ids: list[str],
+) -> dict[str, Any]:
+    """Apply policy DELETE list to existing alt_a/b/c without replacing from workspace."""
+    if not delete_ids:
+        return {"status": "options_unchanged", "files": []}
+
+    touched: list[str] = []
+    all_removed: list[str] = []
+    for filename, _title in _OPTION_PREVIEW_FILES:
+        path = cinema_dir / filename
+        if not path.exists():
+            continue
+        html = path.read_text(encoding="utf-8")
+        patched, removed = apply_spatial_deletes_to_html(html, delete_ids)
+        if not removed:
+            continue
+        path.write_text(finalize_cinema_html(patched), encoding="utf-8")
+        touched.append(filename)
+        all_removed.extend(removed)
+
+    return {
+        "status": "options_patched",
+        "files": touched,
+        "spatial_removed": sorted(set(all_removed)),
+        "delete_ids": list(delete_ids),
+    }
+
+
 def load_effective_ui_constraints(root: Path, capsule_name: str, *, stage: int = 0) -> dict[str, Any]:
     """Load ledger from disk and return effective UI constraints for a stage."""
     ledger_path = policy_ledger_path(root, capsule_name)
@@ -118,14 +266,14 @@ def resolve_iteration_mode(
     - DELETE → active workspace (spatial patch / LLM).
     - KEEP-only without hint → active workspace.
     """
-    if pending_goal or (has_hints and delete_count == 0):
-        return "goal_options"
     if delete_count > 0:
         return "active_workspace"
-    if has_hints:
-        return "goal_options"
     if keep_count > 0:
         return "active_workspace"
+    if pending_goal or (has_hints and delete_count == 0 and keep_count == 0):
+        return "goal_options"
+    if has_hints:
+        return "goal_options"
     return "none"
 
 

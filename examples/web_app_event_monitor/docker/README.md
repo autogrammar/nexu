@@ -19,10 +19,16 @@ Aby zbudować i uruchomić cały rozproszony ekosystem w kontenerach Docker, wyk
 
 ```bash
 # Wejdź do katalogu konfiguracyjnego Docker
-cd /home/tom/github/semcod/nexu/examples/web_app_event_monitor/docker/
+cd examples/web_app_event_monitor/docker/
 
 # Zbuduj obrazy i uruchom kontenery w tle
 docker compose up --build -d
+```
+
+Przed budowaniem możesz sprawdzić składnię Compose:
+
+```bash
+docker compose config --quiet
 ```
 
 ### Sprawdzenie statusu kontenerów:

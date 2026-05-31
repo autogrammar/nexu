@@ -1,7 +1,0 @@
-menu_items:
-  - item_id: connect-id
-    label: Identification
-    icon: "👤"
-  - item_id: connect-test
-    label: Tests
-    icon: "🧪"

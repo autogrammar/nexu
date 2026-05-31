@@ -3,11 +3,11 @@
 
 ## AI Cost Tracking
 
-![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.5.13-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
-![AI Cost](https://img.shields.io/badge/AI%20Cost-$2.16-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-8.2h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
+![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.5.14-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
+![AI Cost](https://img.shields.io/badge/AI%20Cost-$2.18-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-8.4h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
 
-- 🤖 **LLM usage:** $2.1634 (19 commits)
-- 👤 **Human dev:** ~$823 (8.2h @ $100/h, 30min dedup)
+- 🤖 **LLM usage:** $2.1769 (20 commits)
+- 👤 **Human dev:** ~$840 (8.4h @ $100/h, 30min dedup)
 
 Generated on 2026-05-31 using [openrouter/qwen/qwen3-coder-next](https://openrouter.ai/qwen/qwen3-coder-next)
 
@@ -29,15 +29,17 @@ Nexu is designed to work with **Intract**-style intent contracts, but it can run
 The goal is not to make an LLM magically correct. The goal is to keep the LLM inside a small, versioned,
 contract-bound sandbox and detect when its output diverges from declared intent.
 
-## What changed in 0.5.0
+## Current status
 
-The fifth iteration adds LLM orchestration and an MCP service:
+The 0.5.x line includes capsule orchestration, MCP tools, live Cinema UI evolution and dynamic Intract validation:
 
 - `capsule orchestrate` creates an offline or optional LLM-assisted step-by-step capsule evolution plan,
 - orchestration writes `orchestration.yaml`, `orchestration.md`, `orchestration-prompt.md` and context YAML,
 - `nexu mcp tools` lists tools available to IDE/agent clients,
 - `nexu mcp serve` exposes Nexu operations through a conservative MCP-compatible stdio JSON-RPC service,
-- MCP promotion remains dry-run only and LLM network calls remain disabled unless explicitly allowed in `nexu.yaml`.
+- MCP exposes both dry-run promotion planning and an explicit apply tool,
+- Cinema assets are generated from package templates under `src/nexu/templates/cinema/`,
+- LLM network calls remain disabled unless explicitly allowed in `nexu.yaml`.
 
 ## Why Nexu?
 
@@ -120,6 +122,7 @@ Start here:
 - [Capsule format](docs/capsule-format.md)
 - [Intent contracts](docs/intent-contracts.md)
 - [Verification model](docs/verification.md)
+- [Runtime and reports](docs/runtime-and-reports.md)
 - [LLM review and handoff](docs/llm-review.md)
 - [LLM orchestration](docs/llm-orchestration.md)
 - [MCP service](docs/mcp-service.md)
@@ -150,6 +153,45 @@ nexu mcp tools
 nexu mcp serve --path .
 ```
 
+## Verified examples
+
+The local example smoke runner covers `frontend_view`, `backend_service`, `vertical_slice` and `mcp_service`:
+
+```bash
+python examples/run_examples.py
+```
+
+The calculator and dashboard examples can be run directly:
+
+```bash
+python examples/web_app_calculator/run.py
+python examples/web_app_dashboard/run.py
+```
+
+The Pactown examples require `uv`, `pactown` and local ports to be free:
+
+```bash
+python examples/web_app_pactown_ecosystem/run.py
+python examples/web_app_event_monitor/run.py
+docker compose -f examples/web_app_event_monitor/docker/docker-compose.yml config --quiet
+```
+
+## Quality checks
+
+Use the lightweight local quality profile before changing release-facing code:
+
+```bash
+make quality
+```
+
+It runs tests, local Markdown link validation, source-level Intract checks, duplication scanning and the lint subset that is currently clean. For a full backlog-oriented report, use:
+
+```bash
+make quality-strict
+```
+
+The same fast profile is described in `pyqual.yaml` for tools that prefer declarative pipelines.
+
 ## Cinema (LLM live mode)
 
 To run Cinema with real LLM evolution:
@@ -174,7 +216,7 @@ llm:
 make cinema
 ```
 
-Use the URL printed in the log (`Live HTTP Server started for Cinema Player: http://127.0.0.1:…`) — not a fixed port (8080 may be taken by another service).
+Use the URL printed in the log (`Live HTTP Server started for Nexu: http://127.0.0.1:…`) — not a fixed port (8080 may be taken by another service).
 
 Stop stale cinema servers before restarting:
 

@@ -34,10 +34,14 @@ src/nexu/plan.py            deterministic S1..Sn iteration planning
 src/nexu/blueprint.py       UI/API/test blueprint generation
 src/nexu/runtime.py         static HTML capsule runtime/mock
 src/nexu/export_prompt.py   LLM-ready prompt export
-src/nexu/verify.py          verification gates and evidence
+src/nexu/verify.py          deterministic verification gates and evidence
+src/nexu/intract_adapter.py dynamic adapter for sibling/installed Intract validation
 src/nexu/report.py          Markdown/HTML/YAML reports
 src/nexu/journal.py         capsule event history
 src/nexu/promote.py         promotion plan
+src/nexu/cinema.py          Cinema player assembly workflow
+src/nexu/cinema_server.py   generated Cinema HTTP server launcher
+src/nexu/templates/cinema/  generated Cinema HTML/Python templates
 ```
 
 ## Why this shape?
@@ -46,4 +50,4 @@ nexu should not let an LLM edit the full project blindly. The LLM should work in
 
 ## Relationship with Intract
 
-nexu uses Intract-style contracts as the formal language of intent. In the MVP, nexu includes a lightweight parser for `@intract.v1` lines and `intract.yaml`. In a later version it should call the real Intract engine directly.
+nexu uses Intract-style contracts as the formal language of intent. It includes a lightweight parser for `@intract.v1` lines and `intract.yaml`, and the verification step dynamically uses a sibling or installed `intract` package when available.

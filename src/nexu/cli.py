@@ -143,7 +143,7 @@ def capsule_iterate(
     path: Annotated[str, typer.Option("--path", "-p", help="Project root.")] = ".",
     steps: Annotated[int, typer.Option("--steps", "-s", help="How many planned iterations to create.")] = 1,
     goal: Annotated[str, typer.Option("--goal", "-g", help="Iteration goal.")] = "Evolve capsule safely.",
-    cinema: Annotated[bool, typer.Option("--cinema", "-c", help="Generate an interactive Cinema Player for visual approval.")] = False,
+    cinema: Annotated[bool, typer.Option("--cinema", "-c", help="Start interactive Nexu editor (visual approval).")] = False,
 ) -> None:
     """Create planned S1..Sn iteration folders and prompts."""
     root = project_root(path)
@@ -152,7 +152,7 @@ def capsule_iterate(
     console.print(f"[green]created iterations[/green] {', '.join(created)}")
     if cinema:
         player_path = generate_cinema_player(root, name)
-        console.print(f"[bold green]🎬 Cinema Player generated successfully:[/bold green] {player_path}")
+        console.print(f"[bold green]🎬 Nexu ready:[/bold green] {player_path}")
 
 
 @capsule_app.command("blueprint")

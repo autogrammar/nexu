@@ -1,9 +1,40 @@
-# redup/duplication | 0 groups | 35f 3161L | 2026-05-30
+# redup/duplication | 2 groups | 58f 7046L | 2026-05-31
 
 SUMMARY:
-  files_scanned: 35
-  total_lines:   3161
-  dup_groups:    0
-  dup_fragments: 0
-  saved_lines:   0
-  scan_ms:       2094
+  files_scanned: 58
+  total_lines:   7046
+  dup_groups:    2
+  dup_fragments: 5
+  saved_lines:   78
+  scan_ms:       2211
+
+HOTSPOTS[4] (files with most duplication):
+  examples/web_app_calculator/markpact_sandbox/sandbox/src/calculator.py  dup=37L  groups=1  frags=1  (0.5%)
+  examples/web_app_calculator/src/calculator.py  dup=37L  groups=1  frags=1  (0.5%)
+  examples/web_app_calculator/workspace/src/calculator.py  dup=37L  groups=1  frags=1  (0.5%)
+  src/nexu/cinema_policy.py  dup=8L  groups=1  frags=2  (0.1%)
+
+DUPLICATES[2] (ranked by impact):
+  [f3aa7c7e1fe24b1d] ! EXAC  render_calculator  L=37 N=3 saved=74 sim=1.00
+      examples/web_app_calculator/markpact_sandbox/sandbox/src/calculator.py:2-38  (render_calculator)
+      examples/web_app_calculator/src/calculator.py:2-38  (render_calculator)
+      examples/web_app_calculator/workspace/src/calculator.py:2-38  (render_calculator)
+  [3e7f254259144cfa]   STRU  option_previews_are_distinct  L=4 N=2 saved=4 sim=1.00
+      src/nexu/cinema_policy.py:119-122  (option_previews_are_distinct)
+      src/nexu/cinema_policy.py:125-128  (stage_files_are_distinct)
+
+REFACTOR[2] (ranked by priority):
+  [1] ◐ extract_function   → examples/web_app_calculator/utils/render_calculator.py
+      WHY: 3 occurrences of 37-line block across 3 files — saves 74 lines
+      FILES: examples/web_app_calculator/markpact_sandbox/sandbox/src/calculator.py, examples/web_app_calculator/src/calculator.py, examples/web_app_calculator/workspace/src/calculator.py
+  [2] ○ extract_function   → src/nexu/utils/option_previews_are_distinct.py
+      WHY: 2 occurrences of 4-line block across 1 files — saves 4 lines
+      FILES: src/nexu/cinema_policy.py
+
+EFFORT_ESTIMATE (total ≈ 3.8h):
+  hard   render_calculator                   saved=74L  ~222min
+  easy   option_previews_are_distinct        saved=4L  ~8min
+
+METRICS-TARGET:
+  dup_groups:  2 → 0
+  saved_lines: 78 lines recoverable

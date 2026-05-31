@@ -1,178 +1,80 @@
 project: /home/tom/github/semcod/nexu
 generated_from: code2llm call graph analysis
 stats:
-  total_nodes: 95
-  total_edges: 207
-  modules_count: 29
+  total_nodes: 213
+  total_edges: 359
+  modules_count: 43
 nodes:
-  src.nexu.mcp_server._tool_map:
-    name: _tool_map
-    module: src.nexu.mcp_server
-    line: 157
-    cyclomatic_complexity: 10
-    calls_out: 61
-    calls_in: 1
-  src.nexu.verify.verify_capsule:
-    name: verify_capsule
-    module: src.nexu.verify
-    line: 73
-    cyclomatic_complexity: 45
-    calls_out: 59
-    calls_in: 7
-  src.nexu.mcp_server.call_tool:
-    name: call_tool
-    module: src.nexu.mcp_server
-    line: 218
-    cyclomatic_complexity: 3
-    calls_out: 2
-    calls_in: 1
-  src.nexu.cli.capsule_bundle:
-    name: capsule_bundle
-    module: src.nexu.cli
-    line: 311
-    cyclomatic_complexity: 1
-    calls_out: 10
-    calls_in: 0
-  src.nexu.config.load_config:
-    name: load_config
-    module: src.nexu.config
-    line: 46
-    cyclomatic_complexity: 6
-    calls_out: 41
-    calls_in: 2
-  src.nexu.llm.call_litellm_review:
-    name: call_litellm_review
-    module: src.nexu.llm
-    line: 156
-    cyclomatic_complexity: 2
-    calls_out: 3
-    calls_in: 1
-  src.nexu.mcp_server._read_resource:
-    name: _read_resource
-    module: src.nexu.mcp_server
-    line: 252
-    cyclomatic_complexity: 6
-    calls_out: 11
-    calls_in: 1
-  src.nexu.cli.init:
-    name: init
-    module: src.nexu.cli
-    line: 41
-    cyclomatic_complexity: 3
-    calls_out: 7
-    calls_in: 0
-  src.nexu.cli.capsule_list:
-    name: capsule_list
-    module: src.nexu.cli
-    line: 95
+  src.nexu.cinema_policy.append_policy_ledger_entry:
+    name: append_policy_ledger_entry
+    module: src.nexu.cinema_policy
+    line: 448
     cyclomatic_complexity: 3
     calls_out: 8
-    calls_in: 0
-  src.nexu.files.matches_any:
-    name: matches_any
-    module: src.nexu.files
-    line: 28
-    cyclomatic_complexity: 3
-    calls_out: 4
     calls_in: 2
-  src.nexu.models.write_yaml:
-    name: write_yaml
-    module: src.nexu.models
-    line: 143
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 22
-  src.nexu.cli.capsule_diff:
-    name: capsule_diff
-    module: src.nexu.cli
-    line: 172
-    cyclomatic_complexity: 1
-    calls_out: 19
-    calls_in: 0
-  src.nexu.orchestrate._contract_dicts:
-    name: _contract_dicts
-    module: src.nexu.orchestrate
-    line: 21
-    cyclomatic_complexity: 2
-    calls_out: 0
-    calls_in: 1
-  src.nexu.paths.ensure_project_dirs:
-    name: ensure_project_dirs
-    module: src.nexu.paths
-    line: 26
-    cyclomatic_complexity: 2
-    calls_out: 7
-    calls_in: 3
-  src.nexu.runtime.build_capsule_runtime:
-    name: build_capsule_runtime
-    module: src.nexu.runtime
-    line: 111
+  src.nexu.cinema_publish.list_published_services:
+    name: list_published_services
+    module: src.nexu.cinema_publish
+    line: 112
     cyclomatic_complexity: 3
-    calls_out: 16
-    calls_in: 3
-  src.nexu.cli.capsule_export_prompt:
-    name: capsule_export_prompt
-    module: src.nexu.cli
-    line: 160
-    cyclomatic_complexity: 1
-    calls_out: 9
+    calls_out: 6
     calls_in: 0
-  src.nexu.init_project.init_project:
-    name: init_project
-    module: src.nexu.init_project
-    line: 9
-    cyclomatic_complexity: 3
-    calls_out: 7
+  src.nexu.verify._text:
+    name: _text
+    module: src.nexu.verify
+    line: 47
+    cyclomatic_complexity: 2
+    calls_out: 1
+    calls_in: 2
+  src.nexu.cinema_scripts._delete_match_keys:
+    name: _delete_match_keys
+    module: src.nexu.cinema_scripts
+    line: 466
+    cyclomatic_complexity: 4
+    calls_out: 11
     calls_in: 3
-  src.nexu.capsule.load_capsule:
-    name: load_capsule
-    module: src.nexu.capsule
-    line: 118
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 11
-  src.nexu.export_prompt.export_iteration_prompt:
-    name: export_iteration_prompt
-    module: src.nexu.export_prompt
-    line: 21
+  src.nexu.cli.capsule_status_command:
+    name: capsule_status_command
+    module: src.nexu.cli
+    line: 120
     cyclomatic_complexity: 3
     calls_out: 17
+    calls_in: 0
+  src.nexu.cinema_history._write_index:
+    name: _write_index
+    module: src.nexu.cinema_history
+    line: 40
+    cyclomatic_complexity: 1
+    calls_out: 5
+    calls_in: 1
+  src.vico.hashing.sha256_file:
+    name: sha256_file
+    module: src.vico.hashing
+    line: 7
+    cyclomatic_complexity: 2
+    calls_out: 6
     calls_in: 4
-  src.nexu.paths.nexu_dir:
-    name: nexu_dir
-    module: src.nexu.paths
-    line: 10
-    cyclomatic_complexity: 1
-    calls_out: 0
-    calls_in: 6
-  src.nexu.orchestrate.build_orchestration_prompt:
-    name: build_orchestration_prompt
-    module: src.nexu.orchestrate
-    line: 62
-    cyclomatic_complexity: 1
+  src.nexu.cinema_publish._slug_service_id:
+    name: _slug_service_id
+    module: src.nexu.cinema_publish
+    line: 53
+    cyclomatic_complexity: 4
     calls_out: 2
     calls_in: 1
-  src.nexu.cli.capsule_orchestrate:
-    name: capsule_orchestrate
-    module: src.nexu.cli
-    line: 278
-    cyclomatic_complexity: 1
-    calls_out: 16
-    calls_in: 0
-  src.nexu.models.utc_now:
-    name: utc_now
-    module: src.nexu.models
-    line: 11
-    cyclomatic_complexity: 1
-    calls_out: 2
-    calls_in: 16
-  src.nexu.intract.read_manifest_contracts:
-    name: read_manifest_contracts
-    module: src.nexu.intract
-    line: 100
+  src.nexu.export_prompt._cinema_policy_ledger_block:
+    name: _cinema_policy_ledger_block
+    module: src.nexu.export_prompt
+    line: 16
     cyclomatic_complexity: 12
-    calls_out: 32
-    calls_in: 6
+    calls_out: 13
+    calls_in: 1
+  src.nexu.intract_adapter._ensure_intract_on_path:
+    name: _ensure_intract_on_path
+    module: src.nexu.intract_adapter
+    line: 21
+    cyclomatic_complexity: 3
+    calls_out: 4
+    calls_in: 1
   src.nexu.runtime._read_fixture:
     name: _read_fixture
     module: src.nexu.runtime
@@ -180,61 +82,362 @@ nodes:
     cyclomatic_complexity: 5
     calls_out: 6
     calls_in: 1
-  src.nexu.diff.diff_capsule:
-    name: diff_capsule
-    module: src.nexu.diff
-    line: 12
-    cyclomatic_complexity: 12
-    calls_out: 14
-    calls_in: 9
-  src.nexu.hashing.sha256_file:
-    name: sha256_file
-    module: src.nexu.hashing
-    line: 7
+  src.nexu.config.load_config:
+    name: load_config
+    module: src.nexu.config
+    line: 88
+    cyclomatic_complexity: 6
+    calls_out: 42
+    calls_in: 4
+  src.nexu.cli.capsule_drift:
+    name: capsule_drift
+    module: src.nexu.cli
+    line: 201
     cyclomatic_complexity: 2
+    calls_out: 10
+    calls_in: 0
+  src.nexu.cinema_policy._proposal_kind_and_element:
+    name: _proposal_kind_and_element
+    module: src.nexu.cinema_policy
+    line: 459
+    cyclomatic_complexity: 12
+    calls_out: 8
+    calls_in: 2
+  src.nexu.orchestrate.build_orchestration_context:
+    name: build_orchestration_context
+    module: src.nexu.orchestrate
+    line: 41
+    cyclomatic_complexity: 2
+    calls_out: 11
+    calls_in: 1
+  src.nexu.cinema_server._render_server_script:
+    name: _render_server_script
+    module: src.nexu.cinema_server
+    line: 19
+    cyclomatic_complexity: 1
+    calls_out: 11
+    calls_in: 1
+  src.nexu.verify._contains_patterns:
+    name: _contains_patterns
+    module: src.nexu.verify
+    line: 54
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 2
+  src.nexu.cinema._render_cinema_template:
+    name: _render_cinema_template
+    module: src.nexu.cinema
+    line: 26
+    cyclomatic_complexity: 2
+    calls_out: 5
+    calls_in: 4
+  scripts.check-doc-links._targets:
+    name: _targets
+    module: scripts.check-doc-links
+    line: 60
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 1
+  src.nexu.cinema_publish._load_registry:
+    name: _load_registry
+    module: src.nexu.cinema_publish
+    line: 33
+    cyclomatic_complexity: 3
     calls_out: 6
     calls_in: 4
-  src.nexu.llm.offline_review_from_status:
-    name: offline_review_from_status
-    module: src.nexu.llm
-    line: 135
-    cyclomatic_complexity: 4
+  src.nexu.cinema_policy.append_iteration_ledger_entry:
+    name: append_iteration_ledger_entry
+    module: src.nexu.cinema_policy
+    line: 498
+    cyclomatic_complexity: 1
+    calls_out: 7
+    calls_in: 0
+  src.nexu.promote._promotion_map:
+    name: _promotion_map
+    module: src.nexu.promote
+    line: 14
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 1
+  src.nexu.orchestrate._contract_dicts:
+    name: _contract_dicts
+    module: src.nexu.orchestrate
+    line: 21
+    cyclomatic_complexity: 2
     calls_out: 0
     calls_in: 1
-  src.nexu.intract.parse_intract_line:
-    name: parse_intract_line
-    module: src.nexu.intract
-    line: 58
-    cyclomatic_complexity: 3
-    calls_out: 22
-    calls_in: 1
-  src.nexu.orchestrate.offline_orchestration_from_context:
-    name: offline_orchestration_from_context
-    module: src.nexu.orchestrate
-    line: 91
-    cyclomatic_complexity: 13
-    calls_out: 22
-    calls_in: 1
-  src.nexu.plan.build_iteration_plan:
-    name: build_iteration_plan
-    module: src.nexu.plan
+  scripts.check-doc-links._slug:
+    name: _slug
+    module: scripts.check-doc-links
     line: 35
-    cyclomatic_complexity: 7
-    calls_out: 15
-    calls_in: 4
-  src.nexu.plan._contract_summary:
-    name: _contract_summary
-    module: src.nexu.plan
-    line: 27
-    cyclomatic_complexity: 9
-    calls_out: 3
+    cyclomatic_complexity: 1
+    calls_out: 5
     calls_in: 1
+  src.nexu.capsule.create_capsule:
+    name: create_capsule
+    module: src.nexu.capsule
+    line: 38
+    cyclomatic_complexity: 8
+    calls_out: 24
+    calls_in: 7
+  src.nexu.cli.capsule_diff:
+    name: capsule_diff
+    module: src.nexu.cli
+    line: 185
+    cyclomatic_complexity: 1
+    calls_out: 19
+    calls_in: 0
+  src.nexu.cinema_history.restore_history_checkpoint:
+    name: restore_history_checkpoint
+    module: src.nexu.cinema_history
+    line: 141
+    cyclomatic_complexity: 8
+    calls_out: 18
+    calls_in: 0
+  src.vico.models.FrozenSnapshot.from_dict:
+    name: from_dict
+    module: src.vico.models
+    line: 34
+    cyclomatic_complexity: 2
+    calls_out: 6
+    calls_in: 0
+  src.nexu.cinema_history.history_dir:
+    name: history_dir
+    module: src.nexu.cinema_history
+    line: 24
+    cyclomatic_complexity: 1
+    calls_out: 0
+    calls_in: 4
+  src.nexu.cinema_policy.enforce_deletes_on_option_previews:
+    name: enforce_deletes_on_option_previews
+    module: src.nexu.cinema_policy
+    line: 213
+    cyclomatic_complexity: 5
+    calls_out: 10
+    calls_in: 1
+  src.nexu.cinema_policy.load_policy_snapshot:
+    name: load_policy_snapshot
+    module: src.nexu.cinema_policy
+    line: 307
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 1
+  src.nexu.cli.capsule_export_prompt:
+    name: capsule_export_prompt
+    module: src.nexu.cli
+    line: 173
+    cyclomatic_complexity: 1
+    calls_out: 8
+    calls_in: 0
+  src.nexu.mcp_server._prompts_list:
+    name: _prompts_list
+    module: src.nexu.mcp_server
+    line: 299
+    cyclomatic_complexity: 1
+    calls_out: 0
+    calls_in: 1
+  scripts.check-doc-links.main:
+    name: main
+    module: scripts.check-doc-links
+    line: 98
+    cyclomatic_complexity: 3
+    calls_out: 7
+    calls_in: 0
   src.nexu.bundle._should_include:
     name: _should_include
     module: src.nexu.bundle
     line: 13
     cyclomatic_complexity: 5
     calls_out: 4
+    calls_in: 1
+  src.nexu.cinema_server._try_spawn_on_port:
+    name: _try_spawn_on_port
+    module: src.nexu.cinema_server
+    line: 41
+    cyclomatic_complexity: 2
+    calls_out: 5
+    calls_in: 2
+  src.nexu.cinema_history.list_history_checkpoints:
+    name: list_history_checkpoints
+    module: src.nexu.cinema_history
+    line: 137
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 0
+  src.nexu.cli._relative_to_root:
+    name: _relative_to_root
+    module: src.nexu.cli
+    line: 47
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 10
+  src.nexu.intract_adapter._policy_findings:
+    name: _policy_findings
+    module: src.nexu.intract_adapter
+    line: 69
+    cyclomatic_complexity: 3
+    calls_out: 4
+    calls_in: 1
+  src.nexu.mcp_server._prompt_get:
+    name: _prompt_get
+    module: src.nexu.mcp_server
+    line: 312
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 1
+  src.nexu.cinema_policy.ensure_option_previews_from_stages:
+    name: ensure_option_previews_from_stages
+    module: src.nexu.cinema_policy
+    line: 131
+    cyclomatic_complexity: 3
+    calls_out: 5
+    calls_in: 1
+  src.vico.drift.check_source_drift:
+    name: check_source_drift
+    module: src.vico.drift
+    line: 11
+    cyclomatic_complexity: 7
+    calls_out: 10
+    calls_in: 5
+  scripts.check-doc-links._markdown_files:
+    name: _markdown_files
+    module: scripts.check-doc-links
+    line: 52
+    cyclomatic_complexity: 4
+    calls_out: 4
+    calls_in: 1
+  src.nexu.config._load_env_file:
+    name: _load_env_file
+    module: src.nexu.config
+    line: 49
+    cyclomatic_complexity: 10
+    calls_out: 11
+    calls_in: 1
+  src.nexu.verify._check_source_files_presence:
+    name: _check_source_files_presence
+    module: src.nexu.verify
+    line: 100
+    cyclomatic_complexity: 3
+    calls_out: 4
+    calls_in: 1
+  src.nexu.orchestrate._render_orchestration_markdown:
+    name: _render_orchestration_markdown
+    module: src.nexu.orchestrate
+    line: 200
+    cyclomatic_complexity: 9
+    calls_out: 22
+    calls_in: 1
+  src.nexu.cinema_policy.manifest_paths_from_snapshot:
+    name: manifest_paths_from_snapshot
+    module: src.nexu.cinema_policy
+    line: 314
+    cyclomatic_complexity: 5
+    calls_out: 10
+    calls_in: 0
+  src.nexu.verify.verify_capsule:
+    name: verify_capsule
+    module: src.nexu.verify
+    line: 286
+    cyclomatic_complexity: 1
+    calls_out: 26
+    calls_in: 7
+  src.nexu.cinema_policy.policy_ledger_path:
+    name: policy_ledger_path
+    module: src.nexu.cinema_policy
+    line: 303
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 3
+  src.nexu.mcp_server._tool_map:
+    name: _tool_map
+    module: src.nexu.mcp_server
+    line: 243
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 1
+  src.nexu.cinema.write_cinema_nexu_hooks:
+    name: write_cinema_nexu_hooks
+    module: src.nexu.cinema
+    line: 31
+    cyclomatic_complexity: 1
+    calls_out: 8
+    calls_in: 1
+  src.nexu.cli.freeze:
+    name: freeze
+    module: src.nexu.cli
+    line: 64
+    cyclomatic_complexity: 2
+    calls_out: 10
+    calls_in: 0
+  src.nexu.cinema_scripts.apply_spatial_deletes_to_html:
+    name: apply_spatial_deletes_to_html
+    module: src.nexu.cinema_scripts
+    line: 480
+    cyclomatic_complexity: 4
+    calls_out: 14
+    calls_in: 2
+  src.vico.models.write_yaml:
+    name: write_yaml
+    module: src.vico.models
+    line: 143
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 22
+  src.nexu.cinema_publish._http_ok:
+    name: _http_ok
+    module: src.nexu.cinema_publish
+    line: 80
+    cyclomatic_complexity: 2
+    calls_out: 1
+    calls_in: 1
+  src.vico.status.capsule_status:
+    name: capsule_status
+    module: src.vico.status
+    line: 11
+    cyclomatic_complexity: 3
+    calls_out: 10
+    calls_in: 3
+  src.nexu.paths.nexu_dir:
+    name: nexu_dir
+    module: src.nexu.paths
+    line: 10
+    cyclomatic_complexity: 1
+    calls_out: 0
+    calls_in: 7
+  examples.run_examples.run_example:
+    name: run_example
+    module: examples.run_examples
+    line: 34
+    cyclomatic_complexity: 2
+    calls_out: 26
+    calls_in: 1
+  src.nexu.cinema_server._template_text:
+    name: _template_text
+    module: src.nexu.cinema_server
+    line: 15
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 1
+  src.nexu.cinema_server.start_persistent_http_server:
+    name: start_persistent_http_server
+    module: src.nexu.cinema_server
+    line: 72
+    cyclomatic_complexity: 2
+    calls_out: 7
+    calls_in: 1
+  scripts.check-doc-links.check_links:
+    name: check_links
+    module: scripts.check-doc-links
+    line: 70
+    cyclomatic_complexity: 12
+    calls_out: 21
+    calls_in: 1
+  src.nexu.verify._find_term_evidence:
+    name: _find_term_evidence
+    module: src.nexu.verify
+    line: 63
+    cyclomatic_complexity: 6
+    calls_out: 8
     calls_in: 1
   src.nexu.journal.read_journal:
     name: read_journal
@@ -243,97 +446,6 @@ nodes:
     cyclomatic_complexity: 5
     calls_out: 6
     calls_in: 3
-  src.nexu.verify._find_term_evidence:
-    name: _find_term_evidence
-    module: src.nexu.verify
-    line: 59
-    cyclomatic_complexity: 6
-    calls_out: 8
-    calls_in: 1
-  src.nexu.cli.freeze:
-    name: freeze
-    module: src.nexu.cli
-    line: 53
-    cyclomatic_complexity: 2
-    calls_out: 10
-    calls_in: 0
-  src.nexu.models.FrozenSnapshot.from_dict:
-    name: from_dict
-    module: src.nexu.models
-    line: 34
-    cyclomatic_complexity: 2
-    calls_out: 6
-    calls_in: 0
-  src.nexu.files.collect_files:
-    name: collect_files
-    module: src.nexu.files
-    line: 36
-    cyclomatic_complexity: 8
-    calls_out: 8
-    calls_in: 6
-  src.nexu.bundle.build_capsule_bundle:
-    name: build_capsule_bundle
-    module: src.nexu.bundle
-    line: 24
-    cyclomatic_complexity: 3
-    calls_out: 15
-    calls_in: 2
-  src.nexu.cli.capsule_blueprint:
-    name: capsule_blueprint
-    module: src.nexu.cli
-    line: 144
-    cyclomatic_complexity: 2
-    calls_out: 10
-    calls_in: 0
-  src.nexu.paths.capsule_dir:
-    name: capsule_dir
-    module: src.nexu.paths
-    line: 22
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 19
-  src.nexu.journal.append_journal:
-    name: append_journal
-    module: src.nexu.journal
-    line: 25
-    cyclomatic_complexity: 2
-    calls_out: 6
-    calls_in: 8
-  src.nexu.orchestrate.build_capsule_orchestration:
-    name: build_capsule_orchestration
-    module: src.nexu.orchestrate
-    line: 144
-    cyclomatic_complexity: 2
-    calls_out: 28
-    calls_in: 3
-  src.nexu.cli.capsule_plan:
-    name: capsule_plan
-    module: src.nexu.cli
-    line: 219
-    cyclomatic_complexity: 2
-    calls_out: 14
-    calls_in: 0
-  src.nexu.cli.capsule_journal:
-    name: capsule_journal
-    module: src.nexu.cli
-    line: 263
-    cyclomatic_complexity: 2
-    calls_out: 17
-    calls_in: 0
-  src.nexu.report.build_capsule_report:
-    name: build_capsule_report
-    module: src.nexu.report
-    line: 35
-    cyclomatic_complexity: 1
-    calls_out: 32
-    calls_in: 3
-  src.nexu.cli.capsule_runtime:
-    name: capsule_runtime
-    module: src.nexu.cli
-    line: 238
-    cyclomatic_complexity: 1
-    calls_out: 11
-    calls_in: 0
   src.nexu.paths.capsules_dir:
     name: capsules_dir
     module: src.nexu.paths
@@ -341,103 +453,194 @@ nodes:
     cyclomatic_complexity: 1
     calls_out: 1
     calls_in: 3
-  src.nexu.mcp_server.handle_mcp_message:
-    name: handle_mcp_message
-    module: src.nexu.mcp_server
-    line: 303
-    cyclomatic_complexity: 14
-    calls_out: 19
-    calls_in: 1
-  src.nexu.intract._tokenize_contract:
-    name: _tokenize_contract
-    module: src.nexu.intract
-    line: 39
-    cyclomatic_complexity: 5
-    calls_out: 10
-    calls_in: 1
-  src.nexu.mcp_server._result_content:
-    name: _result_content
-    module: src.nexu.mcp_server
-    line: 225
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 1
-  src.nexu.cli.capsule_drift:
-    name: capsule_drift
+  src.nexu.cli.mcp_serve:
+    name: mcp_serve
     module: src.nexu.cli
-    line: 188
+    line: 370
     cyclomatic_complexity: 2
-    calls_out: 10
-    calls_in: 0
-  src.nexu.intract.scan_contracts_in_file:
-    name: scan_contracts_in_file
-    module: src.nexu.intract
-    line: 91
-    cyclomatic_complexity: 3
-    calls_out: 5
-    calls_in: 1
-  src.nexu.cli.capsule_promote:
-    name: capsule_promote
-    module: src.nexu.cli
-    line: 324
-    cyclomatic_complexity: 2
-    calls_out: 10
-    calls_in: 0
-  src.nexu.runtime._collect_fixtures:
-    name: _collect_fixtures
-    module: src.nexu.runtime
-    line: 30
-    cyclomatic_complexity: 5
-    calls_out: 7
-    calls_in: 1
-  src.nexu.drift.check_source_drift:
-    name: check_source_drift
-    module: src.nexu.drift
-    line: 11
-    cyclomatic_complexity: 7
-    calls_out: 10
-    calls_in: 5
-  src.nexu.review._markdown_review_prompt:
-    name: _markdown_review_prompt
-    module: src.nexu.review
-    line: 20
-    cyclomatic_complexity: 1
     calls_out: 6
-    calls_in: 1
-  src.nexu.cli.capsule_verify:
-    name: capsule_verify
-    module: src.nexu.cli
-    line: 202
-    cyclomatic_complexity: 4
-    calls_out: 10
     calls_in: 0
-  src.nexu.freeze.freeze_project:
-    name: freeze_project
-    module: src.nexu.freeze
-    line: 12
-    cyclomatic_complexity: 2
-    calls_out: 12
-    calls_in: 3
-  src.nexu.capsule.create_capsule:
-    name: create_capsule
-    module: src.nexu.capsule
-    line: 38
-    cyclomatic_complexity: 8
-    calls_out: 24
-    calls_in: 3
-  src.nexu.paths.snapshots_dir:
-    name: snapshots_dir
-    module: src.nexu.paths
-    line: 14
+  src.nexu.cinema_policy.option_previews_are_distinct:
+    name: option_previews_are_distinct
+    module: src.nexu.cinema_policy
+    line: 119
     cyclomatic_complexity: 1
     calls_out: 1
     calls_in: 2
-  src.nexu.files.is_text_file:
-    name: is_text_file
-    module: src.nexu.files
-    line: 32
+  src.nexu.cli.init:
+    name: init
+    module: src.nexu.cli
+    line: 52
+    cyclomatic_complexity: 3
+    calls_out: 7
+    calls_in: 0
+  src.nexu.cli.capsule_blueprint:
+    name: capsule_blueprint
+    module: src.nexu.cli
+    line: 159
     cyclomatic_complexity: 2
+    calls_out: 8
+    calls_in: 0
+  src.nexu.cinema_policy.effective_ui_constraints_from_ledger:
+    name: effective_ui_constraints_from_ledger
+    module: src.nexu.cinema_policy
+    line: 26
+    cyclomatic_complexity: 24
+    calls_out: 17
+    calls_in: 1
+  src.nexu.llm._strip_fences:
+    name: _strip_fences
+    module: src.nexu.llm
+    line: 65
+    cyclomatic_complexity: 7
+    calls_out: 9
+    calls_in: 1
+  src.nexu.llm.call_litellm_review:
+    name: call_litellm_review
+    module: src.nexu.llm
+    line: 156
+    cyclomatic_complexity: 2
+    calls_out: 3
+    calls_in: 1
+  src.nexu.bundle.build_capsule_bundle:
+    name: build_capsule_bundle
+    module: src.nexu.bundle
+    line: 24
+    cyclomatic_complexity: 3
+    calls_out: 15
+    calls_in: 2
+  src.nexu.cinema_scripts.finalize_cinema_html:
+    name: finalize_cinema_html
+    module: src.nexu.cinema_scripts
+    line: 509
+    cyclomatic_complexity: 6
+    calls_out: 6
+    calls_in: 3
+  src.nexu.cinema_server._open_browser:
+    name: _open_browser
+    module: src.nexu.cinema_server
+    line: 87
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 1
+  src.nexu.config.load_env_files:
+    name: load_env_files
+    module: src.nexu.config
+    line: 66
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 3
+  src.nexu.cinema_publish._service_alive:
+    name: _service_alive
+    module: src.nexu.cinema_publish
+    line: 88
+    cyclomatic_complexity: 6
+    calls_out: 8
+    calls_in: 2
+  src.nexu.mcp_server._read_resource:
+    name: _read_resource
+    module: src.nexu.mcp_server
+    line: 284
+    cyclomatic_complexity: 6
+    calls_out: 11
+    calls_in: 1
+  src.nexu.cinema_server._available_port:
+    name: _available_port
+    module: src.nexu.cinema_server
+    line: 57
+    cyclomatic_complexity: 4
+    calls_out: 8
+    calls_in: 1
+  src.nexu.cinema_policy.cinema_model_label:
+    name: cinema_model_label
+    module: src.nexu.cinema_policy
+    line: 287
+    cyclomatic_complexity: 2
+    calls_out: 3
+    calls_in: 0
+  src.nexu.cinema_projects._resolve_source_cinema:
+    name: _resolve_source_cinema
+    module: src.nexu.cinema_projects
+    line: 160
+    cyclomatic_complexity: 5
+    calls_out: 2
+    calls_in: 1
+  src.nexu.files.collect_files:
+    name: collect_files
+    module: src.nexu.files
+    line: 36
+    cyclomatic_complexity: 8
+    calls_out: 8
+    calls_in: 6
+  src.nexu.capsule.list_capsules:
+    name: list_capsules
+    module: src.nexu.capsule
+    line: 111
+    cyclomatic_complexity: 4
+    calls_out: 5
+    calls_in: 3
+  src.nexu.paths.project_root:
+    name: project_root
+    module: src.nexu.paths
+    line: 6
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 28
+  src.nexu.cinema_scripts.repair_cinema_html_files:
+    name: repair_cinema_html_files
+    module: src.nexu.cinema_scripts
+    line: 533
+    cyclomatic_complexity: 5
+    calls_out: 8
+    calls_in: 0
+  src.nexu.mcp_server._result_content:
+    name: _result_content
+    module: src.nexu.mcp_server
+    line: 257
+    cyclomatic_complexity: 1
     calls_out: 1
+    calls_in: 1
+  src.nexu.cli.capsule_plan:
+    name: capsule_plan
+    module: src.nexu.cli
+    line: 237
+    cyclomatic_complexity: 2
+    calls_out: 12
+    calls_in: 0
+  src.nexu.verify._check_forbidden_write:
+    name: _check_forbidden_write
+    module: src.nexu.verify
+    line: 150
+    cyclomatic_complexity: 6
+    calls_out: 5
+    calls_in: 1
+  src.nexu.cinema._cinema_template_text:
+    name: _cinema_template_text
+    module: src.nexu.cinema
+    line: 22
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 3
+  src.nexu.cinema_publish.services_root:
+    name: services_root
+    module: src.nexu.cinema_publish
+    line: 25
+    cyclomatic_complexity: 1
+    calls_out: 0
+    calls_in: 4
+  src.nexu.cinema_server.start_cinema_player_server:
+    name: start_cinema_player_server
+    module: src.nexu.cinema_server
+    line: 105
+    cyclomatic_complexity: 2
+    calls_out: 3
+    calls_in: 1
+  src.vico.intract.scan_contracts_in_text:
+    name: scan_contracts_in_text
+    module: src.vico.intract
+    line: 82
+    cyclomatic_complexity: 3
+    calls_out: 4
     calls_in: 1
   src.nexu.llm._extract_content:
     name: _extract_content
@@ -446,223 +649,104 @@ nodes:
     cyclomatic_complexity: 4
     calls_out: 5
     calls_in: 1
-  src.nexu.llm.call_litellm_json:
-    name: call_litellm_json
-    module: src.nexu.llm
+  src.nexu.promote.apply_promotion_plan:
+    name: apply_promotion_plan
+    module: src.nexu.promote
     line: 79
-    cyclomatic_complexity: 8
-    calls_out: 13
-    calls_in: 2
-  src.nexu.review.build_review_packet:
-    name: build_review_packet
-    module: src.nexu.review
-    line: 70
-    cyclomatic_complexity: 5
-    calls_out: 24
-    calls_in: 3
-  src.nexu.models.read_yaml:
-    name: read_yaml
-    module: src.nexu.models
-    line: 149
-    cyclomatic_complexity: 3
-    calls_out: 4
-    calls_in: 4
-  src.nexu.journal.journal_path:
-    name: journal_path
-    module: src.nexu.journal
-    line: 10
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 2
-  src.nexu.llm._strip_fences:
-    name: _strip_fences
-    module: src.nexu.llm
-    line: 65
-    cyclomatic_complexity: 7
-    calls_out: 9
-    calls_in: 1
-  src.nexu.mcp_server.run_mcp_stdio:
-    name: run_mcp_stdio
-    module: src.nexu.mcp_server
-    line: 337
-    cyclomatic_complexity: 6
-    calls_out: 7
-    calls_in: 1
-  src.nexu.capsule.save_capsule:
-    name: save_capsule
-    module: src.nexu.capsule
-    line: 123
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 1
-  src.nexu.iterate.iterate_capsule:
-    name: iterate_capsule
-    module: src.nexu.iterate
-    line: 10
-    cyclomatic_complexity: 7
-    calls_out: 14
-    calls_in: 3
-  src.nexu.promote.build_promotion_plan:
-    name: build_promotion_plan
-    module: src.nexu.promote
-    line: 30
-    cyclomatic_complexity: 6
-    calls_out: 16
-    calls_in: 2
-  src.nexu.cli.capsule_status_command:
-    name: capsule_status_command
-    module: src.nexu.cli
-    line: 109
-    cyclomatic_complexity: 3
-    calls_out: 17
-    calls_in: 0
-  src.nexu.verify._contains_patterns:
-    name: _contains_patterns
-    module: src.nexu.verify
-    line: 50
-    cyclomatic_complexity: 3
-    calls_out: 2
-    calls_in: 2
-  src.nexu.cli.capsule_iterate:
-    name: capsule_iterate
-    module: src.nexu.cli
-    line: 130
-    cyclomatic_complexity: 1
-    calls_out: 11
-    calls_in: 0
-  src.nexu.orchestrate.build_orchestration_context:
-    name: build_orchestration_context
-    module: src.nexu.orchestrate
-    line: 41
-    cyclomatic_complexity: 2
-    calls_out: 11
-    calls_in: 1
-  src.nexu.promote._promotion_map:
-    name: _promotion_map
-    module: src.nexu.promote
-    line: 14
-    cyclomatic_complexity: 2
-    calls_out: 4
-    calls_in: 1
-  src.nexu.intract._split_csv:
-    name: _split_csv
-    module: src.nexu.intract
-    line: 33
     cyclomatic_complexity: 4
-    calls_out: 4
-    calls_in: 6
-  src.nexu.orchestrate._render_orchestration_markdown:
-    name: _render_orchestration_markdown
-    module: src.nexu.orchestrate
-    line: 200
-    cyclomatic_complexity: 9
-    calls_out: 22
-    calls_in: 1
-  src.nexu.status.capsule_status:
-    name: capsule_status
-    module: src.nexu.status
-    line: 11
+    calls_out: 8
+    calls_in: 3
+  src.nexu.cinema_publish._refresh_service_status:
+    name: _refresh_service_status
+    module: src.nexu.cinema_publish
+    line: 104
     cyclomatic_complexity: 3
-    calls_out: 10
-    calls_in: 4
-  src.nexu.files.rel:
-    name: rel
-    module: src.nexu.files
-    line: 24
-    cyclomatic_complexity: 1
-    calls_out: 2
-    calls_in: 11
-  src.nexu.verify._scan_capsule_contracts:
-    name: _scan_capsule_contracts
-    module: src.nexu.verify
-    line: 36
-    cyclomatic_complexity: 2
-    calls_out: 4
-    calls_in: 1
-  src.nexu.cli.capsule_create:
-    name: capsule_create
-    module: src.nexu.cli
-    line: 68
-    cyclomatic_complexity: 1
-    calls_out: 15
-    calls_in: 0
-  src.nexu.mcp_server._resource_list:
-    name: _resource_list
-    module: src.nexu.mcp_server
-    line: 236
-    cyclomatic_complexity: 2
-    calls_out: 2
-    calls_in: 1
-  src.nexu.cli.capsule_report:
-    name: capsule_report
-    module: src.nexu.cli
-    line: 250
-    cyclomatic_complexity: 1
-    calls_out: 12
-    calls_in: 0
-  examples.run_examples.run_example:
-    name: run_example
-    module: examples.run_examples
-    line: 34
-    cyclomatic_complexity: 2
-    calls_out: 26
-    calls_in: 1
-  src.nexu.paths.project_root:
-    name: project_root
-    module: src.nexu.paths
-    line: 6
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 20
-  src.nexu.verify._text:
-    name: _text
-    module: src.nexu.verify
-    line: 43
-    cyclomatic_complexity: 2
     calls_out: 1
-    calls_in: 2
-  src.nexu.intract.scan_contracts_in_text:
-    name: scan_contracts_in_text
-    module: src.nexu.intract
-    line: 82
-    cyclomatic_complexity: 3
-    calls_out: 4
+    calls_in: 3
+  src.nexu.cinema_markpact.build_markpact_readme:
+    name: build_markpact_readme
+    module: src.nexu.cinema_markpact
+    line: 19
+    cyclomatic_complexity: 10
+    calls_out: 17
     calls_in: 1
-  src.nexu.cli.capsule_review:
-    name: capsule_review
-    module: src.nexu.cli
-    line: 295
-    cyclomatic_complexity: 1
-    calls_out: 15
-    calls_in: 0
-  src.nexu.cli.mcp_serve:
-    name: mcp_serve
-    module: src.nexu.cli
-    line: 348
+  src.nexu.journal.append_journal:
+    name: append_journal
+    module: src.nexu.journal
+    line: 25
     cyclomatic_complexity: 2
     calls_out: 6
-    calls_in: 0
-  src.nexu.git.current_git_sha:
-    name: current_git_sha
-    module: src.nexu.git
-    line: 7
-    cyclomatic_complexity: 4
-    calls_out: 3
-    calls_in: 2
-  src.nexu.capsule.list_capsules:
-    name: list_capsules
-    module: src.nexu.capsule
-    line: 111
-    cyclomatic_complexity: 4
+    calls_in: 8
+  src.nexu.cinema.build_intract_policy_snapshot:
+    name: build_intract_policy_snapshot
+    module: src.nexu.cinema
+    line: 68
+    cyclomatic_complexity: 11
+    calls_out: 29
+    calls_in: 1
+  src.nexu.intract_adapter._finding_for_result:
+    name: _finding_for_result
+    module: src.nexu.intract_adapter
+    line: 32
+    cyclomatic_complexity: 9
+    calls_out: 16
+    calls_in: 1
+  src.nexu.mcp_server._rpc_handlers:
+    name: _rpc_handlers
+    module: src.nexu.mcp_server
+    line: 343
+    cyclomatic_complexity: 3
+    calls_out: 15
+    calls_in: 1
+  src.nexu.cinema_policy.ensure_intract_on_path:
+    name: ensure_intract_on_path
+    module: src.nexu.cinema_policy
+    line: 379
+    cyclomatic_complexity: 5
     calls_out: 5
     calls_in: 4
-  src.nexu.blueprint.build_blueprint:
-    name: build_blueprint
-    module: src.nexu.blueprint
-    line: 11
-    cyclomatic_complexity: 7
-    calls_out: 8
-    calls_in: 9
+  src.nexu.llm.offline_review_from_status:
+    name: offline_review_from_status
+    module: src.nexu.llm
+    line: 135
+    cyclomatic_complexity: 4
+    calls_out: 0
+    calls_in: 1
+  src.nexu.files.is_text_file:
+    name: is_text_file
+    module: src.nexu.files
+    line: 32
+    cyclomatic_complexity: 2
+    calls_out: 1
+    calls_in: 1
+  src.nexu.cli.capsule_orchestrate:
+    name: capsule_orchestrate
+    module: src.nexu.cli
+    line: 294
+    cyclomatic_complexity: 1
+    calls_out: 14
+    calls_in: 0
+  src.nexu.cinema_history._copy_checkpoint_files:
+    name: _copy_checkpoint_files
+    module: src.nexu.cinema_history
+    line: 49
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 1
+  src.nexu.review._markdown_review_prompt:
+    name: _markdown_review_prompt
+    module: src.nexu.review
+    line: 20
+    cyclomatic_complexity: 1
+    calls_out: 6
+    calls_in: 1
+  src.nexu.cinema_publish._registry_path:
+    name: _registry_path
+    module: src.nexu.cinema_publish
+    line: 29
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 2
   examples.run_examples.main:
     name: main
     module: examples.run_examples
@@ -670,39 +754,910 @@ nodes:
     cyclomatic_complexity: 2
     calls_out: 1
     calls_in: 0
+  src.nexu.verify._check_baseline_lock:
+    name: _check_baseline_lock
+    module: src.nexu.verify
+    line: 119
+    cyclomatic_complexity: 2
+    calls_out: 7
+    calls_in: 1
+  src.nexu.cinema.write_intract_policy_files:
+    name: write_intract_policy_files
+    module: src.nexu.cinema
+    line: 113
+    cyclomatic_complexity: 2
+    calls_out: 5
+    calls_in: 2
+  src.nexu.cinema_scripts.write_cinema_inject_files:
+    name: write_cinema_inject_files
+    module: src.nexu.cinema_scripts
+    line: 527
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 3
+  src.nexu.cinema_policy.load_effective_ui_constraints:
+    name: load_effective_ui_constraints
+    module: src.nexu.cinema_policy
+    line: 243
+    cyclomatic_complexity: 3
+    calls_out: 6
+    calls_in: 4
+  src.nexu.cinema_markpact._escape_markdown_fence:
+    name: _escape_markdown_fence
+    module: src.nexu.cinema_markpact
+    line: 12
+    cyclomatic_complexity: 2
+    calls_out: 1
+    calls_in: 2
+  src.nexu.cinema_history.ledger_archive_for_display:
+    name: ledger_archive_for_display
+    module: src.nexu.cinema_history
+    line: 220
+    cyclomatic_complexity: 5
+    calls_out: 16
+    calls_in: 0
+  src.nexu.promote.build_promotion_plan:
+    name: build_promotion_plan
+    module: src.nexu.promote
+    line: 30
+    cyclomatic_complexity: 6
+    calls_out: 16
+    calls_in: 3
+  src.nexu.cinema_publish.publish_project_service:
+    name: publish_project_service
+    module: src.nexu.cinema_publish
+    line: 175
+    cyclomatic_complexity: 21
+    calls_out: 34
+    calls_in: 0
+  src.nexu.mcp_server.call_tool:
+    name: call_tool
+    module: src.nexu.mcp_server
+    line: 250
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 1
+  src.nexu.intract_adapter._sibling_intract_src:
+    name: _sibling_intract_src
+    module: src.nexu.intract_adapter
+    line: 11
+    cyclomatic_complexity: 4
+    calls_out: 3
+    calls_in: 1
+  src.nexu.orchestrate.build_capsule_orchestration:
+    name: build_capsule_orchestration
+    module: src.nexu.orchestrate
+    line: 144
+    cyclomatic_complexity: 2
+    calls_out: 28
+    calls_in: 2
+  src.nexu.cli.capsule_create:
+    name: capsule_create
+    module: src.nexu.cli
+    line: 79
+    cyclomatic_complexity: 1
+    calls_out: 15
+    calls_in: 0
+  src.nexu.cinema_policy.policy_snapshot_path:
+    name: policy_snapshot_path
+    module: src.nexu.cinema_policy
+    line: 299
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 1
+  src.nexu.cinema_policy.sync_option_previews_from_workspace:
+    name: sync_option_previews_from_workspace
+    module: src.nexu.cinema_policy
+    line: 162
+    cyclomatic_complexity: 10
+    calls_out: 17
+    calls_in: 0
+  src.nexu.verify._check_output_presence:
+    name: _check_output_presence
+    module: src.nexu.verify
+    line: 210
+    cyclomatic_complexity: 12
+    calls_out: 6
+    calls_in: 1
+  src.nexu.cinema_history.save_history_checkpoint:
+    name: save_history_checkpoint
+    module: src.nexu.cinema_history
+    line: 86
+    cyclomatic_complexity: 4
+    calls_out: 19
+    calls_in: 1
+  src.nexu.verify._check_forbidden_secret:
+    name: _check_forbidden_secret
+    module: src.nexu.verify
+    line: 183
+    cyclomatic_complexity: 7
+    calls_out: 4
+    calls_in: 1
+  src.nexu.cinema_history._load_index:
+    name: _load_index
+    module: src.nexu.cinema_history
+    line: 32
+    cyclomatic_complexity: 3
+    calls_out: 5
+    calls_in: 3
+  examples.scientific_calculator_demo2.main:
+    name: main
+    module: examples.scientific_calculator_demo2
+    line: 18
+    cyclomatic_complexity: 2
+    calls_out: 17
+    calls_in: 0
+  src.vico.intract._split_csv:
+    name: _split_csv
+    module: src.vico.intract
+    line: 33
+    cyclomatic_complexity: 4
+    calls_out: 4
+    calls_in: 6
+  src.nexu.cli.capsule_promote:
+    name: capsule_promote
+    module: src.nexu.cli
+    line: 340
+    cyclomatic_complexity: 3
+    calls_out: 14
+    calls_in: 0
+  src.nexu.cli.capsule_runtime:
+    name: capsule_runtime
+    module: src.nexu.cli
+    line: 254
+    cyclomatic_complexity: 1
+    calls_out: 9
+    calls_in: 0
+  src.nexu.cinema_publish._port_open:
+    name: _port_open
+    module: src.nexu.cinema_publish
+    line: 72
+    cyclomatic_complexity: 2
+    calls_out: 1
+    calls_in: 1
+  src.nexu.cli.capsule_iterate:
+    name: capsule_iterate
+    module: src.nexu.cli
+    line: 141
+    cyclomatic_complexity: 2
+    calls_out: 14
+    calls_in: 0
+  src.nexu.cinema_history._build_label:
+    name: _build_label
+    module: src.nexu.cinema_history
+    line: 67
+    cyclomatic_complexity: 4
+    calls_out: 7
+    calls_in: 2
+  src.nexu.cinema.generate_cinema_player:
+    name: generate_cinema_player
+    module: src.nexu.cinema
+    line: 124
+    cyclomatic_complexity: 1
+    calls_out: 19
+    calls_in: 1
+  src.nexu.journal.journal_path:
+    name: journal_path
+    module: src.nexu.journal
+    line: 10
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 2
+  src.nexu.cinema_projects.activate_example_project:
+    name: activate_example_project
+    module: src.nexu.cinema_projects
+    line: 281
+    cyclomatic_complexity: 16
+    calls_out: 24
+    calls_in: 0
+  src.nexu.cinema_policy.apply_ledger_from_cinema:
+    name: apply_ledger_from_cinema
+    module: src.nexu.cinema_policy
+    line: 335
+    cyclomatic_complexity: 8
+    calls_out: 17
+    calls_in: 1
+  src.nexu.verify._scan_capsule_contracts:
+    name: _scan_capsule_contracts
+    module: src.nexu.verify
+    line: 37
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 1
+  src.nexu.cinema._start_cinema_server:
+    name: _start_cinema_server
+    module: src.nexu.cinema
+    line: 177
+    cyclomatic_complexity: 2
+    calls_out: 3
+    calls_in: 1
+  src.nexu.cinema_publish.stop_published_service:
+    name: stop_published_service
+    module: src.nexu.cinema_publish
+    line: 315
+    cyclomatic_complexity: 9
+    calls_out: 11
+    calls_in: 1
+  src.nexu.cinema_policy.propose_llm_for_stage:
+    name: propose_llm_for_stage
+    module: src.nexu.cinema_policy
+    line: 535
+    cyclomatic_complexity: 8
+    calls_out: 14
+    calls_in: 0
+  src.nexu.cinema_policy.cinema_dir_for:
+    name: cinema_dir_for
+    module: src.nexu.cinema_policy
+    line: 295
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 4
+  scripts.check-doc-links._anchors:
+    name: _anchors
+    module: scripts.check-doc-links
+    line: 41
+    cyclomatic_complexity: 3
+    calls_out: 6
+    calls_in: 1
+  src.nexu.paths.snapshots_dir:
+    name: snapshots_dir
+    module: src.nexu.paths
+    line: 14
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 2
+  src.vico.freeze.freeze_project:
+    name: freeze_project
+    module: src.vico.freeze
+    line: 12
+    cyclomatic_complexity: 2
+    calls_out: 12
+    calls_in: 6
+  src.nexu.review.build_review_packet:
+    name: build_review_packet
+    module: src.nexu.review
+    line: 70
+    cyclomatic_complexity: 5
+    calls_out: 24
+    calls_in: 2
+  src.nexu.cinema_publish.start_published_service:
+    name: start_published_service
+    module: src.nexu.cinema_publish
+    line: 261
+    cyclomatic_complexity: 17
+    calls_out: 29
+    calls_in: 1
+  src.vico.git.current_git_sha:
+    name: current_git_sha
+    module: src.vico.git
+    line: 7
+    cyclomatic_complexity: 4
+    calls_out: 3
+    calls_in: 2
+  src.nexu.cinema_policy.propose_ui_delta_contract_dicts:
+    name: propose_ui_delta_contract_dicts
+    module: src.nexu.cinema_policy
+    line: 393
+    cyclomatic_complexity: 5
+    calls_out: 5
+    calls_in: 1
+  src.nexu.mcp_server.run_mcp_stdio:
+    name: run_mcp_stdio
+    module: src.nexu.mcp_server
+    line: 375
+    cyclomatic_complexity: 6
+    calls_out: 7
+    calls_in: 1
+  src.vico.diff.diff_capsule:
+    name: diff_capsule
+    module: src.vico.diff
+    line: 12
+    cyclomatic_complexity: 12
+    calls_out: 14
+    calls_in: 9
+  src.nexu.cinema.format_intract_v1_line:
+    name: format_intract_v1_line
+    module: src.nexu.cinema
+    line: 58
+    cyclomatic_complexity: 3
+    calls_out: 1
+    calls_in: 1
+  examples.web_app_dashboard.run.main:
+    name: main
+    module: examples.web_app_dashboard.run
+    line: 16
+    cyclomatic_complexity: 2
+    calls_out: 35
+    calls_in: 0
+  src.nexu.cli.capsule_review:
+    name: capsule_review
+    module: src.nexu.cli
+    line: 311
+    cyclomatic_complexity: 1
+    calls_out: 13
+    calls_in: 0
+  src.nexu.cinema_publish._write_service_readme:
+    name: _write_service_readme
+    module: src.nexu.cinema_publish
+    line: 120
+    cyclomatic_complexity: 6
+    calls_out: 16
+    calls_in: 1
+  scripts.check-doc-links._resolve:
+    name: _resolve
+    module: scripts.check-doc-links
+    line: 64
+    cyclomatic_complexity: 1
+    calls_out: 5
+    calls_in: 1
+  src.nexu.cinema_projects._write_seed_variants:
+    name: _write_seed_variants
+    module: src.nexu.cinema_projects
+    line: 253
+    cyclomatic_complexity: 3
+    calls_out: 8
+    calls_in: 1
+  src.vico.intract.scan_contracts_in_file:
+    name: scan_contracts_in_file
+    module: src.vico.intract
+    line: 91
+    cyclomatic_complexity: 3
+    calls_out: 5
+    calls_in: 1
+  src.nexu.cinema_policy._normalize_html_body:
+    name: _normalize_html_body
+    module: src.nexu.cinema_policy
+    line: 102
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 1
+  examples.web_app_calculator.run.main:
+    name: main
+    module: examples.web_app_calculator.run
+    line: 14
+    cyclomatic_complexity: 2
+    calls_out: 23
+    calls_in: 0
+  src.vico.intract.read_manifest_contracts:
+    name: read_manifest_contracts
+    module: src.vico.intract
+    line: 100
+    cyclomatic_complexity: 12
+    calls_out: 32
+    calls_in: 8
+  src.nexu.cinema_publish._save_registry:
+    name: _save_registry
+    module: src.nexu.cinema_publish
+    line: 44
+    cyclomatic_complexity: 1
+    calls_out: 5
+    calls_in: 4
+  src.nexu.cinema_history.ensure_initial_checkpoint:
+    name: ensure_initial_checkpoint
+    module: src.nexu.cinema_history
+    line: 201
+    cyclomatic_complexity: 3
+    calls_out: 4
+    calls_in: 1
+  src.nexu.export_prompt.export_iteration_prompt:
+    name: export_iteration_prompt
+    module: src.nexu.export_prompt
+    line: 58
+    cyclomatic_complexity: 3
+    calls_out: 18
+    calls_in: 4
+  src.nexu.report.build_capsule_report:
+    name: build_capsule_report
+    module: src.nexu.report
+    line: 35
+    cyclomatic_complexity: 1
+    calls_out: 32
+    calls_in: 2
+  src.nexu.cinema_policy.verify_capsule_workspace:
+    name: verify_capsule_workspace
+    module: src.nexu.cinema_policy
+    line: 607
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 0
+  src.nexu.cinema_policy.normalize_proposals_for_ledger:
+    name: normalize_proposals_for_ledger
+    module: src.nexu.cinema_policy
+    line: 476
+    cyclomatic_complexity: 6
+    calls_out: 11
+    calls_in: 1
+  src.nexu.cinema_server._litellm_available:
+    name: _litellm_available
+    module: src.nexu.cinema_server
+    line: 31
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 1
+  src.nexu.plan.build_iteration_plan:
+    name: build_iteration_plan
+    module: src.nexu.plan
+    line: 35
+    cyclomatic_complexity: 7
+    calls_out: 15
+    calls_in: 4
+  src.nexu.orchestrate.offline_orchestration_from_context:
+    name: offline_orchestration_from_context
+    module: src.nexu.orchestrate
+    line: 91
+    cyclomatic_complexity: 13
+    calls_out: 22
+    calls_in: 1
+  src.nexu.llm.call_litellm_json:
+    name: call_litellm_json
+    module: src.nexu.llm
+    line: 79
+    cyclomatic_complexity: 8
+    calls_out: 13
+    calls_in: 2
+  src.nexu.mcp_server._apply_promotion_from_mcp:
+    name: _apply_promotion_from_mcp
+    module: src.nexu.mcp_server
+    line: 226
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 0
+  src.nexu.cinema_policy.stage_files_are_distinct:
+    name: stage_files_are_distinct
+    module: src.nexu.cinema_policy
+    line: 125
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 1
+  src.nexu.cinema_policy._replace_html_title:
+    name: _replace_html_title
+    module: src.nexu.cinema_policy
+    line: 148
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 2
+  examples.scientific_calculator_demo.main:
+    name: main
+    module: examples.scientific_calculator_demo
+    line: 17
+    cyclomatic_complexity: 2
+    calls_out: 23
+    calls_in: 0
+  src.nexu.cli.capsule_report:
+    name: capsule_report
+    module: src.nexu.cli
+    line: 266
+    cyclomatic_complexity: 1
+    calls_out: 10
+    calls_in: 0
+  src.nexu.mcp_server._resource_list:
+    name: _resource_list
+    module: src.nexu.mcp_server
+    line: 268
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 1
+  examples.scientific_calculator_demo2.print_code:
+    name: print_code
+    module: examples.scientific_calculator_demo2
+    line: 13
+    cyclomatic_complexity: 1
+    calls_out: 6
+    calls_in: 3
+  src.vico.models.utc_now:
+    name: utc_now
+    module: src.vico.models
+    line: 11
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 16
+  src.nexu.plan._contract_summary:
+    name: _contract_summary
+    module: src.nexu.plan
+    line: 27
+    cyclomatic_complexity: 9
+    calls_out: 3
+    calls_in: 1
+  src.nexu.cinema_history.history_index_path:
+    name: history_index_path
+    module: src.nexu.cinema_history
+    line: 28
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 2
+  src.nexu.intract_adapter._result_status:
+    name: _result_status
+    module: src.nexu.intract_adapter
+    line: 27
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 1
+  src.nexu.blueprint.build_blueprint:
+    name: build_blueprint
+    module: src.nexu.blueprint
+    line: 11
+    cyclomatic_complexity: 7
+    calls_out: 8
+    calls_in: 8
+  src.nexu.files.matches_any:
+    name: matches_any
+    module: src.nexu.files
+    line: 28
+    cyclomatic_complexity: 3
+    calls_out: 4
+    calls_in: 2
+  src.nexu.capsule.load_capsule:
+    name: load_capsule
+    module: src.nexu.capsule
+    line: 118
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 11
+  src.nexu.cinema_history._refresh_policy_snapshot:
+    name: _refresh_policy_snapshot
+    module: src.nexu.cinema_history
+    line: 195
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 1
+  src.nexu.iterate.iterate_capsule:
+    name: iterate_capsule
+    module: src.nexu.iterate
+    line: 10
+    cyclomatic_complexity: 7
+    calls_out: 14
+    calls_in: 7
+  src.nexu.mcp_server.handle_mcp_message:
+    name: handle_mcp_message
+    module: src.nexu.mcp_server
+    line: 358
+    cyclomatic_complexity: 5
+    calls_out: 8
+    calls_in: 1
+  src.nexu.paths.capsule_dir:
+    name: capsule_dir
+    module: src.nexu.paths
+    line: 22
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 23
+  src.nexu.cli._print_yaml:
+    name: _print_yaml
+    module: src.nexu.cli
+    line: 41
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 2
+  src.nexu.files.rel:
+    name: rel
+    module: src.nexu.files
+    line: 24
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 12
+  src.nexu.cinema_policy.normalize_manifest_target:
+    name: normalize_manifest_target
+    module: src.nexu.cinema_policy
+    line: 280
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 1
+  src.nexu.cinema_projects._copy_cinema_files:
+    name: _copy_cinema_files
+    module: src.nexu.cinema_projects
+    line: 232
+    cyclomatic_complexity: 4
+    calls_out: 6
+    calls_in: 1
+  src.nexu.runtime.build_capsule_runtime:
+    name: build_capsule_runtime
+    module: src.nexu.runtime
+    line: 111
+    cyclomatic_complexity: 3
+    calls_out: 16
+    calls_in: 7
+  src.vico.models.read_yaml:
+    name: read_yaml
+    module: src.vico.models
+    line: 149
+    cyclomatic_complexity: 3
+    calls_out: 4
+    calls_in: 5
+  src.nexu.intract_adapter.check_intract_policy:
+    name: check_intract_policy
+    module: src.nexu.intract_adapter
+    line: 90
+    cyclomatic_complexity: 7
+    calls_out: 11
+    calls_in: 1
+  scripts.check-doc-links._is_external:
+    name: _is_external
+    module: scripts.check-doc-links
+    line: 30
+    cyclomatic_complexity: 3
+    calls_out: 4
+    calls_in: 1
+  src.nexu.mcp_server._rpc_initialize:
+    name: _rpc_initialize
+    module: src.nexu.mcp_server
+    line: 335
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 1
+  src.nexu.cinema._contract_to_public_dict:
+    name: _contract_to_public_dict
+    module: src.nexu.cinema
+    line: 39
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 2
+  src.nexu.cinema_projects.find_nexu_repo_root:
+    name: find_nexu_repo_root
+    module: src.nexu.cinema_projects
+    line: 41
+    cyclomatic_complexity: 5
+    calls_out: 4
+    calls_in: 2
+  src.nexu.cli.capsule_verify:
+    name: capsule_verify
+    module: src.nexu.cli
+    line: 215
+    cyclomatic_complexity: 4
+    calls_out: 10
+    calls_in: 0
+  src.nexu.cli.capsule_bundle:
+    name: capsule_bundle
+    module: src.nexu.cli
+    line: 327
+    cyclomatic_complexity: 1
+    calls_out: 9
+    calls_in: 0
+  src.nexu.cinema_policy.validate_intract_artifact:
+    name: validate_intract_artifact
+    module: src.nexu.cinema_policy
+    line: 582
+    cyclomatic_complexity: 8
+    calls_out: 5
+    calls_in: 0
+  src.vico.intract.parse_intract_line:
+    name: parse_intract_line
+    module: src.vico.intract
+    line: 58
+    cyclomatic_complexity: 3
+    calls_out: 22
+    calls_in: 1
+  src.nexu.cinema_policy._html_files_distinct:
+    name: _html_files_distinct
+    module: src.nexu.cinema_policy
+    line: 109
+    cyclomatic_complexity: 3
+    calls_out: 6
+    calls_in: 2
+  src.nexu.orchestrate.build_orchestration_prompt:
+    name: build_orchestration_prompt
+    module: src.nexu.orchestrate
+    line: 62
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 1
+  src.vico.intract._tokenize_contract:
+    name: _tokenize_contract
+    module: src.vico.intract
+    line: 39
+    cyclomatic_complexity: 5
+    calls_out: 10
+    calls_in: 1
+  src.nexu.paths.ensure_project_dirs:
+    name: ensure_project_dirs
+    module: src.nexu.paths
+    line: 26
+    cyclomatic_complexity: 2
+    calls_out: 7
+    calls_in: 3
+  src.nexu.cli.capsule_list:
+    name: capsule_list
+    module: src.nexu.cli
+    line: 106
+    cyclomatic_complexity: 3
+    calls_out: 8
+    calls_in: 0
+  src.nexu.capsule.save_capsule:
+    name: save_capsule
+    module: src.nexu.capsule
+    line: 123
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 1
+  src.nexu.init_project.init_project:
+    name: init_project
+    module: src.nexu.init_project
+    line: 9
+    cyclomatic_complexity: 3
+    calls_out: 7
+    calls_in: 6
+  src.nexu.cli.capsule_journal:
+    name: capsule_journal
+    module: src.nexu.cli
+    line: 279
+    cyclomatic_complexity: 2
+    calls_out: 17
+    calls_in: 0
+  src.nexu.runtime._collect_fixtures:
+    name: _collect_fixtures
+    module: src.nexu.runtime
+    line: 30
+    cyclomatic_complexity: 5
+    calls_out: 7
+    calls_in: 1
+  src.nexu.cinema_history._ledger_snapshot:
+    name: _ledger_snapshot
+    module: src.nexu.cinema_history
+    line: 59
+    cyclomatic_complexity: 3
+    calls_out: 4
+    calls_in: 3
 edges:
-- caller: src.nexu.status.capsule_status
-  callee: src.nexu.capsule.load_capsule
+- caller: examples.scientific_calculator_demo.main
+  callee: src.nexu.init_project.init_project
   call_type: resolved
-- caller: src.nexu.status.capsule_status
-  callee: src.nexu.paths.capsule_dir
+- caller: examples.scientific_calculator_demo.main
+  callee: src.vico.freeze.freeze_project
   call_type: resolved
-- caller: src.nexu.status.capsule_status
-  callee: src.nexu.diff.diff_capsule
+- caller: examples.scientific_calculator_demo.main
+  callee: src.nexu.capsule.create_capsule
   call_type: resolved
-- caller: src.nexu.status.capsule_status
-  callee: src.nexu.models.read_yaml
+- caller: examples.run_examples.run_example
+  callee: src.nexu.init_project.init_project
   call_type: resolved
-- caller: src.nexu.plan.build_iteration_plan
-  callee: src.nexu.capsule.load_capsule
+- caller: examples.run_examples.run_example
+  callee: src.vico.freeze.freeze_project
   call_type: resolved
-- caller: src.nexu.plan.build_iteration_plan
-  callee: src.nexu.paths.capsule_dir
+- caller: examples.run_examples.run_example
+  callee: src.nexu.capsule.create_capsule
   call_type: resolved
-- caller: src.nexu.plan.build_iteration_plan
-  callee: src.nexu.intract.read_manifest_contracts
+- caller: examples.run_examples.run_example
+  callee: src.nexu.plan.build_iteration_plan
   call_type: resolved
-- caller: src.nexu.plan.build_iteration_plan
+- caller: examples.run_examples.run_example
   callee: src.nexu.blueprint.build_blueprint
   call_type: resolved
-- caller: src.nexu.plan.build_iteration_plan
-  callee: src.nexu.plan._contract_summary
+- caller: examples.run_examples.run_example
+  callee: src.nexu.iterate.iterate_capsule
   call_type: resolved
-- caller: src.nexu.plan.build_iteration_plan
-  callee: src.nexu.models.write_yaml
+- caller: examples.run_examples.run_example
+  callee: src.nexu.runtime.build_capsule_runtime
   call_type: resolved
-- caller: src.nexu.plan.build_iteration_plan
+- caller: examples.run_examples.run_example
+  callee: src.nexu.export_prompt.export_iteration_prompt
+  call_type: resolved
+- caller: examples.run_examples.main
+  callee: examples.run_examples.run_example
+  call_type: resolved
+- caller: examples.scientific_calculator_demo2.main
+  callee: examples.scientific_calculator_demo2.print_code
+  call_type: resolved
+- caller: examples.scientific_calculator_demo2.main
+  callee: src.nexu.init_project.init_project
+  call_type: resolved
+- caller: examples.scientific_calculator_demo2.main
+  callee: src.vico.freeze.freeze_project
+  call_type: resolved
+- caller: examples.scientific_calculator_demo2.main
+  callee: src.nexu.capsule.create_capsule
+  call_type: resolved
+- caller: examples.scientific_calculator_demo2.main
+  callee: src.nexu.iterate.iterate_capsule
+  call_type: resolved
+- caller: examples.web_app_calculator.run.main
+  callee: src.nexu.init_project.init_project
+  call_type: resolved
+- caller: examples.web_app_calculator.run.main
+  callee: src.vico.freeze.freeze_project
+  call_type: resolved
+- caller: examples.web_app_calculator.run.main
+  callee: src.nexu.capsule.create_capsule
+  call_type: resolved
+- caller: examples.web_app_dashboard.run.main
+  callee: src.nexu.init_project.init_project
+  call_type: resolved
+- caller: examples.web_app_dashboard.run.main
+  callee: src.vico.freeze.freeze_project
+  call_type: resolved
+- caller: examples.web_app_dashboard.run.main
+  callee: src.nexu.capsule.create_capsule
+  call_type: resolved
+- caller: src.nexu.runtime._collect_fixtures
+  callee: src.nexu.runtime._read_fixture
+  call_type: resolved
+- caller: src.nexu.runtime.build_capsule_runtime
+  callee: src.nexu.capsule.load_capsule
+  call_type: resolved
+- caller: src.nexu.runtime.build_capsule_runtime
+  callee: src.nexu.paths.capsule_dir
+  call_type: resolved
+- caller: src.nexu.runtime.build_capsule_runtime
+  callee: src.nexu.blueprint.build_blueprint
+  call_type: resolved
+- caller: src.nexu.runtime.build_capsule_runtime
+  callee: src.vico.intract.read_manifest_contracts
+  call_type: resolved
+- caller: src.nexu.runtime.build_capsule_runtime
+  callee: src.vico.models.write_yaml
+  call_type: resolved
+- caller: src.nexu.runtime.build_capsule_runtime
   callee: src.nexu.journal.append_journal
+  call_type: resolved
+- caller: src.nexu.runtime.build_capsule_runtime
+  callee: src.vico.models.utc_now
+  call_type: resolved
+- caller: src.nexu.init_project.init_project
+  callee: src.nexu.paths.ensure_project_dirs
+  call_type: resolved
+- caller: src.nexu.init_project.init_project
+  callee: src.vico.models.write_yaml
+  call_type: resolved
+- caller: src.nexu.config.load_env_files
+  callee: src.nexu.config._load_env_file
+  call_type: resolved
+- caller: src.nexu.config.load_config
+  callee: src.nexu.config.load_env_files
+  call_type: resolved
+- caller: src.nexu.config.load_config
+  callee: src.vico.models.read_yaml
+  call_type: resolved
+- caller: src.vico.intract.parse_intract_line
+  callee: src.vico.intract._tokenize_contract
+  call_type: resolved
+- caller: src.vico.intract.parse_intract_line
+  callee: src.vico.intract._split_csv
+  call_type: resolved
+- caller: src.vico.intract.scan_contracts_in_text
+  callee: src.vico.intract.parse_intract_line
+  call_type: resolved
+- caller: src.vico.intract.scan_contracts_in_file
+  callee: src.vico.intract.scan_contracts_in_text
+  call_type: resolved
+- caller: src.nexu.llm.call_litellm_json
+  callee: src.nexu.llm._strip_fences
+  call_type: resolved
+- caller: src.nexu.llm.call_litellm_json
+  callee: src.nexu.llm._extract_content
+  call_type: resolved
+- caller: src.nexu.llm.call_litellm_review
+  callee: src.nexu.llm.call_litellm_json
+  call_type: resolved
+- caller: src.nexu.bundle._should_include
+  callee: src.nexu.files.rel
+  call_type: resolved
+- caller: src.nexu.bundle.build_capsule_bundle
+  callee: src.nexu.paths.capsule_dir
+  call_type: resolved
+- caller: src.nexu.bundle.build_capsule_bundle
+  callee: src.vico.models.write_yaml
+  call_type: resolved
+- caller: src.nexu.bundle.build_capsule_bundle
+  callee: src.nexu.journal.append_journal
+  call_type: resolved
+- caller: src.nexu.bundle.build_capsule_bundle
+  callee: src.vico.models.utc_now
+  call_type: resolved
+- caller: src.vico.freeze.freeze_project
+  callee: src.nexu.paths.ensure_project_dirs
+  call_type: resolved
+- caller: src.vico.freeze.freeze_project
+  callee: src.vico.models.write_yaml
+  call_type: resolved
+- caller: src.vico.freeze.freeze_project
+  callee: src.nexu.files.collect_files
+  call_type: resolved
+- caller: src.vico.freeze.freeze_project
+  callee: src.vico.git.current_git_sha
+  call_type: resolved
+- caller: src.vico.freeze.freeze_project
+  callee: src.nexu.paths.snapshots_dir
+  call_type: resolved
+- caller: src.vico.freeze.freeze_project
+  callee: src.nexu.files.rel
   call_type: resolved
 - caller: src.nexu.review.build_review_packet
   callee: src.nexu.config.load_config
@@ -714,10 +1669,10 @@ edges:
   callee: src.nexu.verify.verify_capsule
   call_type: resolved
 - caller: src.nexu.review.build_review_packet
-  callee: src.nexu.diff.diff_capsule
+  callee: src.vico.diff.diff_capsule
   call_type: resolved
 - caller: src.nexu.review.build_review_packet
-  callee: src.nexu.drift.check_source_drift
+  callee: src.vico.drift.check_source_drift
   call_type: resolved
 - caller: src.nexu.review.build_review_packet
   callee: src.nexu.blueprint.build_blueprint
@@ -731,20 +1686,41 @@ edges:
 - caller: src.nexu.review.build_review_packet
   callee: src.nexu.review._markdown_review_prompt
   call_type: resolved
-- caller: src.nexu.drift.check_source_drift
+- caller: src.nexu.plan.build_iteration_plan
   callee: src.nexu.capsule.load_capsule
   call_type: resolved
-- caller: src.nexu.drift.check_source_drift
-  callee: src.nexu.models.write_yaml
-  call_type: resolved
-- caller: src.nexu.drift.check_source_drift
-  callee: src.nexu.hashing.sha256_file
-  call_type: resolved
-- caller: src.nexu.drift.check_source_drift
-  callee: src.nexu.models.utc_now
-  call_type: resolved
-- caller: src.nexu.drift.check_source_drift
+- caller: src.nexu.plan.build_iteration_plan
   callee: src.nexu.paths.capsule_dir
+  call_type: resolved
+- caller: src.nexu.plan.build_iteration_plan
+  callee: src.vico.intract.read_manifest_contracts
+  call_type: resolved
+- caller: src.nexu.plan.build_iteration_plan
+  callee: src.nexu.blueprint.build_blueprint
+  call_type: resolved
+- caller: src.nexu.plan.build_iteration_plan
+  callee: src.nexu.plan._contract_summary
+  call_type: resolved
+- caller: src.nexu.plan.build_iteration_plan
+  callee: src.vico.models.write_yaml
+  call_type: resolved
+- caller: src.nexu.plan.build_iteration_plan
+  callee: src.nexu.journal.append_journal
+  call_type: resolved
+- caller: src.nexu.blueprint.build_blueprint
+  callee: src.nexu.capsule.load_capsule
+  call_type: resolved
+- caller: src.nexu.blueprint.build_blueprint
+  callee: src.nexu.paths.capsule_dir
+  call_type: resolved
+- caller: src.nexu.blueprint.build_blueprint
+  callee: src.vico.intract.read_manifest_contracts
+  call_type: resolved
+- caller: src.nexu.blueprint.build_blueprint
+  callee: src.vico.models.write_yaml
+  call_type: resolved
+- caller: src.nexu.blueprint.build_blueprint
+  callee: src.vico.models.utc_now
   call_type: resolved
 - caller: src.nexu.files.collect_files
   callee: src.nexu.files.rel
@@ -755,14 +1731,116 @@ edges:
 - caller: src.nexu.files.collect_files
   callee: src.nexu.files.is_text_file
   call_type: resolved
-- caller: src.nexu.llm.call_litellm_json
-  callee: src.nexu.llm._strip_fences
+- caller: src.vico.status.capsule_status
+  callee: src.nexu.capsule.load_capsule
   call_type: resolved
-- caller: src.nexu.llm.call_litellm_json
-  callee: src.nexu.llm._extract_content
+- caller: src.vico.status.capsule_status
+  callee: src.nexu.paths.capsule_dir
   call_type: resolved
-- caller: src.nexu.llm.call_litellm_review
-  callee: src.nexu.llm.call_litellm_json
+- caller: src.vico.status.capsule_status
+  callee: src.vico.diff.diff_capsule
+  call_type: resolved
+- caller: src.vico.status.capsule_status
+  callee: src.vico.models.read_yaml
+  call_type: resolved
+- caller: src.nexu.iterate.iterate_capsule
+  callee: src.nexu.capsule.load_capsule
+  call_type: resolved
+- caller: src.nexu.iterate.iterate_capsule
+  callee: src.nexu.paths.capsule_dir
+  call_type: resolved
+- caller: src.nexu.iterate.iterate_capsule
+  callee: src.nexu.capsule.save_capsule
+  call_type: resolved
+- caller: src.nexu.iterate.iterate_capsule
+  callee: src.vico.models.write_yaml
+  call_type: resolved
+- caller: src.vico.drift.check_source_drift
+  callee: src.nexu.capsule.load_capsule
+  call_type: resolved
+- caller: src.vico.drift.check_source_drift
+  callee: src.vico.models.write_yaml
+  call_type: resolved
+- caller: src.vico.drift.check_source_drift
+  callee: src.vico.hashing.sha256_file
+  call_type: resolved
+- caller: src.vico.drift.check_source_drift
+  callee: src.vico.models.utc_now
+  call_type: resolved
+- caller: src.vico.drift.check_source_drift
+  callee: src.nexu.paths.capsule_dir
+  call_type: resolved
+- caller: src.nexu.cinema_history.history_index_path
+  callee: src.nexu.cinema_history.history_dir
+  call_type: resolved
+- caller: src.nexu.cinema_history._load_index
+  callee: src.nexu.cinema_history.history_index_path
+  call_type: resolved
+- caller: src.nexu.cinema_history._write_index
+  callee: src.nexu.cinema_history.history_dir
+  call_type: resolved
+- caller: src.nexu.cinema_history._write_index
+  callee: src.nexu.cinema_history.history_index_path
+  call_type: resolved
+- caller: src.nexu.cinema_history.save_history_checkpoint
+  callee: src.nexu.cinema_history._load_index
+  call_type: resolved
+- caller: src.nexu.cinema_history.save_history_checkpoint
+  callee: src.nexu.cinema_history._copy_checkpoint_files
+  call_type: resolved
+- caller: src.nexu.cinema_history.save_history_checkpoint
+  callee: src.nexu.cinema_history._ledger_snapshot
+  call_type: resolved
+- caller: src.nexu.cinema_history.list_history_checkpoints
+  callee: src.nexu.cinema_history._load_index
+  call_type: resolved
+- caller: src.nexu.cinema_history.restore_history_checkpoint
+  callee: src.nexu.paths.project_root
+  call_type: resolved
+- caller: src.nexu.cinema_history.restore_history_checkpoint
+  callee: src.nexu.cinema_policy.cinema_dir_for
+  call_type: resolved
+- caller: src.nexu.cinema_history.restore_history_checkpoint
+  callee: src.nexu.cinema_history._refresh_policy_snapshot
+  call_type: resolved
+- caller: src.nexu.cinema_history.restore_history_checkpoint
+  callee: src.nexu.cinema_history.history_dir
+  call_type: resolved
+- caller: src.nexu.cinema_history._refresh_policy_snapshot
+  callee: src.nexu.cinema.write_intract_policy_files
+  call_type: resolved
+- caller: src.nexu.cinema_history.ensure_initial_checkpoint
+  callee: src.nexu.cinema_history._load_index
+  call_type: resolved
+- caller: src.nexu.cinema_history.ensure_initial_checkpoint
+  callee: src.nexu.cinema_history.save_history_checkpoint
+  call_type: resolved
+- caller: src.nexu.cinema_history.ensure_initial_checkpoint
+  callee: src.nexu.cinema_history._ledger_snapshot
+  call_type: resolved
+- caller: src.nexu.cinema_history.ledger_archive_for_display
+  callee: src.nexu.cinema_history._ledger_snapshot
+  call_type: resolved
+- caller: src.nexu.cinema_history.ledger_archive_for_display
+  callee: src.nexu.cinema_history._build_label
+  call_type: resolved
+- caller: src.nexu.export_prompt.export_iteration_prompt
+  callee: src.nexu.capsule.load_capsule
+  call_type: resolved
+- caller: src.nexu.export_prompt.export_iteration_prompt
+  callee: src.nexu.paths.capsule_dir
+  call_type: resolved
+- caller: src.nexu.export_prompt.export_iteration_prompt
+  callee: src.vico.intract.read_manifest_contracts
+  call_type: resolved
+- caller: src.nexu.export_prompt.export_iteration_prompt
+  callee: src.nexu.blueprint.build_blueprint
+  call_type: resolved
+- caller: src.nexu.export_prompt.export_iteration_prompt
+  callee: src.vico.diff.diff_capsule
+  call_type: resolved
+- caller: src.nexu.export_prompt.export_iteration_prompt
+  callee: src.nexu.export_prompt._cinema_policy_ledger_block
   call_type: resolved
 - caller: src.nexu.paths.snapshots_dir
   callee: src.nexu.paths.nexu_dir
@@ -782,60 +1860,6 @@ edges:
 - caller: src.nexu.paths.ensure_project_dirs
   callee: src.nexu.paths.capsules_dir
   call_type: resolved
-- caller: src.nexu.runtime._collect_fixtures
-  callee: src.nexu.runtime._read_fixture
-  call_type: resolved
-- caller: src.nexu.runtime.build_capsule_runtime
-  callee: src.nexu.capsule.load_capsule
-  call_type: resolved
-- caller: src.nexu.runtime.build_capsule_runtime
-  callee: src.nexu.paths.capsule_dir
-  call_type: resolved
-- caller: src.nexu.runtime.build_capsule_runtime
-  callee: src.nexu.blueprint.build_blueprint
-  call_type: resolved
-- caller: src.nexu.runtime.build_capsule_runtime
-  callee: src.nexu.intract.read_manifest_contracts
-  call_type: resolved
-- caller: src.nexu.runtime.build_capsule_runtime
-  callee: src.nexu.models.write_yaml
-  call_type: resolved
-- caller: src.nexu.runtime.build_capsule_runtime
-  callee: src.nexu.journal.append_journal
-  call_type: resolved
-- caller: src.nexu.runtime.build_capsule_runtime
-  callee: src.nexu.models.utc_now
-  call_type: resolved
-- caller: src.nexu.export_prompt.export_iteration_prompt
-  callee: src.nexu.capsule.load_capsule
-  call_type: resolved
-- caller: src.nexu.export_prompt.export_iteration_prompt
-  callee: src.nexu.paths.capsule_dir
-  call_type: resolved
-- caller: src.nexu.export_prompt.export_iteration_prompt
-  callee: src.nexu.intract.read_manifest_contracts
-  call_type: resolved
-- caller: src.nexu.export_prompt.export_iteration_prompt
-  callee: src.nexu.blueprint.build_blueprint
-  call_type: resolved
-- caller: src.nexu.export_prompt.export_iteration_prompt
-  callee: src.nexu.diff.diff_capsule
-  call_type: resolved
-- caller: src.nexu.diff.diff_capsule
-  callee: src.nexu.capsule.load_capsule
-  call_type: resolved
-- caller: src.nexu.diff.diff_capsule
-  callee: src.nexu.paths.capsule_dir
-  call_type: resolved
-- caller: src.nexu.diff.diff_capsule
-  callee: src.nexu.models.write_yaml
-  call_type: resolved
-- caller: src.nexu.diff.diff_capsule
-  callee: src.nexu.files.rel
-  call_type: resolved
-- caller: src.nexu.diff.diff_capsule
-  callee: src.nexu.hashing.sha256_file
-  call_type: resolved
 - caller: src.nexu.promote._promotion_map
   callee: src.nexu.files.rel
   call_type: resolved
@@ -852,133 +1876,22 @@ edges:
   callee: src.nexu.verify.verify_capsule
   call_type: resolved
 - caller: src.nexu.promote.build_promotion_plan
-  callee: src.nexu.drift.check_source_drift
+  callee: src.vico.drift.check_source_drift
   call_type: resolved
 - caller: src.nexu.promote.build_promotion_plan
-  callee: src.nexu.diff.diff_capsule
+  callee: src.vico.diff.diff_capsule
   call_type: resolved
 - caller: src.nexu.promote.build_promotion_plan
-  callee: src.nexu.models.write_yaml
+  callee: src.vico.models.write_yaml
   call_type: resolved
 - caller: src.nexu.promote.build_promotion_plan
-  callee: src.nexu.models.utc_now
+  callee: src.vico.models.utc_now
   call_type: resolved
 - caller: src.nexu.promote.build_promotion_plan
   callee: src.nexu.promote._promotion_map
   call_type: resolved
-- caller: src.nexu.journal.journal_path
+- caller: src.nexu.promote.apply_promotion_plan
   callee: src.nexu.paths.capsule_dir
-  call_type: resolved
-- caller: src.nexu.journal.read_journal
-  callee: src.nexu.journal.journal_path
-  call_type: resolved
-- caller: src.nexu.journal.read_journal
-  callee: src.nexu.models.read_yaml
-  call_type: resolved
-- caller: src.nexu.journal.append_journal
-  callee: src.nexu.journal.read_journal
-  call_type: resolved
-- caller: src.nexu.journal.append_journal
-  callee: src.nexu.models.write_yaml
-  call_type: resolved
-- caller: src.nexu.journal.append_journal
-  callee: src.nexu.models.utc_now
-  call_type: resolved
-- caller: src.nexu.journal.append_journal
-  callee: src.nexu.journal.journal_path
-  call_type: resolved
-- caller: src.nexu.report.build_capsule_report
-  callee: src.nexu.paths.capsule_dir
-  call_type: resolved
-- caller: src.nexu.report.build_capsule_report
-  callee: src.nexu.verify.verify_capsule
-  call_type: resolved
-- caller: src.nexu.report.build_capsule_report
-  callee: src.nexu.diff.diff_capsule
-  call_type: resolved
-- caller: src.nexu.report.build_capsule_report
-  callee: src.nexu.drift.check_source_drift
-  call_type: resolved
-- caller: src.nexu.report.build_capsule_report
-  callee: src.nexu.status.capsule_status
-  call_type: resolved
-- caller: src.nexu.report.build_capsule_report
-  callee: src.nexu.journal.read_journal
-  call_type: resolved
-- caller: src.nexu.report.build_capsule_report
-  callee: src.nexu.models.write_yaml
-  call_type: resolved
-- caller: src.nexu.capsule.create_capsule
-  callee: src.nexu.paths.ensure_project_dirs
-  call_type: resolved
-- caller: src.nexu.capsule.create_capsule
-  callee: src.nexu.paths.capsule_dir
-  call_type: resolved
-- caller: src.nexu.capsule.create_capsule
-  callee: src.nexu.files.collect_files
-  call_type: resolved
-- caller: src.nexu.capsule.create_capsule
-  callee: src.nexu.models.write_yaml
-  call_type: resolved
-- caller: src.nexu.capsule.create_capsule
-  callee: src.nexu.journal.append_journal
-  call_type: resolved
-- caller: src.nexu.capsule.list_capsules
-  callee: src.nexu.paths.capsules_dir
-  call_type: resolved
-- caller: src.nexu.capsule.load_capsule
-  callee: src.nexu.models.read_yaml
-  call_type: resolved
-- caller: src.nexu.capsule.load_capsule
-  callee: src.nexu.paths.capsule_dir
-  call_type: resolved
-- caller: src.nexu.capsule.save_capsule
-  callee: src.nexu.models.write_yaml
-  call_type: resolved
-- caller: src.nexu.capsule.save_capsule
-  callee: src.nexu.paths.capsule_dir
-  call_type: resolved
-- caller: src.nexu.iterate.iterate_capsule
-  callee: src.nexu.capsule.load_capsule
-  call_type: resolved
-- caller: src.nexu.iterate.iterate_capsule
-  callee: src.nexu.paths.capsule_dir
-  call_type: resolved
-- caller: src.nexu.iterate.iterate_capsule
-  callee: src.nexu.capsule.save_capsule
-  call_type: resolved
-- caller: src.nexu.iterate.iterate_capsule
-  callee: src.nexu.models.write_yaml
-  call_type: resolved
-- caller: src.nexu.verify._scan_capsule_contracts
-  callee: src.nexu.intract.read_manifest_contracts
-  call_type: resolved
-- caller: src.nexu.verify._scan_capsule_contracts
-  callee: src.nexu.files.collect_files
-  call_type: resolved
-- caller: src.nexu.verify._scan_capsule_contracts
-  callee: src.nexu.intract.scan_contracts_in_file
-  call_type: resolved
-- caller: src.nexu.verify._contains_patterns
-  callee: src.nexu.verify._text
-  call_type: resolved
-- caller: src.nexu.verify._find_term_evidence
-  callee: src.nexu.verify._text
-  call_type: resolved
-- caller: src.nexu.verify._find_term_evidence
-  callee: src.nexu.files.rel
-  call_type: resolved
-- caller: src.nexu.verify.verify_capsule
-  callee: src.nexu.capsule.load_capsule
-  call_type: resolved
-- caller: src.nexu.verify.verify_capsule
-  callee: src.nexu.paths.capsule_dir
-  call_type: resolved
-- caller: src.nexu.verify.verify_capsule
-  callee: src.nexu.verify._scan_capsule_contracts
-  call_type: resolved
-- caller: src.nexu.verify.verify_capsule
-  callee: src.nexu.files.collect_files
   call_type: resolved
 - caller: src.nexu.orchestrate.build_orchestration_context
   callee: src.nexu.capsule.load_capsule
@@ -987,7 +1900,7 @@ edges:
   callee: src.nexu.paths.capsule_dir
   call_type: resolved
 - caller: src.nexu.orchestrate.build_orchestration_context
-  callee: src.nexu.intract.read_manifest_contracts
+  callee: src.vico.intract.read_manifest_contracts
   call_type: resolved
 - caller: src.nexu.orchestrate.build_orchestration_context
   callee: src.nexu.plan.build_iteration_plan
@@ -999,13 +1912,13 @@ edges:
   callee: src.nexu.verify.verify_capsule
   call_type: resolved
 - caller: src.nexu.orchestrate.build_orchestration_context
-  callee: src.nexu.diff.diff_capsule
+  callee: src.vico.diff.diff_capsule
   call_type: resolved
 - caller: src.nexu.orchestrate.build_orchestration_context
   callee: src.nexu.orchestrate._contract_dicts
   call_type: resolved
 - caller: src.nexu.orchestrate.offline_orchestration_from_context
-  callee: src.nexu.models.utc_now
+  callee: src.vico.models.utc_now
   call_type: resolved
 - caller: src.nexu.orchestrate.build_capsule_orchestration
   callee: src.nexu.config.load_config
@@ -1020,34 +1933,115 @@ edges:
   callee: src.nexu.orchestrate.build_orchestration_prompt
   call_type: resolved
 - caller: src.nexu.orchestrate.build_capsule_orchestration
-  callee: src.nexu.models.write_yaml
+  callee: src.vico.models.write_yaml
   call_type: resolved
 - caller: src.nexu.orchestrate.build_capsule_orchestration
   callee: src.nexu.orchestrate._render_orchestration_markdown
   call_type: resolved
-- caller: src.nexu.init_project.init_project
+- caller: src.vico.models.FrozenSnapshot.from_dict
+  callee: src.vico.models.utc_now
+  call_type: resolved
+- caller: src.vico.diff.diff_capsule
+  callee: src.nexu.capsule.load_capsule
+  call_type: resolved
+- caller: src.vico.diff.diff_capsule
+  callee: src.nexu.paths.capsule_dir
+  call_type: resolved
+- caller: src.vico.diff.diff_capsule
+  callee: src.vico.models.write_yaml
+  call_type: resolved
+- caller: src.vico.diff.diff_capsule
+  callee: src.nexu.files.rel
+  call_type: resolved
+- caller: src.vico.diff.diff_capsule
+  callee: src.vico.hashing.sha256_file
+  call_type: resolved
+- caller: src.nexu.cinema_scripts.apply_spatial_deletes_to_html
+  callee: src.nexu.cinema_scripts._delete_match_keys
+  call_type: resolved
+- caller: src.nexu.cinema_scripts.repair_cinema_html_files
+  callee: src.nexu.cinema_scripts.write_cinema_inject_files
+  call_type: resolved
+- caller: src.nexu.cinema_scripts.repair_cinema_html_files
+  callee: src.nexu.cinema_scripts.finalize_cinema_html
+  call_type: resolved
+- caller: src.nexu.journal.journal_path
+  callee: src.nexu.paths.capsule_dir
+  call_type: resolved
+- caller: src.nexu.journal.read_journal
+  callee: src.nexu.journal.journal_path
+  call_type: resolved
+- caller: src.nexu.journal.read_journal
+  callee: src.vico.models.read_yaml
+  call_type: resolved
+- caller: src.nexu.journal.append_journal
+  callee: src.nexu.journal.read_journal
+  call_type: resolved
+- caller: src.nexu.journal.append_journal
+  callee: src.vico.models.write_yaml
+  call_type: resolved
+- caller: src.nexu.journal.append_journal
+  callee: src.vico.models.utc_now
+  call_type: resolved
+- caller: src.nexu.journal.append_journal
+  callee: src.nexu.journal.journal_path
+  call_type: resolved
+- caller: src.nexu.report.build_capsule_report
+  callee: src.nexu.paths.capsule_dir
+  call_type: resolved
+- caller: src.nexu.report.build_capsule_report
+  callee: src.nexu.verify.verify_capsule
+  call_type: resolved
+- caller: src.nexu.report.build_capsule_report
+  callee: src.vico.diff.diff_capsule
+  call_type: resolved
+- caller: src.nexu.report.build_capsule_report
+  callee: src.vico.drift.check_source_drift
+  call_type: resolved
+- caller: src.nexu.report.build_capsule_report
+  callee: src.vico.status.capsule_status
+  call_type: resolved
+- caller: src.nexu.report.build_capsule_report
+  callee: src.nexu.journal.read_journal
+  call_type: resolved
+- caller: src.nexu.report.build_capsule_report
+  callee: src.vico.models.write_yaml
+  call_type: resolved
+- caller: src.nexu.capsule.create_capsule
   callee: src.nexu.paths.ensure_project_dirs
   call_type: resolved
-- caller: src.nexu.init_project.init_project
-  callee: src.nexu.models.write_yaml
+- caller: src.nexu.capsule.create_capsule
+  callee: src.nexu.paths.capsule_dir
   call_type: resolved
-- caller: src.nexu.mcp_server._tool_map
-  callee: src.nexu.status.capsule_status
+- caller: src.nexu.capsule.create_capsule
+  callee: src.nexu.files.collect_files
   call_type: resolved
-- caller: src.nexu.mcp_server._tool_map
-  callee: src.nexu.plan.build_iteration_plan
+- caller: src.nexu.capsule.create_capsule
+  callee: src.vico.models.write_yaml
   call_type: resolved
-- caller: src.nexu.mcp_server._tool_map
-  callee: src.nexu.blueprint.build_blueprint
+- caller: src.nexu.capsule.create_capsule
+  callee: src.nexu.journal.append_journal
   call_type: resolved
-- caller: src.nexu.mcp_server._tool_map
-  callee: src.nexu.orchestrate.build_capsule_orchestration
+- caller: src.nexu.capsule.list_capsules
+  callee: src.nexu.paths.capsules_dir
   call_type: resolved
-- caller: src.nexu.mcp_server._tool_map
-  callee: src.nexu.runtime.build_capsule_runtime
+- caller: src.nexu.capsule.load_capsule
+  callee: src.vico.models.read_yaml
   call_type: resolved
-- caller: src.nexu.mcp_server._tool_map
-  callee: src.nexu.review.build_review_packet
+- caller: src.nexu.capsule.load_capsule
+  callee: src.nexu.paths.capsule_dir
+  call_type: resolved
+- caller: src.nexu.capsule.save_capsule
+  callee: src.vico.models.write_yaml
+  call_type: resolved
+- caller: src.nexu.capsule.save_capsule
+  callee: src.nexu.paths.capsule_dir
+  call_type: resolved
+- caller: src.nexu.mcp_server._apply_promotion_from_mcp
+  callee: src.nexu.promote.build_promotion_plan
+  call_type: resolved
+- caller: src.nexu.mcp_server._apply_promotion_from_mcp
+  callee: src.nexu.promote.apply_promotion_plan
   call_type: resolved
 - caller: src.nexu.mcp_server.call_tool
   callee: src.nexu.mcp_server._tool_map
@@ -1056,19 +2050,31 @@ edges:
   callee: src.nexu.capsule.list_capsules
   call_type: resolved
 - caller: src.nexu.mcp_server._read_resource
-  callee: src.nexu.status.capsule_status
+  callee: src.vico.status.capsule_status
   call_type: resolved
-- caller: src.nexu.mcp_server.handle_mcp_message
+- caller: src.nexu.mcp_server._rpc_handlers
+  callee: src.nexu.mcp_server._rpc_initialize
+  call_type: resolved
+- caller: src.nexu.mcp_server._rpc_handlers
   callee: src.nexu.mcp_server._result_content
   call_type: resolved
-- caller: src.nexu.mcp_server.handle_mcp_message
+- caller: src.nexu.mcp_server._rpc_handlers
+  callee: src.nexu.mcp_server._read_resource
+  call_type: resolved
+- caller: src.nexu.mcp_server._rpc_handlers
+  callee: src.nexu.mcp_server._prompt_get
+  call_type: resolved
+- caller: src.nexu.mcp_server._rpc_handlers
   callee: src.nexu.mcp_server.call_tool
   call_type: resolved
-- caller: src.nexu.mcp_server.handle_mcp_message
+- caller: src.nexu.mcp_server._rpc_handlers
   callee: src.nexu.mcp_server._resource_list
   call_type: resolved
+- caller: src.nexu.mcp_server._rpc_handlers
+  callee: src.nexu.mcp_server._prompts_list
+  call_type: resolved
 - caller: src.nexu.mcp_server.handle_mcp_message
-  callee: src.nexu.mcp_server._read_resource
+  callee: src.nexu.mcp_server._rpc_handlers
   call_type: resolved
 - caller: src.nexu.mcp_server.run_mcp_stdio
   callee: src.nexu.mcp_server.handle_mcp_message
@@ -1083,7 +2089,7 @@ edges:
   callee: src.nexu.paths.project_root
   call_type: resolved
 - caller: src.nexu.cli.freeze
-  callee: src.nexu.freeze.freeze_project
+  callee: src.vico.freeze.freeze_project
   call_type: resolved
 - caller: src.nexu.cli.capsule_create
   callee: src.nexu.paths.project_root
@@ -1104,7 +2110,7 @@ edges:
   callee: src.nexu.paths.project_root
   call_type: resolved
 - caller: src.nexu.cli.capsule_status_command
-  callee: src.nexu.status.capsule_status
+  callee: src.vico.status.capsule_status
   call_type: resolved
 - caller: src.nexu.cli.capsule_iterate
   callee: src.nexu.paths.project_root
@@ -1115,11 +2121,17 @@ edges:
 - caller: src.nexu.cli.capsule_iterate
   callee: src.nexu.journal.append_journal
   call_type: resolved
+- caller: src.nexu.cli.capsule_iterate
+  callee: src.nexu.cinema.generate_cinema_player
+  call_type: resolved
 - caller: src.nexu.cli.capsule_blueprint
   callee: src.nexu.paths.project_root
   call_type: resolved
 - caller: src.nexu.cli.capsule_blueprint
   callee: src.nexu.blueprint.build_blueprint
+  call_type: resolved
+- caller: src.nexu.cli.capsule_blueprint
+  callee: src.nexu.cli._print_yaml
   call_type: resolved
 - caller: src.nexu.cli.capsule_export_prompt
   callee: src.nexu.paths.project_root
@@ -1127,17 +2139,20 @@ edges:
 - caller: src.nexu.cli.capsule_export_prompt
   callee: src.nexu.export_prompt.export_iteration_prompt
   call_type: resolved
+- caller: src.nexu.cli.capsule_export_prompt
+  callee: src.nexu.cli._relative_to_root
+  call_type: resolved
 - caller: src.nexu.cli.capsule_diff
   callee: src.nexu.paths.project_root
   call_type: resolved
 - caller: src.nexu.cli.capsule_diff
-  callee: src.nexu.diff.diff_capsule
+  callee: src.vico.diff.diff_capsule
   call_type: resolved
 - caller: src.nexu.cli.capsule_drift
   callee: src.nexu.paths.project_root
   call_type: resolved
 - caller: src.nexu.cli.capsule_drift
-  callee: src.nexu.drift.check_source_drift
+  callee: src.vico.drift.check_source_drift
   call_type: resolved
 - caller: src.nexu.cli.capsule_verify
   callee: src.nexu.paths.project_root
@@ -1151,17 +2166,26 @@ edges:
 - caller: src.nexu.cli.capsule_plan
   callee: src.nexu.plan.build_iteration_plan
   call_type: resolved
+- caller: src.nexu.cli.capsule_plan
+  callee: src.nexu.cli._print_yaml
+  call_type: resolved
 - caller: src.nexu.cli.capsule_runtime
   callee: src.nexu.paths.project_root
   call_type: resolved
 - caller: src.nexu.cli.capsule_runtime
   callee: src.nexu.runtime.build_capsule_runtime
   call_type: resolved
+- caller: src.nexu.cli.capsule_runtime
+  callee: src.nexu.cli._relative_to_root
+  call_type: resolved
 - caller: src.nexu.cli.capsule_report
   callee: src.nexu.paths.project_root
   call_type: resolved
 - caller: src.nexu.cli.capsule_report
   callee: src.nexu.report.build_capsule_report
+  call_type: resolved
+- caller: src.nexu.cli.capsule_report
+  callee: src.nexu.cli._relative_to_root
   call_type: resolved
 - caller: src.nexu.cli.capsule_journal
   callee: src.nexu.paths.project_root
@@ -1187,11 +2211,17 @@ edges:
 - caller: src.nexu.cli.capsule_bundle
   callee: src.nexu.bundle.build_capsule_bundle
   call_type: resolved
+- caller: src.nexu.cli.capsule_bundle
+  callee: src.nexu.cli._relative_to_root
+  call_type: resolved
 - caller: src.nexu.cli.capsule_promote
   callee: src.nexu.paths.project_root
   call_type: resolved
 - caller: src.nexu.cli.capsule_promote
   callee: src.nexu.promote.build_promotion_plan
+  call_type: resolved
+- caller: src.nexu.cli.capsule_promote
+  callee: src.nexu.promote.apply_promotion_plan
   call_type: resolved
 - caller: src.nexu.cli.mcp_serve
   callee: src.nexu.paths.project_root
@@ -1199,103 +2229,373 @@ edges:
 - caller: src.nexu.cli.mcp_serve
   callee: src.nexu.mcp_server.run_mcp_stdio
   call_type: resolved
-- caller: src.nexu.freeze.freeze_project
-  callee: src.nexu.paths.ensure_project_dirs
+- caller: src.nexu.cinema_server._render_server_script
+  callee: src.nexu.cinema_server._template_text
   call_type: resolved
-- caller: src.nexu.freeze.freeze_project
-  callee: src.nexu.models.write_yaml
+- caller: src.nexu.cinema_server._available_port
+  callee: src.nexu.cinema_server._try_spawn_on_port
   call_type: resolved
-- caller: src.nexu.freeze.freeze_project
+- caller: src.nexu.cinema_server.start_persistent_http_server
+  callee: src.nexu.config.load_env_files
+  call_type: resolved
+- caller: src.nexu.cinema_server.start_persistent_http_server
+  callee: src.nexu.cinema_server._render_server_script
+  call_type: resolved
+- caller: src.nexu.cinema_server.start_persistent_http_server
+  callee: src.nexu.cinema_server._available_port
+  call_type: resolved
+- caller: src.nexu.cinema_server.start_persistent_http_server
+  callee: src.nexu.config.load_config
+  call_type: resolved
+- caller: src.nexu.cinema_server.start_persistent_http_server
+  callee: src.nexu.cinema_server._litellm_available
+  call_type: resolved
+- caller: src.nexu.cinema_server.start_cinema_player_server
+  callee: src.nexu.cinema_server.start_persistent_http_server
+  call_type: resolved
+- caller: src.nexu.cinema_server.start_cinema_player_server
+  callee: src.nexu.cinema_server._open_browser
+  call_type: resolved
+- caller: src.nexu.cinema._render_cinema_template
+  callee: src.nexu.cinema._cinema_template_text
+  call_type: resolved
+- caller: src.nexu.cinema.write_cinema_nexu_hooks
+  callee: src.nexu.cinema._cinema_template_text
+  call_type: resolved
+- caller: src.nexu.cinema._contract_to_public_dict
+  callee: src.nexu.cinema.format_intract_v1_line
+  call_type: resolved
+- caller: src.nexu.cinema.build_intract_policy_snapshot
+  callee: src.nexu.paths.capsule_dir
+  call_type: resolved
+- caller: src.nexu.cinema.build_intract_policy_snapshot
+  callee: src.vico.models.read_yaml
+  call_type: resolved
+- caller: src.nexu.cinema.build_intract_policy_snapshot
+  callee: src.nexu.cinema._contract_to_public_dict
+  call_type: resolved
+- caller: src.nexu.cinema.write_intract_policy_files
+  callee: src.nexu.cinema.build_intract_policy_snapshot
+  call_type: resolved
+- caller: src.nexu.cinema.generate_cinema_player
+  callee: src.nexu.paths.capsule_dir
+  call_type: resolved
+- caller: src.nexu.cinema.generate_cinema_player
+  callee: src.nexu.cinema.write_intract_policy_files
+  call_type: resolved
+- caller: src.nexu.cinema.generate_cinema_player
+  callee: src.nexu.cinema.write_cinema_nexu_hooks
+  call_type: resolved
+- caller: src.nexu.cinema.generate_cinema_player
+  callee: src.nexu.cinema_scripts.write_cinema_inject_files
+  call_type: resolved
+- caller: src.nexu.cinema.generate_cinema_player
+  callee: src.nexu.cinema_history.ensure_initial_checkpoint
+  call_type: resolved
+- caller: src.nexu.cinema.generate_cinema_player
+  callee: src.nexu.cinema._render_cinema_template
+  call_type: resolved
+- caller: src.nexu.cinema._start_cinema_server
+  callee: src.nexu.cinema_server.start_cinema_player_server
+  call_type: resolved
+- caller: src.nexu.intract_adapter._ensure_intract_on_path
+  callee: src.nexu.intract_adapter._sibling_intract_src
+  call_type: resolved
+- caller: src.nexu.intract_adapter._finding_for_result
+  callee: src.nexu.intract_adapter._result_status
+  call_type: resolved
+- caller: src.nexu.intract_adapter.check_intract_policy
+  callee: src.nexu.intract_adapter._ensure_intract_on_path
+  call_type: resolved
+- caller: src.nexu.intract_adapter.check_intract_policy
+  callee: src.nexu.files.rel
+  call_type: resolved
+- caller: src.nexu.intract_adapter.check_intract_policy
+  callee: src.nexu.intract_adapter._policy_findings
+  call_type: resolved
+- caller: src.nexu.cinema_projects.activate_example_project
+  callee: src.nexu.cinema_projects._resolve_source_cinema
+  call_type: resolved
+- caller: src.nexu.cinema_projects.activate_example_project
+  callee: src.nexu.cinema_scripts.write_cinema_inject_files
+  call_type: resolved
+- caller: src.nexu.cinema_projects.activate_example_project
+  callee: src.nexu.cinema_projects.find_nexu_repo_root
+  call_type: resolved
+- caller: src.nexu.cinema_projects.activate_example_project
+  callee: src.nexu.cinema_projects._copy_cinema_files
+  call_type: resolved
+- caller: src.nexu.cinema_projects.activate_example_project
+  callee: src.nexu.cinema_projects._write_seed_variants
+  call_type: resolved
+- caller: src.nexu.cinema_projects.activate_example_project
+  callee: src.nexu.cinema_policy.stage_files_are_distinct
+  call_type: resolved
+- caller: src.nexu.cinema_projects.activate_example_project
+  callee: src.nexu.cinema_policy.ensure_option_previews_from_stages
+  call_type: resolved
+- caller: src.nexu.cinema_policy._html_files_distinct
+  callee: src.nexu.cinema_policy._normalize_html_body
+  call_type: resolved
+- caller: src.nexu.cinema_policy.option_previews_are_distinct
+  callee: src.nexu.cinema_policy._html_files_distinct
+  call_type: resolved
+- caller: src.nexu.cinema_policy.stage_files_are_distinct
+  callee: src.nexu.cinema_policy._html_files_distinct
+  call_type: resolved
+- caller: src.nexu.cinema_policy.ensure_option_previews_from_stages
+  callee: src.nexu.cinema_policy._replace_html_title
+  call_type: resolved
+- caller: src.nexu.cinema_policy.sync_option_previews_from_workspace
+  callee: src.nexu.cinema_scripts.apply_spatial_deletes_to_html
+  call_type: resolved
+- caller: src.nexu.cinema_policy.sync_option_previews_from_workspace
+  callee: src.nexu.cinema_scripts.finalize_cinema_html
+  call_type: resolved
+- caller: src.nexu.cinema_policy.sync_option_previews_from_workspace
+  callee: src.nexu.cinema_policy.load_effective_ui_constraints
+  call_type: resolved
+- caller: src.nexu.cinema_policy.enforce_deletes_on_option_previews
+  callee: src.nexu.cinema_scripts.apply_spatial_deletes_to_html
+  call_type: resolved
+- caller: src.nexu.cinema_policy.enforce_deletes_on_option_previews
+  callee: src.nexu.cinema_scripts.finalize_cinema_html
+  call_type: resolved
+- caller: src.nexu.cinema_policy.load_effective_ui_constraints
+  callee: src.nexu.cinema_policy.policy_ledger_path
+  call_type: resolved
+- caller: src.nexu.cinema_policy.load_effective_ui_constraints
+  callee: src.nexu.cinema_policy.effective_ui_constraints_from_ledger
+  call_type: resolved
+- caller: src.nexu.cinema_policy.cinema_model_label
+  callee: src.nexu.config.load_env_files
+  call_type: resolved
+- caller: src.nexu.cinema_policy.cinema_model_label
+  callee: src.nexu.config.load_config
+  call_type: resolved
+- caller: src.nexu.cinema_policy.cinema_dir_for
+  callee: src.nexu.paths.capsule_dir
+  call_type: resolved
+- caller: src.nexu.cinema_policy.cinema_dir_for
+  callee: src.nexu.paths.project_root
+  call_type: resolved
+- caller: src.nexu.cinema_policy.policy_snapshot_path
+  callee: src.nexu.cinema_policy.cinema_dir_for
+  call_type: resolved
+- caller: src.nexu.cinema_policy.policy_ledger_path
+  callee: src.nexu.cinema_policy.cinema_dir_for
+  call_type: resolved
+- caller: src.nexu.cinema_policy.load_policy_snapshot
+  callee: src.nexu.cinema_policy.policy_snapshot_path
+  call_type: resolved
+- caller: src.nexu.cinema_policy.manifest_paths_from_snapshot
+  callee: src.nexu.paths.project_root
+  call_type: resolved
+- caller: src.nexu.cinema_policy.apply_ledger_from_cinema
+  callee: src.nexu.paths.project_root
+  call_type: resolved
+- caller: src.nexu.cinema_policy.apply_ledger_from_cinema
+  callee: src.nexu.cinema_policy.policy_ledger_path
+  call_type: resolved
+- caller: src.nexu.cinema_policy.apply_ledger_from_cinema
+  callee: src.nexu.cinema_policy.normalize_manifest_target
+  call_type: resolved
+- caller: src.nexu.cinema_policy.apply_ledger_from_cinema
+  callee: src.nexu.cinema_policy.load_policy_snapshot
+  call_type: resolved
+- caller: src.nexu.cinema_policy.ensure_intract_on_path
+  callee: src.nexu.paths.project_root
+  call_type: resolved
+- caller: src.nexu.cinema_policy.propose_ui_delta_contract_dicts
+  callee: src.nexu.cinema_policy.ensure_intract_on_path
+  call_type: resolved
+- caller: src.nexu.cinema_policy.append_policy_ledger_entry
+  callee: src.nexu.cinema_policy.policy_ledger_path
+  call_type: resolved
+- caller: src.nexu.cinema_policy.normalize_proposals_for_ledger
+  callee: src.nexu.cinema_policy._proposal_kind_and_element
+  call_type: resolved
+- caller: src.nexu.cinema_policy.append_iteration_ledger_entry
+  callee: src.nexu.cinema_policy.normalize_proposals_for_ledger
+  call_type: resolved
+- caller: src.nexu.cinema_policy.append_iteration_ledger_entry
+  callee: src.nexu.cinema_policy.append_policy_ledger_entry
+  call_type: resolved
+- caller: src.nexu.cinema_policy.append_iteration_ledger_entry
+  callee: src.nexu.cinema_policy.propose_ui_delta_contract_dicts
+  call_type: resolved
+- caller: src.nexu.cinema_policy.append_iteration_ledger_entry
+  callee: src.nexu.paths.project_root
+  call_type: resolved
+- caller: src.nexu.cinema_policy.propose_llm_for_stage
+  callee: src.nexu.cinema_policy.cinema_dir_for
+  call_type: resolved
+- caller: src.nexu.cinema_policy.propose_llm_for_stage
+  callee: src.nexu.cinema_policy.ensure_intract_on_path
+  call_type: resolved
+- caller: src.nexu.cinema_policy.propose_llm_for_stage
+  callee: src.nexu.cinema_policy.append_policy_ledger_entry
+  call_type: resolved
+- caller: src.nexu.cinema_policy.propose_llm_for_stage
+  callee: src.nexu.paths.project_root
+  call_type: resolved
+- caller: src.nexu.cinema_policy.validate_intract_artifact
+  callee: src.nexu.cinema_policy.ensure_intract_on_path
+  call_type: resolved
+- caller: src.nexu.cinema_policy.verify_capsule_workspace
+  callee: src.nexu.verify.verify_capsule
+  call_type: resolved
+- caller: src.nexu.cinema_policy.verify_capsule_workspace
+  callee: src.nexu.paths.project_root
+  call_type: resolved
+- caller: src.nexu.cinema_markpact.build_markpact_readme
+  callee: src.nexu.cinema_markpact._escape_markdown_fence
+  call_type: resolved
+- caller: src.nexu.cinema_publish._registry_path
+  callee: src.nexu.cinema_publish.services_root
+  call_type: resolved
+- caller: src.nexu.cinema_publish._load_registry
+  callee: src.nexu.cinema_publish._registry_path
+  call_type: resolved
+- caller: src.nexu.cinema_publish._save_registry
+  callee: src.nexu.cinema_publish.services_root
+  call_type: resolved
+- caller: src.nexu.cinema_publish._save_registry
+  callee: src.nexu.cinema_publish._registry_path
+  call_type: resolved
+- caller: src.nexu.cinema_publish._service_alive
+  callee: src.nexu.cinema_publish._port_open
+  call_type: resolved
+- caller: src.nexu.cinema_publish._service_alive
+  callee: src.nexu.cinema_publish._http_ok
+  call_type: resolved
+- caller: src.nexu.cinema_publish._refresh_service_status
+  callee: src.nexu.cinema_publish._service_alive
+  call_type: resolved
+- caller: src.nexu.cinema_publish.list_published_services
+  callee: src.nexu.cinema_publish._load_registry
+  call_type: resolved
+- caller: src.nexu.cinema_publish.list_published_services
+  callee: src.nexu.cinema_publish._save_registry
+  call_type: resolved
+- caller: src.nexu.cinema_publish.list_published_services
+  callee: src.nexu.cinema_publish._refresh_service_status
+  call_type: resolved
+- caller: src.nexu.cinema_publish._write_service_readme
+  callee: src.nexu.cinema_markpact._escape_markdown_fence
+  call_type: resolved
+- caller: src.nexu.cinema_publish.publish_project_service
+  callee: src.nexu.cinema_publish._slug_service_id
+  call_type: resolved
+- caller: src.nexu.cinema_publish.publish_project_service
+  callee: src.nexu.cinema_markpact.build_markpact_readme
+  call_type: resolved
+- caller: src.nexu.cinema_publish.publish_project_service
+  callee: src.nexu.cinema_publish._load_registry
+  call_type: resolved
+- caller: src.nexu.cinema_publish.publish_project_service
+  callee: src.nexu.cinema_policy.load_effective_ui_constraints
+  call_type: resolved
+- caller: src.nexu.cinema_publish.start_published_service
+  callee: src.nexu.cinema_publish._load_registry
+  call_type: resolved
+- caller: src.nexu.cinema_publish.start_published_service
+  callee: src.nexu.cinema_publish._refresh_service_status
+  call_type: resolved
+- caller: src.nexu.cinema_publish.start_published_service
+  callee: src.nexu.cinema_publish._save_registry
+  call_type: resolved
+- caller: src.nexu.cinema_publish.stop_published_service
+  callee: src.nexu.cinema_publish._load_registry
+  call_type: resolved
+- caller: src.nexu.cinema_publish.stop_published_service
+  callee: src.nexu.cinema_publish._save_registry
+  call_type: resolved
+- caller: src.nexu.verify._scan_capsule_contracts
+  callee: src.vico.intract.read_manifest_contracts
+  call_type: resolved
+- caller: src.nexu.verify._scan_capsule_contracts
   callee: src.nexu.files.collect_files
   call_type: resolved
-- caller: src.nexu.freeze.freeze_project
-  callee: src.nexu.git.current_git_sha
+- caller: src.nexu.verify._scan_capsule_contracts
+  callee: src.vico.intract.scan_contracts_in_file
   call_type: resolved
-- caller: src.nexu.freeze.freeze_project
-  callee: src.nexu.paths.snapshots_dir
+- caller: src.nexu.verify._contains_patterns
+  callee: src.nexu.verify._text
   call_type: resolved
-- caller: src.nexu.freeze.freeze_project
+- caller: src.nexu.verify._find_term_evidence
+  callee: src.nexu.verify._text
+  call_type: resolved
+- caller: src.nexu.verify._find_term_evidence
   callee: src.nexu.files.rel
   call_type: resolved
-- caller: src.nexu.blueprint.build_blueprint
+- caller: src.nexu.verify._check_source_files_presence
+  callee: src.nexu.files.rel
+  call_type: resolved
+- caller: src.nexu.verify._check_baseline_lock
+  callee: src.vico.diff.diff_capsule
+  call_type: resolved
+- caller: src.nexu.verify._check_forbidden_write
+  callee: src.nexu.verify._contains_patterns
+  call_type: resolved
+- caller: src.nexu.verify._check_forbidden_secret
+  callee: src.nexu.verify._contains_patterns
+  call_type: resolved
+- caller: src.nexu.verify._check_output_presence
+  callee: src.nexu.verify._find_term_evidence
+  call_type: resolved
+- caller: src.nexu.verify.verify_capsule
   callee: src.nexu.capsule.load_capsule
   call_type: resolved
-- caller: src.nexu.blueprint.build_blueprint
+- caller: src.nexu.verify.verify_capsule
   callee: src.nexu.paths.capsule_dir
   call_type: resolved
-- caller: src.nexu.blueprint.build_blueprint
-  callee: src.nexu.intract.read_manifest_contracts
+- caller: src.nexu.verify.verify_capsule
+  callee: src.nexu.verify._scan_capsule_contracts
   call_type: resolved
-- caller: src.nexu.blueprint.build_blueprint
-  callee: src.nexu.models.write_yaml
+- caller: src.nexu.verify.verify_capsule
+  callee: src.nexu.files.collect_files
   call_type: resolved
-- caller: src.nexu.blueprint.build_blueprint
-  callee: src.nexu.models.utc_now
+- caller: scripts.check-doc-links._anchors
+  callee: scripts.check-doc-links._slug
   call_type: resolved
-- caller: src.nexu.bundle._should_include
-  callee: src.nexu.files.rel
+- caller: scripts.check-doc-links.check_links
+  callee: scripts.check-doc-links._markdown_files
   call_type: resolved
-- caller: src.nexu.bundle.build_capsule_bundle
-  callee: src.nexu.paths.capsule_dir
+- caller: scripts.check-doc-links.check_links
+  callee: scripts.check-doc-links._targets
   call_type: resolved
-- caller: src.nexu.bundle.build_capsule_bundle
-  callee: src.nexu.models.write_yaml
+- caller: scripts.check-doc-links.check_links
+  callee: scripts.check-doc-links._resolve
   call_type: resolved
-- caller: src.nexu.bundle.build_capsule_bundle
-  callee: src.nexu.journal.append_journal
+- caller: scripts.check-doc-links.check_links
+  callee: scripts.check-doc-links._is_external
   call_type: resolved
-- caller: src.nexu.bundle.build_capsule_bundle
-  callee: src.nexu.models.utc_now
-  call_type: resolved
-- caller: src.nexu.config.load_config
-  callee: src.nexu.models.read_yaml
-  call_type: resolved
-- caller: src.nexu.intract.parse_intract_line
-  callee: src.nexu.intract._tokenize_contract
-  call_type: resolved
-- caller: src.nexu.intract.parse_intract_line
-  callee: src.nexu.intract._split_csv
-  call_type: resolved
-- caller: src.nexu.intract.scan_contracts_in_text
-  callee: src.nexu.intract.parse_intract_line
-  call_type: resolved
-- caller: src.nexu.intract.scan_contracts_in_file
-  callee: src.nexu.intract.scan_contracts_in_text
-  call_type: resolved
-- caller: src.nexu.models.FrozenSnapshot.from_dict
-  callee: src.nexu.models.utc_now
-  call_type: resolved
-- caller: examples.run_examples.run_example
-  callee: src.nexu.init_project.init_project
-  call_type: resolved
-- caller: examples.run_examples.run_example
-  callee: src.nexu.freeze.freeze_project
-  call_type: resolved
-- caller: examples.run_examples.run_example
-  callee: src.nexu.capsule.create_capsule
-  call_type: resolved
-- caller: examples.run_examples.run_example
-  callee: src.nexu.plan.build_iteration_plan
-  call_type: resolved
-- caller: examples.run_examples.run_example
-  callee: src.nexu.blueprint.build_blueprint
-  call_type: resolved
-- caller: examples.run_examples.run_example
-  callee: src.nexu.iterate.iterate_capsule
-  call_type: resolved
-- caller: examples.run_examples.run_example
-  callee: src.nexu.runtime.build_capsule_runtime
-  call_type: resolved
-- caller: examples.run_examples.run_example
-  callee: src.nexu.export_prompt.export_iteration_prompt
-  call_type: resolved
-- caller: examples.run_examples.main
-  callee: examples.run_examples.run_example
+- caller: scripts.check-doc-links.main
+  callee: scripts.check-doc-links.check_links
   call_type: resolved
 modules:
   examples.run_examples:
   - examples.run_examples.main
   - examples.run_examples.run_example
+  examples.scientific_calculator_demo:
+  - examples.scientific_calculator_demo.main
+  examples.scientific_calculator_demo2:
+  - examples.scientific_calculator_demo2.main
+  - examples.scientific_calculator_demo2.print_code
+  examples.web_app_calculator.run:
+  - examples.web_app_calculator.run.main
+  examples.web_app_dashboard.run:
+  - examples.web_app_dashboard.run.main
+  scripts.check-doc-links:
+  - scripts.check-doc-links._anchors
+  - scripts.check-doc-links._is_external
+  - scripts.check-doc-links._markdown_files
+  - scripts.check-doc-links._resolve
+  - scripts.check-doc-links._slug
+  - scripts.check-doc-links._targets
+  - scripts.check-doc-links.check_links
+  - scripts.check-doc-links.main
   src.nexu.blueprint:
   - src.nexu.blueprint.build_blueprint
   src.nexu.bundle:
@@ -1306,7 +2606,100 @@ modules:
   - src.nexu.capsule.list_capsules
   - src.nexu.capsule.load_capsule
   - src.nexu.capsule.save_capsule
+  src.nexu.cinema:
+  - src.nexu.cinema._cinema_template_text
+  - src.nexu.cinema._contract_to_public_dict
+  - src.nexu.cinema._render_cinema_template
+  - src.nexu.cinema._start_cinema_server
+  - src.nexu.cinema.build_intract_policy_snapshot
+  - src.nexu.cinema.format_intract_v1_line
+  - src.nexu.cinema.generate_cinema_player
+  - src.nexu.cinema.write_cinema_nexu_hooks
+  - src.nexu.cinema.write_intract_policy_files
+  src.nexu.cinema_history:
+  - src.nexu.cinema_history._build_label
+  - src.nexu.cinema_history._copy_checkpoint_files
+  - src.nexu.cinema_history._ledger_snapshot
+  - src.nexu.cinema_history._load_index
+  - src.nexu.cinema_history._refresh_policy_snapshot
+  - src.nexu.cinema_history._write_index
+  - src.nexu.cinema_history.ensure_initial_checkpoint
+  - src.nexu.cinema_history.history_dir
+  - src.nexu.cinema_history.history_index_path
+  - src.nexu.cinema_history.ledger_archive_for_display
+  - src.nexu.cinema_history.list_history_checkpoints
+  - src.nexu.cinema_history.restore_history_checkpoint
+  - src.nexu.cinema_history.save_history_checkpoint
+  src.nexu.cinema_markpact:
+  - src.nexu.cinema_markpact._escape_markdown_fence
+  - src.nexu.cinema_markpact.build_markpact_readme
+  src.nexu.cinema_policy:
+  - src.nexu.cinema_policy._html_files_distinct
+  - src.nexu.cinema_policy._normalize_html_body
+  - src.nexu.cinema_policy._proposal_kind_and_element
+  - src.nexu.cinema_policy._replace_html_title
+  - src.nexu.cinema_policy.append_iteration_ledger_entry
+  - src.nexu.cinema_policy.append_policy_ledger_entry
+  - src.nexu.cinema_policy.apply_ledger_from_cinema
+  - src.nexu.cinema_policy.cinema_dir_for
+  - src.nexu.cinema_policy.cinema_model_label
+  - src.nexu.cinema_policy.effective_ui_constraints_from_ledger
+  - src.nexu.cinema_policy.enforce_deletes_on_option_previews
+  - src.nexu.cinema_policy.ensure_intract_on_path
+  - src.nexu.cinema_policy.ensure_option_previews_from_stages
+  - src.nexu.cinema_policy.load_effective_ui_constraints
+  - src.nexu.cinema_policy.load_policy_snapshot
+  - src.nexu.cinema_policy.manifest_paths_from_snapshot
+  - src.nexu.cinema_policy.normalize_manifest_target
+  - src.nexu.cinema_policy.normalize_proposals_for_ledger
+  - src.nexu.cinema_policy.option_previews_are_distinct
+  - src.nexu.cinema_policy.policy_ledger_path
+  - src.nexu.cinema_policy.policy_snapshot_path
+  - src.nexu.cinema_policy.propose_llm_for_stage
+  - src.nexu.cinema_policy.propose_ui_delta_contract_dicts
+  - src.nexu.cinema_policy.stage_files_are_distinct
+  - src.nexu.cinema_policy.sync_option_previews_from_workspace
+  - src.nexu.cinema_policy.validate_intract_artifact
+  - src.nexu.cinema_policy.verify_capsule_workspace
+  src.nexu.cinema_projects:
+  - src.nexu.cinema_projects._copy_cinema_files
+  - src.nexu.cinema_projects._resolve_source_cinema
+  - src.nexu.cinema_projects._write_seed_variants
+  - src.nexu.cinema_projects.activate_example_project
+  - src.nexu.cinema_projects.find_nexu_repo_root
+  src.nexu.cinema_publish:
+  - src.nexu.cinema_publish._http_ok
+  - src.nexu.cinema_publish._load_registry
+  - src.nexu.cinema_publish._port_open
+  - src.nexu.cinema_publish._refresh_service_status
+  - src.nexu.cinema_publish._registry_path
+  - src.nexu.cinema_publish._save_registry
+  - src.nexu.cinema_publish._service_alive
+  - src.nexu.cinema_publish._slug_service_id
+  - src.nexu.cinema_publish._write_service_readme
+  - src.nexu.cinema_publish.list_published_services
+  - src.nexu.cinema_publish.publish_project_service
+  - src.nexu.cinema_publish.services_root
+  - src.nexu.cinema_publish.start_published_service
+  - src.nexu.cinema_publish.stop_published_service
+  src.nexu.cinema_scripts:
+  - src.nexu.cinema_scripts._delete_match_keys
+  - src.nexu.cinema_scripts.apply_spatial_deletes_to_html
+  - src.nexu.cinema_scripts.finalize_cinema_html
+  - src.nexu.cinema_scripts.repair_cinema_html_files
+  - src.nexu.cinema_scripts.write_cinema_inject_files
+  src.nexu.cinema_server:
+  - src.nexu.cinema_server._available_port
+  - src.nexu.cinema_server._litellm_available
+  - src.nexu.cinema_server._open_browser
+  - src.nexu.cinema_server._render_server_script
+  - src.nexu.cinema_server._template_text
+  - src.nexu.cinema_server._try_spawn_on_port
+  - src.nexu.cinema_server.start_cinema_player_server
+  - src.nexu.cinema_server.start_persistent_http_server
   src.nexu.cli:
+  - src.nexu.cli._print_yaml
+  - src.nexu.cli._relative_to_root
   - src.nexu.cli.capsule_blueprint
   - src.nexu.cli.capsule_bundle
   - src.nexu.cli.capsule_create
@@ -1328,33 +2721,26 @@ modules:
   - src.nexu.cli.init
   - src.nexu.cli.mcp_serve
   src.nexu.config:
+  - src.nexu.config._load_env_file
   - src.nexu.config.load_config
-  src.nexu.diff:
-  - src.nexu.diff.diff_capsule
-  src.nexu.drift:
-  - src.nexu.drift.check_source_drift
+  - src.nexu.config.load_env_files
   src.nexu.export_prompt:
+  - src.nexu.export_prompt._cinema_policy_ledger_block
   - src.nexu.export_prompt.export_iteration_prompt
   src.nexu.files:
   - src.nexu.files.collect_files
   - src.nexu.files.is_text_file
   - src.nexu.files.matches_any
   - src.nexu.files.rel
-  src.nexu.freeze:
-  - src.nexu.freeze.freeze_project
-  src.nexu.git:
-  - src.nexu.git.current_git_sha
-  src.nexu.hashing:
-  - src.nexu.hashing.sha256_file
   src.nexu.init_project:
   - src.nexu.init_project.init_project
-  src.nexu.intract:
-  - src.nexu.intract._split_csv
-  - src.nexu.intract._tokenize_contract
-  - src.nexu.intract.parse_intract_line
-  - src.nexu.intract.read_manifest_contracts
-  - src.nexu.intract.scan_contracts_in_file
-  - src.nexu.intract.scan_contracts_in_text
+  src.nexu.intract_adapter:
+  - src.nexu.intract_adapter._ensure_intract_on_path
+  - src.nexu.intract_adapter._finding_for_result
+  - src.nexu.intract_adapter._policy_findings
+  - src.nexu.intract_adapter._result_status
+  - src.nexu.intract_adapter._sibling_intract_src
+  - src.nexu.intract_adapter.check_intract_policy
   src.nexu.iterate:
   - src.nexu.iterate.iterate_capsule
   src.nexu.journal:
@@ -1368,18 +2754,18 @@ modules:
   - src.nexu.llm.call_litellm_review
   - src.nexu.llm.offline_review_from_status
   src.nexu.mcp_server:
+  - src.nexu.mcp_server._apply_promotion_from_mcp
+  - src.nexu.mcp_server._prompt_get
+  - src.nexu.mcp_server._prompts_list
   - src.nexu.mcp_server._read_resource
   - src.nexu.mcp_server._resource_list
   - src.nexu.mcp_server._result_content
+  - src.nexu.mcp_server._rpc_handlers
+  - src.nexu.mcp_server._rpc_initialize
   - src.nexu.mcp_server._tool_map
   - src.nexu.mcp_server.call_tool
   - src.nexu.mcp_server.handle_mcp_message
   - src.nexu.mcp_server.run_mcp_stdio
-  src.nexu.models:
-  - src.nexu.models.FrozenSnapshot.from_dict
-  - src.nexu.models.read_yaml
-  - src.nexu.models.utc_now
-  - src.nexu.models.write_yaml
   src.nexu.orchestrate:
   - src.nexu.orchestrate._contract_dicts
   - src.nexu.orchestrate._render_orchestration_markdown
@@ -1399,6 +2785,7 @@ modules:
   - src.nexu.plan.build_iteration_plan
   src.nexu.promote:
   - src.nexu.promote._promotion_map
+  - src.nexu.promote.apply_promotion_plan
   - src.nexu.promote.build_promotion_plan
   src.nexu.report:
   - src.nexu.report.build_capsule_report
@@ -1409,20 +2796,80 @@ modules:
   - src.nexu.runtime._collect_fixtures
   - src.nexu.runtime._read_fixture
   - src.nexu.runtime.build_capsule_runtime
-  src.nexu.status:
-  - src.nexu.status.capsule_status
   src.nexu.verify:
+  - src.nexu.verify._check_baseline_lock
+  - src.nexu.verify._check_forbidden_secret
+  - src.nexu.verify._check_forbidden_write
+  - src.nexu.verify._check_output_presence
+  - src.nexu.verify._check_source_files_presence
   - src.nexu.verify._contains_patterns
   - src.nexu.verify._find_term_evidence
   - src.nexu.verify._scan_capsule_contracts
   - src.nexu.verify._text
   - src.nexu.verify.verify_capsule
+  src.vico.diff:
+  - src.vico.diff.diff_capsule
+  src.vico.drift:
+  - src.vico.drift.check_source_drift
+  src.vico.freeze:
+  - src.vico.freeze.freeze_project
+  src.vico.git:
+  - src.vico.git.current_git_sha
+  src.vico.hashing:
+  - src.vico.hashing.sha256_file
+  src.vico.intract:
+  - src.vico.intract._split_csv
+  - src.vico.intract._tokenize_contract
+  - src.vico.intract.parse_intract_line
+  - src.vico.intract.read_manifest_contracts
+  - src.vico.intract.scan_contracts_in_file
+  - src.vico.intract.scan_contracts_in_text
+  src.vico.models:
+  - src.vico.models.FrozenSnapshot.from_dict
+  - src.vico.models.read_yaml
+  - src.vico.models.utc_now
+  - src.vico.models.write_yaml
+  src.vico.status:
+  - src.vico.status.capsule_status
 entry_points:
 - examples.backend_service.app.users.list_users
 - examples.frontend_view.src.menu_icons.preview_menu_icons
 - examples.mcp_service.src.demo.plan_demo
+- examples.nexu_markpact_exporter.main
+- examples.realtime_lane_nexu_sync.simulate_realtime_sync
 - examples.run_examples.main
+- examples.scientific_calculator_demo.main
+- examples.scientific_calculator_demo2.main
 - examples.vertical_slice.src.flow.run_flow
+- examples.web_app_calculator.markpact_sandbox.sandbox.src.calculator.render_calculator
+- examples.web_app_calculator.run.main
+- examples.web_app_calculator.workspace.src.calculator.render_calculator
+- examples.web_app_dashboard.run.main
+- examples.web_app_dashboard.src.dashboard.render_dashboard
+- examples.web_app_dashboard.workspace.src.dashboard.render_dashboard
+- examples.web_app_event_monitor.run.main
+- examples.web_app_pactown_ecosystem.run.main
+- scripts.check-doc-links.main
+- src.nexu.cinema_history.ledger_archive_for_display
+- src.nexu.cinema_history.list_history_checkpoints
+- src.nexu.cinema_history.restore_history_checkpoint
+- src.nexu.cinema_markpact.markpact_download_filename
+- src.nexu.cinema_policy.append_iteration_ledger_entry
+- src.nexu.cinema_policy.cinema_model_label
+- src.nexu.cinema_policy.manifest_paths_from_snapshot
+- src.nexu.cinema_policy.merge_ui_constraint_lists
+- src.nexu.cinema_policy.propose_llm_for_stage
+- src.nexu.cinema_policy.resolve_iteration_mode
+- src.nexu.cinema_policy.sync_option_previews_from_workspace
+- src.nexu.cinema_policy.validate_intract_artifact
+- src.nexu.cinema_policy.verify_capsule_workspace
+- src.nexu.cinema_projects.ExampleProject.to_public_dict
+- src.nexu.cinema_projects.activate_example_project
+- src.nexu.cinema_projects.list_project_catalog
+- src.nexu.cinema_projects.load_active_project
+- src.nexu.cinema_publish.list_published_services
+- src.nexu.cinema_publish.publish_project_service
+- src.nexu.cinema_scripts.repair_cinema_html_files
 - src.nexu.cli.capsule_blueprint
 - src.nexu.cli.capsule_bundle
 - src.nexu.cli.capsule_create
@@ -1444,12 +2891,13 @@ entry_points:
 - src.nexu.cli.init
 - src.nexu.cli.mcp_serve
 - src.nexu.cli.mcp_tools
-- src.nexu.hashing.sha256_text
+- src.nexu.mcp_server._apply_promotion_from_mcp
 - src.nexu.mcp_server._schema
-- src.nexu.models.Capsule.from_dict
-- src.nexu.models.Capsule.to_dict
-- src.nexu.models.CapsuleDiff.to_dict
-- src.nexu.models.FrozenSnapshot.from_dict
-- src.nexu.models.FrozenSnapshot.to_dict
-- src.nexu.models.PromptExport.to_dict
-- src.nexu.models.VerificationReport.to_dict
+- src.vico.hashing.sha256_text
+- src.vico.models.Capsule.from_dict
+- src.vico.models.Capsule.to_dict
+- src.vico.models.CapsuleDiff.to_dict
+- src.vico.models.FrozenSnapshot.from_dict
+- src.vico.models.FrozenSnapshot.to_dict
+- src.vico.models.PromptExport.to_dict
+- src.vico.models.VerificationReport.to_dict

@@ -2,12 +2,17 @@
 
 app {
   name: nexu;
-  version: 0.5.2;
+  version: 0.5.13;
 }
 
 dependencies {
-  runtime: "pyyaml>=6.0, typer>=0.12.0, rich>=13.0";
+  runtime: "pyyaml>=6.0, typer>=0.12.0, rich>=13.0, litellm>=1.0";
   dev: "pytest>=7.0, ruff>=0.4, mypy>=1.8, goal>=2.1.0, costs>=0.1.20, pfix>=0.1.60";
+}
+
+interface[type="api"] {
+  type: rest;
+  framework: fastapi;
 }
 
 interface[type="cli"] {
@@ -27,8 +32,81 @@ workflow[name="examples"] {
   step-1: run cmd=python examples/run_examples.py;
 }
 
+workflow[name="docs-links"] {
+  trigger: manual;
+  step-1: run cmd=python scripts/check-doc-links.py .;
+}
+
+workflow[name="quality-intract"] {
+  trigger: manual;
+  step-1: run cmd=intract check src --format text;
+  step-2: run cmd=intract coverage src;
+}
+
+workflow[name="quality-redup"] {
+  trigger: manual;
+  step-1: run cmd=redup scan src --format toon --min-lines 8;
+}
+
+workflow[name="quality"] {
+  trigger: manual;
+  step-1: run cmd=ruff check src/nexu/cinema.py src/nexu/cinema_server.py src/nexu/verify.py src/nexu/intract_adapter.py tests/test_cinema_server.py;
+}
+
+workflow[name="quality-strict"] {
+  trigger: manual;
+  step-1: run cmd=pytest -q;
+  step-2: run cmd=ruff check src tests --statistics;
+  step-3: run cmd=intract check . --format text;
+  step-4: run cmd=redup scan src --format toon;
+}
+
+workflow[name="cinema"] {
+  trigger: manual;
+  step-1: run cmd=uv sync --quiet;
+  step-2: run cmd=$(CINEMA_MODEL_ARG) uv run nexu capsule iterate $(CINEMA_CAPSULE) --steps 1 --goal "$(CINEMA_GOAL)" --cinema --path $(CINEMA_PATH);
+}
+
+workflow[name="cinema-open"] {
+  trigger: manual;
+  step-1: run cmd=url="$$( uv sync --quiet; $(CINEMA_MODEL_ARG) uv run nexu capsule iterate $(CINEMA_CAPSULE) --steps 1 --goal "$(CINEMA_GOAL)" --cinema --path $(CINEMA_PATH) 2>&1 | tee /tmp/nexu-cinema-open.log | sed -n 's/.*Live HTTP Server started for Nexu: //p' | tail -1)"; \;
+  step-2: run cmd=if [ -z "$$url" ]; then \;
+  step-3: run cmd=echo "Could not detect Nexu URL. See /tmp/nexu-cinema-open.log"; \;
+  step-4: run cmd=exit 1; \;
+  step-5: run cmd=fi; \;
+  step-6: run cmd=echo "Opening $$url"; \;
+  step-7: run cmd=( xdg-open "$$url" >/dev/null 2>&1 || sensible-browser "$$url" >/dev/null 2>&1 || firefox "$$url" >/dev/null 2>&1 || google-chrome "$$url" >/dev/null 2>&1 || true );
+}
+
+workflow[name="cinema-test"] {
+  trigger: manual;
+  step-1: run cmd=pytest -q;
+}
+
+workflow[name="cinema-stop"] {
+  trigger: manual;
+  step-1: run cmd=pkill -f '[/]cinema/server.py' >/dev/null 2>&1 || true;
+  step-2: run cmd=echo 'Stopped cinema server.py process(es) if any were running.';
+}
+
+workflow[name="cinema-restart"] {
+  trigger: manual;
+  step-1: run cmd=$(MAKE) cinema-stop;
+  step-2: run cmd=$(MAKE) cinema;
+}
+
+workflow[name="cinema-repair"] {
+  trigger: manual;
+  step-1: run cmd=uv run python -c "from pathlib import Path; from nexu.cinema_scripts import repair_cinema_html_files; d=Path('$(CINEMA_PATH)')/'.nexu/capsules/$(CINEMA_CAPSULE)/cinema'; n=repair_cinema_html_files(d); print(f'Repaired {n} HTML file(s) in {d}')";
+}
+
+workflow[name="ci-cinema-smoke"] {
+  trigger: manual;
+  step-1: run cmd=./scripts/ci-cinema-smoke.sh;
+}
+
 deploy {
-  target: makefile;
+  target: docker;
 }
 
 environment[name="local"] {

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Option C: Expanded Scientific (Many Buttons)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            overflow: hidden;
+            background: #090d16;
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+        }
+        .calc-body {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            
+            width: 90%;
+            height: 90%;
+            max-width: 75vh;
+            max-height: 115vw;
+            aspect-ratio: 4/5;
+            
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+        .screen { background: #0f172a; color: #38bdf8; font-size: calc(8px + 1.8vh); text-align: right; padding: 8px; border-radius: 6px; margin-bottom: 8px; }
+        .grid { display: grid; grid-template-columns: repeat(5, 1fr); grid-auto-rows: 1fr; gap: 6px; flex: 1; }
+        .btn {
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: calc(6px + 0.9vh);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.15s ease;
+        }
+        .btn-sci { background: #38bdf8; color: #0f172a; font-weight: bold; }
+        .btn-sci-excess { background: #818cf8; color: #fff; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="calc-body">
+        <div class="screen" id="screen">12.5</div>
+        <div class="grid">
+            <div class="btn btn-sci" id="btn-sin">sin</div>
+            <div class="btn btn-sci" id="btn-cos">cos</div>
+            <div class="btn btn-sci" id="btn-tan">tan</div>
+            <div class="btn btn-sci" id="btn-log">log</div>
+            <div class="btn btn-sci" id="btn-ln">ln</div>
+            
+            <div class="btn btn-sci-excess" id="btn-EXP">EXP</div>
+            <div class="btn btn-sci-excess" id="btn-Mod">Mod</div>
+            <div class="btn btn-sci-excess" id="btn-deg">deg</div>
+            <div class="btn btn-sci-excess" id="btn-rad">rad</div>
+            <div class="btn btn-sci-excess" id="btn-pi">π</div>
+            
+            <div class="btn" id="btn-7">7</div><div class="btn" id="btn-8">8</div><div class="btn" id="btn-9">9</div><div class="btn" id="btn-div" style="background:#e67e22;">/</div><div class="btn" id="btn-clear" style="background:#e67e22;">C</div>
+            <div class="btn" id="btn-4">4</div><div class="btn" id="btn-5">5</div><div class="btn" id="btn-6">6</div><div class="btn" id="btn-mul" style="background:#e67e22;">*</div><div class="btn" id="btn-lp" style="background:#e67e22;">(</div>
+            <div class="btn" id="btn-1">1</div><div class="btn" id="btn-2">2</div><div class="btn" id="btn-3">3</div><div class="btn" id="btn-sub" style="background:#e67e22;">-</div><div class="btn" id="btn-rp" style="background:#e67e22;">)</div>
+        </div>
+    </div>
+    $INJECTED_SCRIPTS
+</body>
+</html>

@@ -56,7 +56,7 @@ def simulate_realtime_sync():
     # We load nexu capsule compile for the Lane Task
     print("\n=== Step 3: Compiling Capsule Runtime index.html for Stage Preview ===")
     # Visual check of S2 Runtime
-    print("Generated runtime mock files successfully sync'd with Cinema Player.")
+    print("Generated runtime mock files successfully sync'd with Nexu.")
 
 if __name__ == "__main__":
     simulate_realtime_sync()

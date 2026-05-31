@@ -1,0 +1,1200 @@
+#!$PYTHON_EXECUTABLE_RAW
+import http.server
+import socketserver
+import sys
+import os
+import re
+import json
+import csv
+import mimetypes
+import subprocess
+from pathlib import Path
+from datetime import datetime
+
+# Force correct MIME types and UTF-8 charsets for clean encoding
+mimetypes.add_type("text/html; charset=utf-8", ".html")
+mimetypes.add_type("application/javascript; charset=utf-8", ".js")
+mimetypes.add_type("text/css; charset=utf-8", ".css")
+
+PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8080
+DIRECTORY = Path(__file__).parent.absolute()
+LOG_CSV = DIRECTORY / "log.csv"
+POLICY_SNAPSHOT_PATH = DIRECTORY / "intract_policy.json"
+POLICY_LEDGER_PATH = DIRECTORY / "intract_policy_ledger.json"
+
+WORKSPACE_PATH = $WORKSPACE_PATH
+ROOT_PATH = Path(WORKSPACE_PATH).absolute()
+CAPSULE_NAME = $CAPSULE_NAME
+SYS_EXE = $PYTHON_EXECUTABLE
+ALLOW_NETWORK_CALLS = $ALLOW_NETWORK_CALLS
+API_KEY_ENV = $API_KEY_ENV
+DEFAULT_MODEL = $DEFAULT_MODEL
+MAX_TOKENS = int(os.environ.get("CINEMA_MAX_TOKENS", "4096"))
+
+ENV_PATH_CANDIDATES = [
+    ROOT_PATH / ".env",
+    ROOT_PATH.parent / ".env",
+    ROOT_PATH.parent.parent / ".env",
+    ROOT_PATH.parent.parent.parent / ".env",
+    DIRECTORY / ".env",
+]
+
+
+_MODEL_ENV_KEYS = frozenset({"LLM_MODEL", "NEXU_MODEL", "nexu_MODEL"})
+
+
+def _load_env_file(path: Path, override_keys=None) -> None:
+    override_keys = override_keys or frozenset()
+    if not path.exists():
+        return
+    try:
+        for raw_line in path.read_text(encoding="utf-8").splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            key = key.strip()
+            value = value.strip().strip('"').strip("'")
+            if key and (key not in os.environ or key in override_keys):
+                os.environ[key] = value
+    except Exception:
+        return
+
+
+def _load_all_env() -> None:
+    for index, env_path in enumerate(ENV_PATH_CANDIDATES):
+        _load_env_file(env_path, _MODEL_ENV_KEYS if index else frozenset())
+
+
+def _resolve_model() -> str:
+    _load_all_env()
+    return (
+        os.environ.get("LLM_MODEL")
+        or os.environ.get("NEXU_MODEL")
+        or os.environ.get("nexu_MODEL")
+        or DEFAULT_MODEL
+    )
+
+
+def _litellm_available() -> bool:
+    import importlib.util
+
+    return importlib.util.find_spec("litellm") is not None
+
+
+def _ensure_api_key_env() -> None:
+    if os.environ.get(API_KEY_ENV):
+        return
+    _load_all_env()
+    if os.environ.get(API_KEY_ENV):
+        return
+
+
+def _strip_markdown_fences(text: str) -> str:
+    raw = text.strip()
+    if raw.startswith("```"):
+        lines = raw.splitlines()
+        if lines and lines[0].startswith("```"):
+            lines = lines[1:]
+        if lines and lines[-1].strip() == "```":
+            lines = lines[:-1]
+        return chr(10).join(lines).strip()
+    return raw
+
+
+def _extract_llm_content(response: object) -> str | None:
+    choices = getattr(response, "choices", None)
+    if not choices:
+        return None
+    message = getattr(choices[0], "message", None)
+    if message is None:
+        return None
+    content = getattr(message, "content", None)
+    if isinstance(content, list):
+        parts: list[str] = []
+        for item in content:
+            if isinstance(item, dict):
+                text = item.get("text")
+                if isinstance(text, str):
+                    parts.append(text)
+            elif isinstance(item, str):
+                parts.append(item)
+        return "".join(parts)
+    if content is None:
+        return None
+    return str(content)
+
+
+def _compact_llm_error(err_text: str) -> str:
+    if "OpenrouterException - " in err_text:
+        payload = err_text.split("OpenrouterException - ", 1)[1].strip()
+        try:
+            data = json.loads(payload)
+            msg = data.get("error", {}).get("message")
+            if isinstance(msg, str) and msg.strip():
+                return msg.strip()
+        except Exception:
+            pass
+    compact = " ".join(err_text.split())
+    return compact[:260]
+
+
+def _load_policy_payload() -> dict:
+    snapshot = {}
+    if POLICY_SNAPSHOT_PATH.exists():
+        snapshot = json.loads(POLICY_SNAPSHOT_PATH.read_text(encoding="utf-8"))
+    ledger = []
+    if POLICY_LEDGER_PATH.exists():
+        ledger = json.loads(POLICY_LEDGER_PATH.read_text(encoding="utf-8"))
+    if not isinstance(ledger, list):
+        ledger = []
+    effective_ui = _effective_ui_constraints_from_ledger(ledger, stage=0)
+    return {"snapshot": snapshot, "ledger": ledger, "effective_ui": effective_ui}
+
+
+def _effective_ui_constraints_from_ledger(ledger: list, stage: int = 0) -> dict:
+    try:
+        import nexu_hooks
+        return nexu_hooks.effective_ui_constraints(stage)
+    except Exception:
+        pass
+    state = {}
+    if not isinstance(ledger, list):
+        return {"keep": [], "delete": [], "by_element": {}}
+    for entry in ledger:
+        if not isinstance(entry, dict):
+            continue
+        if entry.get("stage") is not None and int(entry.get("stage", 0)) != stage:
+            continue
+        for el in entry.get("keep") or []:
+            key = str(el).strip()
+            if key:
+                state[key] = "keep"
+        for el in entry.get("delete") or []:
+            key = str(el).strip()
+            if key:
+                state[key] = "delete"
+    keep = sorted(k for k, v in state.items() if v == "keep")
+    delete = sorted(k for k, v in state.items() if v == "delete")
+    return {"keep": keep, "delete": delete, "by_element": state}
+
+
+def _merge_ui_constraints(ledger_keep, ledger_delete, session_keep, session_delete):
+    state = {}
+    for el in ledger_keep or []:
+        key = str(el).strip()
+        if key:
+            state[key] = "keep"
+    for el in ledger_delete or []:
+        key = str(el).strip()
+        if key:
+            state[key] = "delete"
+    for el in session_keep or []:
+        key = str(el).strip()
+        if key:
+            state[key] = "keep"
+    for el in session_delete or []:
+        key = str(el).strip()
+        if key:
+            state[key] = "delete"
+    keep = sorted(k for k, v in state.items() if v == "keep")
+    delete = sorted(k for k, v in state.items() if v == "delete")
+    return keep, delete
+
+
+def _ensure_intract_on_path() -> bool:
+    import sys
+
+    curr = ROOT_PATH.resolve()
+    for _ in range(6):
+        for candidate in (curr / "intract" / "src", curr.parent / "intract" / "src"):
+            if candidate.exists():
+                path = str(candidate)
+                if path not in sys.path:
+                    sys.path.insert(0, path)
+                return True
+        curr = curr.parent
+    return False
+
+
+def _propose_cinema_contracts(stage: int, keep_els: list, delete_els: list) -> list:
+    if _ensure_intract_on_path():
+        try:
+            from intract.proposals import propose_ui_delta_contract_dicts
+
+            return propose_ui_delta_contract_dicts(
+                stage=stage,
+                keep=keep_els,
+                delete=delete_els,
+                capsule=CAPSULE_NAME,
+                domain="calculator",
+            )
+        except Exception:
+            pass
+
+    proposals = []
+    for element_id in delete_els:
+        contract_id = f"cinema.{CAPSULE_NAME}.S{stage}.ui.remove.{element_id}"
+        proposals.append({
+            "id": contract_id,
+            "kind": "delete",
+            "element": element_id,
+            "line": (
+                f"@intract.v1 id:{contract_id} scope:ui intent:ui:remove:{element_id} "
+                f"priority:3 domain:calculator effect:ui_change forbid:destructive_write,secret_leak "
+                f"require:human_review validate:no_forbidden_effect "
+                f'meaning:"Cinema S{stage} removed #{element_id}"'
+            ),
+        })
+    for element_id in keep_els:
+        contract_id = f"cinema.{CAPSULE_NAME}.S{stage}.ui.keep.{element_id}"
+        proposals.append({
+            "id": contract_id,
+            "kind": "keep",
+            "element": element_id,
+            "line": (
+                f"@intract.v1 id:{contract_id} scope:ui intent:ui:keep:{element_id} "
+                f"priority:3 domain:calculator effect:read forbid:destructive_write,secret_leak "
+                f"require:human_review validate:no_forbidden_effect "
+                f'meaning:"Cinema S{stage} preserved #{element_id}"'
+            ),
+        })
+    return proposals
+
+
+def _proposal_kind_and_element(proposal: dict) -> tuple[str, str]:
+    kind = str(proposal.get("kind") or "")
+    element = str(proposal.get("element") or "")
+    if kind and element:
+        return kind, element
+
+    intent = str(proposal.get("intent") or "")
+    if ":remove:" in intent:
+        maybe = intent.rsplit(":", 1)[-1]
+        if maybe:
+            return "delete", maybe
+    if ":keep:" in intent:
+        maybe = intent.rsplit(":", 1)[-1]
+        if maybe:
+            return "keep", maybe
+    return (kind or "change"), (element or "unknown")
+
+
+def _proposal_delta_text(stage: int, proposal: dict) -> str:
+    kind, element = _proposal_kind_and_element(proposal)
+    action = "remove" if kind == "delete" else ("keep" if kind == "keep" else kind)
+    base_id = str(proposal.get("based_on") or f"cinema.{CAPSULE_NAME}.S{stage}.ui.template")
+    supersedes = proposal.get("supersedes")
+    text = f"Δ {action} #{element} based_on={base_id}"
+    if supersedes:
+        text += f" supersedes={supersedes}"
+    return text
+
+
+def _normalize_proposals_for_ledger(stage: int, proposals: list) -> list:
+    normalized = []
+    for proposal in proposals:
+        if not isinstance(proposal, dict):
+            continue
+        kind, element = _proposal_kind_and_element(proposal)
+        item = dict(proposal)
+        item.setdefault("kind", kind)
+        item.setdefault("element", element)
+        item.setdefault("based_on", f"cinema.{CAPSULE_NAME}.S{stage}.ui.template")
+        item.setdefault("delta_text", _proposal_delta_text(stage, item))
+        normalized.append(item)
+    return normalized
+
+
+def _append_policy_entry_legacy(stage: int, keep_els: list, delete_els: list, status: str, model: str) -> dict:
+    proposals = _normalize_proposals_for_ledger(
+        stage,
+        _propose_cinema_contracts(stage, keep_els, delete_els),
+    )
+    entry = {
+        "timestamp": datetime.now().isoformat(),
+        "capsule": CAPSULE_NAME,
+        "workspace": str(ROOT_PATH),
+        "stage": stage,
+        "status": status,
+        "model": model,
+        "keep": keep_els,
+        "delete": delete_els,
+        "proposed_contracts": proposals,
+    }
+    ledger = []
+    if POLICY_LEDGER_PATH.exists():
+        ledger = json.loads(POLICY_LEDGER_PATH.read_text(encoding="utf-8"))
+    if not isinstance(ledger, list):
+        ledger = []
+    ledger.append(entry)
+    POLICY_LEDGER_PATH.write_text(
+        json.dumps(ledger, indent=2, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    return entry
+
+
+def _nexu_hooks_apply(*, dry_run: bool = False, target: str = "both") -> dict:
+    try:
+        import nexu_hooks
+    except ImportError:
+        return {"error": "nexu_hooks.py missing; regenerate cinema (make cinema)"}
+    return nexu_hooks.apply_manifest_from_ledger(dry_run=dry_run, target=target)
+
+
+def _nexu_hooks_verify() -> dict:
+    try:
+        import nexu_hooks
+    except ImportError:
+        return {"error": "nexu_hooks.py missing; regenerate cinema (make cinema)"}
+    return nexu_hooks.verify_capsule()
+
+
+def _propose_llm_for_stage(stage: int, goal: str) -> dict:
+    try:
+        import nexu_hooks
+    except ImportError:
+        return {"error": "nexu_hooks.py missing; regenerate cinema (make cinema)"}
+    return nexu_hooks.propose_llm(stage, goal, _resolve_model())
+
+
+def _validate_intract_artifact(artifact: str, proposals: list, filename: str):
+    try:
+        import nexu_hooks
+    except ImportError:
+        return None
+    return nexu_hooks.validate_artifact(artifact, proposals, filename)
+
+
+def _append_policy_entry(stage: int, keep_els: list, delete_els: list, status: str, model: str) -> dict:
+    try:
+        import nexu_hooks
+    except ImportError:
+        return _append_policy_entry_legacy(stage, keep_els, delete_els, status, model)
+    return nexu_hooks.append_policy_entry(stage, keep_els, delete_els, status, model)
+
+
+def _save_history_checkpoint(**kwargs) -> dict | None:
+    try:
+        import nexu_hooks
+    except ImportError:
+        return None
+    try:
+        return nexu_hooks.save_history(**kwargs)
+    except Exception:
+        return None
+
+
+def _list_history() -> dict:
+    try:
+        import nexu_hooks
+    except ImportError:
+        return {"checkpoints": [], "ledger_archive": []}
+    payload = nexu_hooks.list_history()
+    if isinstance(payload, dict):
+        return payload
+    return {"checkpoints": payload if isinstance(payload, list) else [], "ledger_archive": []}
+
+
+def _restore_history(checkpoint_id: str, *, apply_manifest: bool = True, target: str = "both") -> dict:
+    try:
+        import nexu_hooks
+    except ImportError:
+        return {"error": "nexu_hooks.py missing; regenerate cinema (make cinema)"}
+    return nexu_hooks.restore_history(
+        checkpoint_id, apply_manifest=apply_manifest, target=target
+    )
+
+
+def _sync_option_previews(stage: int, delete_els: list | None = None) -> dict:
+    try:
+        import nexu_hooks
+    except ImportError:
+        return {}
+    return nexu_hooks.sync_option_previews(stage, delete_els)
+
+
+def _patch_option_previews(stage: int = 0) -> dict:
+    try:
+        import nexu_hooks
+    except ImportError:
+        return {}
+    return nexu_hooks.patch_option_previews(stage)
+
+
+def _projects_catalog() -> dict:
+    try:
+        import nexu_hooks
+    except ImportError:
+        return {"projects": [], "filters": {}}
+    return nexu_hooks.projects_catalog()
+
+
+def _active_project() -> dict:
+    try:
+        import nexu_hooks
+    except ImportError:
+        return {"active": None}
+    active = nexu_hooks.active_project()
+    return {"active": active}
+
+
+def _activate_project(project_id: str) -> dict:
+    try:
+        import nexu_hooks
+    except ImportError:
+        return {"error": "nexu_hooks.py missing; regenerate cinema (make cinema)"}
+    return nexu_hooks.activate_project(project_id)
+
+
+def _export_markpact_markdown(*, stage: int = 0, user_goal: str = "") -> dict:
+    try:
+        import nexu_hooks
+    except ImportError:
+        return {"error": "nexu_hooks.py missing; regenerate cinema (make cinema)"}
+    return nexu_hooks.export_markpact_readme(stage, user_goal)
+
+
+def _services_catalog() -> dict:
+    try:
+        import nexu_hooks
+    except ImportError:
+        return {"services": [], "count": 0}
+    return nexu_hooks.services_catalog()
+
+
+def _publish_service(*, stage: int, project_id: str, project_title: str, user_goal: str) -> dict:
+    try:
+        import nexu_hooks
+    except ImportError:
+        return {"error": "nexu_hooks.py missing; regenerate cinema (make cinema)"}
+    return nexu_hooks.publish_service(
+        stage=stage,
+        project_id=project_id,
+        project_title=project_title,
+        user_goal=user_goal,
+    )
+
+
+def _start_service(service_id: str) -> dict:
+    try:
+        import nexu_hooks
+    except ImportError:
+        return {"error": "nexu_hooks.py missing; regenerate cinema (make cinema)"}
+    return nexu_hooks.start_service(service_id)
+
+
+def _stop_service(service_id: str) -> dict:
+    try:
+        import nexu_hooks
+    except ImportError:
+        return {"error": "nexu_hooks.py missing; regenerate cinema (make cinema)"}
+    return nexu_hooks.stop_service(service_id)
+
+
+class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, directory=str(DIRECTORY), **kwargs)
+
+    def do_GET(self):
+        if self.path in ("/policy", "/policy/"):
+            try:
+                payload = _load_policy_payload()
+                body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-type", "application/json; charset=utf-8")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(body)
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(str(e).encode("utf-8"))
+                return
+        if self.path in ("/projects/catalog", "/projects/catalog/"):
+            try:
+                payload = _projects_catalog()
+                body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-type", "application/json; charset=utf-8")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(body)
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(str(e).encode("utf-8"))
+                return
+        if self.path in ("/projects/active", "/projects/active/"):
+            try:
+                payload = _active_project()
+                body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-type", "application/json; charset=utf-8")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(body)
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(str(e).encode("utf-8"))
+                return
+        if self.path in ("/services/catalog", "/services/catalog/"):
+            try:
+                payload = _services_catalog()
+                body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-type", "application/json; charset=utf-8")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(body)
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(str(e).encode("utf-8"))
+                return
+        if self.path in ("/health", "/health/"):
+            body = json.dumps({"ok": True, "cinema": CAPSULE_NAME}).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-type", "application/json; charset=utf-8")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            self.wfile.write(body)
+            return
+        if self.path in ("/history", "/history/"):
+            try:
+                payload = _list_history()
+                body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-type", "application/json; charset=utf-8")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(body)
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(str(e).encode("utf-8"))
+                return
+        if self.path.startswith("/export/markpact"):
+            try:
+                from urllib.parse import parse_qs, urlparse
+
+                parsed = urlparse(self.path)
+                qs = parse_qs(parsed.query)
+                stage = int((qs.get("stage") or ["0"])[0])
+                user_goal = str((qs.get("goal") or [""])[0])
+                payload = _export_markpact_markdown(stage=stage, user_goal=user_goal)
+                if payload.get("error"):
+                    self.send_response(404)
+                    self.send_header("Access-Control-Allow-Origin", "*")
+                    self.end_headers()
+                    self.wfile.write(payload["error"].encode("utf-8"))
+                    return
+                filename = str(payload.get("filename") or "nexu-markpact.md")
+                body = str(payload.get("markdown") or "").encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-type", "text/markdown; charset=utf-8")
+                self.send_header(
+                    "Content-Disposition",
+                    f'attachment; filename="{{filename}}"',
+                )
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(body)
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(str(e).encode("utf-8"))
+                return
+        return super().do_GET()
+
+    def do_POST(self):
+        if self.path == '/log':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            try:
+                data = json.loads(post_data.decode('utf-8', errors='replace'))
+                timestamp = datetime.now().isoformat()
+                action = data.get('action', 'unknown')
+                details = data.get('details', '')
+                
+                # Append to CSV log using robust UTF-8 encoding
+                file_exists = LOG_CSV.exists()
+                with open(LOG_CSV, mode='a', newline='', encoding='utf-8') as f:
+                    writer = csv.writer(f)
+                    if not file_exists:
+                        writer.writerow(['timestamp', 'action', 'details'])
+                    writer.writerow([timestamp, action, details])
+                
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json; charset=utf-8')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(json.dumps({"status": "logged"}).encode('utf-8'))
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.end_headers()
+                self.wfile.write(str(e).encode('utf-8'))
+                return
+
+        elif self.path == '/manifest/apply-ledger':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            try:
+                data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+                dry_run = bool(data.get('dry_run', False))
+                target = str(data.get('target', 'both'))
+                payload = _nexu_hooks_apply(dry_run=dry_run, target=target)
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json; charset=utf-8')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(str(e).encode('utf-8'))
+                return
+
+        elif self.path == '/capsule/verify':
+            try:
+                payload = _nexu_hooks_verify()
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json; charset=utf-8')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(str(e).encode('utf-8'))
+                return
+
+        elif self.path == '/propose/llm':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            try:
+                data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+                stage = int(data.get('current_stage', 0))
+                goal = str(data.get('goal', '') or '')
+                payload = _propose_llm_for_stage(stage, goal)
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json; charset=utf-8')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(str(e).encode('utf-8'))
+                return
+                
+        elif self.path == '/history/restore':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            try:
+                data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+                cp_id = str(data.get('checkpoint_id', '') or data.get('id', '')).strip()
+                if not cp_id:
+                    payload = {"error": "checkpoint_id required"}
+                else:
+                    apply_manifest = bool(data.get('apply_manifest', True))
+                    target = str(data.get('target', 'both'))
+                    payload = _restore_history(cp_id, apply_manifest=apply_manifest, target=target)
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json; charset=utf-8')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(str(e).encode('utf-8'))
+                return
+
+        elif self.path == '/services/publish':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            try:
+                data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+                payload = _publish_service(
+                    stage=int(data.get('stage', 0)),
+                    project_id=str(data.get('project_id') or data.get('id') or ''),
+                    project_title=str(data.get('project_title') or data.get('title') or ''),
+                    user_goal=str(data.get('goal') or data.get('user_goal') or ''),
+                )
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json; charset=utf-8')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(str(e).encode('utf-8'))
+                return
+
+        elif self.path == '/services/start':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            try:
+                data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+                service_id = str(data.get('service_id') or data.get('id') or '').strip()
+                if not service_id:
+                    payload = {"error": "missing service_id"}
+                else:
+                    payload = _start_service(service_id)
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json; charset=utf-8')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(str(e).encode('utf-8'))
+                return
+
+        elif self.path == '/services/stop':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            try:
+                data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+                service_id = str(data.get('service_id') or data.get('id') or '').strip()
+                if not service_id:
+                    payload = {"error": "missing service_id"}
+                else:
+                    payload = _stop_service(service_id)
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json; charset=utf-8')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(str(e).encode('utf-8'))
+                return
+
+        elif self.path == '/projects/activate':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            try:
+                data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+                project_id = str(data.get('id') or data.get('project_id') or '').strip()
+                if not project_id:
+                    payload = {"error": "missing project id"}
+                else:
+                    payload = _activate_project(project_id)
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json; charset=utf-8')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(str(e).encode('utf-8'))
+                return
+
+        elif self.path == '/promote':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            try:
+                data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+                alt_name = str(data.get('alt', 'alt_a.html')).split('?')[0]
+                stage = int(data.get('stage', 0))
+                allowed_alts = {'alt_a.html', 'alt_b.html', 'alt_c.html'}
+                if alt_name not in allowed_alts:
+                    payload = {"error": f"unsupported option file: {alt_name}"}
+                elif stage < 0 or stage > 2:
+                    payload = {"error": f"unsupported stage: S{stage}"}
+                else:
+                    alt_path = DIRECTORY / alt_name
+                    stage_path = DIRECTORY / f'stage{stage}.html'
+                    if not alt_path.exists():
+                        payload = {"error": f"option file not found: {alt_name}"}
+                    else:
+                        stage_path.write_text(alt_path.read_text(encoding='utf-8'), encoding='utf-8')
+                        options_sync = _patch_option_previews(stage)
+                        history_entry = _save_history_checkpoint(
+                            action='promote',
+                            stage=stage,
+                            status='promoted',
+                            extra=alt_name,
+                        )
+                        payload = {
+                            "status": "promoted",
+                            "alt": alt_name,
+                            "stage": stage,
+                            "stage_path": str(stage_path.name),
+                            "history_checkpoint": history_entry,
+                            "options_sync": options_sync,
+                        }
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json; charset=utf-8')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(str(e).encode('utf-8'))
+                return
+
+        elif self.path == '/iterate':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            try:
+                data = json.loads(post_data.decode('utf-8', errors='replace'))
+                spatial_feedback = data.get('prompt', '')
+                current_stage = int(data.get('current_stage', 0))
+                annotations = data.get('annotations', [])
+                user_hints = data.get('user_hints', [])
+                if not isinstance(user_hints, list):
+                    user_hints = []
+                normalized_hints = [str(item).strip() for item in user_hints if str(item).strip()]
+                hints_block = "\n".join(f"- {hint}" for hint in normalized_hints) if normalized_hints else "none provided"
+                
+                # Read current active stage HTML
+                stage_file = DIRECTORY / f'stage{current_stage}.html'
+                current_html = stage_file.read_text(encoding='utf-8') if stage_file.exists() else '<p>No stage found</p>'
+                
+                # Build structured LLM prompt from spatial annotations
+                pending_goal = bool(data.get('pending_goal', False))
+                requested_mode = str(data.get('iteration_mode', '') or '').strip()
+                session_keep = [a['id'] for a in annotations if a.get('type') == 'KEEP']
+                session_delete = [a['id'] for a in annotations if a.get('type') == 'DELETE']
+                if session_delete or session_keep:
+                    pending_goal = False
+                policy_payload = _load_policy_payload()
+                ledger_ui = policy_payload.get("effective_ui") or {}
+                ledger_keep = list(ledger_ui.get("keep") or [])
+                ledger_delete = list(ledger_ui.get("delete") or [])
+                keep_els, delete_els = _merge_ui_constraints(
+                    ledger_keep, ledger_delete, session_keep, session_delete
+                )
+                if delete_els or keep_els or requested_mode == 'active_workspace':
+                    apply_active = bool(delete_els or keep_els)
+                    apply_options = False
+                elif (pending_goal or requested_mode == 'goal_options') and normalized_hints:
+                    apply_active = False
+                    apply_options = True
+                elif normalized_hints:
+                    apply_active = False
+                    apply_options = True
+                else:
+                    apply_active = False
+                    apply_options = False
+
+                def _build_llm_prompt(*, variant_note: str = "") -> str:
+                    variant_block = f"Variant direction:\n{variant_note}\n\n" if variant_note else ""
+                    ledger_block = ""
+                    if ledger_keep or ledger_delete:
+                        ledger_block = (
+                            "Accumulated policy contracts from earlier Cinema iterations (MUST respect):\n"
+                            "- KEEP from ledger: " + (', '.join(ledger_keep) if ledger_keep else 'none') + "\n"
+                            "- DELETE from ledger: " + (', '.join(ledger_delete) if ledger_delete else 'none') + "\n\n"
+                        )
+                    prompt = (
+                        "You are evolving a calculator web UI. Below is the current HTML.\n\n"
+                        "Current HTML:\n```html\n" + current_html + "\n```\n\n"
+                        + variant_block
+                        + ledger_block
+                        + "Effective UI constraints for this request (ledger + current marks):\n"
+                        "- KEEP these elements (user likes them): "
+                        + (', '.join(keep_els) if keep_els else 'none specified') + "\n"
+                        "- REDESIGN/DELETE these elements (user wants them changed or removed): "
+                        + (', '.join(delete_els) if delete_els else 'none specified') + "\n\n"
+                        "User goal/hints:\n" + hints_block + "\n\n"
+                        "Additional context: " + spatial_feedback + "\n\n"
+                        "Rules:\n"
+                        "1. Return ONLY the complete evolved HTML document, nothing else.\n"
+                        "2. Keep the same overall structure (full <!DOCTYPE html> page).\n"
+                        "3. Preserve elements marked KEEP - do not change their function.\n"
+                        "4. For DELETE elements: remove ONLY those buttons from the HTML — do not remove anything else.\n"
+                        "5. Do NOT simplify the calculator or drop scientific buttons unless they are in the DELETE list.\n"
+                        "6. Improve visual design only when explicitly asked in hints; otherwise preserve layout.\n"
+                        "7. Keep the same CSS class names (.btn, .btn-sci, .btn-sci-excess, .btn-op, .screen) so buttons work.\n"
+                        "8. Do NOT include any <script> tags — runtime is injected by Nexu after generation.\n"
+                        "9. Each option variant must be visually and functionally distinct.\n"
+                        "10. Use id=screen for the display and class=btn / btn-sci / btn-op on buttons.\n"
+                        "11. When generating chemical-calculator variants, still include buttons listed under KEEP "
+                        "(e.g. sin, cos, tan, log, ln) unless they appear under DELETE.\n"
+                    )
+                    if keep_els and apply_options:
+                        trig = [t for t in keep_els if t in ('sin', 'cos', 'tan', 'log', 'ln')]
+                        if trig:
+                            prompt += (
+                                "\n\nCRITICAL: These controls were explicitly kept and must appear in the HTML: "
+                                + ", ".join(trig) + "."
+                            )
+                    if delete_els and not variant_note:
+                        delete_list = ", ".join(delete_els)
+                        prompt += (
+                            "\n\nCRITICAL: Remove ONLY these controls: "
+                            + delete_list
+                            + ". Every other button (sin, cos, tan, log, ln, EXP, pi, digits, operators) must remain."
+                        )
+                    prompt += "\n\nReturn the full HTML:"
+                    return prompt
+
+                def _apply_spatial_patch(html: str, delete_els: list) -> tuple[str | None, list]:
+                    try:
+                        import nexu_hooks
+                    except ImportError:
+                        return None, []
+                    return nexu_hooks.apply_spatial_patch(html, delete_els)
+
+                def _finalize_llm_html(html: str) -> str:
+                    import re
+                    if not html:
+                        return html
+                    cleaned = re.sub(
+                        r'<script\b[^>]*>[\s\S]*?</script>', '', html, flags=re.I
+                    )
+                    inject = ''
+                    for name in ('_inject_shield.html', '_inject_runtime.html'):
+                        path = DIRECTORY / name
+                        if path.exists():
+                            inject += path.read_text(encoding='utf-8')
+                    lower = cleaned.lower()
+                    if '</body>' in lower:
+                        idx = lower.rfind('</body>')
+                        return cleaned[:idx] + inject + cleaned[idx:]
+                    return cleaned.rstrip() + inject + '\n</body>\n</html>\n'
+
+                def _call_llm(prompt: str) -> tuple[str | None, str | None]:
+                    _ensure_api_key_env()
+                    api_key = os.environ.get(API_KEY_ENV, '')
+                    model = _resolve_model()
+                    if not ALLOW_NETWORK_CALLS:
+                        return None, 'llm.allow_network_calls disabled in nexu.yaml'
+                    if not _litellm_available():
+                        return None, (
+                            'litellm is not installed for the cinema server Python '
+                            f'({SYS_EXE}). From the nexu repo run: uv sync && make cinema'
+                        )
+                    if not api_key:
+                        return None, f'{API_KEY_ENV} not set'
+                    try:
+                        from litellm import completion as llm_completion
+                        response = llm_completion(
+                            model=model,
+                            messages=[
+                                {"role": "system", "content": "You are a UI evolution engine. Return only complete HTML documents. No markdown fences, no explanation."},
+                                {"role": "user", "content": prompt},
+                            ],
+                            temperature=0.35,
+                            max_tokens=MAX_TOKENS,
+                            timeout=90,
+                            api_key=api_key,
+                            api_base='https://openrouter.ai/api/v1',
+                        )
+                        content = _extract_llm_content(response)
+                        if content is None:
+                            return None, 'LLM returned empty content'
+                        raw = _strip_markdown_fences(str(content))
+                        if raw and '<!DOCTYPE' in raw.upper()[:50]:
+                            return _finalize_llm_html(raw), None
+                        return None, 'Invalid HTML returned'
+                    except ModuleNotFoundError:
+                        return None, (
+                            'litellm is not installed for the cinema server Python '
+                            f'({SYS_EXE}). From the nexu repo run: uv sync && make cinema'
+                        )
+                    except Exception as llm_exc:
+                        return None, _compact_llm_error(str(llm_exc))
+
+                _ensure_api_key_env()
+                model = _resolve_model()
+                evolved_html = None
+                llm_error = None
+                options_written: list[str] = []
+                spatial_removed: list[str] = []
+                iteration_mode = "none"
+
+                if not apply_active and not apply_options:
+                    status_msg = 'llm_skipped: no spatial feedback or goal provided'
+                elif apply_options:
+                    iteration_mode = "options_only"
+                    hints_text = "; ".join(normalized_hints)
+                    goal_focus = (" Primary user goal: " + hints_text + ".") if hints_text else ""
+                    if any("chem" in h.lower() for h in normalized_hints):
+                        goal_focus += (
+                            " Build chemical-calculator UIs: element buttons (H,O,C,N),"
+                            " molar mass display, formula entry."
+                        )
+                        if keep_els:
+                            goal_focus += (
+                                " Preserve all KEEP controls from policy: "
+                                + ", ".join(keep_els[:24])
+                                + ("…" if len(keep_els) > 24 else "")
+                                + "."
+                            )
+                    option_variants = [
+                        (
+                            "alt_a.html",
+                            "Option A (minimal)",
+                            "Minimalist UI: fewer buttons, clean layout, essential functions only." + goal_focus,
+                        ),
+                        (
+                            "alt_b.html",
+                            "Option B (balanced)",
+                            "Balanced calculator implementing the user goal with moderate complexity." + goal_focus,
+                        ),
+                        (
+                            "alt_c.html",
+                            "Option C (expanded)",
+                            "Expanded UI: richer feature set toward the user goal." + goal_focus,
+                        ),
+                    ]
+                    for filename, label, variant_note in option_variants:
+                        prompt = _build_llm_prompt(variant_note=variant_note)
+                        html, err = _call_llm(prompt)
+                        if html:
+                            (DIRECTORY / filename).write_text(html, encoding="utf-8")
+                            options_written.append(label)
+                        elif not llm_error:
+                            llm_error = err
+                    if options_written:
+                        status_msg = 'proposed_options_by_llm'
+                        llm_error = None
+                    else:
+                        status_msg = f'llm_skipped: {llm_error or "No option HTML generated"}'
+                else:
+                    iteration_mode = "active_workspace"
+                    if delete_els:
+                        evolved_html, spatial_removed = _apply_spatial_patch(current_html, delete_els)
+                    if delete_els and spatial_removed:
+                        stage_file.write_text(evolved_html, encoding="utf-8")
+                        status_msg = 'evolved_by_spatial_patch'
+                        llm_error = None
+                    else:
+                        evolved_html, llm_error = _call_llm(_build_llm_prompt())
+                        if evolved_html:
+                            stage_file.write_text(evolved_html, encoding="utf-8")
+                            status_msg = 'evolved_by_llm'
+                        else:
+                            status_msg = f'llm_skipped: {llm_error or "Invalid HTML returned"}'
+                
+                # Log iteration
+                file_exists = LOG_CSV.exists()
+                with open(LOG_CSV, mode='a', newline='', encoding='utf-8') as f:
+                    writer = csv.writer(f)
+                    if not file_exists:
+                        writer.writerow(['timestamp', 'action', 'details'])
+                    writer.writerow([datetime.now().isoformat(), 'ITERATION_LLM', f"Stage: {current_stage} | Status: {status_msg} | Keep: {len(keep_els)} | Delete: {len(delete_els)}" ])
+
+                options_sync = None
+                if status_msg in ('evolved_by_spatial_patch', 'evolved_by_llm') or (
+                    status_msg == 'proposed_options_by_llm' and options_written
+                ):
+                    options_sync = _patch_option_previews(current_stage)
+
+                policy_entry = None
+                intract_validation = None
+                if keep_els or delete_els:
+                    policy_entry = _append_policy_entry(
+                        current_stage, keep_els, delete_els, status_msg, model
+                    )
+                if evolved_html and policy_entry:
+                    intract_validation = _validate_intract_artifact(
+                        evolved_html,
+                        policy_entry.get("proposed_contracts", []),
+                        f"stage{current_stage}.html",
+                    )
+
+                history_checkpoint = None
+                if status_msg in (
+                    'proposed_options_by_llm',
+                    'evolved_by_llm',
+                    'evolved_by_spatial_patch',
+                    'promoted',
+                ):
+                    extra = ', '.join(options_written) if options_written else ''
+                    history_checkpoint = _save_history_checkpoint(
+                        action='iterate',
+                        stage=current_stage,
+                        status=status_msg,
+                        keep=keep_els,
+                        delete=delete_els,
+                        extra=extra,
+                    )
+                
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json; charset=utf-8')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(json.dumps({
+                    "status": status_msg,
+                    "mode": iteration_mode,
+                    "new_stage": current_stage,
+                    "keep_count": len(keep_els),
+                    "delete_count": len(delete_els),
+                    "ledger_keep": ledger_keep,
+                    "ledger_delete": ledger_delete,
+                    "session_keep": session_keep,
+                    "session_delete": session_delete,
+                    "options_written": options_written,
+                    "spatial_removed": spatial_removed,
+                    "error": llm_error,
+                    "policy_updated": policy_entry is not None,
+                    "intract_validation": intract_validation,
+                    "history_checkpoint": history_checkpoint,
+                    "options_sync": options_sync,
+                }).encode('utf-8'))
+                return
+            except Exception as e:
+                import traceback
+                traceback.print_exc()
+                self.send_response(500)
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(str(e).encode('utf-8'))
+                return
+                
+        super().do_POST()
+
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.end_headers()
+
+socketserver.TCPServer.allow_reuse_address = True
+with socketserver.TCPServer(('127.0.0.1', PORT), CustomHTTPRequestHandler) as httpd:
+    httpd.serve_forever()

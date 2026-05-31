@@ -9,314 +9,545 @@ flowchart TD
     subgraph examples__mcp_service
         examples__mcp_service__src__demo__plan_demo["plan_demo"]
     end
+    subgraph examples__nexu_markpact_exporter
+        examples__nexu_markpact_exporter__main["main"]
+    end
+    subgraph examples__realtime_lane_nexu_sync
+        examples__realtime_lane_nexu_sync__simulate_realtime_sync["simulate_realtime_sync"]
+    end
     subgraph examples__run_examples
         examples__run_examples__run_example["run_example"]
         examples__run_examples__main["main"]
     end
+    subgraph examples__scientific_calculator_demo
+        examples__scientific_calculator_demo__main["main"]
+    end
+    subgraph examples__scientific_calculator_demo2
+        examples__scientific_calculator_demo2__print_code["print_code"]
+        examples__scientific_calculator_demo2__main["main"]
+    end
     subgraph examples__vertical_slice
         examples__vertical_slice__src__flow__run_flow["run_flow"]
     end
+    subgraph examples__web_app_calculator
+        examples__web_app_calculator__run__main["main"]
+        examples__web_app_calculator__workspace__src__calculator__render_calculator["render_calculator"]
+        examples__web_app_calculator__markpact_sandbox__sandbox__src__calculator__render_calculator["render_calculator"]
+    end
+    subgraph examples__web_app_dashboard
+        examples__web_app_dashboard__run__main["main"]
+        examples__web_app_dashboard__workspace__src__dashboard__render_dashboard["render_dashboard"]
+        examples__web_app_dashboard__src__dashboard__render_dashboard["render_dashboard"]
+    end
+    subgraph examples__web_app_event_monitor
+        examples__web_app_event_monitor__run__main("main CC=13")
+    end
+    subgraph examples__web_app_pactown_ecosystem
+        examples__web_app_pactown_ecosystem__run__main("main CC=8")
+    end
+    subgraph scripts__check_doc_links
+        scripts__check_doc_links___is_external["_is_external"]
+        scripts__check_doc_links___slug["_slug"]
+        scripts__check_doc_links___anchors["_anchors"]
+        scripts__check_doc_links___markdown_files["_markdown_files"]
+        scripts__check_doc_links___targets["_targets"]
+        scripts__check_doc_links___resolve["_resolve"]
+        scripts__check_doc_links__check_links("check_links CC=12")
+        scripts__check_doc_links__main["main"]
+    end
     subgraph src__nexu
-        src__nexu__status__capsule_status["capsule_status"]
-        src__nexu__plan___contract_summary("_contract_summary CC=9")
-        src__nexu__plan__build_iteration_plan["build_iteration_plan"]
-        src__nexu__review___markdown_review_prompt["_markdown_review_prompt"]
-        src__nexu__review__build_review_packet["build_review_packet"]
-        src__nexu__drift__check_source_drift["check_source_drift"]
-        src__nexu__git__current_git_sha["current_git_sha"]
-        src__nexu__files__rel["rel"]
-        src__nexu__files__matches_any["matches_any"]
-        src__nexu__files__is_text_file["is_text_file"]
-        src__nexu__files__collect_files("collect_files CC=8")
+        src__nexu__runtime___read_fixture["_read_fixture"]
+        src__nexu__runtime___collect_fixtures["_collect_fixtures"]
+        src__nexu__runtime___html_page("_html_page CC=9")
+        src__nexu__runtime__build_capsule_runtime["build_capsule_runtime"]
+        src__nexu__init_project__init_project["init_project"]
+        src__nexu__config___as_list["_as_list"]
+        src__nexu__config___load_env_file("_load_env_file CC=10")
+        src__nexu__config__load_env_files["load_env_files"]
+        src__nexu__config___resolved_model_from_env["_resolved_model_from_env"]
+        src__nexu__config__load_config["load_config"]
         src__nexu__llm___extract_content["_extract_content"]
         src__nexu__llm___strip_fences["_strip_fences"]
         src__nexu__llm__call_litellm_json("call_litellm_json CC=8")
         src__nexu__llm__offline_review_from_status["offline_review_from_status"]
         src__nexu__llm__call_litellm_review["call_litellm_review"]
-        src__nexu__hashing__sha256_file["sha256_file"]
-        src__nexu__hashing__sha256_text["sha256_text"]
+        src__nexu__bundle___should_include["_should_include"]
+        src__nexu__bundle__build_capsule_bundle["build_capsule_bundle"]
+        src__nexu__review___markdown_review_prompt["_markdown_review_prompt"]
+        src__nexu__review__build_review_packet["build_review_packet"]
+        src__nexu__plan___contract_summary("_contract_summary CC=9")
+        src__nexu__plan__build_iteration_plan["build_iteration_plan"]
+        src__nexu__blueprint__build_blueprint["build_blueprint"]
+        src__nexu__files__rel["rel"]
+        src__nexu__files__matches_any["matches_any"]
+        src__nexu__files__is_text_file["is_text_file"]
+        src__nexu__files__collect_files("collect_files CC=8")
+        src__nexu__iterate__iterate_capsule["iterate_capsule"]
+        src__nexu__cinema_history__history_dir["history_dir"]
+        src__nexu__cinema_history__history_index_path["history_index_path"]
+        src__nexu__cinema_history___load_index["_load_index"]
+        src__nexu__cinema_history___write_index["_write_index"]
+        src__nexu__cinema_history___copy_checkpoint_files["_copy_checkpoint_files"]
+        src__nexu__cinema_history___ledger_snapshot["_ledger_snapshot"]
+        src__nexu__cinema_history___build_label["_build_label"]
+        src__nexu__cinema_history__save_history_checkpoint["save_history_checkpoint"]
+        src__nexu__cinema_history__list_history_checkpoints["list_history_checkpoints"]
+        src__nexu__cinema_history__restore_history_checkpoint("restore_history_checkpoint CC=8")
+        src__nexu__cinema_history___refresh_policy_snapshot["_refresh_policy_snapshot"]
+        src__nexu__cinema_history__ensure_initial_checkpoint["ensure_initial_checkpoint"]
+        src__nexu__cinema_history__ledger_archive_for_display["ledger_archive_for_display"]
+        src__nexu__export_prompt___cinema_policy_ledger_block("_cinema_policy_ledger_block CC=12")
+        src__nexu__export_prompt___latest_iteration["_latest_iteration"]
+        src__nexu__export_prompt__export_iteration_prompt["export_iteration_prompt"]
         src__nexu__paths__project_root["project_root"]
         src__nexu__paths__nexu_dir["nexu_dir"]
         src__nexu__paths__snapshots_dir["snapshots_dir"]
         src__nexu__paths__capsules_dir["capsules_dir"]
         src__nexu__paths__capsule_dir["capsule_dir"]
         src__nexu__paths__ensure_project_dirs["ensure_project_dirs"]
-        src__nexu__runtime___read_fixture["_read_fixture"]
-        src__nexu__runtime___collect_fixtures["_collect_fixtures"]
-        src__nexu__runtime___html_page("_html_page CC=9")
-        src__nexu__runtime__build_capsule_runtime["build_capsule_runtime"]
-        src__nexu__export_prompt___latest_iteration["_latest_iteration"]
-        src__nexu__export_prompt__export_iteration_prompt["export_iteration_prompt"]
-        src__nexu__diff__diff_capsule("diff_capsule CC=12")
         src__nexu__promote___promotion_map["_promotion_map"]
         src__nexu__promote__build_promotion_plan["build_promotion_plan"]
-        src__nexu__journal__journal_path["journal_path"]
-        src__nexu__journal__read_journal["read_journal"]
-        src__nexu__journal__append_journal["append_journal"]
-        src__nexu__report___finding_table["_finding_table"]
-        src__nexu__report___html_from_markdownish["_html_from_markdownish"]
-        src__nexu__report__build_capsule_report["build_capsule_report"]
-        src__nexu__capsule__default_contract_manifest["default_contract_manifest"]
-        src__nexu__capsule__create_capsule("create_capsule CC=8")
-        src__nexu__capsule__list_capsules["list_capsules"]
-        src__nexu__capsule__load_capsule["load_capsule"]
-        src__nexu__capsule__save_capsule["save_capsule"]
-        src__nexu__iterate__iterate_capsule["iterate_capsule"]
-        src__nexu__verify___scan_capsule_contracts["_scan_capsule_contracts"]
-        src__nexu__verify___text["_text"]
-        src__nexu__verify___contains_patterns["_contains_patterns"]
-        src__nexu__verify___find_term_evidence["_find_term_evidence"]
-        src__nexu__verify__verify_capsule{{verify_capsule CC=45}}
+        src__nexu__promote__apply_promotion_plan["apply_promotion_plan"]
         src__nexu__orchestrate___contract_dicts["_contract_dicts"]
         src__nexu__orchestrate__build_orchestration_context["build_orchestration_context"]
         src__nexu__orchestrate__build_orchestration_prompt["build_orchestration_prompt"]
         src__nexu__orchestrate__offline_orchestration_from_context("offline_orchestration_from_context CC=13")
         src__nexu__orchestrate__build_capsule_orchestration["build_capsule_orchestration"]
         src__nexu__orchestrate___render_orchestration_markdown("_render_orchestration_markdown CC=9")
-        src__nexu__init_project__init_project["init_project"]
-        src__nexu__mcp_server___schema["_schema"]
-        src__nexu__mcp_server___tool_map("_tool_map CC=10")
-        src__nexu__mcp_server__call_tool["call_tool"]
+        src__nexu__cinema_scripts___delete_match_keys["_delete_match_keys"]
+        src__nexu__cinema_scripts__apply_spatial_deletes_to_html["apply_spatial_deletes_to_html"]
     end
-    src__nexu__status__capsule_status --> src__nexu__capsule__load_capsule
-    src__nexu__status__capsule_status --> src__nexu__paths__capsule_dir
-    src__nexu__status__capsule_status --> src__nexu__diff__diff_capsule
-    src__nexu__status__capsule_status --> src__nexu__models__read_yaml
-    src__nexu__plan__build_iteration_plan --> src__nexu__capsule__load_capsule
-    src__nexu__plan__build_iteration_plan --> src__nexu__paths__capsule_dir
-    src__nexu__plan__build_iteration_plan --> src__nexu__intract__read_manifest_contracts
-    src__nexu__plan__build_iteration_plan --> src__nexu__blueprint__build_blueprint
-    src__nexu__plan__build_iteration_plan --> src__nexu__plan___contract_summary
-    src__nexu__plan__build_iteration_plan --> src__nexu__models__write_yaml
-    src__nexu__plan__build_iteration_plan --> src__nexu__journal__append_journal
-    src__nexu__plan__build_iteration_plan --> src__nexu__models__utc_now
-    src__nexu__review__build_review_packet --> src__nexu__config__load_config
-    src__nexu__review__build_review_packet --> src__nexu__paths__capsule_dir
-    src__nexu__review__build_review_packet --> src__nexu__verify__verify_capsule
-    src__nexu__review__build_review_packet --> src__nexu__diff__diff_capsule
-    src__nexu__review__build_review_packet --> src__nexu__drift__check_source_drift
-    src__nexu__review__build_review_packet --> src__nexu__blueprint__build_blueprint
-    src__nexu__review__build_review_packet --> src__nexu__export_prompt__export_iteration_prompt
-    src__nexu__review__build_review_packet --> src__nexu__llm__offline_review_from_status
-    src__nexu__review__build_review_packet --> src__nexu__review___markdown_review_prompt
-    src__nexu__review__build_review_packet --> src__nexu__models__write_yaml
-    src__nexu__review__build_review_packet --> src__nexu__journal__append_journal
-    src__nexu__review__build_review_packet --> src__nexu__models__utc_now
-    src__nexu__drift__check_source_drift --> src__nexu__capsule__load_capsule
-    src__nexu__drift__check_source_drift --> src__nexu__models__write_yaml
-    src__nexu__drift__check_source_drift --> src__nexu__hashing__sha256_file
-    src__nexu__drift__check_source_drift --> src__nexu__models__utc_now
-    src__nexu__drift__check_source_drift --> src__nexu__paths__capsule_dir
-    src__nexu__files__collect_files --> src__nexu__files__rel
-    src__nexu__files__collect_files --> src__nexu__files__matches_any
-    src__nexu__files__collect_files --> src__nexu__files__is_text_file
-    src__nexu__llm__call_litellm_json --> src__nexu__llm___strip_fences
-    src__nexu__llm__call_litellm_json --> src__nexu__llm___extract_content
-    src__nexu__llm__call_litellm_review --> src__nexu__llm__call_litellm_json
-    src__nexu__paths__snapshots_dir --> src__nexu__paths__nexu_dir
-    src__nexu__paths__capsules_dir --> src__nexu__paths__nexu_dir
-    src__nexu__paths__capsule_dir --> src__nexu__paths__capsules_dir
-    src__nexu__paths__ensure_project_dirs --> src__nexu__paths__nexu_dir
-    src__nexu__paths__ensure_project_dirs --> src__nexu__paths__snapshots_dir
-    src__nexu__paths__ensure_project_dirs --> src__nexu__paths__capsules_dir
-    src__nexu__runtime___collect_fixtures --> src__nexu__runtime___read_fixture
-    src__nexu__runtime__build_capsule_runtime --> src__nexu__capsule__load_capsule
-    src__nexu__runtime__build_capsule_runtime --> src__nexu__paths__capsule_dir
-    src__nexu__runtime__build_capsule_runtime --> src__nexu__blueprint__build_blueprint
-    src__nexu__runtime__build_capsule_runtime --> src__nexu__intract__read_manifest_contracts
-    src__nexu__runtime__build_capsule_runtime --> src__nexu__models__write_yaml
-    src__nexu__runtime__build_capsule_runtime --> src__nexu__journal__append_journal
-    src__nexu__runtime__build_capsule_runtime --> src__nexu__models__utc_now
-    src__nexu__runtime__build_capsule_runtime --> src__nexu__runtime___collect_fixtures
-    src__nexu__runtime__build_capsule_runtime --> src__nexu__runtime___html_page
-    src__nexu__export_prompt__export_iteration_prompt --> src__nexu__capsule__load_capsule
-    src__nexu__export_prompt__export_iteration_prompt --> src__nexu__paths__capsule_dir
-    src__nexu__export_prompt__export_iteration_prompt --> src__nexu__intract__read_manifest_contracts
-    src__nexu__export_prompt__export_iteration_prompt --> src__nexu__blueprint__build_blueprint
-    src__nexu__export_prompt__export_iteration_prompt --> src__nexu__diff__diff_capsule
-    src__nexu__export_prompt__export_iteration_prompt --> src__nexu__models__write_yaml
-    src__nexu__export_prompt__export_iteration_prompt --> src__nexu__export_prompt___latest_iteration
-    src__nexu__diff__diff_capsule --> src__nexu__capsule__load_capsule
-    src__nexu__diff__diff_capsule --> src__nexu__paths__capsule_dir
-    src__nexu__diff__diff_capsule --> src__nexu__models__write_yaml
-    src__nexu__diff__diff_capsule --> src__nexu__files__rel
-    src__nexu__diff__diff_capsule --> src__nexu__hashing__sha256_file
-    src__nexu__diff__diff_capsule --> src__nexu__files__collect_files
-    src__nexu__promote___promotion_map --> src__nexu__files__rel
-    src__nexu__promote__build_promotion_plan --> src__nexu__capsule__load_capsule
-    src__nexu__promote__build_promotion_plan --> src__nexu__paths__capsule_dir
-    src__nexu__promote__build_promotion_plan --> src__nexu__files__collect_files
-    src__nexu__promote__build_promotion_plan --> src__nexu__verify__verify_capsule
-    src__nexu__promote__build_promotion_plan --> src__nexu__drift__check_source_drift
-    src__nexu__promote__build_promotion_plan --> src__nexu__diff__diff_capsule
-    src__nexu__promote__build_promotion_plan --> src__nexu__models__write_yaml
-    src__nexu__promote__build_promotion_plan --> src__nexu__models__utc_now
-    src__nexu__promote__build_promotion_plan --> src__nexu__promote___promotion_map
-    src__nexu__journal__journal_path --> src__nexu__paths__capsule_dir
-    src__nexu__journal__read_journal --> src__nexu__journal__journal_path
-    src__nexu__journal__read_journal --> src__nexu__models__read_yaml
-    src__nexu__journal__append_journal --> src__nexu__journal__read_journal
-    src__nexu__journal__append_journal --> src__nexu__models__write_yaml
-    src__nexu__journal__append_journal --> src__nexu__models__utc_now
-    src__nexu__journal__append_journal --> src__nexu__journal__journal_path
-    src__nexu__report__build_capsule_report --> src__nexu__paths__capsule_dir
-    src__nexu__report__build_capsule_report --> src__nexu__verify__verify_capsule
-    src__nexu__report__build_capsule_report --> src__nexu__diff__diff_capsule
-    src__nexu__report__build_capsule_report --> src__nexu__drift__check_source_drift
-    src__nexu__report__build_capsule_report --> src__nexu__status__capsule_status
-    src__nexu__report__build_capsule_report --> src__nexu__journal__read_journal
-    src__nexu__report__build_capsule_report --> src__nexu__models__write_yaml
-    src__nexu__report__build_capsule_report --> src__nexu__journal__append_journal
-    src__nexu__report__build_capsule_report --> src__nexu__models__utc_now
-    src__nexu__capsule__create_capsule --> src__nexu__paths__ensure_project_dirs
-    src__nexu__capsule__create_capsule --> src__nexu__paths__capsule_dir
-    src__nexu__capsule__create_capsule --> src__nexu__files__collect_files
-    src__nexu__capsule__create_capsule --> src__nexu__models__write_yaml
-    src__nexu__capsule__create_capsule --> src__nexu__journal__append_journal
-    src__nexu__capsule__create_capsule --> src__nexu__files__rel
-    src__nexu__capsule__list_capsules --> src__nexu__paths__capsules_dir
-    src__nexu__capsule__load_capsule --> src__nexu__models__read_yaml
-    src__nexu__capsule__load_capsule --> src__nexu__paths__capsule_dir
-    src__nexu__capsule__save_capsule --> src__nexu__models__write_yaml
-    src__nexu__capsule__save_capsule --> src__nexu__paths__capsule_dir
-    src__nexu__iterate__iterate_capsule --> src__nexu__capsule__load_capsule
-    src__nexu__iterate__iterate_capsule --> src__nexu__paths__capsule_dir
-    src__nexu__iterate__iterate_capsule --> src__nexu__capsule__save_capsule
-    src__nexu__iterate__iterate_capsule --> src__nexu__models__write_yaml
-    src__nexu__iterate__iterate_capsule --> src__nexu__models__utc_now
-    src__nexu__verify___scan_capsule_contracts --> src__nexu__intract__read_manifest_contracts
-    src__nexu__verify___scan_capsule_contracts --> src__nexu__files__collect_files
-    src__nexu__verify___scan_capsule_contracts --> src__nexu__intract__scan_contracts_in_file
-    src__nexu__verify___contains_patterns --> src__nexu__verify___text
-    src__nexu__verify___find_term_evidence --> src__nexu__verify___text
-    src__nexu__verify___find_term_evidence --> src__nexu__files__rel
-    src__nexu__verify__verify_capsule --> src__nexu__capsule__load_capsule
-    src__nexu__verify__verify_capsule --> src__nexu__paths__capsule_dir
-    src__nexu__verify__verify_capsule --> src__nexu__verify___scan_capsule_contracts
-    src__nexu__verify__verify_capsule --> src__nexu__files__collect_files
-    src__nexu__verify__verify_capsule --> src__nexu__models__write_yaml
-    src__nexu__orchestrate__build_orchestration_context --> src__nexu__capsule__load_capsule
-    src__nexu__orchestrate__build_orchestration_context --> src__nexu__paths__capsule_dir
-    src__nexu__orchestrate__build_orchestration_context --> src__nexu__intract__read_manifest_contracts
-    src__nexu__orchestrate__build_orchestration_context --> src__nexu__plan__build_iteration_plan
-    src__nexu__orchestrate__build_orchestration_context --> src__nexu__blueprint__build_blueprint
-    src__nexu__orchestrate__build_orchestration_context --> src__nexu__verify__verify_capsule
-    src__nexu__orchestrate__build_orchestration_context --> src__nexu__diff__diff_capsule
-    src__nexu__orchestrate__build_orchestration_context --> src__nexu__orchestrate___contract_dicts
-    src__nexu__orchestrate__offline_orchestration_from_context --> src__nexu__models__utc_now
-    src__nexu__orchestrate__build_capsule_orchestration --> src__nexu__config__load_config
-    src__nexu__orchestrate__build_capsule_orchestration --> src__nexu__paths__capsule_dir
-    src__nexu__orchestrate__build_capsule_orchestration --> src__nexu__orchestrate__build_orchestration_context
-    src__nexu__orchestrate__build_capsule_orchestration --> src__nexu__orchestrate__build_orchestration_prompt
-    src__nexu__orchestrate__build_capsule_orchestration --> src__nexu__models__write_yaml
-    src__nexu__orchestrate__build_capsule_orchestration --> src__nexu__orchestrate___render_orchestration_markdown
-    src__nexu__orchestrate__build_capsule_orchestration --> src__nexu__journal__append_journal
-    src__nexu__orchestrate__build_capsule_orchestration --> src__nexu__llm__call_litellm_json
-    src__nexu__init_project__init_project --> src__nexu__paths__ensure_project_dirs
-    src__nexu__init_project__init_project --> src__nexu__models__write_yaml
-    src__nexu__mcp_server___tool_map --> src__nexu__status__capsule_status
-    src__nexu__mcp_server___tool_map --> src__nexu__plan__build_iteration_plan
-    src__nexu__mcp_server___tool_map --> src__nexu__blueprint__build_blueprint
-    src__nexu__mcp_server___tool_map --> src__nexu__orchestrate__build_capsule_orchestration
-    src__nexu__mcp_server___tool_map --> src__nexu__runtime__build_capsule_runtime
-    src__nexu__mcp_server___tool_map --> src__nexu__review__build_review_packet
-    src__nexu__mcp_server___tool_map --> src__nexu__report__build_capsule_report
-    src__nexu__mcp_server___tool_map --> src__nexu__promote__build_promotion_plan
-    src__nexu__mcp_server___tool_map --> src__nexu__capsule__list_capsules
-    src__nexu__mcp_server__call_tool --> src__nexu__mcp_server___tool_map
-    src__nexu__mcp_server___resource_list --> src__nexu__capsule__list_capsules
-    src__nexu__mcp_server___read_resource --> src__nexu__status__capsule_status
-    src__nexu__mcp_server___read_resource --> src__nexu__capsule__list_capsules
-    src__nexu__mcp_server__handle_mcp_message --> src__nexu__mcp_server___result_content
-    src__nexu__mcp_server__handle_mcp_message --> src__nexu__mcp_server__call_tool
-    src__nexu__mcp_server__handle_mcp_message --> src__nexu__mcp_server___resource_list
-    src__nexu__mcp_server__handle_mcp_message --> src__nexu__mcp_server___read_resource
-    src__nexu__mcp_server__handle_mcp_message --> src__nexu__mcp_server___prompts_list
-    src__nexu__mcp_server__run_mcp_stdio --> src__nexu__mcp_server__handle_mcp_message
-    src__nexu__cli__init --> src__nexu__paths__project_root
-    src__nexu__cli__init --> src__nexu__init_project__init_project
-    src__nexu__cli__freeze --> src__nexu__paths__project_root
-    src__nexu__cli__freeze --> src__nexu__freeze__freeze_project
-    src__nexu__cli__capsule_create --> src__nexu__paths__project_root
-    src__nexu__cli__capsule_create --> src__nexu__capsule__create_capsule
-    src__nexu__cli__capsule_create --> src__nexu__blueprint__build_blueprint
-    src__nexu__cli__capsule_list --> src__nexu__paths__project_root
-    src__nexu__cli__capsule_list --> src__nexu__capsule__list_capsules
-    src__nexu__cli__capsule_status_command --> src__nexu__paths__project_root
-    src__nexu__cli__capsule_status_command --> src__nexu__status__capsule_status
-    src__nexu__cli__capsule_iterate --> src__nexu__paths__project_root
-    src__nexu__cli__capsule_iterate --> src__nexu__iterate__iterate_capsule
-    src__nexu__cli__capsule_iterate --> src__nexu__journal__append_journal
-    src__nexu__cli__capsule_blueprint --> src__nexu__paths__project_root
-    src__nexu__cli__capsule_blueprint --> src__nexu__blueprint__build_blueprint
-    src__nexu__cli__capsule_export_prompt --> src__nexu__paths__project_root
-    src__nexu__cli__capsule_export_prompt --> src__nexu__export_prompt__export_iteration_prompt
-    src__nexu__cli__capsule_diff --> src__nexu__paths__project_root
-    src__nexu__cli__capsule_diff --> src__nexu__diff__diff_capsule
-    src__nexu__cli__capsule_drift --> src__nexu__paths__project_root
-    src__nexu__cli__capsule_drift --> src__nexu__drift__check_source_drift
-    src__nexu__cli__capsule_verify --> src__nexu__paths__project_root
-    src__nexu__cli__capsule_verify --> src__nexu__verify__verify_capsule
-    src__nexu__cli__capsule_plan --> src__nexu__paths__project_root
-    src__nexu__cli__capsule_plan --> src__nexu__plan__build_iteration_plan
-    src__nexu__cli__capsule_runtime --> src__nexu__paths__project_root
-    src__nexu__cli__capsule_runtime --> src__nexu__runtime__build_capsule_runtime
-    src__nexu__cli__capsule_report --> src__nexu__paths__project_root
-    src__nexu__cli__capsule_report --> src__nexu__report__build_capsule_report
-    src__nexu__cli__capsule_journal --> src__nexu__paths__project_root
-    src__nexu__cli__capsule_journal --> src__nexu__journal__read_journal
-    src__nexu__cli__capsule_orchestrate --> src__nexu__paths__project_root
-    src__nexu__cli__capsule_orchestrate --> src__nexu__orchestrate__build_capsule_orchestration
-    src__nexu__cli__capsule_review --> src__nexu__paths__project_root
-    src__nexu__cli__capsule_review --> src__nexu__review__build_review_packet
-    src__nexu__cli__capsule_bundle --> src__nexu__paths__project_root
-    src__nexu__cli__capsule_bundle --> src__nexu__bundle__build_capsule_bundle
-    src__nexu__cli__capsule_promote --> src__nexu__paths__project_root
-    src__nexu__cli__capsule_promote --> src__nexu__promote__build_promotion_plan
-    src__nexu__cli__mcp_serve --> src__nexu__paths__project_root
-    src__nexu__cli__mcp_serve --> src__nexu__mcp_server__run_mcp_stdio
-    src__nexu__freeze__freeze_project --> src__nexu__paths__ensure_project_dirs
-    src__nexu__freeze__freeze_project --> src__nexu__models__write_yaml
-    src__nexu__freeze__freeze_project --> src__nexu__files__collect_files
-    src__nexu__freeze__freeze_project --> src__nexu__git__current_git_sha
-    src__nexu__freeze__freeze_project --> src__nexu__paths__snapshots_dir
-    src__nexu__freeze__freeze_project --> src__nexu__files__rel
-    src__nexu__freeze__freeze_project --> src__nexu__hashing__sha256_file
-    src__nexu__blueprint__build_blueprint --> src__nexu__capsule__load_capsule
-    src__nexu__blueprint__build_blueprint --> src__nexu__paths__capsule_dir
-    src__nexu__blueprint__build_blueprint --> src__nexu__intract__read_manifest_contracts
-    src__nexu__blueprint__build_blueprint --> src__nexu__models__write_yaml
-    src__nexu__blueprint__build_blueprint --> src__nexu__models__utc_now
-    src__nexu__bundle___should_include --> src__nexu__files__rel
-    src__nexu__bundle__build_capsule_bundle --> src__nexu__paths__capsule_dir
-    src__nexu__bundle__build_capsule_bundle --> src__nexu__models__write_yaml
-    src__nexu__bundle__build_capsule_bundle --> src__nexu__journal__append_journal
-    src__nexu__bundle__build_capsule_bundle --> src__nexu__models__utc_now
-    src__nexu__bundle__build_capsule_bundle --> src__nexu__files__rel
-    src__nexu__bundle__build_capsule_bundle --> src__nexu__bundle___should_include
-    src__nexu__config__load_config --> src__nexu__models__read_yaml
-    src__nexu__intract__parse_intract_line --> src__nexu__intract___tokenize_contract
-    src__nexu__intract__parse_intract_line --> src__nexu__intract___split_csv
-    src__nexu__intract__scan_contracts_in_text --> src__nexu__intract__parse_intract_line
-    src__nexu__intract__scan_contracts_in_file --> src__nexu__intract__scan_contracts_in_text
-    src__nexu__models__FrozenSnapshot__from_dict --> src__nexu__models__utc_now
-    src__nexu__models__Capsule__from_dict --> src__nexu__models__utc_now
+    subgraph src__vico
+        src__vico__intract___split_csv["_split_csv"]
+        src__vico__intract___tokenize_contract["_tokenize_contract"]
+        src__vico__intract__parse_intract_line["parse_intract_line"]
+        src__vico__intract__scan_contracts_in_text["scan_contracts_in_text"]
+        src__vico__intract__scan_contracts_in_file["scan_contracts_in_file"]
+        src__vico__intract__read_manifest_contracts("read_manifest_contracts CC=12")
+        src__vico__freeze__freeze_project["freeze_project"]
+        src__vico__status__capsule_status["capsule_status"]
+        src__vico__drift__check_source_drift["check_source_drift"]
+        src__vico__git__current_git_sha["current_git_sha"]
+        src__vico__hashing__sha256_file["sha256_file"]
+        src__vico__hashing__sha256_text["sha256_text"]
+        src__vico__models__utc_now["utc_now"]
+        src__vico__models__FrozenSnapshot__to_dict["to_dict"]
+        src__vico__models__FrozenSnapshot__from_dict["from_dict"]
+        src__vico__models__Capsule__to_dict["to_dict"]
+        src__vico__models__Capsule__from_dict["from_dict"]
+        src__vico__models__VerificationReport__to_dict["to_dict"]
+        src__vico__models__CapsuleDiff__to_dict["to_dict"]
+        src__vico__models__PromptExport__to_dict["to_dict"]
+        src__vico__models__write_yaml["write_yaml"]
+        src__vico__models__read_yaml["read_yaml"]
+        src__vico__diff__diff_capsule("diff_capsule CC=12")
+    end
+    examples__scientific_calculator_demo__main --> src__nexu__init_project__init_project
+    examples__scientific_calculator_demo__main --> src__vico__freeze__freeze_project
+    examples__scientific_calculator_demo__main --> src__nexu__capsule__create_capsule
+    examples__scientific_calculator_demo__main --> src__nexu__plan__build_iteration_plan
+    examples__scientific_calculator_demo__main --> src__nexu__iterate__iterate_capsule
     examples__run_examples__run_example --> src__nexu__init_project__init_project
-    examples__run_examples__run_example --> src__nexu__freeze__freeze_project
+    examples__run_examples__run_example --> src__vico__freeze__freeze_project
     examples__run_examples__run_example --> src__nexu__capsule__create_capsule
     examples__run_examples__run_example --> src__nexu__plan__build_iteration_plan
     examples__run_examples__run_example --> src__nexu__blueprint__build_blueprint
     examples__run_examples__run_example --> src__nexu__iterate__iterate_capsule
     examples__run_examples__run_example --> src__nexu__runtime__build_capsule_runtime
     examples__run_examples__run_example --> src__nexu__export_prompt__export_iteration_prompt
-    examples__run_examples__run_example --> src__nexu__diff__diff_capsule
-    examples__run_examples__run_example --> src__nexu__drift__check_source_drift
+    examples__run_examples__run_example --> src__vico__diff__diff_capsule
+    examples__run_examples__run_example --> src__vico__drift__check_source_drift
     examples__run_examples__run_example --> src__nexu__verify__verify_capsule
     examples__run_examples__run_example --> src__nexu__report__build_capsule_report
     examples__run_examples__run_example --> src__nexu__review__build_review_packet
     examples__run_examples__main --> examples__run_examples__run_example
+    examples__scientific_calculator_demo2__main --> examples__scientific_calculator_demo2__print_code
+    examples__scientific_calculator_demo2__main --> src__nexu__init_project__init_project
+    examples__scientific_calculator_demo2__main --> src__vico__freeze__freeze_project
+    examples__scientific_calculator_demo2__main --> src__nexu__capsule__create_capsule
+    examples__scientific_calculator_demo2__main --> src__nexu__iterate__iterate_capsule
+    examples__web_app_calculator__run__main --> src__nexu__init_project__init_project
+    examples__web_app_calculator__run__main --> src__vico__freeze__freeze_project
+    examples__web_app_calculator__run__main --> src__nexu__capsule__create_capsule
+    examples__web_app_calculator__run__main --> src__nexu__runtime__build_capsule_runtime
+    examples__web_app_dashboard__run__main --> src__nexu__init_project__init_project
+    examples__web_app_dashboard__run__main --> src__vico__freeze__freeze_project
+    examples__web_app_dashboard__run__main --> src__nexu__capsule__create_capsule
+    examples__web_app_dashboard__run__main --> src__nexu__runtime__build_capsule_runtime
+    examples__web_app_dashboard__run__main --> src__nexu__iterate__iterate_capsule
+    src__nexu__runtime___collect_fixtures --> src__nexu__runtime___read_fixture
+    src__nexu__runtime__build_capsule_runtime --> src__nexu__capsule__load_capsule
+    src__nexu__runtime__build_capsule_runtime --> src__nexu__paths__capsule_dir
+    src__nexu__runtime__build_capsule_runtime --> src__nexu__blueprint__build_blueprint
+    src__nexu__runtime__build_capsule_runtime --> src__vico__intract__read_manifest_contracts
+    src__nexu__runtime__build_capsule_runtime --> src__vico__models__write_yaml
+    src__nexu__runtime__build_capsule_runtime --> src__nexu__journal__append_journal
+    src__nexu__runtime__build_capsule_runtime --> src__vico__models__utc_now
+    src__nexu__runtime__build_capsule_runtime --> src__nexu__runtime___collect_fixtures
+    src__nexu__runtime__build_capsule_runtime --> src__nexu__runtime___html_page
+    src__nexu__init_project__init_project --> src__nexu__paths__ensure_project_dirs
+    src__nexu__init_project__init_project --> src__vico__models__write_yaml
+    src__nexu__config__load_env_files --> src__nexu__config___load_env_file
+    src__nexu__config__load_config --> src__nexu__config__load_env_files
+    src__nexu__config__load_config --> src__vico__models__read_yaml
+    src__vico__intract__parse_intract_line --> src__vico__intract___tokenize_contract
+    src__vico__intract__parse_intract_line --> src__vico__intract___split_csv
+    src__vico__intract__scan_contracts_in_text --> src__vico__intract__parse_intract_line
+    src__vico__intract__scan_contracts_in_file --> src__vico__intract__scan_contracts_in_text
+    src__nexu__llm__call_litellm_json --> src__nexu__llm___strip_fences
+    src__nexu__llm__call_litellm_json --> src__nexu__llm___extract_content
+    src__nexu__llm__call_litellm_review --> src__nexu__llm__call_litellm_json
+    src__nexu__bundle___should_include --> src__nexu__files__rel
+    src__nexu__bundle__build_capsule_bundle --> src__nexu__paths__capsule_dir
+    src__nexu__bundle__build_capsule_bundle --> src__vico__models__write_yaml
+    src__nexu__bundle__build_capsule_bundle --> src__nexu__journal__append_journal
+    src__nexu__bundle__build_capsule_bundle --> src__vico__models__utc_now
+    src__nexu__bundle__build_capsule_bundle --> src__nexu__files__rel
+    src__nexu__bundle__build_capsule_bundle --> src__nexu__bundle___should_include
+    src__vico__freeze__freeze_project --> src__nexu__paths__ensure_project_dirs
+    src__vico__freeze__freeze_project --> src__vico__models__write_yaml
+    src__vico__freeze__freeze_project --> src__nexu__files__collect_files
+    src__vico__freeze__freeze_project --> src__vico__git__current_git_sha
+    src__vico__freeze__freeze_project --> src__nexu__paths__snapshots_dir
+    src__vico__freeze__freeze_project --> src__nexu__files__rel
+    src__vico__freeze__freeze_project --> src__vico__hashing__sha256_file
+    src__nexu__review__build_review_packet --> src__nexu__config__load_config
+    src__nexu__review__build_review_packet --> src__nexu__paths__capsule_dir
+    src__nexu__review__build_review_packet --> src__nexu__verify__verify_capsule
+    src__nexu__review__build_review_packet --> src__vico__diff__diff_capsule
+    src__nexu__review__build_review_packet --> src__vico__drift__check_source_drift
+    src__nexu__review__build_review_packet --> src__nexu__blueprint__build_blueprint
+    src__nexu__review__build_review_packet --> src__nexu__export_prompt__export_iteration_prompt
+    src__nexu__review__build_review_packet --> src__nexu__llm__offline_review_from_status
+    src__nexu__review__build_review_packet --> src__nexu__review___markdown_review_prompt
+    src__nexu__review__build_review_packet --> src__vico__models__write_yaml
+    src__nexu__review__build_review_packet --> src__nexu__journal__append_journal
+    src__nexu__review__build_review_packet --> src__vico__models__utc_now
+    src__nexu__plan__build_iteration_plan --> src__nexu__capsule__load_capsule
+    src__nexu__plan__build_iteration_plan --> src__nexu__paths__capsule_dir
+    src__nexu__plan__build_iteration_plan --> src__vico__intract__read_manifest_contracts
+    src__nexu__plan__build_iteration_plan --> src__nexu__blueprint__build_blueprint
+    src__nexu__plan__build_iteration_plan --> src__nexu__plan___contract_summary
+    src__nexu__plan__build_iteration_plan --> src__vico__models__write_yaml
+    src__nexu__plan__build_iteration_plan --> src__nexu__journal__append_journal
+    src__nexu__plan__build_iteration_plan --> src__vico__models__utc_now
+    src__nexu__blueprint__build_blueprint --> src__nexu__capsule__load_capsule
+    src__nexu__blueprint__build_blueprint --> src__nexu__paths__capsule_dir
+    src__nexu__blueprint__build_blueprint --> src__vico__intract__read_manifest_contracts
+    src__nexu__blueprint__build_blueprint --> src__vico__models__write_yaml
+    src__nexu__blueprint__build_blueprint --> src__vico__models__utc_now
+    src__nexu__files__collect_files --> src__nexu__files__rel
+    src__nexu__files__collect_files --> src__nexu__files__matches_any
+    src__nexu__files__collect_files --> src__nexu__files__is_text_file
+    src__vico__status__capsule_status --> src__nexu__capsule__load_capsule
+    src__vico__status__capsule_status --> src__nexu__paths__capsule_dir
+    src__vico__status__capsule_status --> src__vico__diff__diff_capsule
+    src__vico__status__capsule_status --> src__vico__models__read_yaml
+    src__nexu__iterate__iterate_capsule --> src__nexu__capsule__load_capsule
+    src__nexu__iterate__iterate_capsule --> src__nexu__paths__capsule_dir
+    src__nexu__iterate__iterate_capsule --> src__nexu__capsule__save_capsule
+    src__nexu__iterate__iterate_capsule --> src__vico__models__write_yaml
+    src__nexu__iterate__iterate_capsule --> src__vico__models__utc_now
+    src__vico__drift__check_source_drift --> src__nexu__capsule__load_capsule
+    src__vico__drift__check_source_drift --> src__vico__models__write_yaml
+    src__vico__drift__check_source_drift --> src__vico__hashing__sha256_file
+    src__vico__drift__check_source_drift --> src__vico__models__utc_now
+    src__vico__drift__check_source_drift --> src__nexu__paths__capsule_dir
+    src__nexu__cinema_history__history_index_path --> src__nexu__cinema_history__history_dir
+    src__nexu__cinema_history___load_index --> src__nexu__cinema_history__history_index_path
+    src__nexu__cinema_history___write_index --> src__nexu__cinema_history__history_dir
+    src__nexu__cinema_history___write_index --> src__nexu__cinema_history__history_index_path
+    src__nexu__cinema_history__save_history_checkpoint --> src__nexu__cinema_history___load_index
+    src__nexu__cinema_history__save_history_checkpoint --> src__nexu__cinema_history___copy_checkpoint_files
+    src__nexu__cinema_history__save_history_checkpoint --> src__nexu__cinema_history___ledger_snapshot
+    src__nexu__cinema_history__save_history_checkpoint --> src__nexu__cinema_history___write_index
+    src__nexu__cinema_history__save_history_checkpoint --> src__nexu__cinema_history__history_dir
+    src__nexu__cinema_history__list_history_checkpoints --> src__nexu__cinema_history___load_index
+    src__nexu__cinema_history__restore_history_checkpoint --> src__nexu__paths__project_root
+    src__nexu__cinema_history__restore_history_checkpoint --> src__nexu__cinema_policy__cinema_dir_for
+    src__nexu__cinema_history__restore_history_checkpoint --> src__nexu__cinema_history___refresh_policy_snapshot
+    src__nexu__cinema_history__restore_history_checkpoint --> src__nexu__cinema_history__history_dir
+    src__nexu__cinema_history__restore_history_checkpoint --> src__nexu__cinema_policy__apply_ledger_from_cinema
+    src__nexu__cinema_history___refresh_policy_snapshot --> src__nexu__cinema__write_intract_policy_files
+    src__nexu__cinema_history__ensure_initial_checkpoint --> src__nexu__cinema_history___load_index
+    src__nexu__cinema_history__ensure_initial_checkpoint --> src__nexu__cinema_history__save_history_checkpoint
+    src__nexu__cinema_history__ensure_initial_checkpoint --> src__nexu__cinema_history___ledger_snapshot
+    src__nexu__cinema_history__ledger_archive_for_display --> src__nexu__cinema_history___ledger_snapshot
+    src__nexu__cinema_history__ledger_archive_for_display --> src__nexu__cinema_history___build_label
+    src__nexu__export_prompt__export_iteration_prompt --> src__nexu__capsule__load_capsule
+    src__nexu__export_prompt__export_iteration_prompt --> src__nexu__paths__capsule_dir
+    src__nexu__export_prompt__export_iteration_prompt --> src__vico__intract__read_manifest_contracts
+    src__nexu__export_prompt__export_iteration_prompt --> src__nexu__blueprint__build_blueprint
+    src__nexu__export_prompt__export_iteration_prompt --> src__vico__diff__diff_capsule
+    src__nexu__export_prompt__export_iteration_prompt --> src__nexu__export_prompt___cinema_policy_ledger_block
+    src__nexu__export_prompt__export_iteration_prompt --> src__vico__models__write_yaml
+    src__nexu__export_prompt__export_iteration_prompt --> src__nexu__export_prompt___latest_iteration
+    src__nexu__paths__snapshots_dir --> src__nexu__paths__nexu_dir
+    src__nexu__paths__capsules_dir --> src__nexu__paths__nexu_dir
+    src__nexu__paths__capsule_dir --> src__nexu__paths__capsules_dir
+    src__nexu__paths__ensure_project_dirs --> src__nexu__paths__nexu_dir
+    src__nexu__paths__ensure_project_dirs --> src__nexu__paths__snapshots_dir
+    src__nexu__paths__ensure_project_dirs --> src__nexu__paths__capsules_dir
+    src__nexu__promote___promotion_map --> src__nexu__files__rel
+    src__nexu__promote__build_promotion_plan --> src__nexu__capsule__load_capsule
+    src__nexu__promote__build_promotion_plan --> src__nexu__paths__capsule_dir
+    src__nexu__promote__build_promotion_plan --> src__nexu__files__collect_files
+    src__nexu__promote__build_promotion_plan --> src__nexu__verify__verify_capsule
+    src__nexu__promote__build_promotion_plan --> src__vico__drift__check_source_drift
+    src__nexu__promote__build_promotion_plan --> src__vico__diff__diff_capsule
+    src__nexu__promote__build_promotion_plan --> src__vico__models__write_yaml
+    src__nexu__promote__build_promotion_plan --> src__vico__models__utc_now
+    src__nexu__promote__build_promotion_plan --> src__nexu__promote___promotion_map
+    src__nexu__promote__apply_promotion_plan --> src__nexu__paths__capsule_dir
+    src__nexu__orchestrate__build_orchestration_context --> src__nexu__capsule__load_capsule
+    src__nexu__orchestrate__build_orchestration_context --> src__nexu__paths__capsule_dir
+    src__nexu__orchestrate__build_orchestration_context --> src__vico__intract__read_manifest_contracts
+    src__nexu__orchestrate__build_orchestration_context --> src__nexu__plan__build_iteration_plan
+    src__nexu__orchestrate__build_orchestration_context --> src__nexu__blueprint__build_blueprint
+    src__nexu__orchestrate__build_orchestration_context --> src__nexu__verify__verify_capsule
+    src__nexu__orchestrate__build_orchestration_context --> src__vico__diff__diff_capsule
+    src__nexu__orchestrate__build_orchestration_context --> src__nexu__orchestrate___contract_dicts
+    src__nexu__orchestrate__offline_orchestration_from_context --> src__vico__models__utc_now
+    src__nexu__orchestrate__build_capsule_orchestration --> src__nexu__config__load_config
+    src__nexu__orchestrate__build_capsule_orchestration --> src__nexu__paths__capsule_dir
+    src__nexu__orchestrate__build_capsule_orchestration --> src__nexu__orchestrate__build_orchestration_context
+    src__nexu__orchestrate__build_capsule_orchestration --> src__nexu__orchestrate__build_orchestration_prompt
+    src__nexu__orchestrate__build_capsule_orchestration --> src__vico__models__write_yaml
+    src__nexu__orchestrate__build_capsule_orchestration --> src__nexu__orchestrate___render_orchestration_markdown
+    src__nexu__orchestrate__build_capsule_orchestration --> src__nexu__journal__append_journal
+    src__nexu__orchestrate__build_capsule_orchestration --> src__nexu__llm__call_litellm_json
+    src__vico__models__FrozenSnapshot__from_dict --> src__vico__models__utc_now
+    src__vico__models__Capsule__from_dict --> src__vico__models__utc_now
+    src__vico__diff__diff_capsule --> src__nexu__capsule__load_capsule
+    src__vico__diff__diff_capsule --> src__nexu__paths__capsule_dir
+    src__vico__diff__diff_capsule --> src__vico__models__write_yaml
+    src__vico__diff__diff_capsule --> src__nexu__files__rel
+    src__vico__diff__diff_capsule --> src__vico__hashing__sha256_file
+    src__vico__diff__diff_capsule --> src__nexu__files__collect_files
+    src__nexu__cinema_scripts__apply_spatial_deletes_to_html --> src__nexu__cinema_scripts___delete_match_keys
+    src__nexu__cinema_scripts__repair_cinema_html_files --> src__nexu__cinema_scripts__write_cinema_inject_files
+    src__nexu__cinema_scripts__repair_cinema_html_files --> src__nexu__cinema_scripts__finalize_cinema_html
+    src__nexu__journal__journal_path --> src__nexu__paths__capsule_dir
+    src__nexu__journal__read_journal --> src__nexu__journal__journal_path
+    src__nexu__journal__read_journal --> src__vico__models__read_yaml
+    src__nexu__journal__append_journal --> src__nexu__journal__read_journal
+    src__nexu__journal__append_journal --> src__vico__models__write_yaml
+    src__nexu__journal__append_journal --> src__vico__models__utc_now
+    src__nexu__journal__append_journal --> src__nexu__journal__journal_path
+    src__nexu__report__build_capsule_report --> src__nexu__paths__capsule_dir
+    src__nexu__report__build_capsule_report --> src__nexu__verify__verify_capsule
+    src__nexu__report__build_capsule_report --> src__vico__diff__diff_capsule
+    src__nexu__report__build_capsule_report --> src__vico__drift__check_source_drift
+    src__nexu__report__build_capsule_report --> src__vico__status__capsule_status
+    src__nexu__report__build_capsule_report --> src__nexu__journal__read_journal
+    src__nexu__report__build_capsule_report --> src__vico__models__write_yaml
+    src__nexu__report__build_capsule_report --> src__nexu__journal__append_journal
+    src__nexu__report__build_capsule_report --> src__vico__models__utc_now
+    src__nexu__capsule__create_capsule --> src__nexu__paths__ensure_project_dirs
+    src__nexu__capsule__create_capsule --> src__nexu__paths__capsule_dir
+    src__nexu__capsule__create_capsule --> src__nexu__files__collect_files
+    src__nexu__capsule__create_capsule --> src__vico__models__write_yaml
+    src__nexu__capsule__create_capsule --> src__nexu__journal__append_journal
+    src__nexu__capsule__create_capsule --> src__nexu__files__rel
+    src__nexu__capsule__list_capsules --> src__nexu__paths__capsules_dir
+    src__nexu__capsule__load_capsule --> src__vico__models__read_yaml
+    src__nexu__capsule__load_capsule --> src__nexu__paths__capsule_dir
+    src__nexu__capsule__save_capsule --> src__vico__models__write_yaml
+    src__nexu__capsule__save_capsule --> src__nexu__paths__capsule_dir
+    src__nexu__mcp_server___apply_promotion_from_mcp --> src__nexu__promote__build_promotion_plan
+    src__nexu__mcp_server___apply_promotion_from_mcp --> src__nexu__promote__apply_promotion_plan
+    src__nexu__mcp_server__call_tool --> src__nexu__mcp_server___tool_map
+    src__nexu__mcp_server___resource_list --> src__nexu__capsule__list_capsules
+    src__nexu__mcp_server___read_resource --> src__vico__status__capsule_status
+    src__nexu__mcp_server___read_resource --> src__nexu__capsule__list_capsules
+    src__nexu__mcp_server___rpc_handlers --> src__nexu__mcp_server___rpc_initialize
+    src__nexu__mcp_server___rpc_handlers --> src__nexu__mcp_server___result_content
+    src__nexu__mcp_server___rpc_handlers --> src__nexu__mcp_server___read_resource
+    src__nexu__mcp_server___rpc_handlers --> src__nexu__mcp_server___prompt_get
+    src__nexu__mcp_server___rpc_handlers --> src__nexu__mcp_server__call_tool
+    src__nexu__mcp_server___rpc_handlers --> src__nexu__mcp_server___resource_list
+    src__nexu__mcp_server___rpc_handlers --> src__nexu__mcp_server___prompts_list
+    src__nexu__mcp_server__handle_mcp_message --> src__nexu__mcp_server___rpc_handlers
+    src__nexu__mcp_server__run_mcp_stdio --> src__nexu__mcp_server__handle_mcp_message
+    src__nexu__cli__init --> src__nexu__paths__project_root
+    src__nexu__cli__init --> src__nexu__init_project__init_project
+    src__nexu__cli__freeze --> src__nexu__paths__project_root
+    src__nexu__cli__freeze --> src__vico__freeze__freeze_project
+    src__nexu__cli__capsule_create --> src__nexu__paths__project_root
+    src__nexu__cli__capsule_create --> src__nexu__capsule__create_capsule
+    src__nexu__cli__capsule_create --> src__nexu__blueprint__build_blueprint
+    src__nexu__cli__capsule_list --> src__nexu__paths__project_root
+    src__nexu__cli__capsule_list --> src__nexu__capsule__list_capsules
+    src__nexu__cli__capsule_status_command --> src__nexu__paths__project_root
+    src__nexu__cli__capsule_status_command --> src__vico__status__capsule_status
+    src__nexu__cli__capsule_iterate --> src__nexu__paths__project_root
+    src__nexu__cli__capsule_iterate --> src__nexu__iterate__iterate_capsule
+    src__nexu__cli__capsule_iterate --> src__nexu__journal__append_journal
+    src__nexu__cli__capsule_iterate --> src__nexu__cinema__generate_cinema_player
+    src__nexu__cli__capsule_blueprint --> src__nexu__paths__project_root
+    src__nexu__cli__capsule_blueprint --> src__nexu__blueprint__build_blueprint
+    src__nexu__cli__capsule_blueprint --> src__nexu__cli___print_yaml
+    src__nexu__cli__capsule_export_prompt --> src__nexu__paths__project_root
+    src__nexu__cli__capsule_export_prompt --> src__nexu__export_prompt__export_iteration_prompt
+    src__nexu__cli__capsule_export_prompt --> src__nexu__cli___relative_to_root
+    src__nexu__cli__capsule_diff --> src__nexu__paths__project_root
+    src__nexu__cli__capsule_diff --> src__vico__diff__diff_capsule
+    src__nexu__cli__capsule_drift --> src__nexu__paths__project_root
+    src__nexu__cli__capsule_drift --> src__vico__drift__check_source_drift
+    src__nexu__cli__capsule_verify --> src__nexu__paths__project_root
+    src__nexu__cli__capsule_verify --> src__nexu__verify__verify_capsule
+    src__nexu__cli__capsule_plan --> src__nexu__paths__project_root
+    src__nexu__cli__capsule_plan --> src__nexu__plan__build_iteration_plan
+    src__nexu__cli__capsule_plan --> src__nexu__cli___print_yaml
+    src__nexu__cli__capsule_runtime --> src__nexu__paths__project_root
+    src__nexu__cli__capsule_runtime --> src__nexu__runtime__build_capsule_runtime
+    src__nexu__cli__capsule_runtime --> src__nexu__cli___relative_to_root
+    src__nexu__cli__capsule_report --> src__nexu__paths__project_root
+    src__nexu__cli__capsule_report --> src__nexu__report__build_capsule_report
+    src__nexu__cli__capsule_report --> src__nexu__cli___relative_to_root
+    src__nexu__cli__capsule_journal --> src__nexu__paths__project_root
+    src__nexu__cli__capsule_journal --> src__nexu__journal__read_journal
+    src__nexu__cli__capsule_orchestrate --> src__nexu__paths__project_root
+    src__nexu__cli__capsule_orchestrate --> src__nexu__orchestrate__build_capsule_orchestration
+    src__nexu__cli__capsule_orchestrate --> src__nexu__cli___relative_to_root
+    src__nexu__cli__capsule_review --> src__nexu__paths__project_root
+    src__nexu__cli__capsule_review --> src__nexu__review__build_review_packet
+    src__nexu__cli__capsule_review --> src__nexu__cli___relative_to_root
+    src__nexu__cli__capsule_bundle --> src__nexu__paths__project_root
+    src__nexu__cli__capsule_bundle --> src__nexu__bundle__build_capsule_bundle
+    src__nexu__cli__capsule_bundle --> src__nexu__cli___relative_to_root
+    src__nexu__cli__capsule_promote --> src__nexu__paths__project_root
+    src__nexu__cli__capsule_promote --> src__nexu__promote__build_promotion_plan
+    src__nexu__cli__capsule_promote --> src__nexu__promote__apply_promotion_plan
+    src__nexu__cli__mcp_serve --> src__nexu__paths__project_root
+    src__nexu__cli__mcp_serve --> src__nexu__mcp_server__run_mcp_stdio
+    src__nexu__cinema_server___render_server_script --> src__nexu__cinema_server___template_text
+    src__nexu__cinema_server___available_port --> src__nexu__cinema_server___try_spawn_on_port
+    src__nexu__cinema_server__start_persistent_http_server --> src__nexu__config__load_env_files
+    src__nexu__cinema_server__start_persistent_http_server --> src__nexu__cinema_server___render_server_script
+    src__nexu__cinema_server__start_persistent_http_server --> src__nexu__cinema_server___available_port
+    src__nexu__cinema_server__start_persistent_http_server --> src__nexu__config__load_config
+    src__nexu__cinema_server__start_persistent_http_server --> src__nexu__cinema_server___litellm_available
+    src__nexu__cinema_server__start_cinema_player_server --> src__nexu__cinema_server__start_persistent_http_server
+    src__nexu__cinema_server__start_cinema_player_server --> src__nexu__cinema_server___open_browser
+    src__nexu__cinema___render_cinema_template --> src__nexu__cinema___cinema_template_text
+    src__nexu__cinema__write_cinema_nexu_hooks --> src__nexu__cinema___cinema_template_text
+    src__nexu__cinema___contract_to_public_dict --> src__nexu__cinema__format_intract_v1_line
+    src__nexu__cinema__build_intract_policy_snapshot --> src__nexu__paths__capsule_dir
+    src__nexu__cinema__build_intract_policy_snapshot --> src__vico__models__read_yaml
+    src__nexu__cinema__build_intract_policy_snapshot --> src__nexu__cinema___contract_to_public_dict
+    src__nexu__cinema__write_intract_policy_files --> src__nexu__cinema__build_intract_policy_snapshot
+    src__nexu__cinema__generate_cinema_player --> src__nexu__paths__capsule_dir
+    src__nexu__cinema__generate_cinema_player --> src__nexu__cinema__write_intract_policy_files
+    src__nexu__cinema__generate_cinema_player --> src__nexu__cinema__write_cinema_nexu_hooks
+    src__nexu__cinema__generate_cinema_player --> src__nexu__cinema_scripts__write_cinema_inject_files
+    src__nexu__cinema__generate_cinema_player --> src__nexu__cinema_history__ensure_initial_checkpoint
+    src__nexu__cinema__generate_cinema_player --> src__nexu__cinema___render_cinema_template
+    src__nexu__cinema___start_cinema_server --> src__nexu__cinema_server__start_cinema_player_server
+    src__nexu__intract_adapter___ensure_intract_on_path --> src__nexu__intract_adapter___sibling_intract_src
+    src__nexu__intract_adapter___finding_for_result --> src__nexu__intract_adapter___result_status
+    src__nexu__intract_adapter__check_intract_policy --> src__nexu__intract_adapter___ensure_intract_on_path
+    src__nexu__intract_adapter__check_intract_policy --> src__nexu__files__rel
+    src__nexu__intract_adapter__check_intract_policy --> src__nexu__intract_adapter___policy_findings
+    src__nexu__intract_adapter__check_intract_policy --> src__nexu__intract_adapter___finding_for_result
+    src__nexu__cinema_projects__activate_example_project --> src__nexu__cinema_projects___resolve_source_cinema
+    src__nexu__cinema_projects__activate_example_project --> src__nexu__cinema_scripts__write_cinema_inject_files
+    src__nexu__cinema_projects__activate_example_project --> src__nexu__cinema_projects__find_nexu_repo_root
+    src__nexu__cinema_projects__activate_example_project --> src__nexu__cinema_projects___copy_cinema_files
+    src__nexu__cinema_projects__activate_example_project --> src__nexu__cinema_projects___write_seed_variants
+    src__nexu__cinema_projects__activate_example_project --> src__nexu__cinema_policy__stage_files_are_distinct
+    src__nexu__cinema_projects__activate_example_project --> src__nexu__cinema_policy__ensure_option_previews_from_stages
+    src__nexu__cinema_projects__activate_example_project --> src__nexu__cinema_policy__load_effective_ui_constraints
+    src__nexu__cinema_projects__activate_example_project --> src__nexu__cinema_projects___seed_html_for_project
+    src__nexu__cinema_policy__effective_ui_constraints_from_ledger --> src__nexu__cinema_policy___proposal_kind_and_element
+    src__nexu__cinema_policy___html_files_distinct --> src__nexu__cinema_policy___normalize_html_body
+    src__nexu__cinema_policy__option_previews_are_distinct --> src__nexu__cinema_policy___html_files_distinct
+    src__nexu__cinema_policy__stage_files_are_distinct --> src__nexu__cinema_policy___html_files_distinct
+    src__nexu__cinema_policy__ensure_option_previews_from_stages --> src__nexu__cinema_policy___replace_html_title
+    src__nexu__cinema_policy__sync_option_previews_from_workspace --> src__nexu__cinema_scripts__apply_spatial_deletes_to_html
+    src__nexu__cinema_policy__sync_option_previews_from_workspace --> src__nexu__cinema_scripts__finalize_cinema_html
+    src__nexu__cinema_policy__sync_option_previews_from_workspace --> src__nexu__cinema_policy__load_effective_ui_constraints
+    src__nexu__cinema_policy__sync_option_previews_from_workspace --> src__nexu__cinema_policy___replace_html_title
+    src__nexu__cinema_policy__enforce_deletes_on_option_previews --> src__nexu__cinema_scripts__apply_spatial_deletes_to_html
+    src__nexu__cinema_policy__enforce_deletes_on_option_previews --> src__nexu__cinema_scripts__finalize_cinema_html
+    src__nexu__cinema_policy__load_effective_ui_constraints --> src__nexu__cinema_policy__policy_ledger_path
+    src__nexu__cinema_policy__load_effective_ui_constraints --> src__nexu__cinema_policy__effective_ui_constraints_from_ledger
+    src__nexu__cinema_policy__cinema_model_label --> src__nexu__config__load_env_files
+    src__nexu__cinema_policy__cinema_model_label --> src__nexu__config__load_config
+    src__nexu__cinema_policy__cinema_dir_for --> src__nexu__paths__capsule_dir
+    src__nexu__cinema_policy__cinema_dir_for --> src__nexu__paths__project_root
+    src__nexu__cinema_policy__policy_snapshot_path --> src__nexu__cinema_policy__cinema_dir_for
+    src__nexu__cinema_policy__policy_ledger_path --> src__nexu__cinema_policy__cinema_dir_for
+    src__nexu__cinema_policy__load_policy_snapshot --> src__nexu__cinema_policy__policy_snapshot_path
+    src__nexu__cinema_policy__manifest_paths_from_snapshot --> src__nexu__paths__project_root
+    src__nexu__cinema_policy__apply_ledger_from_cinema --> src__nexu__paths__project_root
+    src__nexu__cinema_policy__apply_ledger_from_cinema --> src__nexu__cinema_policy__policy_ledger_path
+    src__nexu__cinema_policy__apply_ledger_from_cinema --> src__nexu__cinema_policy__normalize_manifest_target
+    src__nexu__cinema_policy__apply_ledger_from_cinema --> src__nexu__cinema_policy__load_policy_snapshot
+    src__nexu__cinema_policy__ensure_intract_on_path --> src__nexu__paths__project_root
+    src__nexu__cinema_policy__propose_ui_delta_contract_dicts --> src__nexu__cinema_policy__ensure_intract_on_path
+    src__nexu__cinema_policy__append_policy_ledger_entry --> src__nexu__cinema_policy__policy_ledger_path
+    src__nexu__cinema_policy__normalize_proposals_for_ledger --> src__nexu__cinema_policy___proposal_kind_and_element
+    src__nexu__cinema_policy__append_iteration_ledger_entry --> src__nexu__cinema_policy__normalize_proposals_for_ledger
+    src__nexu__cinema_policy__append_iteration_ledger_entry --> src__nexu__cinema_policy__append_policy_ledger_entry
+    src__nexu__cinema_policy__append_iteration_ledger_entry --> src__nexu__cinema_policy__propose_ui_delta_contract_dicts
+    src__nexu__cinema_policy__append_iteration_ledger_entry --> src__nexu__paths__project_root
+    src__nexu__cinema_policy__propose_llm_for_stage --> src__nexu__cinema_policy__cinema_dir_for
+    src__nexu__cinema_policy__propose_llm_for_stage --> src__nexu__cinema_policy__ensure_intract_on_path
+    src__nexu__cinema_policy__propose_llm_for_stage --> src__nexu__cinema_policy__append_policy_ledger_entry
+    src__nexu__cinema_policy__propose_llm_for_stage --> src__nexu__paths__project_root
+    src__nexu__cinema_policy__validate_intract_artifact --> src__nexu__cinema_policy__ensure_intract_on_path
+    src__nexu__cinema_policy__verify_capsule_workspace --> src__nexu__verify__verify_capsule
+    src__nexu__cinema_policy__verify_capsule_workspace --> src__nexu__paths__project_root
+    src__nexu__cinema_markpact__build_markpact_readme --> src__nexu__cinema_markpact___escape_markdown_fence
+    src__nexu__cinema_publish___registry_path --> src__nexu__cinema_publish__services_root
+    src__nexu__cinema_publish___load_registry --> src__nexu__cinema_publish___registry_path
+    src__nexu__cinema_publish___save_registry --> src__nexu__cinema_publish__services_root
+    src__nexu__cinema_publish___save_registry --> src__nexu__cinema_publish___registry_path
+    src__nexu__cinema_publish___service_alive --> src__nexu__cinema_publish___port_open
+    src__nexu__cinema_publish___service_alive --> src__nexu__cinema_publish___http_ok
+    src__nexu__cinema_publish___refresh_service_status --> src__nexu__cinema_publish___service_alive
+    src__nexu__cinema_publish__list_published_services --> src__nexu__cinema_publish___load_registry
+    src__nexu__cinema_publish__list_published_services --> src__nexu__cinema_publish___save_registry
+    src__nexu__cinema_publish__list_published_services --> src__nexu__cinema_publish___refresh_service_status
+    src__nexu__cinema_publish___write_service_readme --> src__nexu__cinema_markpact___escape_markdown_fence
+    src__nexu__cinema_publish__publish_project_service --> src__nexu__cinema_publish___slug_service_id
+    src__nexu__cinema_publish__publish_project_service --> src__nexu__cinema_markpact__build_markpact_readme
+    src__nexu__cinema_publish__publish_project_service --> src__nexu__cinema_publish___load_registry
+    src__nexu__cinema_publish__publish_project_service --> src__nexu__cinema_policy__load_effective_ui_constraints
+    src__nexu__cinema_publish__publish_project_service --> src__nexu__cinema_publish___write_service_readme
+    src__nexu__cinema_publish__publish_project_service --> src__nexu__cinema_publish___save_registry
+    src__nexu__cinema_publish__publish_project_service --> src__nexu__cinema_publish__services_root
+    src__nexu__cinema_publish__start_published_service --> src__nexu__cinema_publish___load_registry
+    src__nexu__cinema_publish__start_published_service --> src__nexu__cinema_publish___refresh_service_status
+    src__nexu__cinema_publish__start_published_service --> src__nexu__cinema_publish___save_registry
+    src__nexu__cinema_publish__start_published_service --> src__nexu__cinema_publish__services_root
+    src__nexu__cinema_publish__stop_published_service --> src__nexu__cinema_publish___load_registry
+    src__nexu__cinema_publish__stop_published_service --> src__nexu__cinema_publish___save_registry
+    src__nexu__verify___scan_capsule_contracts --> src__vico__intract__read_manifest_contracts
+    src__nexu__verify___scan_capsule_contracts --> src__nexu__files__collect_files
+    src__nexu__verify___scan_capsule_contracts --> src__vico__intract__scan_contracts_in_file
+    src__nexu__verify___contains_patterns --> src__nexu__verify___text
+    src__nexu__verify___find_term_evidence --> src__nexu__verify___text
+    src__nexu__verify___find_term_evidence --> src__nexu__files__rel
+    src__nexu__verify___check_source_files_presence --> src__nexu__files__rel
+    src__nexu__verify___check_baseline_lock --> src__vico__diff__diff_capsule
+    src__nexu__verify___check_forbidden_write --> src__nexu__verify___contains_patterns
+    src__nexu__verify___check_forbidden_secret --> src__nexu__verify___contains_patterns
+    src__nexu__verify___check_output_presence --> src__nexu__verify___find_term_evidence
+    src__nexu__verify__verify_capsule --> src__nexu__capsule__load_capsule
+    src__nexu__verify__verify_capsule --> src__nexu__paths__capsule_dir
+    src__nexu__verify__verify_capsule --> src__nexu__verify___scan_capsule_contracts
+    src__nexu__verify__verify_capsule --> src__nexu__files__collect_files
+    src__nexu__verify__verify_capsule --> src__nexu__verify___summary_status
+    scripts__check_doc_links___anchors --> scripts__check_doc_links___slug
+    scripts__check_doc_links__check_links --> scripts__check_doc_links___markdown_files
+    scripts__check_doc_links__check_links --> scripts__check_doc_links___targets
+    scripts__check_doc_links__check_links --> scripts__check_doc_links___resolve
+    scripts__check_doc_links__check_links --> scripts__check_doc_links___is_external
+    scripts__check_doc_links__main --> scripts__check_doc_links__check_links
 
     classDef highCC fill:#ff6b6b,stroke:#c92a2a,color:#fff
     classDef medCC fill:#ffd43b,stroke:#f08c00,color:#000
-    class src__nexu__verify__verify_capsule highCC
-    class src__nexu__plan___contract_summary,src__nexu__files__collect_files,src__nexu__llm__call_litellm_json,src__nexu__runtime___html_page,src__nexu__diff__diff_capsule,src__nexu__capsule__create_capsule,src__nexu__orchestrate__offline_orchestration_from_context,src__nexu__orchestrate___render_orchestration_markdown,src__nexu__mcp_server___tool_map,src__nexu__mcp_server__handle_mcp_message,src__nexu__intract__read_manifest_contracts medCC
+    class src__nexu__cinema_projects__activate_example_project,src__nexu__cinema_policy__effective_ui_constraints_from_ledger,src__nexu__cinema_publish__publish_project_service,src__nexu__cinema_publish__start_published_service highCC
+    class examples__web_app_event_monitor__run__main,examples__web_app_pactown_ecosystem__run__main,src__nexu__runtime___html_page,src__nexu__config___load_env_file,src__vico__intract__read_manifest_contracts,src__nexu__llm__call_litellm_json,src__nexu__plan___contract_summary,src__nexu__files__collect_files,src__nexu__cinema_history__restore_history_checkpoint,src__nexu__export_prompt___cinema_policy_ledger_block,src__nexu__orchestrate__offline_orchestration_from_context,src__nexu__orchestrate___render_orchestration_markdown,src__vico__diff__diff_capsule,src__nexu__capsule__create_capsule,src__nexu__cinema__build_intract_policy_snapshot,src__nexu__intract_adapter___finding_for_result,src__nexu__cinema_policy__merge_ui_constraint_lists,src__nexu__cinema_policy__sync_option_previews_from_workspace,src__nexu__cinema_policy__resolve_iteration_mode,src__nexu__cinema_policy__apply_ledger_from_cinema,src__nexu__cinema_policy___proposal_kind_and_element,src__nexu__cinema_policy__propose_llm_for_stage,src__nexu__cinema_policy__validate_intract_artifact,src__nexu__cinema_markpact__build_markpact_readme,src__nexu__cinema_publish__stop_published_service,src__nexu__verify___check_output_presence,src__nexu__verify___check_required_intents,scripts__check_doc_links__check_links medCC

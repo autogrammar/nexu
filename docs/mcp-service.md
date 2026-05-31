@@ -5,8 +5,8 @@ nexu 0.5 exposes a conservative MCP-compatible stdio service so IDE agents can c
 The service is intentionally limited:
 
 - no shell execution,
-- no direct source-project mutation,
-- promotion is dry-run only,
+- source-project mutation is limited to the explicit `nexu_capsule_promote_apply` tool,
+- dry-run promotion planning remains available as `nexu_capsule_promote_plan`,
 - LLM calls remain disabled unless `nexu.yaml` explicitly allows network calls.
 
 ## List tools
@@ -43,6 +43,7 @@ nexu_capsule_verify
 nexu_capsule_review
 nexu_capsule_report
 nexu_capsule_promote_plan
+nexu_capsule_promote_apply
 ```
 
 ## Resources and prompts
@@ -77,7 +78,7 @@ Call a tool:
 
 ## Security model
 
-MCP tools are powerful because an external agent can trigger local operations. nexu therefore keeps the first implementation conservative:
+MCP tools are powerful because an external agent can trigger local operations. Treat `nexu_capsule_promote_apply` as a write-capable operation: expose it only to trusted clients and prefer `nexu_capsule_promote_plan` for review-first workflows.
 
 - `nexu_capsule_promote_plan` creates a review plan only.
 - `nexu_capsule_orchestrate` uses offline mode unless the project config enables LLM network calls.

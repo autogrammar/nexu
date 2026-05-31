@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Option B: Standard Scientific</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            overflow: hidden;
+            background: #0f172a;
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+        }
+        .calc-body {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 15px;
+            
+            width: 90%;
+            height: 90%;
+            max-width: 70vh;
+            max-height: 120vw;
+            aspect-ratio: 3/4;
+            
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+        .screen { background: #0f172a; color: #2ecc71; font-size: calc(10px + 2vh); text-align: right; padding: 10px; border-radius: 6px; margin-bottom: 10px; }
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 1fr; gap: 8px; flex: 1; }
+        .btn {
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: calc(8px + 1vh);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.15s ease;
+        }
+        .btn-sci { background: #38bdf8; color: #0f172a; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="calc-body">
+        <div class="screen" id="screen">12.5</div>
+        <div class="grid">
+            <div class="btn btn-sci" id="btn-sin">sin</div><div class="btn btn-sci" id="btn-cos">cos</div><div class="btn btn-sci" id="btn-tan">tan</div><div class="btn btn-sci" id="btn-ln">ln</div>
+            <div class="btn" id="btn-7">7</div><div class="btn" id="btn-8">8</div><div class="btn" id="btn-9">9</div><div class="btn" id="btn-div" style="background:#e67e22;">/</div>
+            <div class="btn" id="btn-4">4</div><div class="btn" id="btn-5">5</div><div class="btn" id="btn-6">6</div><div class="btn" id="btn-mul" style="background:#e67e22;">*</div>
+            <div class="btn" id="btn-1">1</div><div class="btn" id="btn-2">2</div><div class="btn" id="btn-3">3</div><div class="btn" id="btn-sub" style="background:#e67e22;">-</div>
+        </div>
+    </div>
+    $INJECTED_SCRIPTS
+</body>
+</html>

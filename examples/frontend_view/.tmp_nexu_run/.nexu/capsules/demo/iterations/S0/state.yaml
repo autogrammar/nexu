@@ -1,9 +1,0 @@
-state: S0
-created_at: '2026-05-30T18:47:55+00:00'
-description: Frozen capsule baseline copied from source project.
-copied_files:
-- src/menu_icons.py
-baseline_lock:
-  source_git_sha: 6bcda3ecc28021848890005e0cc1f35097fa1717
-  source_snapshot_id: baseline
-  file_count: 1

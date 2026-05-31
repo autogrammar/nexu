@@ -1,105 +1,159 @@
-# nexu | 54f 3681L | python:51,shell:2,less:1 | 2026-05-30
-# stats: 129 func | 13 cls | 54 mod | CC̄=3.9 | critical:9 | cycles:0
-# alerts[5]: CC verify_capsule=45; CC handle_mcp_message=14; CC offline_orchestration_from_context=13; CC test_plan_runtime_report_and_journal=13; CC test_review_bundle_and_promotion_prechecks=13
-# hotspots[5]: run_example fan=23; verify_capsule fan=23; create_capsule fan=20; _tool_map fan=20; build_review_packet fan=19
+# nexu | 82f 8265L | python:78,shell:3,less:1 | 2026-05-31
+# stats: 290 func | 15 cls | 82 mod | CC̄=4.0 | critical:22 | cycles:0
+# alerts[5]: CC effective_ui_constraints_from_ledger=24; CC publish_project_service=21; CC start_published_service=17; CC activate_example_project=16; CC main=13
+# hotspots[5]: publish_project_service fan=24; run_example fan=23; activate_example_project fan=21; create_capsule fan=20; build_review_packet fan=19
 # evolution: baseline
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[54]:
-  app.doql.less,39
-  examples/backend_service/.tmp_nexu_run/.nexu/capsules/demo/src/app/users.py,9
-  examples/backend_service/.tmp_nexu_run/app/users.py,9
+M[82]:
+  app.doql.less,117
   examples/backend_service/app/users.py,9
-  examples/frontend_view/.tmp_nexu_run/.nexu/capsules/demo/src/src/menu_icons.py,25
-  examples/frontend_view/.tmp_nexu_run/src/menu_icons.py,25
   examples/frontend_view/src/menu_icons.py,25
-  examples/mcp_service/.tmp_nexu_run/.nexu/capsules/demo/src/src/demo.py,11
-  examples/mcp_service/.tmp_nexu_run/src/demo.py,11
   examples/mcp_service/src/demo.py,11
+  examples/nexu_markpact_exporter.py,96
+  examples/realtime_lane_nexu_sync.py,63
   examples/run_examples.py,80
-  examples/vertical_slice/.tmp_nexu_run/.nexu/capsules/demo/src/src/flow.py,10
-  examples/vertical_slice/.tmp_nexu_run/src/flow.py,10
+  examples/scientific_calculator_demo.py,62
+  examples/scientific_calculator_demo2.py,87
   examples/vertical_slice/src/flow.py,10
+  examples/web_app_calculator/markpact_sandbox/sandbox/src/calculator.py,38
+  examples/web_app_calculator/run.py,111
+  examples/web_app_calculator/src/calculator.py,39
+  examples/web_app_calculator/workspace/src/calculator.py,39
+  examples/web_app_dashboard/run.py,119
+  examples/web_app_dashboard/src/dashboard.py,11
+  examples/web_app_dashboard/workspace/src/dashboard.py,25
+  examples/web_app_event_monitor/run.py,91
+  examples/web_app_pactown_ecosystem/run.py,98
   project.sh,50
+  scripts/check-doc-links.py,115
+  scripts/ci-cinema-smoke.sh,49
   src/nexu/__init__.py,6
   src/nexu/__main__.py,5
   src/nexu/blueprint.py,74
   src/nexu/bundle.py,56
   src/nexu/capsule.py,125
-  src/nexu/cli.py,358
-  src/nexu/config.py,78
+  src/nexu/cinema.py,187
+  src/nexu/cinema_history.py,245
+  src/nexu/cinema_markpact.py,96
+  src/nexu/cinema_policy.py,625
+  src/nexu/cinema_projects.py,360
+  src/nexu/cinema_publish.py,340
+  src/nexu/cinema_scripts.py,546
+  src/nexu/cinema_server.py,120
+  src/nexu/cli.py,380
+  src/nexu/config.py,122
   src/nexu/diff.py,36
   src/nexu/drift.py,37
-  src/nexu/export_prompt.py,101
+  src/nexu/export_prompt.py,161
   src/nexu/files.py,52
   src/nexu/freeze.py,27
   src/nexu/git.py,23
   src/nexu/hashing.py,17
   src/nexu/init_project.py,87
   src/nexu/intract.py,126
+  src/nexu/intract_adapter.py,134
   src/nexu/iterate.py,45
   src/nexu/journal.py,44
   src/nexu/llm.py,166
-  src/nexu/mcp_server.py,356
+  src/nexu/mcp_server.py,394
   src/nexu/models.py,155
   src/nexu/orchestrate.py,233
   src/nexu/paths.py,36
   src/nexu/plan.py,82
-  src/nexu/promote.py,78
+  src/nexu/promote.py,93
   src/nexu/report.py,95
   src/nexu/review.py,158
   src/nexu/runtime.py,132
   src/nexu/status.py,36
-  src/nexu/verify.py,237
+  src/nexu/verify.py,318
+  tests/conftest.py,23
   tests/test_capsule_flow.py,26
   tests/test_capsule_next_stage.py,59
   tests/test_capsule_runtime_report.py,51
+  tests/test_cinema_history.py,50
+  tests/test_cinema_markpact.py,33
+  tests/test_cinema_policy.py,187
+  tests/test_cinema_projects.py,70
+  tests/test_cinema_publish.py,89
+  tests/test_cinema_scripts.py,15
+  tests/test_cinema_server.py,68
+  tests/test_cinema_spatial_patch.py,17
+  tests/test_export_prompt_ledger.py,42
   tests/test_intract.py,12
   tests/test_models.py,15
   tests/test_nexu.py,12
   tests/test_orchestration_mcp.py,63
+  tests/test_promote_apply.py,37
   tests/test_review_bundle.py,46
+  tests/test_verify_intract.py,29
   tree.sh,2
 D:
-  examples/backend_service/.tmp_nexu_run/.nexu/capsules/demo/src/app/users.py:
-    e: list_users
-    list_users(filters;users)
-  examples/backend_service/.tmp_nexu_run/app/users.py:
-    e: list_users
-    list_users(filters;users)
   examples/backend_service/app/users.py:
     e: list_users
     list_users(filters;users)
-  examples/frontend_view/.tmp_nexu_run/.nexu/capsules/demo/src/src/menu_icons.py:
-    e: preview_menu_icons
-    preview_menu_icons(menu_items)
-  examples/frontend_view/.tmp_nexu_run/src/menu_icons.py:
-    e: preview_menu_icons
-    preview_menu_icons(menu_items)
   examples/frontend_view/src/menu_icons.py:
     e: preview_menu_icons
     preview_menu_icons(menu_items)
-  examples/mcp_service/.tmp_nexu_run/.nexu/capsules/demo/src/src/demo.py:
-    e: plan_demo
-    plan_demo(user_goal)
-  examples/mcp_service/.tmp_nexu_run/src/demo.py:
-    e: plan_demo
-    plan_demo(user_goal)
   examples/mcp_service/src/demo.py:
     e: plan_demo
     plan_demo(user_goal)
+  examples/nexu_markpact_exporter.py:
+    e: main
+    main()
+  examples/realtime_lane_nexu_sync.py:
+    e: simulate_realtime_sync
+    simulate_realtime_sync()
   examples/run_examples.py:
     e: run_example,main
     run_example(example)
     main()
-  examples/vertical_slice/.tmp_nexu_run/.nexu/capsules/demo/src/src/flow.py:
-    e: run_flow
-    run_flow(menu_items)
-  examples/vertical_slice/.tmp_nexu_run/src/flow.py:
-    e: run_flow
-    run_flow(menu_items)
+  examples/scientific_calculator_demo.py:
+    e: main
+    main()
+  examples/scientific_calculator_demo2.py:
+    e: print_code,main
+    print_code(title;path)
+    main()
   examples/vertical_slice/src/flow.py:
     e: run_flow
     run_flow(menu_items)
+  examples/web_app_calculator/markpact_sandbox/sandbox/src/calculator.py:
+    e: render_calculator
+    render_calculator(calculator_state)
+  examples/web_app_calculator/run.py:
+    e: main
+    main()
+  examples/web_app_calculator/src/calculator.py:
+    e: render_calculator
+    render_calculator(calculator_state)
+  examples/web_app_calculator/workspace/src/calculator.py:
+    e: render_calculator
+    render_calculator(calculator_state)
+  examples/web_app_dashboard/run.py:
+    e: main
+    main()
+  examples/web_app_dashboard/src/dashboard.py:
+    e: render_dashboard
+    render_dashboard(telemetry_data)
+  examples/web_app_dashboard/workspace/src/dashboard.py:
+    e: render_dashboard
+    render_dashboard(telemetry_data)
+  examples/web_app_event_monitor/run.py:
+    e: main
+    main()
+  examples/web_app_pactown_ecosystem/run.py:
+    e: main
+    main()
+  scripts/check-doc-links.py:
+    e: _is_external,_slug,_anchors,_markdown_files,_targets,_resolve,check_links,main
+    _is_external(target)
+    _slug(text)
+    _anchors(path)
+    _markdown_files(root)
+    _targets(text)
+    _resolve(base;target)
+    check_links(root)
+    main()
   src/nexu/__init__.py:
   src/nexu/__main__.py:
   src/nexu/blueprint.py:
@@ -116,14 +170,123 @@ D:
     list_capsules(root)
     load_capsule(root;name)
     save_capsule(root;capsule)
+  src/nexu/cinema.py:
+    e: _cinema_template_text,_render_cinema_template,write_cinema_nexu_hooks,_contract_to_public_dict,format_intract_v1_line,build_intract_policy_snapshot,write_intract_policy_files,generate_cinema_player,_start_cinema_server
+    _cinema_template_text(name)
+    _render_cinema_template(name)
+    write_cinema_nexu_hooks(cinema_dir;root;name)
+    _contract_to_public_dict(contract)
+    format_intract_v1_line(contract)
+    build_intract_policy_snapshot(root;name)
+    write_intract_policy_files(cinema_dir;root;name)
+    generate_cinema_player(root;name)
+    _start_cinema_server(cinema_dir;root;name)
+  src/nexu/cinema_history.py:
+    e: history_dir,history_index_path,_load_index,_write_index,_copy_checkpoint_files,_ledger_snapshot,_build_label,save_history_checkpoint,list_history_checkpoints,restore_history_checkpoint,_refresh_policy_snapshot,ensure_initial_checkpoint,ledger_archive_for_display
+    history_dir(cinema_dir)
+    history_index_path(cinema_dir)
+    _load_index(cinema_dir)
+    _write_index(cinema_dir;entries)
+    _copy_checkpoint_files(cinema_dir;dest)
+    _ledger_snapshot(cinema_dir)
+    _build_label()
+    save_history_checkpoint(cinema_dir)
+    list_history_checkpoints(cinema_dir)
+    restore_history_checkpoint(root;capsule_name;checkpoint_id)
+    _refresh_policy_snapshot(cinema_dir;root;capsule_name)
+    ensure_initial_checkpoint(cinema_dir)
+    ledger_archive_for_display(cinema_dir)
+  src/nexu/cinema_markpact.py:
+    e: _escape_markdown_fence,build_markpact_readme,markpact_download_filename
+    _escape_markdown_fence(text;fence)
+    build_markpact_readme(cinema_dir)
+    markpact_download_filename(capsule_name;stage)
+  src/nexu/cinema_policy.py:
+    e: effective_ui_constraints_from_ledger,merge_ui_constraint_lists,_normalize_html_body,_html_files_distinct,option_previews_are_distinct,stage_files_are_distinct,ensure_option_previews_from_stages,_replace_html_title,sync_option_previews_from_workspace,enforce_deletes_on_option_previews,load_effective_ui_constraints,resolve_iteration_mode,normalize_manifest_target,cinema_model_label,cinema_dir_for,policy_snapshot_path,policy_ledger_path,load_policy_snapshot,manifest_paths_from_snapshot,apply_ledger_from_cinema,ensure_intract_on_path,propose_ui_delta_contract_dicts,append_policy_ledger_entry,_proposal_kind_and_element,normalize_proposals_for_ledger,append_iteration_ledger_entry,propose_llm_for_stage,validate_intract_artifact,verify_capsule_workspace
+    effective_ui_constraints_from_ledger(ledger)
+    merge_ui_constraint_lists()
+    _normalize_html_body(html)
+    _html_files_distinct(cinema_dir;names)
+    option_previews_are_distinct(cinema_dir)
+    stage_files_are_distinct(cinema_dir)
+    ensure_option_previews_from_stages(cinema_dir)
+    _replace_html_title(html;title)
+    sync_option_previews_from_workspace(cinema_dir)
+    enforce_deletes_on_option_previews(cinema_dir;delete_ids)
+    load_effective_ui_constraints(root;capsule_name)
+    resolve_iteration_mode()
+    normalize_manifest_target(target)
+    cinema_model_label(root)
+    cinema_dir_for(root;capsule_name)
+    policy_snapshot_path(root;capsule_name)
+    policy_ledger_path(root;capsule_name)
+    load_policy_snapshot(root;capsule_name)
+    manifest_paths_from_snapshot(snapshot;root;capsule_name;target)
+    apply_ledger_from_cinema(root;capsule_name)
+    ensure_intract_on_path(root)
+    propose_ui_delta_contract_dicts()
+    append_policy_ledger_entry(root;capsule_name;entry)
+    _proposal_kind_and_element(proposal)
+    normalize_proposals_for_ledger(stage;capsule_name;proposals)
+    append_iteration_ledger_entry(root;capsule_name)
+    propose_llm_for_stage(root;capsule_name;stage;goal)
+    validate_intract_artifact(artifact;proposals)
+    verify_capsule_workspace(root;capsule_name)
+  src/nexu/cinema_projects.py:
+    e: find_nexu_repo_root,list_project_catalog,_resolve_source_cinema,_seed_html_for_project,_copy_cinema_files,_write_seed_variants,activate_example_project,load_active_project,ExampleProject
+    ExampleProject: to_public_dict(0)
+    find_nexu_repo_root(start)
+    list_project_catalog()
+    _resolve_source_cinema(project;repo_root)
+    _seed_html_for_project(project)
+    _copy_cinema_files(source;cinema_dir)
+    _write_seed_variants(cinema_dir;stage_html)
+    activate_example_project(cinema_dir;project_id)
+    load_active_project(cinema_dir)
+  src/nexu/cinema_publish.py:
+    e: services_root,_registry_path,_load_registry,_save_registry,_slug_service_id,_pick_port,_port_open,_http_ok,_service_alive,_refresh_service_status,list_published_services,_write_service_readme,publish_project_service,start_published_service,stop_published_service
+    services_root(cinema_dir)
+    _registry_path(cinema_dir)
+    _load_registry(cinema_dir)
+    _save_registry(cinema_dir;data)
+    _slug_service_id(project_id;capsule_name;stage)
+    _pick_port(used)
+    _port_open(port)
+    _http_ok(url)
+    _service_alive(entry)
+    _refresh_service_status(entry)
+    list_published_services(cinema_dir)
+    _write_service_readme(service_dir)
+    publish_project_service(cinema_dir;root;capsule_name)
+    start_published_service(cinema_dir;service_id)
+    stop_published_service(cinema_dir;service_id)
+  src/nexu/cinema_scripts.py:
+    e: _delete_match_keys,apply_spatial_deletes_to_html,finalize_cinema_html,write_cinema_inject_files,repair_cinema_html_files
+    _delete_match_keys(element_id)
+    apply_spatial_deletes_to_html(html;delete_ids)
+    finalize_cinema_html(html)
+    write_cinema_inject_files(cinema_dir)
+    repair_cinema_html_files(cinema_dir)
+  src/nexu/cinema_server.py:
+    e: _template_text,_render_server_script,_litellm_available,_try_spawn_on_port,_available_port,start_persistent_http_server,_open_browser,start_cinema_player_server
+    _template_text()
+    _render_server_script(root;name;llm_config;python_executable)
+    _litellm_available(python_executable)
+    _try_spawn_on_port(directory;port;python_executable)
+    _available_port(directory;python_executable)
+    start_persistent_http_server(directory;root;name)
+    _open_browser(url)
+    start_cinema_player_server(cinema_dir;root;name)
   src/nexu/cli.py:
-    e: init,freeze,capsule_create,capsule_list,capsule_status_command,capsule_iterate,capsule_blueprint,capsule_export_prompt,capsule_diff,capsule_drift,capsule_verify,capsule_plan,capsule_runtime,capsule_report,capsule_journal,capsule_orchestrate,capsule_review,capsule_bundle,capsule_promote,mcp_tools,mcp_serve
+    e: _print_yaml,_relative_to_root,init,freeze,capsule_create,capsule_list,capsule_status_command,capsule_iterate,capsule_blueprint,capsule_export_prompt,capsule_diff,capsule_drift,capsule_verify,capsule_plan,capsule_runtime,capsule_report,capsule_journal,capsule_orchestrate,capsule_review,capsule_bundle,capsule_promote,mcp_tools,mcp_serve
+    _print_yaml(data)
+    _relative_to_root(root;path)
     init(path)
     freeze(path;name;include)
     capsule_create(path;name;domain;include;route;endpoint;snapshot)
     capsule_list(path)
     capsule_status_command(name;path)
-    capsule_iterate(name;path;steps;goal)
+    capsule_iterate(name;path;steps;goal;cinema)
     capsule_blueprint(name;path;print_yaml)
     capsule_export_prompt(name;path;iteration)
     capsule_diff(name;path)
@@ -140,11 +303,14 @@ D:
     mcp_tools()
     mcp_serve(path;transport)
   src/nexu/config.py:
-    e: _as_list,load_config,LLMConfig,ReviewConfig,nexuConfig
+    e: _as_list,_load_env_file,load_env_files,_resolved_model_from_env,load_config,LLMConfig,ReviewConfig,nexuConfig
     LLMConfig:
     ReviewConfig:
     nexuConfig:
     _as_list(value;default)
+    _load_env_file(path)
+    load_env_files(root)
+    _resolved_model_from_env(yaml_model)
     load_config(root)
   src/nexu/diff.py:
     e: diff_capsule
@@ -153,7 +319,8 @@ D:
     e: check_source_drift
     check_source_drift(root;name)
   src/nexu/export_prompt.py:
-    e: _latest_iteration,export_iteration_prompt
+    e: _cinema_policy_ledger_block,_latest_iteration,export_iteration_prompt
+    _cinema_policy_ledger_block(base)
     _latest_iteration(capsule)
     export_iteration_prompt(root;name)
   src/nexu/files.py:
@@ -184,6 +351,14 @@ D:
     scan_contracts_in_text(text)
     scan_contracts_in_file(path;root)
     read_manifest_contracts(path)
+  src/nexu/intract_adapter.py:
+    e: _sibling_intract_src,_ensure_intract_on_path,_result_status,_finding_for_result,_policy_findings,check_intract_policy
+    _sibling_intract_src(root)
+    _ensure_intract_on_path(root)
+    _result_status(result)
+    _finding_for_result(result)
+    _policy_findings(policy)
+    check_intract_policy(root;base;manifest_path;source_files)
   src/nexu/iterate.py:
     e: iterate_capsule
     iterate_capsule(root;name)
@@ -200,8 +375,9 @@ D:
     offline_review_from_status(status;score)
     call_litellm_review(prompt)
   src/nexu/mcp_server.py:
-    e: _schema,_tool_map,call_tool,_result_content,_resource_list,_read_resource,_prompts_list,_prompt_get,handle_mcp_message,run_mcp_stdio
+    e: _schema,_apply_promotion_from_mcp,_tool_map,call_tool,_result_content,_resource_list,_read_resource,_prompts_list,_prompt_get,_rpc_initialize,_rpc_handlers,handle_mcp_message,run_mcp_stdio
     _schema(properties;required)
+    _apply_promotion_from_mcp(root;name)
     _tool_map(root)
     call_tool(root;tool_name;arguments)
     _result_content(data)
@@ -209,6 +385,8 @@ D:
     _read_resource(root;uri)
     _prompts_list()
     _prompt_get(name;arguments)
+    _rpc_initialize(params)
+    _rpc_handlers(root)
     handle_mcp_message(root;message)
     run_mcp_stdio(root)
   src/nexu/models.py:
@@ -246,9 +424,10 @@ D:
     _contract_summary(contracts)
     build_iteration_plan(root;name)
   src/nexu/promote.py:
-    e: _promotion_map,build_promotion_plan
+    e: _promotion_map,build_promotion_plan,apply_promotion_plan
     _promotion_map(base;root;files)
     build_promotion_plan(root;name)
+    apply_promotion_plan(root;plan)
   src/nexu/report.py:
     e: _finding_table,_html_from_markdownish,build_capsule_report
     _finding_table(findings)
@@ -268,12 +447,24 @@ D:
     e: capsule_status
     capsule_status(root;name)
   src/nexu/verify.py:
-    e: _scan_capsule_contracts,_text,_contains_patterns,_find_term_evidence,verify_capsule
+    e: _scan_capsule_contracts,_text,_contains_patterns,_find_term_evidence,_check_contracts_presence,_check_source_files_presence,_check_baseline_lock,_check_forbidden_write,_check_forbidden_secret,_check_output_presence,_check_required_intents,_check_iteration_count,_summary_status,verify_capsule
     _scan_capsule_contracts(base;manifest_name)
     _text(path)
     _contains_patterns(path;patterns)
     _find_term_evidence(source_files;base;terms)
+    _check_contracts_presence(contracts)
+    _check_source_files_presence(source_files;base)
+    _check_baseline_lock(root;name;baseline_files)
+    _check_forbidden_write(contracts;source_files)
+    _check_forbidden_secret(contracts;source_files)
+    _check_output_presence(contracts;source_files;base)
+    _check_required_intents(contracts)
+    _check_iteration_count(iterations)
+    _summary_status(findings)
     verify_capsule(root;name)
+  tests/conftest.py:
+    e: _prepend_intract_src
+    _prepend_intract_src()
   tests/test_capsule_flow.py:
     e: test_capsule_flow
     test_capsule_flow(tmp_path)
@@ -283,6 +474,54 @@ D:
   tests/test_capsule_runtime_report.py:
     e: test_plan_runtime_report_and_journal
     test_plan_runtime_report_and_journal(tmp_path)
+  tests/test_cinema_history.py:
+    e: test_save_list_and_restore_files
+    test_save_list_and_restore_files(tmp_path;monkeypatch)
+  tests/test_cinema_markpact.py:
+    e: test_build_markpact_readme,test_markpact_download_filename
+    test_build_markpact_readme(tmp_path)
+    test_markpact_download_filename()
+  tests/test_cinema_policy.py:
+    e: test_resolve_iteration_mode,test_normalize_manifest_target_defaults_invalid,test_apply_ledger_from_cinema_project_only,test_effective_ui_constraints_from_ledger_last_wins,test_merge_ui_constraint_lists_session_overrides_ledger,test_sync_option_previews_empty_delete_ids_mirrors_workspace,test_sync_option_previews_from_workspace,test_enforce_deletes_on_option_previews,test_ensure_option_previews_from_stages,test_propose_ui_delta_and_validate
+    test_resolve_iteration_mode()
+    test_normalize_manifest_target_defaults_invalid()
+    test_apply_ledger_from_cinema_project_only(tmp_path)
+    test_effective_ui_constraints_from_ledger_last_wins()
+    test_merge_ui_constraint_lists_session_overrides_ledger()
+    test_sync_option_previews_empty_delete_ids_mirrors_workspace(tmp_path)
+    test_sync_option_previews_from_workspace(tmp_path)
+    test_enforce_deletes_on_option_previews(tmp_path)
+    test_ensure_option_previews_from_stages(tmp_path)
+    test_propose_ui_delta_and_validate(tmp_path)
+  tests/test_cinema_projects.py:
+    e: test_list_project_catalog_has_nine_examples,test_activate_example_project_seeds_when_no_source,test_activate_copies_dashboard_cinema_when_repo_available,test_activate_calculator_preserves_distinct_option_previews
+    test_list_project_catalog_has_nine_examples()
+    test_activate_example_project_seeds_when_no_source(tmp_path)
+    test_activate_copies_dashboard_cinema_when_repo_available()
+    test_activate_calculator_preserves_distinct_option_previews()
+  tests/test_cinema_publish.py:
+    e: cinema_setup,test_publish_creates_service_files,test_list_and_start_stop_service,test_publish_missing_stage_returns_error
+    cinema_setup(tmp_path)
+    test_publish_creates_service_files(cinema_setup)
+    test_list_and_start_stop_service(cinema_setup)
+    test_publish_missing_stage_returns_error(cinema_setup)
+  tests/test_cinema_scripts.py:
+    e: test_finalize_strips_truncated_llm_script_and_injects_canonical
+    test_finalize_strips_truncated_llm_script_and_injects_canonical()
+  tests/test_cinema_server.py:
+    e: test_render_server_script_embeds_runtime_context,test_write_cinema_nexu_hooks_uses_template,test_render_stage_template_injects_runtime_scripts,test_cinema_player_template_is_externalized,test_start_cinema_player_server_returns_url_without_opening,_LLMConfig
+    _LLMConfig:
+    test_render_server_script_embeds_runtime_context()
+    test_write_cinema_nexu_hooks_uses_template(tmp_path)
+    test_render_stage_template_injects_runtime_scripts()
+    test_cinema_player_template_is_externalized()
+    test_start_cinema_player_server_returns_url_without_opening(monkeypatch;tmp_path)
+  tests/test_cinema_spatial_patch.py:
+    e: test_apply_spatial_deletes_removes_only_marked_buttons
+    test_apply_spatial_deletes_removes_only_marked_buttons()
+  tests/test_export_prompt_ledger.py:
+    e: test_export_prompt_includes_cinema_ledger_block
+    test_export_prompt_includes_cinema_ledger_block(tmp_path)
   tests/test_intract.py:
     e: test_parse_intract_line
     test_parse_intract_line()
@@ -299,6 +538,12 @@ D:
     _make_project(tmp_path)
     test_orchestration_offline(tmp_path)
     test_mcp_tool_dispatch_and_protocol(tmp_path)
+  tests/test_promote_apply.py:
+    e: test_apply_promotion_plan
+    test_apply_promotion_plan(tmp_path)
   tests/test_review_bundle.py:
     e: test_review_bundle_and_promotion_prechecks
     test_review_bundle_and_promotion_prechecks(tmp_path)
+  tests/test_verify_intract.py:
+    e: test_verify_treats_manifest_intract_fail_as_warn
+    test_verify_treats_manifest_intract_fail_as_warn(tmp_path)

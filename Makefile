@@ -1,4 +1,4 @@
-.PHONY: test examples cinema cinema-open cinema-test cinema-stop cinema-restart cinema-repair ci-cinema-smoke
+.PHONY: test examples docs-links quality quality-strict quality-intract quality-redup cinema cinema-open cinema-test cinema-stop cinema-restart cinema-repair ci-cinema-smoke
 
 CINEMA_MODEL ?=
 CINEMA_CAPSULE ?= scientific_calc
@@ -12,14 +12,33 @@ test:
 examples:
 	python examples/run_examples.py
 
+docs-links:
+	python scripts/check-doc-links.py .
+
+quality-intract:
+	intract check src --format text
+	intract coverage src
+
+quality-redup:
+	redup scan src --format toon --min-lines 8
+
+quality: test docs-links quality-intract quality-redup
+	ruff check src/nexu/cinema.py src/nexu/cinema_server.py src/nexu/verify.py src/nexu/intract_adapter.py tests/test_cinema_server.py
+
+quality-strict:
+	pytest -q
+	ruff check src tests --statistics
+	intract check . --format text
+	redup scan src --format toon
+
 cinema:
 	uv sync --quiet
 	@$(CINEMA_MODEL_ARG) uv run nexu capsule iterate $(CINEMA_CAPSULE) --steps 1 --goal "$(CINEMA_GOAL)" --cinema --path $(CINEMA_PATH)
 
 cinema-open:
-	@url="$$( uv sync --quiet; $(CINEMA_MODEL_ARG) uv run nexu capsule iterate $(CINEMA_CAPSULE) --steps 1 --goal "$(CINEMA_GOAL)" --cinema --path $(CINEMA_PATH) 2>&1 | tee /tmp/nexu-cinema-open.log | sed -n 's/.*Live HTTP Server started for Cinema Player: //p' | tail -1)"; \
+	@url="$$( uv sync --quiet; $(CINEMA_MODEL_ARG) uv run nexu capsule iterate $(CINEMA_CAPSULE) --steps 1 --goal "$(CINEMA_GOAL)" --cinema --path $(CINEMA_PATH) 2>&1 | tee /tmp/nexu-cinema-open.log | sed -n 's/.*Live HTTP Server started for Nexu: //p' | tail -1)"; \
 	if [ -z "$$url" ]; then \
-		echo "Could not detect Cinema URL. See /tmp/nexu-cinema-open.log"; \
+		echo "Could not detect Nexu URL. See /tmp/nexu-cinema-open.log"; \
 		exit 1; \
 	fi; \
 	echo "Opening $$url"; \

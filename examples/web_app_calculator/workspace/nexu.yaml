@@ -13,12 +13,12 @@ verification:
   - missing_tests
   - partial_output_match
 llm:
-  provider: openrouter
+  provider: offline
   model: openrouter/deepseek/deepseek-v4-pro
   base_url: https://openrouter.ai/api/v1
   api_key_env: OPENROUTER_API_KEY
   temperature: 0.1
-  allow_network_calls: true
+  allow_network_calls: false
 orchestration:
   default_steps: 10
   llm_mode: offline
