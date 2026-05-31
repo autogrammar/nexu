@@ -5,17 +5,17 @@ flowchart TD
     examples__scientific_calculator_demo2["examples.scientific_calculator_demo2<br/>2 funcs"]
     examples__web_app_calculator["examples.web_app_calculator<br/>3 funcs"]
     examples__web_app_dashboard["examples.web_app_dashboard<br/>3 funcs"]
-    src__nexu["src.nexu<br/>203 funcs"]
-    src__nexu["src.nexu<br/>23 funcs"]
-    src__nexu ==>|62| src__nexu
+    src__nexu["src.nexu<br/>238 funcs"]
+    src__vico["src.vico<br/>23 funcs"]
+    src__nexu ==>|62| src__vico
     examples__run_examples ==>|12| src__nexu
-    src__nexu ==>|12| src__nexu
+    src__vico ==>|12| src__nexu
     examples__web_app_dashboard ==>|9| src__nexu
     examples__scientific_calculator_demo ==>|5| src__nexu
     examples__web_app_calculator ==>|5| src__nexu
     examples__scientific_calculator_demo2 ==>|4| src__nexu
-    examples__run_examples -->|3| src__nexu
-    examples__scientific_calculator_demo -->|1| src__nexu
-    examples__scientific_calculator_demo2 -->|1| src__nexu
-    examples__web_app_calculator -->|1| src__nexu
-    examples__web_app_dashboard -->|1| src__nexu
+    examples__run_examples -->|3| src__vico
+    examples__scientific_calculator_demo -->|1| src__vico
+    examples__scientific_calculator_demo2 -->|1| src__vico
+    examples__web_app_calculator -->|1| src__vico
+    examples__web_app_dashboard -->|1| src__vico

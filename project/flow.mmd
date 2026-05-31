@@ -5,27 +5,27 @@ flowchart TD
     classDef entry fill:#4dabf7,stroke:#1971c2,color:#fff
 
     subgraph Core
-        src__nexu__status__capsule_status["capsule_status"]
-        src__nexu__cinema_history__list_history_checkpoints["list_history_checkpoints"]
-        src__nexu__cinema_history__restore_history_checkpoint["restore_history_checkpoint"]
-        src__nexu__cinema_history__ledger_archive_for_display["ledger_archive_for_display"]
-        src__nexu__hashing__sha256_text["sha256_text"]
-        src__nexu__paths__nexu_dir["nexu_dir"]
-        src__nexu__paths__capsules_dir["capsules_dir"]
-        src__nexu__paths__capsule_dir["capsule_dir"]
-        src__nexu__models__FrozenSnapshot__to_dict["to_dict"]
-        src__nexu__models__FrozenSnapshot__from_dict["from_dict"]
-        src__nexu__models__Capsule__to_dict["to_dict"]
-        src__nexu__models__Capsule__from_dict["from_dict"]
-        src__nexu__models__VerificationReport__to_dict["to_dict"]
-        src__nexu__models__CapsuleDiff__to_dict["to_dict"]
-        src__nexu__diff__diff_capsule("diff_capsule CC=12")
-        ...["+48 more"]
+        src__nexu__cli___print_yaml["_print_yaml"]
+        src__nexu__cli___relative_to_root["_relative_to_root"]
+        src__nexu__cli__init["init"]
+        src__nexu__cli__freeze["freeze"]
+        src__nexu__cli__capsule_create["capsule_create"]
+        src__nexu__cli__capsule_list["capsule_list"]
+        src__nexu__cli__capsule_status_command["capsule_status_command"]
+        src__nexu__cli__capsule_iterate["capsule_iterate"]
+        src__nexu__cli__capsule_blueprint["capsule_blueprint"]
+        src__nexu__cli__capsule_diff["capsule_diff"]
+        src__nexu__cli__capsule_drift["capsule_drift"]
+        src__nexu__cli__capsule_verify["capsule_verify"]
+        src__nexu__cli__capsule_plan["capsule_plan"]
+        src__nexu__cli__capsule_runtime["capsule_runtime"]
+        src__nexu__cli__capsule_report["capsule_report"]
+        ...["+49 more"]
     end
 
     subgraph Exporters
-        src__nexu__models__PromptExport__to_dict["to_dict"]
         src__nexu__cli__capsule_export_prompt["capsule_export_prompt"]
+        src__vico__models__PromptExport__to_dict["to_dict"]
     end
 
-    class src__nexu__cinema_history__list_history_checkpoints,src__nexu__cinema_history__restore_history_checkpoint,src__nexu__cinema_history__ledger_archive_for_display,src__nexu__hashing__sha256_text,src__nexu__models__FrozenSnapshot__to_dict,src__nexu__models__FrozenSnapshot__from_dict,src__nexu__models__Capsule__to_dict,src__nexu__models__Capsule__from_dict,src__nexu__models__VerificationReport__to_dict,src__nexu__models__CapsuleDiff__to_dict entry
+    class src__nexu__cli___print_yaml,src__nexu__cli___relative_to_root,src__nexu__cli__init,src__nexu__cli__freeze,src__nexu__cli__capsule_create,src__nexu__cli__capsule_list,src__nexu__cli__capsule_status_command,src__nexu__cli__capsule_iterate,src__nexu__cli__capsule_blueprint,src__nexu__cli__capsule_export_prompt entry

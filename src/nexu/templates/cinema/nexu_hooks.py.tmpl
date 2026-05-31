@@ -111,11 +111,30 @@ def write_offline_goal_options(*, keep_els=None, delete_els=None, hints=None):
     return labels
 
 
-def patch_option_previews(stage: int = 0):
-    """Apply effective ledger DELETE policy to existing alt_a/b/c without copying workspace."""
+def patch_option_previews(
+    stage: int = 0,
+    session_keep=None,
+    session_delete=None,
+):
+    """Apply DELETE policy to alt_a/b/c without copying workspace."""
+    from nexu.cinema_policy import (
+        enforce_deletes_on_option_previews,
+        load_effective_ui_constraints,
+        merge_ui_constraint_lists,
+    )
+
     cinema = Path(__file__).resolve().parent
     effective = load_effective_ui_constraints(ROOT, CAPSULE, stage=stage)
-    to_delete = list(effective.get("delete") or [])
+    if session_keep is not None or session_delete is not None:
+        merged = merge_ui_constraint_lists(
+            list(effective.get("keep") or []),
+            list(effective.get("delete") or []),
+            list(session_keep or []),
+            list(session_delete or []),
+        )
+        to_delete = list(merged.get("delete") or [])
+    else:
+        to_delete = list(effective.get("delete") or [])
     if not to_delete:
         return {"status": "options_unchanged", "files": []}
     return enforce_deletes_on_option_previews(cinema, to_delete)

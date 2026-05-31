@@ -25,6 +25,34 @@
 - `tests/test_cinema_policy.py`, `tests/test_export_prompt_ledger.py`, `tests/test_verify_intract.py`; `tests/conftest.py` adds sibling intract.
 - Full suite: `pytest -q` (16 passed); `make ci-cinema-smoke`.
 
+## [0.5.18] - 2026-05-31
+
+### Docs
+- Update README.md
+- Update SUMD.md
+- Update SUMR.md
+- Update project/README.md
+- Update project/context.md
+
+### Test
+- Update tests/test_cinema_baseline_contracts.py
+- Update tests/test_cinema_markpact.py
+- Update tests/test_cinema_offline_options.py
+- Update tests/test_cinema_publish.py
+
+### Other
+- Update Makefile
+- Update app.doql.less
+- Update examples/web_app_calculator/cinema/alt_a.html
+- Update examples/web_app_calculator/cinema/alt_b.html
+- Update examples/web_app_calculator/cinema/alt_c.html
+- Update examples/web_app_calculator/cinema/cinema_player.html
+- Update examples/web_app_calculator/cinema/stage1.html
+- Update examples/web_app_calculator/cinema/stage2.html
+- Update project/analysis.toon.yaml
+- Update project/calls.mmd
+- ... and 21 more files
+
 ## [0.5.17] - 2026-05-31
 
 ### Docs

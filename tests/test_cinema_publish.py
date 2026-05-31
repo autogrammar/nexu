@@ -19,12 +19,16 @@ from nexu.cinema_publish import (
 def cinema_setup(tmp_path: Path):
     cinema = tmp_path / "cinema"
     cinema.mkdir()
-    (cinema / "stage0.html").write_text("<html><title>Calc</title><body>ok</body></html>", encoding="utf-8")
+    (cinema / "stage0.html").write_text(
+        "<html><title>Calc</title><body>ok</body></html>",
+        encoding="utf-8",
+    )
     root = tmp_path / "workspace"
     root.mkdir()
     capsule = "test_capsule"
     cap_dir = root / ".nexu" / "capsules" / capsule
-    cap_dir.mkdir(parents=True)
+    (cap_dir / "src").mkdir(parents=True)
+    (cap_dir / "src" / "calculator.py").write_text("# calc\n", encoding="utf-8")
     (cap_dir / "policy.json").write_text('{"keep":[],"delete":[]}', encoding="utf-8")
     return cinema, root, capsule
 
@@ -51,6 +55,12 @@ def test_publish_creates_service_files(cinema_setup):
     assert (service_dir / "README.md").exists()
     assert (service_dir / "service-meta.json").exists()
     assert (service_dir / "export-markpact.md").exists()
+    service_meta = json.loads((service_dir / "service-meta.json").read_text(encoding="utf-8"))
+    capsule_contracts = service_meta["baseline_contracts"]["capsule"]
+    assert any(item["id"] == "calc.app.kind" for item in capsule_contracts)
+    assert "Intract baseline model" in (service_dir / "export-markpact.md").read_text(
+        encoding="utf-8"
+    )
 
 
 def test_list_and_start_stop_service(cinema_setup):

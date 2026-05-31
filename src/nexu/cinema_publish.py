@@ -126,6 +126,7 @@ def _write_service_readme(
     user_goal: str,
     effective_ui: dict[str, Any],
     port: int,
+    baseline_contracts: dict[str, Any] | None = None,
 ) -> str:
     html = (service_dir / "index.html").read_text(encoding="utf-8")
     title_match = re.search(r"<title[^>]*>([^<]*)</title>", html, flags=re.I)
@@ -133,6 +134,7 @@ def _write_service_readme(
         title_match.group(1).strip() if title_match else None
     ) or f"{capsule_name} S{stage}"
     goal_line = user_goal.strip() or "(none recorded)"
+    baselines = baseline_contracts or {}
     meta = {
         "published_at": datetime.now(timezone.utc).isoformat(),
         "capsule": capsule_name,
@@ -141,7 +143,17 @@ def _write_service_readme(
         "user_goal": goal_line,
         "policy_keep": list(effective_ui.get("keep") or []),
         "policy_delete": list(effective_ui.get("delete") or []),
+        "baseline_contracts": {
+            "project": list(baselines.get("project") or []),
+            "capsule": list(baselines.get("capsule") or []),
+        },
     }
+    baseline_lines = [
+        str(item.get("line") or item.get("id") or item)
+        for item in meta["baseline_contracts"]["project"]
+        + meta["baseline_contracts"]["capsule"]
+    ]
+    baseline_block = "\n".join(f"- `{line}`" for line in baseline_lines) or "- (none)"
     html_body = _escape_markdown_fence(html)
     readme = f"""# {app_title} — published Nexu service
 
@@ -154,6 +166,13 @@ python -m http.server {port}
 ```
 
 Open **http://127.0.0.1:{port}/** after start.
+
+## Intract baseline model
+
+Keep these contracts attached to future edits. They describe the intended app model and prevent
+goal-driven changes from regressing the baseline UI/functionality:
+
+{baseline_block}
 
 ```json markpact:file path=service-meta.json
 {json.dumps(meta, indent=2, ensure_ascii=False)}
@@ -198,12 +217,16 @@ def _generate_markpact_export(
     user_goal: str,
 ) -> None:
     """Generate and write the Markpact export file."""
+    from .cinema import build_intract_policy_snapshot
+
+    snapshot = build_intract_policy_snapshot(root, capsule_name)
     markpact_body = build_markpact_readme(
         cinema_dir,
         stage=stage,
         capsule_name=capsule_name,
         user_goal=user_goal,
         effective_ui=load_effective_ui_constraints(root, capsule_name, stage=stage),
+        baseline_contracts=snapshot.get("baseline_contracts", {}),
     )
     (service_dir / "export-markpact.md").write_text(markpact_body, encoding="utf-8")
 
@@ -309,6 +332,10 @@ def publish_project_service(
     if prep_error:
         return prep_error
     
+    from .cinema import build_intract_policy_snapshot
+
+    snapshot = build_intract_policy_snapshot(root, capsule_name)
+    baseline_contracts = snapshot.get("baseline_contracts", {})
     _generate_markpact_export(service_dir, cinema_dir, root, capsule_name, stage, user_goal)
     
     # Allocate port
@@ -326,6 +353,7 @@ def publish_project_service(
         user_goal=user_goal,
         effective_ui=effective,
         port=port,
+        baseline_contracts=baseline_contracts,
     )
 
     # Handle existing service

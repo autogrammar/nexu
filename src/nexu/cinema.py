@@ -8,13 +8,18 @@ from pathlib import Path
 from string import Template
 from typing import Any
 
+from .cinema_baseline_contracts import (
+    ensure_capsule_intract_yaml,
+    is_calculator_capsule,
+    merge_calculator_baselines,
+)
 from .cinema_scripts import (
     CALCULATOR_RUNTIME_SCRIPT,
     SHIELD_SCRIPT,
     write_cinema_inject_files,
 )
 from .cinema_server import start_cinema_player_server
-from .intract import IntentContract, read_manifest_contracts
+from .intract import IntentContract, format_intract_v1_line, read_manifest_contracts
 from .models import read_yaml
 from .paths import capsule_dir, nexu_dir
 
@@ -55,16 +60,6 @@ def _contract_to_public_dict(contract: IntentContract) -> dict[str, Any]:
     }
 
 
-def format_intract_v1_line(contract: IntentContract) -> str:
-    meaning = contract.meaning.replace('"', "'") if contract.meaning else ""
-    meaning_part = f' meaning:"{meaning}"' if meaning else ""
-    return (
-        f"@intract.v1 id:{contract.contract_id} scope:{contract.scope} "
-        f"intent:{contract.intent} priority:{contract.priority} domain:{contract.domain}"
-        f"{meaning_part}"
-    )
-
-
 def build_intract_policy_snapshot(root: Path, name: str) -> dict[str, Any]:
     base = capsule_dir(root, name)
     project_intract = root / "intract.yaml"
@@ -78,11 +73,13 @@ def build_intract_policy_snapshot(root: Path, name: str) -> dict[str, Any]:
         if project_intract.exists()
         else []
     )
+    ensure_capsule_intract_yaml(root, name)
     capsule_contracts = (
         [_contract_to_public_dict(c) for c in read_manifest_contracts(capsule_intract)]
         if capsule_intract.exists()
         else []
     )
+    capsule_contracts = merge_calculator_baselines(capsule_contracts, root, name)
 
     return {
         "version": "intract.policy.v1",
@@ -102,6 +99,7 @@ def build_intract_policy_snapshot(root: Path, name: str) -> dict[str, Any]:
             "path": str(base) if base.exists() else None,
             "has_intract_yaml": capsule_intract.exists(),
             "intract_path": str(capsule_intract) if capsule_intract.exists() else None,
+            "is_calculator": is_calculator_capsule(root, name),
         },
         "baseline_contracts": {
             "project": project_contracts,
@@ -164,6 +162,11 @@ def generate_cinema_player(root: Path, name: str) -> Path:
     (cinema_dir / "alt_c.html").write_text(alt_c_html, encoding="utf-8")
     (cinema_dir / "stage1.html").write_text(alt_b_html, encoding="utf-8")
     (cinema_dir / "stage2.html").write_text(alt_c_html, encoding="utf-8")
+
+    if is_calculator_capsule(root, name):
+        from .cinema_offline_options import write_goal_options_offline
+
+        write_goal_options_offline(cinema_dir, keep_els=[], delete_els=[], hints=[])
 
     player_path = cinema_dir / "cinema_player.html"
     player_html = _cinema_template_text("cinema_player.html.tmpl")

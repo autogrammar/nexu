@@ -18,9 +18,21 @@ def test_build_markpact_readme(tmp_path: Path):
         capsule_name="scientific_calc",
         user_goal="kalkulator chemiczny",
         effective_ui={"keep": ["sin"], "delete": ["cos"]},
+        baseline_contracts={
+            "project": [],
+            "capsule": [
+                {
+                    "id": "calc.app.kind",
+                    "line": "@intract.v1 id:calc.app.kind scope:capsule intent:define:calculator",
+                }
+            ],
+        },
     )
 
     assert "markpact:file path=index.html" in md
+    assert "Intract baseline model" in md
+    assert "calc.app.kind" in md
+    assert "baseline_contracts" in md
     assert "markpact:run" in md
     assert "Chem Calc" in md
     assert "kalkulator chemiczny" in md

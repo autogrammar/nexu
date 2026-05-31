@@ -23,7 +23,7 @@ Visual Intent Contract Orchestrator: freeze project slices, evolve capsules, ver
 ## Metadata
 
 - **name**: `nexu`
-- **version**: `0.5.13`
+- **version**: `0.5.17`
 - **python_requires**: `>=3.10`
 - **license**: Apache-2.0
 - **ai_model**: `openrouter/qwen/qwen3-coder-next`
@@ -43,7 +43,7 @@ SUMD (description) → DOQL/source (code) → taskfile (automation) → testql (
 
 app {
   name: nexu;
-  version: 0.5.13;
+  version: 0.5.17;
 }
 
 dependencies {
@@ -91,7 +91,7 @@ workflow[name="quality-redup"] {
 
 workflow[name="quality"] {
   trigger: manual;
-  step-1: run cmd=ruff check src/nexu/cinema.py src/nexu/cinema_server.py src/nexu/verify.py src/nexu/intract_adapter.py tests/test_cinema_server.py;
+  step-1: run cmd=ruff check src/nexu/cinema.py src/nexu/cinema_server.py src/nexu/cinema_baseline_contracts.py src/nexu/cinema_markpact.py src/nexu/cinema_publish.py src/nexu/cinema_offline_options.py src/nexu/verify.py src/nexu/intract_adapter.py tests/test_cinema_server.py tests/test_cinema_baseline_contracts.py tests/test_cinema_markpact.py tests/test_cinema_publish.py tests/test_cinema_offline_options.py;
 }
 
 workflow[name="quality-strict"] {
@@ -215,7 +215,7 @@ pipeline:
       run: redup scan src --format toon --min-lines 8
 
     - name: touched-lint
-      run: ruff check src/nexu/cinema.py src/nexu/cinema_server.py src/nexu/verify.py src/nexu/intract_adapter.py tests/test_cinema_server.py
+      run: ruff check src/nexu/cinema.py src/nexu/cinema_server.py src/nexu/cinema_baseline_contracts.py src/nexu/cinema_markpact.py src/nexu/cinema_publish.py src/nexu/cinema_offline_options.py src/nexu/verify.py src/nexu/intract_adapter.py tests/test_cinema_server.py tests/test_cinema_baseline_contracts.py tests/test_cinema_markpact.py tests/test_cinema_publish.py tests/test_cinema_offline_options.py
 
   loop:
     max_iterations: 1
@@ -227,7 +227,7 @@ pipeline:
 ```yaml
 project:
   name: nexu
-  version: 0.5.13
+  version: 0.5.17
   env: local
 ```
 
@@ -284,7 +284,7 @@ pip install -e .[dev]
 - **commits**: `conventional` scope=`nexu`
 - **changelog**: `keep-a-changelog`
 - **build strategies**: `python`, `nodejs`, `rust`
-- **version files**: `VERSION`, `pyproject.toml:version`, `venv/lib/python3.13/site-packages/cryptography/__init__.py:__version__`
+- **version files**: `VERSION`, `pyproject.toml:version`, `.venv/lib/python3.13/site-packages/httpcore/__init__.py:__version__`
 
 ## Makefile Targets
 
@@ -308,13 +308,13 @@ pip install -e .[dev]
 ### `project/map.toon.yaml`
 
 ```toon markpact:analysis path=project/map.toon.yaml
-# nexu | 82f 8265L | python:78,shell:3,less:1 | 2026-05-31
-# stats: 290 func | 15 cls | 82 mod | CC̄=4.0 | critical:22 | cycles:0
-# alerts[5]: CC effective_ui_constraints_from_ledger=24; CC publish_project_service=21; CC start_published_service=17; CC activate_example_project=16; CC main=13
-# hotspots[5]: publish_project_service fan=24; run_example fan=23; activate_example_project fan=21; create_capsule fan=20; build_review_packet fan=19
+# nexu | 86f 9431L | python:82,shell:3,less:1 | 2026-05-31
+# stats: 339 func | 15 cls | 86 mod | CC̄=4.0 | critical:27 | cycles:0
+# alerts[5]: CC build_markpact_readme=18; CC start_published_service=17; CC write_goal_options_offline=16; CC activate_example_project=16; CC _write_service_readme=14
+# hotspots[5]: run_example fan=23; activate_example_project fan=21; create_capsule fan=20; build_review_packet fan=19; start_published_service fan=18
 # evolution: baseline
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[82]:
+M[86]:
   app.doql.less,117
   examples/backend_service/app/users.py,9
   examples/frontend_view/src/menu_icons.py,25
@@ -342,13 +342,15 @@ M[82]:
   src/nexu/blueprint.py,74
   src/nexu/bundle.py,56
   src/nexu/capsule.py,125
-  src/nexu/cinema.py,187
+  src/nexu/cinema.py,200
+  src/nexu/cinema_baseline_contracts.py,185
   src/nexu/cinema_history.py,245
-  src/nexu/cinema_markpact.py,96
-  src/nexu/cinema_policy.py,625
+  src/nexu/cinema_markpact.py,121
+  src/nexu/cinema_offline_options.py,521
+  src/nexu/cinema_policy.py,656
   src/nexu/cinema_projects.py,360
-  src/nexu/cinema_publish.py,340
-  src/nexu/cinema_scripts.py,546
+  src/nexu/cinema_publish.py,460
+  src/nexu/cinema_scripts.py,623
   src/nexu/cinema_server.py,120
   src/nexu/cli.py,380
   src/nexu/config.py,122
@@ -360,7 +362,7 @@ M[82]:
   src/nexu/git.py,23
   src/nexu/hashing.py,17
   src/nexu/init_project.py,87
-  src/nexu/intract.py,126
+  src/nexu/intract.py,136
   src/nexu/intract_adapter.py,134
   src/nexu/iterate.py,45
   src/nexu/journal.py,44
@@ -380,13 +382,15 @@ M[82]:
   tests/test_capsule_flow.py,26
   tests/test_capsule_next_stage.py,59
   tests/test_capsule_runtime_report.py,51
+  tests/test_cinema_baseline_contracts.py,53
   tests/test_cinema_history.py,50
-  tests/test_cinema_markpact.py,33
+  tests/test_cinema_markpact.py,45
+  tests/test_cinema_offline_options.py,106
   tests/test_cinema_policy.py,187
   tests/test_cinema_projects.py,70
-  tests/test_cinema_publish.py,89
+  tests/test_cinema_publish.py,99
   tests/test_cinema_scripts.py,15
-  tests/test_cinema_server.py,68
+  tests/test_cinema_server.py,71
   tests/test_cinema_spatial_patch.py,17
   tests/test_export_prompt_ledger.py,42
   tests/test_intract.py,12
@@ -491,6 +495,14 @@ D:
     write_intract_policy_files(cinema_dir;root;name)
     generate_cinema_player(root;name)
     _start_cinema_server(cinema_dir;root;name)
+  src/nexu/cinema_baseline_contracts.py:
+    e: _line,_contract,calculator_baseline_contracts,is_calculator_capsule,merge_calculator_baselines,ensure_capsule_intract_yaml
+    _line(contract)
+    _contract(contract_id;intent;meaning)
+    calculator_baseline_contracts()
+    is_calculator_capsule(root;name)
+    merge_calculator_baselines(capsule_contracts;root;name)
+    ensure_capsule_intract_yaml(root;name)
   src/nexu/cinema_history.py:
     e: history_dir,history_index_path,_load_index,_write_index,_copy_checkpoint_files,_ledger_snapshot,_build_label,save_history_checkpoint,list_history_checkpoints,restore_history_checkpoint,_refresh_policy_snapshot,ensure_initial_checkpoint,ledger_archive_for_display
     history_dir(cinema_dir)
@@ -511,8 +523,33 @@ D:
     _escape_markdown_fence(text;fence)
     build_markpact_readme(cinema_dir)
     markpact_download_filename(capsule_name;stage)
+  src/nexu/cinema_offline_options.py:
+    e: _hints_text,is_chemical_goal,_btn,_keep_ids_lower,_mandatory_trig,_trig_row,_policy_constrained,_numpad_token_btn,_numpad_rows,_numpad_from_policy,_policy_screen_text,_expanded_excess_row,_chemical_shell,_cinema_is_calculator,_option_shell,build_policy_scientific_option_html,build_chemical_option_html,_render_packaged_alt,write_goal_options_offline
+    _hints_text(hints)
+    is_chemical_goal(hints)
+    _btn(label;el_id)
+    _keep_ids_lower(keep_els)
+    _mandatory_trig(keep_els)
+    _trig_row(keep_els)
+    _policy_constrained(keep_els;delete_els)
+    _numpad_token_btn(token)
+    _numpad_rows(cols)
+    _numpad_from_policy(keep_els)
+    _policy_screen_text(variant;keep_els)
+    _expanded_excess_row(keep_els)
+    _chemical_shell()
+    _cinema_is_calculator(cinema_dir)
+    _option_shell()
+    build_policy_scientific_option_html(variant;keep_els)
+    build_chemical_option_html(variant;keep_els)
+    _render_packaged_alt(name)
+    write_goal_options_offline(cinema_dir)
   src/nexu/cinema_policy.py:
-    e: effective_ui_constraints_from_ledger,merge_ui_constraint_lists,_normalize_html_body,_html_files_distinct,option_previews_are_distinct,stage_files_are_distinct,ensure_option_previews_from_stages,_replace_html_title,sync_option_previews_from_workspace,enforce_deletes_on_option_previews,load_effective_ui_constraints,resolve_iteration_mode,normalize_manifest_target,cinema_model_label,cinema_dir_for,policy_snapshot_path,policy_ledger_path,load_policy_snapshot,manifest_paths_from_snapshot,apply_ledger_from_cinema,ensure_intract_on_path,propose_ui_delta_contract_dicts,append_policy_ledger_entry,_proposal_kind_and_element,normalize_proposals_for_ledger,append_iteration_ledger_entry,propose_llm_for_stage,validate_intract_artifact,verify_capsule_workspace
+    e: _process_ledger_entry,_process_keep_delete_entries,_process_proposed_contracts,_build_constraint_result,effective_ui_constraints_from_ledger,merge_ui_constraint_lists,_normalize_html_body,_html_files_distinct,option_previews_are_distinct,stage_files_are_distinct,ensure_option_previews_from_stages,_replace_html_title,sync_option_previews_from_workspace,enforce_deletes_on_option_previews,load_effective_ui_constraints,resolve_iteration_mode,normalize_manifest_target,cinema_model_label,cinema_dir_for,policy_snapshot_path,policy_ledger_path,load_policy_snapshot,manifest_paths_from_snapshot,apply_ledger_from_cinema,ensure_intract_on_path,propose_ui_delta_contract_dicts,append_policy_ledger_entry,_proposal_kind_and_element,normalize_proposals_for_ledger,append_iteration_ledger_entry,propose_llm_for_stage,validate_intract_artifact,verify_capsule_workspace
+    _process_ledger_entry(entry;state;stage)
+    _process_keep_delete_entries(entry;state)
+    _process_proposed_contracts(entry;state)
+    _build_constraint_result(state)
     effective_ui_constraints_from_ledger(ledger)
     merge_ui_constraint_lists()
     _normalize_html_body(html)
@@ -554,7 +591,7 @@ D:
     activate_example_project(cinema_dir;project_id)
     load_active_project(cinema_dir)
   src/nexu/cinema_publish.py:
-    e: services_root,_registry_path,_load_registry,_save_registry,_slug_service_id,_pick_port,_port_open,_http_ok,_service_alive,_refresh_service_status,list_published_services,_write_service_readme,publish_project_service,start_published_service,stop_published_service
+    e: services_root,_registry_path,_load_registry,_save_registry,_slug_service_id,_pick_port,_port_open,_http_ok,_service_alive,_refresh_service_status,list_published_services,_write_service_readme,_prepare_service_directory,_generate_markpact_export,_allocate_service_port,_create_service_entry,_register_service,_handle_existing_service,publish_project_service,start_published_service,stop_published_service
     services_root(cinema_dir)
     _registry_path(cinema_dir)
     _load_registry(cinema_dir)
@@ -567,6 +604,12 @@ D:
     _refresh_service_status(entry)
     list_published_services(cinema_dir)
     _write_service_readme(service_dir)
+    _prepare_service_directory(cinema_dir;stage_file;service_id)
+    _generate_markpact_export(service_dir;cinema_dir;root;capsule_name;stage;user_goal)
+    _allocate_service_port(cinema_dir;service_id)
+    _create_service_entry(service_id;capsule_name;project_id;project_title;stage;port)
+    _register_service(cinema_dir;service_entry)
+    _handle_existing_service(cinema_dir;service_id)
     publish_project_service(cinema_dir;root;capsule_name)
     start_published_service(cinema_dir;service_id)
     stop_published_service(cinema_dir;service_id)
@@ -653,8 +696,9 @@ D:
     e: init_project
     init_project(root)
   src/nexu/intract.py:
-    e: _split_csv,_tokenize_contract,parse_intract_line,scan_contracts_in_text,scan_contracts_in_file,read_manifest_contracts,IntentContract
+    e: format_intract_v1_line,_split_csv,_tokenize_contract,parse_intract_line,scan_contracts_in_text,scan_contracts_in_file,read_manifest_contracts,IntentContract
     IntentContract: key(0)
+    format_intract_v1_line(contract)
     _split_csv(value)
     _tokenize_contract(line)
     parse_intract_line(line)
@@ -784,6 +828,13 @@ D:
   tests/test_capsule_runtime_report.py:
     e: test_plan_runtime_report_and_journal
     test_plan_runtime_report_and_journal(tmp_path)
+  tests/test_cinema_baseline_contracts.py:
+    e: test_calculator_baseline_contracts_count,test_is_calculator_capsule_by_name,test_ensure_capsule_intract_yaml_writes,test_snapshot_includes_calculator_baselines,test_merge_does_not_duplicate
+    test_calculator_baseline_contracts_count()
+    test_is_calculator_capsule_by_name(tmp_path)
+    test_ensure_capsule_intract_yaml_writes(tmp_path)
+    test_snapshot_includes_calculator_baselines(tmp_path)
+    test_merge_does_not_duplicate(tmp_path)
   tests/test_cinema_history.py:
     e: test_save_list_and_restore_files
     test_save_list_and_restore_files(tmp_path;monkeypatch)
@@ -791,6 +842,16 @@ D:
     e: test_build_markpact_readme,test_markpact_download_filename
     test_build_markpact_readme(tmp_path)
     test_markpact_download_filename()
+  tests/test_cinema_offline_options.py:
+    e: test_is_chemical_goal,test_write_chemical_options,test_chemical_html_has_elements,test_policy_scientific_includes_mandatory_trig,test_policy_options_a_and_b_differ,test_calculator_cinema_uses_scientific_offline,test_write_policy_options_without_chemical_hints,test_write_chemical_options_respects_deletes
+    test_is_chemical_goal()
+    test_write_chemical_options(tmp_path)
+    test_chemical_html_has_elements()
+    test_policy_scientific_includes_mandatory_trig()
+    test_policy_options_a_and_b_differ()
+    test_calculator_cinema_uses_scientific_offline(tmp_path)
+    test_write_policy_options_without_chemical_hints(tmp_path)
+    test_write_chemical_options_respects_deletes(tmp_path)
   tests/test_cinema_policy.py:
     e: test_resolve_iteration_mode,test_normalize_manifest_target_defaults_invalid,test_apply_ledger_from_cinema_project_only,test_effective_ui_constraints_from_ledger_last_wins,test_merge_ui_constraint_lists_session_overrides_ledger,test_sync_option_previews_empty_delete_ids_mirrors_workspace,test_sync_option_previews_from_workspace,test_enforce_deletes_on_option_previews,test_ensure_option_previews_from_stages,test_propose_ui_delta_and_validate
     test_resolve_iteration_mode()
@@ -863,7 +924,7 @@ D:
 
 ```prolog markpact:analysis path=project/logic.pl
 % ── Project Metadata ─────────────────────────────────────
-project_metadata('nexu', '0.5.13', 'python').
+project_metadata('nexu', '0.5.17', 'python').
 
 % ── Project Files ────────────────────────────────────────
 project_file('app.doql.less', 117, 'less').
@@ -893,13 +954,15 @@ project_file('src/nexu/__main__.py', 5, 'python').
 project_file('src/nexu/blueprint.py', 74, 'python').
 project_file('src/nexu/bundle.py', 56, 'python').
 project_file('src/nexu/capsule.py', 125, 'python').
-project_file('src/nexu/cinema.py', 187, 'python').
+project_file('src/nexu/cinema.py', 190, 'python').
+project_file('src/nexu/cinema_baseline_contracts.py', 185, 'python').
 project_file('src/nexu/cinema_history.py', 245, 'python').
-project_file('src/nexu/cinema_markpact.py', 96, 'python').
-project_file('src/nexu/cinema_policy.py', 625, 'python').
+project_file('src/nexu/cinema_markpact.py', 121, 'python').
+project_file('src/nexu/cinema_offline_options.py', 521, 'python').
+project_file('src/nexu/cinema_policy.py', 656, 'python').
 project_file('src/nexu/cinema_projects.py', 360, 'python').
-project_file('src/nexu/cinema_publish.py', 340, 'python').
-project_file('src/nexu/cinema_scripts.py', 546, 'python').
+project_file('src/nexu/cinema_publish.py', 460, 'python').
+project_file('src/nexu/cinema_scripts.py', 623, 'python').
 project_file('src/nexu/cinema_server.py', 120, 'python').
 project_file('src/nexu/cli.py', 380, 'python').
 project_file('src/nexu/config.py', 122, 'python').
@@ -911,7 +974,7 @@ project_file('src/nexu/freeze.py', 27, 'python').
 project_file('src/nexu/git.py', 23, 'python').
 project_file('src/nexu/hashing.py', 17, 'python').
 project_file('src/nexu/init_project.py', 87, 'python').
-project_file('src/nexu/intract.py', 126, 'python').
+project_file('src/nexu/intract.py', 136, 'python').
 project_file('src/nexu/intract_adapter.py', 134, 'python').
 project_file('src/nexu/iterate.py', 45, 'python').
 project_file('src/nexu/journal.py', 44, 'python').
@@ -931,13 +994,15 @@ project_file('tests/conftest.py', 23, 'python').
 project_file('tests/test_capsule_flow.py', 26, 'python').
 project_file('tests/test_capsule_next_stage.py', 59, 'python').
 project_file('tests/test_capsule_runtime_report.py', 51, 'python').
+project_file('tests/test_cinema_baseline_contracts.py', 53, 'python').
 project_file('tests/test_cinema_history.py', 50, 'python').
-project_file('tests/test_cinema_markpact.py', 33, 'python').
+project_file('tests/test_cinema_markpact.py', 45, 'python').
+project_file('tests/test_cinema_offline_options.py', 106, 'python').
 project_file('tests/test_cinema_policy.py', 187, 'python').
 project_file('tests/test_cinema_projects.py', 70, 'python').
-project_file('tests/test_cinema_publish.py', 89, 'python').
+project_file('tests/test_cinema_publish.py', 99, 'python').
 project_file('tests/test_cinema_scripts.py', 15, 'python').
-project_file('tests/test_cinema_server.py', 68, 'python').
+project_file('tests/test_cinema_server.py', 71, 'python').
 project_file('tests/test_cinema_spatial_patch.py', 17, 'python').
 project_file('tests/test_export_prompt_ledger.py', 42, 'python').
 project_file('tests/test_intract.py', 12, 'python').
@@ -990,11 +1055,15 @@ python_function('src/nexu/cinema.py', '_cinema_template_text', 1, 1, 3).
 python_function('src/nexu/cinema.py', '_render_cinema_template', 1, 2, 5).
 python_function('src/nexu/cinema.py', 'write_cinema_nexu_hooks', 3, 1, 6).
 python_function('src/nexu/cinema.py', '_contract_to_public_dict', 1, 1, 1).
-python_function('src/nexu/cinema.py', 'format_intract_v1_line', 1, 3, 1).
-python_function('src/nexu/cinema.py', 'build_intract_policy_snapshot', 2, 11, 10).
+python_function('src/nexu/cinema.py', 'build_intract_policy_snapshot', 2, 11, 13).
 python_function('src/nexu/cinema.py', 'write_intract_policy_files', 3, 2, 4).
-python_function('src/nexu/cinema.py', 'generate_cinema_player', 2, 1, 10).
+python_function('src/nexu/cinema.py', 'generate_cinema_player', 2, 2, 12).
 python_function('src/nexu/cinema.py', '_start_cinema_server', 3, 2, 3).
+python_function('src/nexu/cinema_baseline_contracts.py', '_contract', 3, 3, 2).
+python_function('src/nexu/cinema_baseline_contracts.py', 'calculator_baseline_contracts', 0, 1, 1).
+python_function('src/nexu/cinema_baseline_contracts.py', 'is_calculator_capsule', 2, 5, 5).
+python_function('src/nexu/cinema_baseline_contracts.py', 'merge_calculator_baselines', 3, 5, 5).
+python_function('src/nexu/cinema_baseline_contracts.py', 'ensure_capsule_intract_yaml', 2, 9, 9).
 python_function('src/nexu/cinema_history.py', 'history_dir', 1, 1, 0).
 python_function('src/nexu/cinema_history.py', 'history_index_path', 1, 1, 1).
 python_function('src/nexu/cinema_history.py', '_load_index', 1, 3, 5).
@@ -1009,9 +1078,32 @@ python_function('src/nexu/cinema_history.py', '_refresh_policy_snapshot', 3, 1, 
 python_function('src/nexu/cinema_history.py', 'ensure_initial_checkpoint', 1, 3, 4).
 python_function('src/nexu/cinema_history.py', 'ledger_archive_for_display', 1, 5, 11).
 python_function('src/nexu/cinema_markpact.py', '_escape_markdown_fence', 2, 2, 1).
-python_function('src/nexu/cinema_markpact.py', 'build_markpact_readme', 1, 10, 13).
+python_function('src/nexu/cinema_markpact.py', 'build_markpact_readme', 1, 18, 14).
 python_function('src/nexu/cinema_markpact.py', 'markpact_download_filename', 2, 2, 2).
-python_function('src/nexu/cinema_policy.py', 'effective_ui_constraints_from_ledger', 1, 24, 8).
+python_function('src/nexu/cinema_offline_options.py', '_hints_text', 1, 3, 4).
+python_function('src/nexu/cinema_offline_options.py', 'is_chemical_goal', 1, 2, 2).
+python_function('src/nexu/cinema_offline_options.py', '_btn', 2, 3, 1).
+python_function('src/nexu/cinema_offline_options.py', '_keep_ids_lower', 1, 3, 3).
+python_function('src/nexu/cinema_offline_options.py', '_mandatory_trig', 1, 3, 1).
+python_function('src/nexu/cinema_offline_options.py', '_trig_row', 1, 7, 4).
+python_function('src/nexu/cinema_offline_options.py', '_policy_constrained', 2, 2, 1).
+python_function('src/nexu/cinema_offline_options.py', '_numpad_token_btn', 1, 4, 3).
+python_function('src/nexu/cinema_offline_options.py', '_numpad_rows', 1, 5, 4).
+python_function('src/nexu/cinema_offline_options.py', '_numpad_from_policy', 1, 11, 10).
+python_function('src/nexu/cinema_offline_options.py', '_policy_screen_text', 2, 2, 4).
+python_function('src/nexu/cinema_offline_options.py', '_expanded_excess_row', 1, 8, 6).
+python_function('src/nexu/cinema_offline_options.py', '_chemical_shell', 0, 1, 0).
+python_function('src/nexu/cinema_offline_options.py', '_cinema_is_calculator', 1, 4, 2).
+python_function('src/nexu/cinema_offline_options.py', '_option_shell', 0, 3, 1).
+python_function('src/nexu/cinema_offline_options.py', 'build_policy_scientific_option_html', 2, 3, 6).
+python_function('src/nexu/cinema_offline_options.py', 'build_chemical_option_html', 2, 7, 5).
+python_function('src/nexu/cinema_offline_options.py', '_render_packaged_alt', 1, 1, 5).
+python_function('src/nexu/cinema_offline_options.py', 'write_goal_options_offline', 1, 16, 14).
+python_function('src/nexu/cinema_policy.py', '_process_ledger_entry', 3, 4, 4).
+python_function('src/nexu/cinema_policy.py', '_process_keep_delete_entries', 2, 7, 3).
+python_function('src/nexu/cinema_policy.py', '_process_proposed_contracts', 2, 8, 3).
+python_function('src/nexu/cinema_policy.py', '_build_constraint_result', 1, 5, 2).
+python_function('src/nexu/cinema_policy.py', 'effective_ui_constraints_from_ledger', 1, 4, 3).
 python_function('src/nexu/cinema_policy.py', 'merge_ui_constraint_lists', 0, 13, 4).
 python_function('src/nexu/cinema_policy.py', '_normalize_html_body', 1, 1, 2).
 python_function('src/nexu/cinema_policy.py', '_html_files_distinct', 2, 3, 6).
@@ -1059,8 +1151,14 @@ python_function('src/nexu/cinema_publish.py', '_http_ok', 1, 2, 1).
 python_function('src/nexu/cinema_publish.py', '_service_alive', 1, 6, 5).
 python_function('src/nexu/cinema_publish.py', '_refresh_service_status', 1, 3, 1).
 python_function('src/nexu/cinema_publish.py', 'list_published_services', 1, 3, 6).
-python_function('src/nexu/cinema_publish.py', '_write_service_readme', 1, 6, 11).
-python_function('src/nexu/cinema_publish.py', 'publish_project_service', 3, 21, 24).
+python_function('src/nexu/cinema_publish.py', '_write_service_readme', 1, 14, 13).
+python_function('src/nexu/cinema_publish.py', '_prepare_service_directory', 3, 1, 4).
+python_function('src/nexu/cinema_publish.py', '_generate_markpact_export', 6, 1, 5).
+python_function('src/nexu/cinema_publish.py', '_allocate_service_port', 2, 11, 6).
+python_function('src/nexu/cinema_publish.py', '_create_service_entry', 6, 3, 2).
+python_function('src/nexu/cinema_publish.py', '_register_service', 2, 4, 5).
+python_function('src/nexu/cinema_publish.py', '_handle_existing_service', 2, 7, 6).
+python_function('src/nexu/cinema_publish.py', 'publish_project_service', 3, 6, 15).
 python_function('src/nexu/cinema_publish.py', 'start_published_service', 2, 17, 18).
 python_function('src/nexu/cinema_publish.py', 'stop_published_service', 2, 9, 8).
 python_function('src/nexu/cinema_scripts.py', '_delete_match_keys', 1, 4, 5).
@@ -1118,6 +1216,7 @@ python_function('src/nexu/git.py', 'current_git_sha', 1, 4, 3).
 python_function('src/nexu/hashing.py', 'sha256_file', 1, 2, 6).
 python_function('src/nexu/hashing.py', 'sha256_text', 1, 1, 3).
 python_function('src/nexu/init_project.py', 'init_project', 1, 3, 4).
+python_function('src/nexu/intract.py', 'format_intract_v1_line', 1, 3, 1).
 python_function('src/nexu/intract.py', '_split_csv', 1, 4, 3).
 python_function('src/nexu/intract.py', '_tokenize_contract', 1, 5, 6).
 python_function('src/nexu/intract.py', 'parse_intract_line', 1, 3, 6).
@@ -1200,9 +1299,22 @@ python_function('tests/conftest.py', '_prepend_intract_src', 0, 4, 5).
 python_function('tests/test_capsule_flow.py', 'test_capsule_flow', 1, 5, 7).
 python_function('tests/test_capsule_next_stage.py', 'test_capsule_blueprint_prompt_diff_status_and_drift', 1, 11, 14).
 python_function('tests/test_capsule_runtime_report.py', 'test_plan_runtime_report_and_journal', 1, 13, 13).
+python_function('tests/test_cinema_baseline_contracts.py', 'test_calculator_baseline_contracts_count', 0, 6, 2).
+python_function('tests/test_cinema_baseline_contracts.py', 'test_is_calculator_capsule_by_name', 1, 2, 3).
+python_function('tests/test_cinema_baseline_contracts.py', 'test_ensure_capsule_intract_yaml_writes', 1, 4, 4).
+python_function('tests/test_cinema_baseline_contracts.py', 'test_snapshot_includes_calculator_baselines', 1, 3, 3).
+python_function('tests/test_cinema_baseline_contracts.py', 'test_merge_does_not_duplicate', 1, 2, 2).
 python_function('tests/test_cinema_history.py', 'test_save_list_and_restore_files', 2, 7, 9).
-python_function('tests/test_cinema_markpact.py', 'test_build_markpact_readme', 1, 7, 3).
+python_function('tests/test_cinema_markpact.py', 'test_build_markpact_readme', 1, 10, 3).
 python_function('tests/test_cinema_markpact.py', 'test_markpact_download_filename', 0, 2, 1).
+python_function('tests/test_cinema_offline_options.py', 'test_is_chemical_goal', 0, 4, 1).
+python_function('tests/test_cinema_offline_options.py', 'test_write_chemical_options', 1, 5, 3).
+python_function('tests/test_cinema_offline_options.py', 'test_chemical_html_has_elements', 0, 3, 2).
+python_function('tests/test_cinema_offline_options.py', 'test_policy_scientific_includes_mandatory_trig', 0, 3, 1).
+python_function('tests/test_cinema_offline_options.py', 'test_policy_options_a_and_b_differ', 0, 10, 1).
+python_function('tests/test_cinema_offline_options.py', 'test_calculator_cinema_uses_scientific_offline', 1, 4, 3).
+python_function('tests/test_cinema_offline_options.py', 'test_write_policy_options_without_chemical_hints', 1, 9, 2).
+python_function('tests/test_cinema_offline_options.py', 'test_write_chemical_options_respects_deletes', 1, 5, 3).
 python_function('tests/test_cinema_policy.py', 'test_resolve_iteration_mode', 0, 7, 1).
 python_function('tests/test_cinema_policy.py', 'test_normalize_manifest_target_defaults_invalid', 0, 3, 1).
 python_function('tests/test_cinema_policy.py', 'test_apply_ledger_from_cinema_project_only', 1, 3, 6).
@@ -1218,7 +1330,7 @@ python_function('tests/test_cinema_projects.py', 'test_activate_example_project_
 python_function('tests/test_cinema_projects.py', 'test_activate_copies_dashboard_cinema_when_repo_available', 0, 6, 7).
 python_function('tests/test_cinema_projects.py', 'test_activate_calculator_preserves_distinct_option_previews', 0, 5, 11).
 python_function('tests/test_cinema_publish.py', 'cinema_setup', 1, 1, 2).
-python_function('tests/test_cinema_publish.py', 'test_publish_creates_service_files', 1, 9, 3).
+python_function('tests/test_cinema_publish.py', 'test_publish_creates_service_files', 1, 11, 6).
 python_function('tests/test_cinema_publish.py', 'test_list_and_start_stop_service', 1, 10, 8).
 python_function('tests/test_cinema_publish.py', 'test_publish_missing_stage_returns_error', 1, 2, 1).
 python_function('tests/test_cinema_scripts.py', 'test_finalize_strips_truncated_llm_script_and_injects_canonical', 0, 5, 3).
@@ -1325,7 +1437,7 @@ sumd_workflow_step('quality-intract', 2, 'intract coverage src').
 sumd_workflow('quality-redup', 'manual').
 sumd_workflow_step('quality-redup', 1, 'redup scan src --format toon --min-lines 8').
 sumd_workflow('quality', 'manual').
-sumd_workflow_step('quality', 1, 'ruff check src/nexu/cinema.py src/nexu/cinema_server.py src/nexu/verify.py src/nexu/intract_adapter.py tests/test_cinema_server.py').
+sumd_workflow_step('quality', 1, 'ruff check src/nexu/cinema.py src/nexu/cinema_server.py src/nexu/cinema_baseline_contracts.py src/nexu/cinema_markpact.py src/nexu/cinema_publish.py src/nexu/cinema_offline_options.py src/nexu/verify.py src/nexu/intract_adapter.py tests/test_cinema_server.py tests/test_cinema_baseline_contracts.py tests/test_cinema_markpact.py tests/test_cinema_publish.py tests/test_cinema_offline_options.py').
 sumd_workflow('quality-strict', 'manual').
 sumd_workflow_step('quality-strict', 1, 'pytest -q').
 sumd_workflow_step('quality-strict', 2, 'ruff check src tests --statistics').
@@ -1358,68 +1470,68 @@ sumd_workflow_step('ci-cinema-smoke', 1, './scripts/ci-cinema-smoke.sh').
 
 ## Call Graph
 
-*213 nodes · 359 edges · 43 modules · CC̄=3.7*
+*248 nodes · 414 edges · 45 modules · CC̄=3.8*
 
 ### Hubs (by degree)
 
 | Function | CC | in | out | total |
 |----------|----|----|-----|-------|
 | `load_config` *(in src.nexu.config)* | 6 | 4 | 42 | **46** |
-| `read_manifest_contracts` *(in src.nexu.intract)* | 12 ⚠ | 8 | 32 | **40** |
+| `_btn` *(in src.nexu.cinema_offline_options)* | 3 | 39 | 1 | **40** |
+| `read_manifest_contracts` *(in src.vico.intract)* | 12 ⚠ | 8 | 32 | **40** |
+| `build_intract_policy_snapshot` *(in src.nexu.cinema)* | 11 ⚠ | 3 | 32 | **35** |
 | `main` *(in examples.web_app_dashboard.run)* | 2 | 0 | 35 | **35** |
-| `publish_project_service` *(in src.nexu.cinema_publish)* | 21 ⚠ | 0 | 34 | **34** |
+| `build_policy_scientific_option_html` *(in src.nexu.cinema_offline_options)* | 3 | 1 | 34 | **35** |
 | `build_capsule_report` *(in src.nexu.report)* | 1 | 2 | 32 | **34** |
 | `verify_capsule` *(in src.nexu.verify)* | 1 | 7 | 26 | **33** |
-| `create_capsule` *(in src.nexu.capsule)* | 8 | 7 | 24 | **31** |
-| `project_root` *(in src.nexu.paths)* | 1 | 28 | 3 | **31** |
 
 ```toon markpact:analysis path=project/calls.toon.yaml
 # code2llm call graph | /home/tom/github/semcod/nexu
-# generated in 0.10s
-# nodes: 213 | edges: 359 | modules: 43
-# CC̄=3.7
+# generated in 0.16s
+# nodes: 248 | edges: 414 | modules: 45
+# CC̄=3.8
 
 HUBS[20]:
   src.nexu.config.load_config
     CC=6  in:4  out:42  total:46
-  src.nexu.intract.read_manifest_contracts
+  src.nexu.cinema_offline_options._btn
+    CC=3  in:39  out:1  total:40
+  src.vico.intract.read_manifest_contracts
     CC=12  in:8  out:32  total:40
+  src.nexu.cinema.build_intract_policy_snapshot
+    CC=11  in:3  out:32  total:35
   examples.web_app_dashboard.run.main
     CC=2  in:0  out:35  total:35
-  src.nexu.cinema_publish.publish_project_service
-    CC=21  in:0  out:34  total:34
+  src.nexu.cinema_offline_options.build_policy_scientific_option_html
+    CC=3  in:1  out:34  total:35
   src.nexu.report.build_capsule_report
     CC=1  in:2  out:32  total:34
   src.nexu.verify.verify_capsule
     CC=1  in:7  out:26  total:33
-  src.nexu.capsule.create_capsule
-    CC=8  in:7  out:24  total:31
   src.nexu.paths.project_root
     CC=1  in:28  out:3  total:31
-  src.nexu.cinema.build_intract_policy_snapshot
-    CC=11  in:1  out:29  total:30
-  src.nexu.orchestrate.build_capsule_orchestration
-    CC=2  in:2  out:28  total:30
+  src.nexu.capsule.create_capsule
+    CC=8  in:7  out:24  total:31
   src.nexu.cinema_publish.start_published_service
     CC=17  in:1  out:29  total:30
+  src.nexu.orchestrate.build_capsule_orchestration
+    CC=2  in:2  out:28  total:30
   examples.run_examples.run_example
     CC=2  in:1  out:26  total:27
+  src.nexu.cinema_markpact.build_markpact_readme
+    CC=18  in:1  out:25  total:26
+  src.nexu.cinema_baseline_contracts.ensure_capsule_intract_yaml
+    CC=9  in:1  out:25  total:26
   src.nexu.review.build_review_packet
     CC=5  in:2  out:24  total:26
-  src.nexu.models.write_yaml
+  src.nexu.paths.capsule_dir
+    CC=1  in:25  out:1  total:26
+  src.nexu.cinema_publish._write_service_readme
+    CC=14  in:1  out:24  total:25
+  src.vico.models.write_yaml
     CC=1  in:22  out:3  total:25
   src.nexu.cinema_projects.activate_example_project
     CC=16  in:0  out:24  total:24
-  src.nexu.paths.capsule_dir
-    CC=1  in:23  out:1  total:24
-  src.nexu.orchestrate._render_orchestration_markdown
-    CC=9  in:1  out:22  total:23
-  src.nexu.diff.diff_capsule
-    CC=12  in:9  out:14  total:23
-  examples.web_app_calculator.run.main
-    CC=2  in:0  out:23  total:23
-  src.nexu.orchestrate.offline_orchestration_from_context
-    CC=13  in:1  out:22  total:23
 
 MODULES:
   examples.run_examples  [2 funcs]
@@ -1458,11 +1570,18 @@ MODULES:
     _contract_to_public_dict  CC=1  out:1
     _render_cinema_template  CC=2  out:5
     _start_cinema_server  CC=2  out:3
-    build_intract_policy_snapshot  CC=11  out:29
+    build_intract_policy_snapshot  CC=11  out:32
     format_intract_v1_line  CC=3  out:1
-    generate_cinema_player  CC=1  out:19
+    generate_cinema_player  CC=2  out:21
     write_cinema_nexu_hooks  CC=1  out:8
     write_intract_policy_files  CC=2  out:5
+  src.nexu.cinema_baseline_contracts  [6 funcs]
+    _contract  CC=3  out:2
+    _line  CC=3  out:1
+    calculator_baseline_contracts  CC=1  out:7
+    ensure_capsule_intract_yaml  CC=9  out:25
+    is_calculator_capsule  CC=5  out:5
+    merge_calculator_baselines  CC=5  out:5
   src.nexu.cinema_history  [13 funcs]
     _build_label  CC=4  out:7
     _copy_checkpoint_files  CC=3  out:3
@@ -1476,35 +1595,46 @@ MODULES:
     ledger_archive_for_display  CC=5  out:16
   src.nexu.cinema_markpact  [2 funcs]
     _escape_markdown_fence  CC=2  out:1
-    build_markpact_readme  CC=10  out:17
-  src.nexu.cinema_policy  [27 funcs]
+    build_markpact_readme  CC=18  out:25
+  src.nexu.cinema_offline_options  [18 funcs]
+    _btn  CC=3  out:1
+    _chemical_shell  CC=1  out:0
+    _cinema_is_calculator  CC=4  out:2
+    _expanded_excess_row  CC=8  out:6
+    _hints_text  CC=3  out:6
+    _keep_ids_lower  CC=3  out:5
+    _mandatory_trig  CC=3  out:1
+    _numpad_from_policy  CC=11  out:11
+    _numpad_rows  CC=5  out:4
+    _numpad_token_btn  CC=4  out:4
+  src.nexu.cinema_policy  [31 funcs]
+    _build_constraint_result  CC=5  out:4
     _html_files_distinct  CC=3  out:6
     _normalize_html_body  CC=1  out:2
+    _process_keep_delete_entries  CC=7  out:6
+    _process_ledger_entry  CC=4  out:4
+    _process_proposed_contracts  CC=8  out:3
     _proposal_kind_and_element  CC=12  out:8
     _replace_html_title  CC=2  out:2
     append_iteration_ledger_entry  CC=1  out:7
     append_policy_ledger_entry  CC=3  out:8
-    apply_ledger_from_cinema  CC=8  out:17
-    cinema_dir_for  CC=1  out:2
-    cinema_model_label  CC=2  out:3
-    effective_ui_constraints_from_ledger  CC=24  out:17
   src.nexu.cinema_projects  [5 funcs]
     _copy_cinema_files  CC=4  out:6
     _resolve_source_cinema  CC=5  out:2
     _write_seed_variants  CC=3  out:8
     activate_example_project  CC=16  out:24
     find_nexu_repo_root  CC=5  out:4
-  src.nexu.cinema_publish  [14 funcs]
+  src.nexu.cinema_publish  [21 funcs]
+    _allocate_service_port  CC=11  out:11
+    _create_service_entry  CC=3  out:2
+    _generate_markpact_export  CC=1  out:5
+    _handle_existing_service  CC=7  out:8
     _http_ok  CC=2  out:1
     _load_registry  CC=3  out:6
+    _pick_port  CC=4  out:2
     _port_open  CC=2  out:1
+    _prepare_service_directory  CC=1  out:4
     _refresh_service_status  CC=3  out:1
-    _registry_path  CC=1  out:1
-    _save_registry  CC=1  out:5
-    _service_alive  CC=6  out:8
-    _slug_service_id  CC=4  out:2
-    _write_service_readme  CC=6  out:16
-    list_published_services  CC=3  out:6
   src.nexu.cinema_scripts  [5 funcs]
     _delete_match_keys  CC=4  out:11
     apply_spatial_deletes_to_html  CC=4  out:14
@@ -1616,37 +1746,37 @@ MODULES:
     _scan_capsule_contracts  CC=2  out:4
     _text  CC=2  out:1
     verify_capsule  CC=1  out:26
-  src.nexu.diff  [1 funcs]
+  src.vico.diff  [1 funcs]
     diff_capsule  CC=12  out:14
-  src.nexu.drift  [1 funcs]
+  src.vico.drift  [1 funcs]
     check_source_drift  CC=7  out:10
-  src.nexu.freeze  [1 funcs]
+  src.vico.freeze  [1 funcs]
     freeze_project  CC=2  out:12
-  src.nexu.git  [1 funcs]
+  src.vico.git  [1 funcs]
     current_git_sha  CC=4  out:3
-  src.nexu.hashing  [1 funcs]
+  src.vico.hashing  [1 funcs]
     sha256_file  CC=2  out:6
-  src.nexu.intract  [6 funcs]
+  src.vico.intract  [6 funcs]
     _split_csv  CC=4  out:4
     _tokenize_contract  CC=5  out:10
     parse_intract_line  CC=3  out:22
     read_manifest_contracts  CC=12  out:32
     scan_contracts_in_file  CC=3  out:5
     scan_contracts_in_text  CC=3  out:4
-  src.nexu.models  [4 funcs]
+  src.vico.models  [4 funcs]
     from_dict  CC=2  out:6
     read_yaml  CC=3  out:4
     utc_now  CC=1  out:2
     write_yaml  CC=1  out:3
-  src.nexu.status  [1 funcs]
+  src.vico.status  [1 funcs]
     capsule_status  CC=3  out:10
 
 EDGES:
   examples.scientific_calculator_demo.main → src.nexu.init_project.init_project
-  examples.scientific_calculator_demo.main → src.nexu.freeze.freeze_project
+  examples.scientific_calculator_demo.main → src.vico.freeze.freeze_project
   examples.scientific_calculator_demo.main → src.nexu.capsule.create_capsule
   examples.run_examples.run_example → src.nexu.init_project.init_project
-  examples.run_examples.run_example → src.nexu.freeze.freeze_project
+  examples.run_examples.run_example → src.vico.freeze.freeze_project
   examples.run_examples.run_example → src.nexu.capsule.create_capsule
   examples.run_examples.run_example → src.nexu.plan.build_iteration_plan
   examples.run_examples.run_example → src.nexu.blueprint.build_blueprint
@@ -1656,42 +1786,42 @@ EDGES:
   examples.run_examples.main → examples.run_examples.run_example
   examples.scientific_calculator_demo2.main → examples.scientific_calculator_demo2.print_code
   examples.scientific_calculator_demo2.main → src.nexu.init_project.init_project
-  examples.scientific_calculator_demo2.main → src.nexu.freeze.freeze_project
+  examples.scientific_calculator_demo2.main → src.vico.freeze.freeze_project
   examples.scientific_calculator_demo2.main → src.nexu.capsule.create_capsule
   examples.scientific_calculator_demo2.main → src.nexu.iterate.iterate_capsule
   examples.web_app_calculator.run.main → src.nexu.init_project.init_project
-  examples.web_app_calculator.run.main → src.nexu.freeze.freeze_project
+  examples.web_app_calculator.run.main → src.vico.freeze.freeze_project
   examples.web_app_calculator.run.main → src.nexu.capsule.create_capsule
   examples.web_app_dashboard.run.main → src.nexu.init_project.init_project
-  examples.web_app_dashboard.run.main → src.nexu.freeze.freeze_project
+  examples.web_app_dashboard.run.main → src.vico.freeze.freeze_project
   examples.web_app_dashboard.run.main → src.nexu.capsule.create_capsule
   src.nexu.runtime._collect_fixtures → src.nexu.runtime._read_fixture
   src.nexu.runtime.build_capsule_runtime → src.nexu.capsule.load_capsule
   src.nexu.runtime.build_capsule_runtime → src.nexu.paths.capsule_dir
   src.nexu.runtime.build_capsule_runtime → src.nexu.blueprint.build_blueprint
-  src.nexu.runtime.build_capsule_runtime → src.nexu.intract.read_manifest_contracts
-  src.nexu.runtime.build_capsule_runtime → src.nexu.models.write_yaml
+  src.nexu.runtime.build_capsule_runtime → src.vico.intract.read_manifest_contracts
+  src.nexu.runtime.build_capsule_runtime → src.vico.models.write_yaml
   src.nexu.runtime.build_capsule_runtime → src.nexu.journal.append_journal
-  src.nexu.runtime.build_capsule_runtime → src.nexu.models.utc_now
+  src.nexu.runtime.build_capsule_runtime → src.vico.models.utc_now
   src.nexu.init_project.init_project → src.nexu.paths.ensure_project_dirs
-  src.nexu.init_project.init_project → src.nexu.models.write_yaml
+  src.nexu.init_project.init_project → src.vico.models.write_yaml
   src.nexu.config.load_env_files → src.nexu.config._load_env_file
   src.nexu.config.load_config → src.nexu.config.load_env_files
-  src.nexu.config.load_config → src.nexu.models.read_yaml
-  src.nexu.intract.parse_intract_line → src.nexu.intract._tokenize_contract
-  src.nexu.intract.parse_intract_line → src.nexu.intract._split_csv
-  src.nexu.intract.scan_contracts_in_text → src.nexu.intract.parse_intract_line
-  src.nexu.intract.scan_contracts_in_file → src.nexu.intract.scan_contracts_in_text
-  src.nexu.llm.call_litellm_json → src.nexu.llm._strip_fences
-  src.nexu.llm.call_litellm_json → src.nexu.llm._extract_content
-  src.nexu.llm.call_litellm_review → src.nexu.llm.call_litellm_json
-  src.nexu.bundle._should_include → src.nexu.files.rel
-  src.nexu.bundle.build_capsule_bundle → src.nexu.paths.capsule_dir
-  src.nexu.bundle.build_capsule_bundle → src.nexu.models.write_yaml
-  src.nexu.bundle.build_capsule_bundle → src.nexu.journal.append_journal
-  src.nexu.bundle.build_capsule_bundle → src.nexu.models.utc_now
-  src.nexu.freeze.freeze_project → src.nexu.paths.ensure_project_dirs
-  src.nexu.freeze.freeze_project → src.nexu.models.write_yaml
+  src.nexu.config.load_config → src.vico.models.read_yaml
+  src.vico.intract.parse_intract_line → src.vico.intract._tokenize_contract
+  src.vico.intract.parse_intract_line → src.vico.intract._split_csv
+  src.vico.intract.scan_contracts_in_text → src.vico.intract.parse_intract_line
+  src.vico.intract.scan_contracts_in_file → src.vico.intract.scan_contracts_in_text
+  src.nexu.cli.init → src.nexu.paths.project_root
+  src.nexu.cli.init → src.nexu.init_project.init_project
+  src.nexu.cli.freeze → src.nexu.paths.project_root
+  src.nexu.cli.freeze → src.vico.freeze.freeze_project
+  src.nexu.cli.capsule_create → src.nexu.paths.project_root
+  src.nexu.cli.capsule_create → src.nexu.capsule.create_capsule
+  src.nexu.cli.capsule_create → src.nexu.blueprint.build_blueprint
+  src.nexu.cli.capsule_list → src.nexu.paths.project_root
+  src.nexu.cli.capsule_list → src.nexu.capsule.list_capsules
+  src.nexu.cli.capsule_status_command → src.nexu.paths.project_root
 ```
 
 ## Test Contracts

@@ -23,6 +23,7 @@ def build_markpact_readme(
     capsule_name: str = "nexu",
     user_goal: str = "",
     effective_ui: dict[str, Any] | None = None,
+    baseline_contracts: dict[str, Any] | None = None,
 ) -> str:
     """
     Package the active Cinema stage HTML as a single Markpact README.md.
@@ -36,12 +37,17 @@ def build_markpact_readme(
 
     html = stage_file.read_text(encoding="utf-8")
     title_match = re.search(r"<title[^>]*>([^<]*)</title>", html, flags=re.I)
-    app_title = (title_match.group(1).strip() if title_match else None) or f"{capsule_name} S{stage}"
+    app_title = (
+        title_match.group(1).strip() if title_match else None
+    ) or f"{capsule_name} S{stage}"
 
     effective = effective_ui or {}
     keep = list(effective.get("keep") or [])
     delete = list(effective.get("delete") or [])
     goal_line = user_goal.strip() or "(none recorded)"
+    baselines = baseline_contracts or {}
+    project_contracts = list(baselines.get("project") or [])
+    capsule_contracts = list(baselines.get("capsule") or [])
 
     meta = {
         "exported_at": datetime.now(timezone.utc).isoformat(),
@@ -51,14 +57,25 @@ def build_markpact_readme(
         "user_goal": goal_line,
         "policy_keep": keep,
         "policy_delete": delete,
+        "baseline_contracts": {
+            "project": project_contracts,
+            "capsule": capsule_contracts,
+        },
     }
 
     html_body = _escape_markdown_fence(html)
+    baseline_lines = [
+        str(item.get("line") or item.get("id") or item)
+        for item in project_contracts + capsule_contracts
+    ]
+    baseline_block = "\n".join(f"- `{line}`" for line in baseline_lines) or "- (none)"
 
     return f"""# {app_title} — Nexu Markpact export
 
 Portable **Markpact** capsule exported from Nexu (stage {stage}).
 Open this file in Markpact and run the `markpact:run` block like any other app.
+The HTML is exported together with Nexu/Intract intent contracts so future edits can preserve the
+baseline model instead of only copying pixels.
 
 ## Nexu context
 
@@ -66,6 +83,13 @@ Open this file in Markpact and run the `markpact:run` block like any other app.
 - **Goal:** {goal_line}
 - **Policy KEEP:** {", ".join(keep) if keep else "(none)"}
 - **Policy DELETE:** {", ".join(delete) if delete else "(none)"}
+
+## Intract baseline model
+
+These contracts describe what the exported app is expected to remain. Treat them as regression
+guards when changing the generated UI:
+
+{baseline_block}
 
 ```json markpact:file path=cinema/export-meta.json
 {json.dumps(meta, indent=2, ensure_ascii=False)}
@@ -83,7 +107,8 @@ Open this file in Markpact and run the `markpact:run` block like any other app.
 python -m http.server ${{MARKPACT_PORT:-8765}}
 ```
 
-Then open `http://127.0.0.1:${{MARKPACT_PORT:-8765}}/` in a browser (Markpact prints the URL in the shell).
+Then open `http://127.0.0.1:${{MARKPACT_PORT:-8765}}/` in a browser.
+Markpact prints the URL in the shell.
 
 > **Linux one-liner** (after `pip install markpact` or `uv pip install markpact`):
 > `markpact "$(pwd)/{capsule_name}-S{stage}-markpact.md"`

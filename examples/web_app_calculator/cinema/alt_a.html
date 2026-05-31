@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Option C (expanded)</title>
+    <title>Option A (minimal)</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&display=swap"
         rel="stylesheet"
@@ -9,43 +9,43 @@
     <style>
         html, body {
             height: 100%; width: 100%; margin: 0; overflow: hidden;
-            background: #090d16; color: #fff; font-family: 'Outfit', sans-serif;
+            background: #0f172a; color: #fff; font-family: 'Outfit', sans-serif;
             display: flex; justify-content: center; align-items: center; user-select: none;
         }
         .calc-body {
             background: #1e293b; border-radius: 12px; width: 90%; height: 90%;
             display: flex; flex-direction: column; box-sizing: border-box;
-            max-width: 78vh; max-height: 118vw; aspect-ratio: 4/5; padding: 14px; border: 1px solid rgba(167, 139, 250, 0.45);
+            max-width: 58vh; max-height: 100vw; aspect-ratio: 3/4; padding: 8px; border: 1px solid rgba(46, 204, 113, 0.35);
         }
         .screen {
-            background: #0f172a; color: #a78bfa; text-align: right;
+            background: #0f172a; color: #2ecc71; text-align: right;
             padding: 8px; border-radius: 6px; margin-bottom: 8px;
-            font-size: calc(9px + 2vh); min-height: 2.4em;
+            font-size: calc(7px + 1.4vh); min-height: 2em;
         }
         .variant-badge {
             display: block; font-size: 0.65em; opacity: 0.75; text-align: left;
             margin-bottom: 4px; letter-spacing: 0.05em;
         }
         .grid {
-            display: grid; grid-template-columns: repeat(5, 1fr);
-            grid-auto-rows: 1fr; gap: 10px; flex: 1;
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            grid-auto-rows: 1fr; gap: 4px; flex: 1;
         }
         .btn {
             background: rgba(255,255,255,0.05); color: #fff;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; user-select: none;
-            font-size: calc(5px + 0.8vh); border-radius: 50%; aspect-ratio: 1; min-height: 0;
+            font-size: calc(5px + 0.75vh); border-radius: 4px; border: 1px solid rgba(255,255,255,0.08);
         }
-        .btn-sci { background: #38bdf8; color: #0f172a; font-weight: bold; }
+        .btn-sci { background: #2ecc71; color: #0f172a; font-weight: bold; }
         .btn-op { background: #e67e22; color: #fff; font-weight: bold; }
         .btn-sci-excess { background: #818cf8; color: #fff; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div class="calc-body" data-variant="expanded">
-        <div class="screen" id="screen"><span class="variant-badge">Variant E</span>12.5 · C · cos,tan</div>
+    <div class="calc-body" data-variant="minimal">
+        <div class="screen" id="screen"><span class="variant-badge">Variant M</span>12.5 · A · cos,tan</div>
         <div class="grid">
-            <div class="btn btn-sci" id="btn-cos">cos</div><div class="btn btn-sci" id="btn-tan">tan</div><div class="btn btn-sci-excess" id="btn-pi">π</div><div class="btn" id="btn-7">7</div><div class="btn" id="btn-8">8</div><div class="btn" id="btn-9">9</div><div class="btn btn-op" id="btn-div" style="background:#e67e22;">/</div><div class="btn btn-op" id="btn-clear" style="background:#e67e22;">C</div><div class="btn" id="btn-4">4</div><div class="btn" id="btn-5">5</div><div class="btn" id="btn-6">6</div><div class="btn btn-op" id="btn-mul" style="background:#e67e22;">*</div><div class="btn btn-op" id="btn-lp" style="background:#e67e22;">(</div><div class="btn" id="btn-1">1</div><div class="btn" id="btn-2">2</div><div class="btn" id="btn-3">3</div><div class="btn btn-op" id="btn-sub" style="background:#e67e22;">-</div><div class="btn btn-op" id="btn-rp" style="background:#e67e22;">)</div><div class="btn" id="btn-0">0</div><div class="btn" id="btn-dot">.</div><div class="btn" id="btn-eq" style="background:#2ecc71;">=</div><div class="btn btn-op" id="btn-add" style="background:#e67e22;">+</div><div class="btn btn-sci-excess" id="btn-pi">π</div>
+            <div class="btn btn-sci" id="btn-cos">cos</div><div class="btn btn-sci" id="btn-tan">tan</div><div class="btn btn-sci" id="btn-pow2">x²</div><div class="btn btn-sci" id="btn-sqrt">√</div><div class="btn btn-op" id="btn-clear">C</div><div class="btn btn" id="btn-7">7</div><div class="btn btn" id="btn-8">8</div><div class="btn btn" id="btn-9">9</div><div class="btn btn-op" id="btn-div" style="background:#e67e22;">/</div><div class="btn btn" id="btn-4">4</div><div class="btn btn" id="btn-5">5</div><div class="btn btn" id="btn-6">6</div><div class="btn btn-op" id="btn-mul" style="background:#e67e22;">*</div><div class="btn btn" id="btn-1">1</div><div class="btn btn" id="btn-2">2</div><div class="btn btn" id="btn-3">3</div><div class="btn btn-op" id="btn-sub" style="background:#e67e22;">-</div>
         </div>
     </div>
 

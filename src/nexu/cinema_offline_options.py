@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from importlib.resources import files
 from pathlib import Path
 from string import Template
@@ -9,6 +10,32 @@ from string import Template
 from .cinema_scripts import apply_spatial_deletes_to_html, finalize_cinema_html
 
 _TRIGGERS = frozenset({"sin", "cos", "tan", "log", "ln"})
+
+_TOKEN_TO_ID: dict[str, str] = {
+    "7": "7",
+    "8": "8",
+    "9": "9",
+    "/": "div",
+    "4": "4",
+    "5": "5",
+    "6": "6",
+    "*": "mul",
+    "1": "1",
+    "2": "2",
+    "3": "3",
+    "-": "sub",
+    "0": "0",
+    ".": "dot",
+    "=": "eq",
+    "+": "add",
+}
+
+_NUMPAD_LAYOUT: tuple[tuple[str, ...], ...] = (
+    ("7", "8", "9", "/"),
+    ("4", "5", "6", "*"),
+    ("1", "2", "3", "-"),
+    ("0", ".", "=", "+"),
+)
 
 
 def _hints_text(hints: list[str]) -> str:
@@ -68,21 +95,67 @@ def _policy_constrained(keep_els: list[str], delete_els: list[str]) -> bool:
     return bool(keep_els or delete_els)
 
 
-def _numpad_rows(cols: int = 4) -> str:
+def _numpad_token_btn(token: str) -> str:
     op_style = "background:#e67e22;"
-    rows = [
-        ("7", "8", "9", "/"),
-        ("4", "5", "6", "*"),
-        ("1", "2", "3", "-"),
-        ("0", ".", "=", "+"),
-    ]
+    cls = "btn-op" if token in "+-*/" else "btn"
+    st = op_style if token in "+-*/" else ("background:#2ecc71;" if token == "=" else "")
+    el_id = _TOKEN_TO_ID.get(token, token.replace(".", "dot").replace("=", "eq"))
+    return _btn(token, el_id, extra_class=cls, style=st)
+
+
+def _numpad_rows(cols: int = 4, *, max_rows: int | None = None) -> str:
+    del cols  # grid column count is chosen by shell, not here
     parts: list[str] = []
-    for row in rows:
+    for i, row in enumerate(_NUMPAD_LAYOUT):
+        if max_rows is not None and i >= max_rows:
+            break
         for token in row:
-            cls = "btn-op" if token in "+-*/" else ("btn" if token != "=" else "btn")
-            st = op_style if token in "+-*/" else ("background:#2ecc71;" if token == "=" else "")
-            el_id = token.replace(".", "dot").replace("=", "eq")
-            parts.append(_btn(token, el_id, extra_class=cls, style=st))
+            parts.append(_numpad_token_btn(token))
+    return "".join(parts)
+
+
+def _numpad_from_policy(keep_els: list[str], *, max_rows: int | None = None) -> str:
+    """Render only KEEP-marked numpad keys when the user marked enough of them."""
+    keep_lower = _keep_ids_lower(keep_els)
+    numpad_ids = {
+        k
+        for k in keep_lower
+        if k.isdigit() or k in _TOKEN_TO_ID.values()
+    }
+    if len(numpad_ids) < 4:
+        return _numpad_rows(max_rows=max_rows)
+    parts: list[str] = []
+    for i, row in enumerate(_NUMPAD_LAYOUT):
+        if max_rows is not None and i >= max_rows:
+            break
+        for token in row:
+            el_id = _TOKEN_TO_ID.get(token, token)
+            if el_id in keep_lower:
+                parts.append(_numpad_token_btn(token))
+    return "".join(parts) if parts else _numpad_rows(max_rows=max_rows)
+
+
+def _policy_screen_text(variant: str, keep_els: list[str]) -> str:
+    trig = _mandatory_trig(keep_els)
+    prefix = {"a": "A", "b": "B", "c": "C"}.get(variant, variant.upper())
+    if trig:
+        return f"12.5 · {prefix} · {','.join(trig)}"
+    return f"12.5 · {prefix}"
+
+
+def _expanded_excess_row(keep_els: list[str]) -> str:
+    keep_lower = _keep_ids_lower(keep_els)
+    defaults = ("EXP", "Mod", "deg", "rad", "pi")
+    if keep_lower:
+        keys = [k for k in defaults if k.lower() in keep_lower or k in keep_lower]
+        if not keys:
+            keys = ["pi"]
+    else:
+        keys = list(defaults)
+    parts: list[str] = []
+    for key in keys:
+        label = "π" if key == "pi" else key
+        parts.append(_btn(label, key, extra_class="btn-sci-excess"))
     return "".join(parts)
 
 
@@ -146,6 +219,71 @@ def _chemical_shell(
 </html>"""
 
 
+def _cinema_is_calculator(cinema_dir: Path) -> bool:
+    active = _active_project_meta(cinema_dir)
+    if str(active.get("kind") or "").lower() == "calculator":
+        return True
+    path = cinema_dir / "stage0.html"
+    if path.is_file() and "calc-body" in path.read_text(encoding="utf-8"):
+        return True
+    return False
+
+
+def _has_stage0(cinema_dir: Path) -> bool:
+    return (cinema_dir / "stage0.html").is_file()
+
+
+def _active_project_meta(cinema_dir: Path) -> dict[str, str]:
+    path = cinema_dir / "active_project.json"
+    if not path.exists():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    if not isinstance(data, dict):
+        return {}
+    return {str(k): str(v) for k, v in data.items() if isinstance(v, str)}
+
+
+def _project_option_label(meta: dict[str, str], variant: str) -> str:
+    kind = meta.get("kind", "project").replace("_", " ")
+    title = {
+        "a": "Option A (project baseline)",
+        "b": f"Option B ({kind} balanced)",
+        "c": f"Option C ({kind} expanded)",
+    }
+    return title[variant]
+
+
+def _write_project_options_from_stages(
+    cinema_dir: Path,
+    *,
+    delete_els: list[str],
+) -> list[str]:
+    """Use active project's stage0/stage1/stage2 as default A-C proposals."""
+    meta = _active_project_meta(cinema_dir)
+    stage_map = [
+        ("stage0.html", "alt_a.html", "a"),
+        ("stage1.html", "alt_b.html", "b"),
+        ("stage2.html", "alt_c.html", "c"),
+    ]
+    labels: list[str] = []
+    for stage_name, alt_name, variant in stage_map:
+        source = cinema_dir / stage_name
+        if not source.exists():
+            source = cinema_dir / "stage0.html"
+        if not source.exists():
+            return []
+        out = finalize_cinema_html(source.read_text(encoding="utf-8"))
+        if delete_els:
+            out, _ = apply_spatial_deletes_to_html(out, delete_els)
+            out = finalize_cinema_html(out)
+        (cinema_dir / alt_name).write_text(out, encoding="utf-8")
+        labels.append(_project_option_label(meta, variant))
+    return labels
+
+
 def _option_shell(
     *,
     title: str,
@@ -153,8 +291,48 @@ def _option_shell(
     screen_text: str,
     grid_cols: int,
     body_buttons: str,
+    skin: str = "standard",
     bg: str = "#0f172a",
 ) -> str:
+    """skin: minimal | standard | expanded — strongly different layouts."""
+    if skin == "minimal":
+        body_css = (
+            "max-width: 58vh; max-height: 100vw; aspect-ratio: 3/4; padding: 8px;"
+            " border: 1px solid rgba(46, 204, 113, 0.35);"
+        )
+        screen_css = "font-size: calc(7px + 1.4vh); min-height: 2em;"
+        grid_gap = "4px"
+        btn_css = (
+            "font-size: calc(5px + 0.75vh); border-radius: 4px;"
+            " border: 1px solid rgba(255,255,255,0.08);"
+        )
+        sci_css = "background: #2ecc71; color: #0f172a;"
+    elif skin == "expanded":
+        body_css = (
+            "max-width: 78vh; max-height: 118vw; aspect-ratio: 4/5; padding: 14px;"
+            " border: 1px solid rgba(167, 139, 250, 0.45);"
+        )
+        screen_css = "font-size: calc(9px + 2vh); min-height: 2.4em;"
+        grid_gap = "10px"
+        btn_css = (
+            "font-size: calc(5px + 0.8vh); border-radius: 50%;"
+            " aspect-ratio: 1; min-height: 0;"
+        )
+        sci_css = "background: #38bdf8; color: #0f172a;"
+    else:
+        body_css = (
+            "max-width: 72vh; max-height: 112vw; aspect-ratio: 4/5; padding: 14px;"
+            " border: 1px solid rgba(56, 189, 248, 0.3);"
+        )
+        screen_css = "font-size: calc(10px + 2vh); min-height: 2.2em;"
+        grid_gap = "8px"
+        btn_css = (
+            "font-size: calc(8px + 1.1vh); border-radius: 8px;"
+            " border: 1px solid rgba(255,255,255,0.1); font-weight: 600;"
+        )
+        sci_css = "background: #38bdf8; color: #0f172a;"
+    variant_label = skin.upper()[:1]
+    badge = f'<span class="variant-badge">Variant {variant_label}</span>'
     return f"""<!DOCTYPE html>
 <html>
 <head>
@@ -170,33 +348,37 @@ def _option_shell(
             display: flex; justify-content: center; align-items: center; user-select: none;
         }}
         .calc-body {{
-            background: #1e293b; border-radius: 12px; padding: 12px;
-            border: 1px solid rgba(255,255,255,0.1);
-            width: 90%; height: 90%; max-width: 75vh; max-height: 115vw;
-            aspect-ratio: 4/5; display: flex; flex-direction: column; box-sizing: border-box;
+            background: #1e293b; border-radius: 12px; width: 90%; height: 90%;
+            display: flex; flex-direction: column; box-sizing: border-box;
+            {body_css}
         }}
         .screen {{
-            background: #0f172a; color: {accent}; font-size: calc(8px + 1.8vh);
-            text-align: right; padding: 8px; border-radius: 6px; margin-bottom: 8px;
+            background: #0f172a; color: {accent}; text-align: right;
+            padding: 8px; border-radius: 6px; margin-bottom: 8px;
+            {screen_css}
+        }}
+        .variant-badge {{
+            display: block; font-size: 0.65em; opacity: 0.75; text-align: left;
+            margin-bottom: 4px; letter-spacing: 0.05em;
         }}
         .grid {{
             display: grid; grid-template-columns: repeat({grid_cols}, 1fr);
-            grid-auto-rows: 1fr; gap: 6px; flex: 1;
+            grid-auto-rows: 1fr; gap: {grid_gap}; flex: 1;
         }}
         .btn {{
             background: rgba(255,255,255,0.05); color: #fff;
-            font-size: calc(6px + 0.9vh); border-radius: 6px;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; user-select: none;
+            {btn_css}
         }}
-        .btn-sci {{ background: #38bdf8; color: #0f172a; font-weight: bold; }}
+        .btn-sci {{ {sci_css} font-weight: bold; }}
         .btn-op {{ background: #e67e22; color: #fff; font-weight: bold; }}
         .btn-sci-excess {{ background: #818cf8; color: #fff; font-weight: bold; }}
     </style>
 </head>
 <body>
-    <div class="calc-body">
-        <div class="screen" id="screen">{screen_text}</div>
+    <div class="calc-body" data-variant="{skin}">
+        <div class="screen" id="screen">{badge}{screen_text}</div>
         <div class="grid">
             {body_buttons}
         </div>
@@ -209,38 +391,48 @@ def build_policy_scientific_option_html(variant: str, keep_els: list[str]) -> st
     """
     Build alt_a/b/c from Intract policy KEEP/DELETE (must-have controls in every variant).
     """
-    keep_lower = _keep_ids_lower(keep_els)
     trig = _trig_row(keep_els)
+    screen = _policy_screen_text(variant, keep_els)
     if variant == "a":
-        body = trig + _numpad_rows(4)
+        util = (
+            _btn("x²", "pow2", extra_class="btn-sci")
+            + _btn("√", "sqrt", extra_class="btn-sci")
+            + _btn("C", "clear", extra_class="btn-op")
+        )
+        body = trig + util + _numpad_from_policy(keep_els, max_rows=3)
         return _option_shell(
             title="Option A (minimal)",
             accent="#2ecc71",
-            screen_text="12.5",
-            grid_cols=4,
+            screen_text=screen,
+            grid_cols=3,
             body_buttons=body,
+            skin="minimal",
         )
     if variant == "b":
-        body = trig + _numpad_rows(4)
+        header = (
+            _btn("C", "clear", extra_class="btn-op", style="grid-column: span 2;")
+            + _btn("(", "lp", extra_class="btn-op")
+            + _btn(")", "rp", extra_class="btn-op")
+        )
+        body = trig + header + _numpad_from_policy(keep_els)
         return _option_shell(
             title="Option B (standard)",
             accent="#38bdf8",
-            screen_text="12.5",
+            screen_text=screen,
             grid_cols=4,
             body_buttons=body,
+            skin="standard",
         )
-    extras = ""
-    if "pi" in keep_lower:
-        extras += _btn("π", "pi", extra_class="btn-sci-excess")
-    if "exp" in keep_lower:
-        extras += _btn("EXP", "EXP", extra_class="btn-sci-excess")
-    body = trig + extras + _numpad_rows(5)
+    excess = _expanded_excess_row(keep_els)
+    numpad_c = _numpad_from_policy(keep_els) + _btn("π", "pi", extra_class="btn-sci-excess")
+    body = trig + excess + numpad_c
     return _option_shell(
         title="Option C (expanded)",
         accent="#a78bfa",
-        screen_text="12.5",
+        screen_text=screen,
         grid_cols=5,
         body_buttons=body,
+        skin="expanded",
         bg="#090d16",
     )
 
@@ -318,13 +510,20 @@ def write_goal_options_offline(
     labels: list[str] = []
     use_chemical = is_chemical_goal(hint_list)
     use_policy = _policy_constrained(keep, delete)
+    use_calculator = _cinema_is_calculator(cinema_dir)
+    use_project_stages = not use_calculator and not use_chemical and _has_stage0(cinema_dir)
+    use_scientific = use_policy or (use_calculator and not use_chemical)
+    if use_project_stages:
+        labels = _write_project_options_from_stages(cinema_dir, delete_els=delete)
+        if labels:
+            return labels
     if use_chemical:
         mapping = [
             ("alt_a.html", "a", "Option A (chemical minimal)"),
             ("alt_b.html", "b", "Option B (chemical balanced)"),
             ("alt_c.html", "c", "Option C (chemical expanded)"),
         ]
-    elif use_policy:
+    elif use_scientific:
         mapping = [
             ("alt_a.html", "a", "Option A (minimal)"),
             ("alt_b.html", "b", "Option B (standard)"),
@@ -339,7 +538,7 @@ def write_goal_options_offline(
     for filename, variant, label in mapping:
         if use_chemical:
             html = build_chemical_option_html(variant, keep)
-        elif use_policy:
+        elif use_scientific:
             html = build_policy_scientific_option_html(variant, keep)
         else:
             tmpl = f"alt_{variant}.html.tmpl"
@@ -350,4 +549,14 @@ def write_goal_options_offline(
             out = finalize_cinema_html(out)
         (cinema_dir / filename).write_text(out, encoding="utf-8")
         labels.append(label)
+    alt_b = cinema_dir / "alt_b.html"
+    alt_c = cinema_dir / "alt_c.html"
+    if labels and alt_b.is_file():
+        (cinema_dir / "stage1.html").write_text(
+            alt_b.read_text(encoding="utf-8"), encoding="utf-8"
+        )
+    if labels and alt_c.is_file():
+        (cinema_dir / "stage2.html").write_text(
+            alt_c.read_text(encoding="utf-8"), encoding="utf-8"
+        )
     return labels

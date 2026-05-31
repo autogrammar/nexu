@@ -4,6 +4,9 @@
     <title>Nexu — Projects · Editor · Services</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
+        * {
+            box-sizing: border-box;
+        }
         body {
             margin: 0;
             background: #05070c;
@@ -303,7 +306,8 @@
             flex-direction: column;
         }
         .main-container {
-            display: flex;
+            display: grid;
+            grid-template-columns: minmax(560px, 1fr) minmax(300px, 24vw) minmax(320px, 24vw);
             flex: 1;
             min-height: 0;
             overflow: hidden;
@@ -451,16 +455,15 @@
         
         /* Left Column: Active Workspace (Window 1) */
         .active-column {
-            flex: 1;
             display: flex;
             flex-direction: column;
             padding: 15px;
             overflow: hidden;
+            min-width: 0;
         }
         
         /* Middle Column: Stacked Options A, B, C (Windows 2-4) */
         .options-column {
-            width: 320px;
             display: flex;
             flex-direction: column;
             gap: 12px;
@@ -469,6 +472,7 @@
             border-right: 1px solid rgba(255,255,255,0.08);
             background: rgba(2, 6, 23, 0.4);
             overflow: hidden;
+            min-width: 0;
         }
         
         .panel {
@@ -513,6 +517,13 @@
             align-items: center;
             border-bottom: 1px solid rgba(255,255,255,0.05);
             z-index: 200;
+            gap: 8px;
+        }
+        .panel-header span:first-child {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         .panel-body {
             flex: 1;
@@ -536,12 +547,13 @@
         
         /* Right Column: Chat & Feedback Controls */
         .side-panel {
-            width: 380px;
             background: #05070c;
             display: flex;
             flex-direction: column;
             padding: 15px;
             overflow-y: auto;
+            overflow-x: hidden;
+            min-width: 0;
         }
         .side-header {
             color: #94a3b8;
@@ -755,6 +767,16 @@
         .intract-policy-panel.collapsed .intract-policy-actions,
         .intract-policy-panel.collapsed .intract-policy-meta { display: none; }
         .btn-action:disabled { opacity: 0.45; cursor: not-allowed; }
+        @media (max-width: 1280px) {
+            .main-container {
+                grid-template-columns: minmax(500px, 1fr) minmax(280px, 25vw) minmax(300px, 27vw);
+            }
+            .active-column,
+            .options-column,
+            .side-panel {
+                padding: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -813,11 +835,11 @@
 
     <div id="editor-app-shell" class="editor-app-shell" hidden>
     <div class="workflow-guide" id="workflow-guide">
-        <div class="wf-step active" id="wf-step-1"><strong>1. Goal</strong>Describe what you want (e.g. chemical calculator).</div>
-        <div class="wf-step" id="wf-step-2"><strong>2. Options A–C</strong>AI generates three variants — workspace unchanged.</div>
-        <div class="wf-step" id="wf-step-3"><strong>3. Promote &amp; refine</strong>Tap each control → ✓ keep or ✗ remove (like Tinder).</div>
+        <div class="wf-step active" id="wf-step-1"><strong>1. Goal or marks</strong>Describe intent or drag on workspace (keep/remove).</div>
+        <div class="wf-step" id="wf-step-2"><strong>2. Options A–C</strong>Refreshed live after each change — workspace unchanged.</div>
+        <div class="wf-step" id="wf-step-3"><strong>3. Promote</strong>Click A, B, or C → refine with more marks or goals.</div>
     </div>
-    <div class="workflow-hint" id="workflow-hint">Start with step 1: add your goal, then click the action button below.</div>
+    <div class="workflow-hint" id="workflow-hint">Each goal or mark sends feedback to AI and updates Options A–C within a moment.</div>
     
     <div class="workspace-shell">
     <div class="main-container">
@@ -874,7 +896,7 @@
         <div class="side-panel">
             <div class="side-header">💬 Live Chat & Automated Logs</div>
             <div class="chat-logs" id="chat-logs">
-                <div class="chat-msg system"><strong>System:</strong> <strong>Step 1:</strong> add your goal below → generate <strong>Options A–C</strong> → click one to promote → drag on workspace buttons to refine.</div>
+                <div class="chat-msg system"><strong>System:</strong> Type a goal or drag on the workspace — <strong>Options A–C</strong> refresh automatically. Click A/B/C to promote, then keep marking to get the next three variants.</div>
             </div>
 
             <div class="side-header">1. Your goal</div>
@@ -892,8 +914,8 @@
             <div class="side-header">Summary for AI</div>
             <div class="prompt-box" id="prompt-box">Add a goal to begin.</div>
             
-            <button class="btn btn-action" id="action-btn" style="margin-top: 15px; width: 100%;" disabled onclick="runLiveIteration()">
-                Add a goal first
+            <button class="btn btn-action" id="action-btn" style="margin-top: 15px; width: 100%;" disabled onclick="runLiveIteration({ manual: true })">
+                Add a goal or mark to start
             </button>
         </div>
     </div>
@@ -1439,8 +1461,8 @@
             }
         }
 
-        function reloadCinemaFrames() {
-            const t = Date.now();
+        function reloadCinemaFrames(stamp) {
+            const t = stamp != null ? stamp : Date.now();
             const ws = {
                 role: 'workspace',
                 active: true,
@@ -1669,6 +1691,18 @@
         }, true);
 
         let isIterating = false;
+        let pendingAutoIterate = false;
+        let autoIterateTimer = null;
+        const AUTO_ITERATE_MS = 420;
+
+        function scheduleAutoIteration(reason) {
+            if (autoIterateTimer) clearTimeout(autoIterateTimer);
+            autoIterateTimer = setTimeout(() => {
+                autoIterateTimer = null;
+                if (resolveIterationMode() === 'none') return;
+                runLiveIteration({ auto: true, reason: reason || 'activity' });
+            }, AUTO_ITERATE_MS);
+        }
 
         // Ultimate cross-origin postMessage listener
         window.addEventListener('message', (e) => {
@@ -1712,26 +1746,30 @@
                 const el = document.getElementById('wf-step-' + n);
                 if (el) el.classList.remove('active', 'done');
             });
-            if ((pendingGoalOptions && !workspaceEngaged) || (mode === 'goal_options' && userHints.length > 0 && !workspaceEngaged)) {
+            if (mode === 'goal_options') {
                 document.getElementById('wf-step-1')?.classList.add('done');
                 document.getElementById('wf-step-2')?.classList.add('active');
-                if (btn) { btn.disabled = isIterating; btn.innerText = '✨ Generate Options A–C'; }
-                if (hintEl) hintEl.textContent = 'Step 2: AI fills Options A–C. Your workspace (left) stays as-is until you promote.';
-            } else if (mode === 'active_workspace') {
-                document.getElementById('wf-step-1')?.classList.add('done');
-                document.getElementById('wf-step-2')?.classList.add('done');
-                document.getElementById('wf-step-3')?.classList.add('active');
-                if (btn) { btn.disabled = isIterating; btn.innerText = '🔧 Apply marks to workspace'; }
-                if (hintEl) hintEl.textContent = 'Step 3: apply your keep/remove marks to the workspace only.';
-            } else if (userHints.length > 0) {
-                document.getElementById('wf-step-1')?.classList.add('done');
-                document.getElementById('wf-step-2')?.classList.add('active');
-                if (btn) { btn.disabled = isIterating; btn.innerText = '✨ Regenerate Options A–C'; }
-                if (hintEl) hintEl.textContent = 'Regenerate Options A–C from your saved goals.';
+                if (workspaceEngaged) {
+                    document.getElementById('wf-step-3')?.classList.add('active');
+                }
+                if (btn) {
+                    btn.disabled = isIterating;
+                    btn.innerText = isIterating ? '⏳ Updating A–C…' : '↻ Refresh Options A–C now';
+                }
+                if (hintEl) {
+                    hintEl.textContent = isIterating
+                        ? 'Sending your latest marks and goals to AI…'
+                        : 'Options A–C update after each goal or mark. Promote one to change the workspace.';
+                }
             } else {
                 document.getElementById('wf-step-1')?.classList.add('active');
-                if (btn) { btn.disabled = true; btn.innerText = 'Add a goal first'; }
-                if (hintEl) hintEl.textContent = 'Step 1: describe what you want, click Add goal, then use the button here.';
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerText = isIterating ? '⏳ Working…' : 'Add a goal or mark to start';
+                }
+                if (hintEl) {
+                    hintEl.textContent = 'Type a goal (Enter or Add goal) or drag on workspace buttons to start live options.';
+                }
             }
         }
 
@@ -1745,12 +1783,8 @@
         }
 
         function resolveIterationMode() {
-            const deletes = annotations.filter(a => a.type === 'DELETE');
-            const keeps = annotations.filter(a => a.type === 'KEEP');
-            if (deletes.length > 0 || keeps.length > 0) return 'active_workspace';
-            if (pendingGoalOptions && !workspaceEngaged) return 'goal_options';
-            if (userHints.length > 0 && !workspaceEngaged) return 'goal_options';
-            if (userHints.length > 0) return 'goal_options';
+            if (userHints.length > 0 || annotations.length > 0) return 'goal_options';
+            if (pendingGoalOptions) return 'goal_options';
             return 'none';
         }
 
@@ -1765,15 +1799,12 @@
             updateFeedbackList();
             syncAllIframeVisuals();
             addChatLog('user', hint);
-            if (workspaceEngaged) {
-                addChatLog('system', '🧭 <strong>Goal saved.</strong> Keep marking the workspace (✓/✗), then <strong>Apply marks to workspace</strong>.');
-            } else {
-                addChatLog('system', '🧭 <strong>Goal saved.</strong> Click <strong>Generate Options A–C</strong> — workspace unchanged until you promote.');
-            }
+            addChatLog('system', '🧭 <strong>Goal saved.</strong> Updating Options A–C…');
             logEvent('USER_HINT', hint.length > 180 ? hint.slice(0, 180) + '...' : hint);
             input.value = '';
             updatePromptBox();
             updateWorkflowUI();
+            scheduleAutoIteration('hint');
         }
 
         function switchStage(stageNum) {
@@ -1826,6 +1857,7 @@
             updatePromptBox();
             updateWorkflowUI();
             updatePlayerUrl();
+            scheduleAutoIteration('mark');
         }
 
         function syncReviewModeToFrames() {
@@ -1958,7 +1990,7 @@
                 pendingGoalOptions = false;
                 workspaceEngaged = true;
                 syncReviewModeToFrames();
-                addChatLog('system', `🌟 <strong>Promoted ${optName} → workspace saved.</strong> Drag to mark (left = keep, right = remove), then Apply marks. You can add or change goals without losing marks.`);
+                addChatLog('system', `🌟 <strong>Promoted ${optName} → workspace saved.</strong> Drag or add goals — Options A–C refresh automatically.`);
                 updateWorkflowUI();
                 refreshHistory();
                 logEvent('PROMOTE', `Option: ${optName} | Source: ${altFile} | Stage: S${activeStage}`);
@@ -1968,28 +2000,36 @@
             });
         }
 
-        function runLiveIteration() {
-            if (isIterating) return; // Prevent concurrent iterations
+        function runLiveIteration(opts) {
+            opts = opts || {};
+            if (isIterating) {
+                if (opts.auto) pendingAutoIterate = true;
+                return;
+            }
             isIterating = true;
 
             const promptBox = document.getElementById('prompt-box');
             const actionBtn = document.getElementById('action-btn');
             
             const iterationMode = resolveIterationMode();
-            if (iterationMode === 'active_workspace') {
-                addChatLog('system', '🔧 <strong>Applying your marks to the workspace…</strong>');
-            } else if (iterationMode === 'goal_options') {
-                addChatLog('system', '✨ <strong>Generating Options A–C from your goal…</strong> (workspace unchanged)');
+            if (iterationMode === 'goal_options') {
+                if (!opts.auto) {
+                    addChatLog('system', '✨ <strong>Refreshing Options A–C…</strong> (workspace unchanged)');
+                }
             } else {
-                addChatLog('system', '⚠️ <strong>Add a goal, or mark buttons in the workspace after promoting an option.</strong>');
+                if (!opts.auto) {
+                    addChatLog('system', '⚠️ <strong>Add a goal, or mark buttons on the workspace.</strong>');
+                }
                 isIterating = false;
                 updateWorkflowUI();
                 return;
             }
-            logEvent('ITERATION_STARTED', `mode=${iterationMode} spatial=${annotations.length} hints=${userHints.length}`);
+            logEvent('ITERATION_STARTED', `mode=${iterationMode} auto=${!!opts.auto} spatial=${annotations.length} hints=${userHints.length}`);
             
-            actionBtn.disabled = true;
-            actionBtn.innerText = '⏳ Working…';
+            if (actionBtn) {
+                actionBtn.disabled = true;
+                actionBtn.innerText = '⏳ Updating A–C…';
+            }
             updateWorkflowUI();
 
             const runIterate = () => fetch('/iterate', {
@@ -2013,6 +2053,8 @@
             .then(data => {
                 isIterating = false;
                 updateWorkflowUI();
+                const rerun = pendingAutoIterate;
+                pendingAutoIterate = false;
                 
                 lastIteration = {
                     at: new Date().toISOString(),
@@ -2030,11 +2072,13 @@
                     document.getElementById('wf-step-2')?.classList.add('done');
                     document.getElementById('wf-step-3')?.classList.add('active');
                     const offlineNote = data.status === 'proposed_options_offline'
-                        ? ' (offline chemical templates — LLM disabled)'
+                        ? ' (offline templates — LLM disabled)'
                         : '';
-                    addChatLog('system', `✨ <strong>Options ready (${opts}).</strong>${offlineNote} Click Option A, B, or C to promote — H/O/C/N element keys in chemical variants.`);
+                    if (!opts.auto) {
+                        addChatLog('system', `✨ <strong>Options ready (${opts}).</strong>${offlineNote} Click A, B, or C to promote.`);
+                    }
                     logEvent('ITERATION_OPTIONS', `status=${data.status} options=${opts}`);
-                    reloadCinemaFrames();
+                    reloadCinemaFrames(data.options_stamp);
                     refreshHistory();
                 } else if (data.status === 'evolved_by_llm' || data.status === 'evolved_by_spatial_patch') {
                     const removed = (data.spatial_removed || []).join(', ');
@@ -2075,9 +2119,13 @@
                         });
                     }
                 }
+                if (rerun) {
+                    scheduleAutoIteration('queued');
+                }
             })
             .catch(err => {
                 isIterating = false;
+                pendingAutoIterate = false;
                 updateWorkflowUI();
                 const msg = String(err.message || err);
                 if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) {
@@ -2333,6 +2381,15 @@
         document.addEventListener('DOMContentLoaded', () => {
             switchMainTab(mainTab, { skipLog: true });
             updateWorkflowUI();
+            const hintInput = document.getElementById('hint-input');
+            if (hintInput) {
+                hintInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        addUserHint();
+                    }
+                });
+            }
         });
     </script>
 </body>

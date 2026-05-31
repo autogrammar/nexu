@@ -4,6 +4,9 @@
     <title>Nexu — Projects · Editor · Services</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
+        * {
+            box-sizing: border-box;
+        }
         body {
             margin: 0;
             background: #05070c;
@@ -303,7 +306,8 @@
             flex-direction: column;
         }
         .main-container {
-            display: flex;
+            display: grid;
+            grid-template-columns: minmax(560px, 1fr) minmax(300px, 24vw) minmax(320px, 24vw);
             flex: 1;
             min-height: 0;
             overflow: hidden;
@@ -451,16 +455,15 @@
         
         /* Left Column: Active Workspace (Window 1) */
         .active-column {
-            flex: 1;
             display: flex;
             flex-direction: column;
             padding: 15px;
             overflow: hidden;
+            min-width: 0;
         }
         
         /* Middle Column: Stacked Options A, B, C (Windows 2-4) */
         .options-column {
-            width: 320px;
             display: flex;
             flex-direction: column;
             gap: 12px;
@@ -469,6 +472,7 @@
             border-right: 1px solid rgba(255,255,255,0.08);
             background: rgba(2, 6, 23, 0.4);
             overflow: hidden;
+            min-width: 0;
         }
         
         .panel {
@@ -513,6 +517,13 @@
             align-items: center;
             border-bottom: 1px solid rgba(255,255,255,0.05);
             z-index: 200;
+            gap: 8px;
+        }
+        .panel-header span:first-child {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         .panel-body {
             flex: 1;
@@ -536,12 +547,13 @@
         
         /* Right Column: Chat & Feedback Controls */
         .side-panel {
-            width: 380px;
             background: #05070c;
             display: flex;
             flex-direction: column;
             padding: 15px;
             overflow-y: auto;
+            overflow-x: hidden;
+            min-width: 0;
         }
         .side-header {
             color: #94a3b8;
@@ -755,6 +767,16 @@
         .intract-policy-panel.collapsed .intract-policy-actions,
         .intract-policy-panel.collapsed .intract-policy-meta { display: none; }
         .btn-action:disabled { opacity: 0.45; cursor: not-allowed; }
+        @media (max-width: 1280px) {
+            .main-container {
+                grid-template-columns: minmax(500px, 1fr) minmax(280px, 25vw) minmax(300px, 27vw);
+            }
+            .active-column,
+            .options-column,
+            .side-panel {
+                padding: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1439,8 +1461,8 @@
             }
         }
 
-        function reloadCinemaFrames() {
-            const t = Date.now();
+        function reloadCinemaFrames(stamp) {
+            const t = stamp != null ? stamp : Date.now();
             const ws = {
                 role: 'workspace',
                 active: true,
@@ -2056,7 +2078,7 @@
                         addChatLog('system', `✨ <strong>Options ready (${opts}).</strong>${offlineNote} Click A, B, or C to promote.`);
                     }
                     logEvent('ITERATION_OPTIONS', `status=${data.status} options=${opts}`);
-                    reloadCinemaFrames();
+                    reloadCinemaFrames(data.options_stamp);
                     refreshHistory();
                 } else if (data.status === 'evolved_by_llm' || data.status === 'evolved_by_spatial_patch') {
                     const removed = (data.spatial_removed || []).join(', ');

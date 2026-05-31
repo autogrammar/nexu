@@ -30,6 +30,16 @@ class IntentContract:
         return self.contract_id or self.intent or self.raw
 
 
+def format_intract_v1_line(contract: IntentContract) -> str:
+    meaning = contract.meaning.replace('"', "'") if contract.meaning else ""
+    meaning_part = f' meaning:"{meaning}"' if meaning else ""
+    return (
+        f"@intract.v1 id:{contract.contract_id} scope:{contract.scope} "
+        f"intent:{contract.intent} priority:{contract.priority} domain:{contract.domain}"
+        f"{meaning_part}"
+    )
+
+
 def _split_csv(value: str) -> list[str]:
     if value.lower() in {"", "none", "null", "-"}:
         return []
@@ -55,7 +65,12 @@ def _tokenize_contract(line: str) -> dict[str, str]:
     return fields
 
 
-def parse_intract_line(line: str, *, source: str = "", line_number: int = 0) -> IntentContract | None:
+def parse_intract_line(
+    line: str,
+    *,
+    source: str = "",
+    line_number: int = 0,
+) -> IntentContract | None:
     if "@intract.v1" not in line:
         return None
     fields = _tokenize_contract(line)

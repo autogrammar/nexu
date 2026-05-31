@@ -238,10 +238,22 @@ def sync_option_previews_from_workspace(
 def enforce_deletes_on_option_previews(
     cinema_dir: Path,
     delete_ids: list[str],
+    *,
+    session_keep: list[str] | None = None,
+    session_delete: list[str] | None = None,
 ) -> dict[str, Any]:
-    """Apply policy DELETE list to existing alt_a/b/c without replacing from workspace."""
-    if not delete_ids:
-        return {"status": "options_unchanged", "files": []}
+    """Apply policy DELETE list to existing alt_a/b/c without replacing from workspace.
+
+    Session lists override ledger when both are passed (e.g. re-KEEP after DELETE).
+    """
+    _keep, effective_delete = merge_ui_constraint_lists(
+        ledger_keep=[],
+        ledger_delete=list(delete_ids),
+        session_keep=list(session_keep or []),
+        session_delete=list(session_delete or []),
+    )
+    if not effective_delete:
+        return {"status": "options_unchanged", "files": [], "delete_ids": []}
 
     touched: list[str] = []
     all_removed: list[str] = []
@@ -250,7 +262,7 @@ def enforce_deletes_on_option_previews(
         if not path.exists():
             continue
         html = path.read_text(encoding="utf-8")
-        patched, removed = apply_spatial_deletes_to_html(html, delete_ids)
+        patched, removed = apply_spatial_deletes_to_html(html, effective_delete)
         if not removed:
             continue
         path.write_text(finalize_cinema_html(patched), encoding="utf-8")
@@ -261,7 +273,7 @@ def enforce_deletes_on_option_previews(
         "status": "options_patched",
         "files": touched,
         "spatial_removed": sorted(set(all_removed)),
-        "delete_ids": list(delete_ids),
+        "delete_ids": effective_delete,
     }
 
 

@@ -8,6 +8,7 @@ import json
 import csv
 import mimetypes
 import subprocess
+import time
 from pathlib import Path
 from datetime import datetime
 
@@ -415,12 +416,20 @@ def _sync_option_previews(stage: int, delete_els: list | None = None) -> dict:
     return nexu_hooks.sync_option_previews(stage, delete_els)
 
 
-def _patch_option_previews(stage: int = 0) -> dict:
+def _patch_option_previews(
+    stage: int = 0,
+    session_keep: list | None = None,
+    session_delete: list | None = None,
+) -> dict:
     try:
         import nexu_hooks
     except ImportError:
         return {}
-    return nexu_hooks.patch_option_previews(stage)
+    return nexu_hooks.patch_option_previews(
+        stage,
+        session_keep=session_keep,
+        session_delete=session_delete,
+    )
 
 
 def _projects_catalog() -> dict:
@@ -1144,11 +1153,22 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                     writer.writerow([datetime.now().isoformat(), 'ITERATION_LLM', f"Stage: {current_stage} | Status: {status_msg} | Keep: {len(keep_els)} | Delete: {len(delete_els)}" ])
 
                 options_sync = None
-                if status_msg in ('evolved_by_spatial_patch', 'evolved_by_llm') or (
+                if status_msg in ('proposed_options_offline', 'proposed_options_by_llm') and options_written:
+                    # Fresh alts already reflect merged keep/delete; ledger-only patch
+                    # would strip re-marked keys (e.g. digit 5 after DELETE then KEEP).
+                    options_sync = {
+                        "status": "options_fresh",
+                        "files": list(options_written or []),
+                    }
+                elif status_msg in ('evolved_by_spatial_patch', 'evolved_by_llm') or (
                     status_msg in ('proposed_options_by_llm', 'proposed_options_offline')
                     and options_written
                 ):
-                    options_sync = _patch_option_previews(current_stage)
+                    options_sync = _patch_option_previews(
+                        current_stage,
+                        session_keep=session_keep,
+                        session_delete=session_delete,
+                    )
 
                 policy_entry = None
                 intract_validation = None
@@ -1196,6 +1216,7 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                     "session_keep": session_keep,
                     "session_delete": session_delete,
                     "options_written": options_written,
+                    "options_stamp": int(time.time() * 1000) if options_written else None,
                     "spatial_removed": spatial_removed,
                     "error": llm_error,
                     "policy_updated": policy_entry is not None,
