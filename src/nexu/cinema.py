@@ -4,6 +4,148 @@ import json
 from pathlib import Path
 from .paths import capsule_dir
 
+def start_persistent_http_server(directory: Path, root: Path, name: str) -> int:
+    """Starts a persistent custom background HTTP server that logs transactions and runs iterations."""
+    import socket
+    import subprocess
+    import sys
+    
+    server_script = f"""import http.server
+import socketserver
+import sys
+import json
+import csv
+import mimetypes
+import subprocess
+from pathlib import Path
+from datetime import datetime
+
+# Force correct MIME types and UTF-8 charsets for clean encoding
+mimetypes.add_type("text/html; charset=utf-8", ".html")
+mimetypes.add_type("application/javascript; charset=utf-8", ".js")
+mimetypes.add_type("text/css; charset=utf-8", ".css")
+
+PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8080
+DIRECTORY = Path(__file__).parent.absolute()
+LOG_CSV = DIRECTORY / "log.csv"
+
+WORKSPACE_PATH = {repr(str(root.absolute()))}
+CAPSULE_NAME = {repr(name)}
+SYS_EXE = {repr(sys.executable)}
+
+class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, directory=str(DIRECTORY), **kwargs)
+
+    def do_POST(self):
+        if self.path == '/log':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            try:
+                data = json.loads(post_data.decode('utf-8', errors='replace'))
+                timestamp = datetime.now().isoformat()
+                action = data.get('action', 'unknown')
+                details = data.get('details', '')
+                
+                # Append to CSV log using robust UTF-8 encoding
+                file_exists = LOG_CSV.exists()
+                with open(LOG_CSV, mode='a', newline='', encoding='utf-8') as f:
+                    writer = csv.writer(f)
+                    if not file_exists:
+                        writer.writerow(['timestamp', 'action', 'details'])
+                    writer.writerow([timestamp, action, details])
+                
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json; charset=utf-8')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(json.dumps({{"status": "logged"}}).encode('utf-8'))
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.end_headers()
+                self.wfile.write(str(e).encode('utf-8'))
+                return
+                
+        elif self.path == '/iterate':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            try:
+                data = json.loads(post_data.decode('utf-8', errors='replace'))
+                prompt = data.get('prompt', '')
+                current_stage = int(data.get('current_stage', 0))
+                
+                # Formulate spatial evolution goal
+                goal = f"Evolution step. Spatial feedback: {{prompt}}"
+                
+                # Execute nexu capsule iterate command using same executable
+                cmd = [
+                    SYS_EXE, "-m", "nexu.cli", "capsule", "iterate", CAPSULE_NAME,
+                    "--steps", "1",
+                    "--goal", goal,
+                    "--cinema",
+                    "--path", WORKSPACE_PATH
+                ]
+                
+                process = subprocess.run(cmd, capture_output=True, text=True)
+                
+                # Append iteration trigger to CSV log
+                file_exists = LOG_CSV.exists()
+                with open(LOG_CSV, mode='a', newline='', encoding='utf-8') as f:
+                    writer = csv.writer(f)
+                    if not file_exists:
+                        writer.writerow(['timestamp', 'action', 'details'])
+                    writer.writerow([datetime.now().isoformat(), 'ITERATION_TRIGGERED', f"Stage: {{current_stage}} | Result: {{process.returncode}}"])
+                
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json; charset=utf-8')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(json.dumps({{
+                    "status": "success",
+                    "new_stage": current_stage + 1,
+                    "stdout": process.stdout,
+                    "stderr": process.stderr
+                }}).encode('utf-8'))
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.end_headers()
+                self.wfile.write(str(e).encode('utf-8'))
+                return
+                
+        super().do_POST()
+
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.end_headers()
+
+socketserver.TCPServer.allow_reuse_address = True
+with socketserver.TCPServer(('127.0.0.1', PORT), CustomHTTPRequestHandler) as httpd:
+    httpd.serve_forever()
+"""
+    (directory / "server.py").write_text(server_script, encoding="utf-8")
+
+    # Find a free port in the range 8080-8095
+    for port in range(8080, 8095):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            try:
+                s.bind(('127.0.0.1', port))
+                s.close()
+                
+                cmd = [
+                    sys.executable, str(directory / "server.py"), str(port)
+                ]
+                # Spawn a completely detached process
+                subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+                return port
+            except OSError:
+                continue
+    return 8080
+
 def generate_cinema_player(root: Path, name: str) -> Path:
     """
     Natively generates the Interactive Cinema Player for a capsule.
@@ -16,44 +158,132 @@ def generate_cinema_player(root: Path, name: str) -> Path:
     cinema_dir = base / "cinema"
     cinema_dir.mkdir(parents=True, exist_ok=True)
     
-    # Combined shield and communication script to inject into every child iframe
+    # Combined marquee bounding box selection script to inject into every child iframe
     shield_script = """
     <script>
-        // Combined unified contextmenu listener to prevent starvation
+        console.log("[NEXU CHILD] IFrame loaded: " + window.location.pathname);
+
+        // Dynamically inject marquee selection styles
+        const style = document.createElement('style');
+        style.innerHTML = `
+            .selection-box {
+                position: fixed;
+                border: 2px dashed #2ed573;
+                background: rgba(46, 213, 115, 0.15);
+                pointer-events: none;
+                z-index: 99999;
+                display: none;
+                border-radius: 4px;
+                box-shadow: 0 0 8px rgba(46, 213, 115, 0.3);
+            }
+            .selection-box.delete {
+                border-color: #ff4757;
+                background: rgba(255, 71, 87, 0.15);
+                box-shadow: 0 0 8px rgba(255, 71, 87, 0.3);
+            }
+        `;
+        document.head.appendChild(style);
+
+        let selectionBox = null;
+        let isDrawing = false;
+        let startX = 0, startY = 0;
+        let selectionType = 'KEEP';
+
+        // Lazy initialize the selection box element
+        function getSelectionBox() {
+            if (!selectionBox) {
+                selectionBox = document.createElement('div');
+                selectionBox.className = 'selection-box';
+                document.body.appendChild(selectionBox);
+            }
+            return selectionBox;
+        }
+
+        // Globally block context menu popup
         document.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            
-            const btn = e.target.closest('.btn, .btn-sci, .btn-sci-excess, .screen');
-            if (btn) {
-                const elementId = btn.innerText.trim() || btn.id;
-                window.parent.postMessage({
-                    type: 'annotation',
-                    elementId: elementId,
-                    action: 'DELETE'
-                }, '*');
-            }
         }, true);
 
-        // Send left clicks directly to parent using postMessage (bypasses file:// sandbox)
-        document.addEventListener('click', (e) => {
-            // Securely determine active workspace status via location search
+        // Mouse Drag Bounding Box Multi-Selection Engine
+        document.addEventListener('mousedown', (e) => {
             const isActiveWorkspace = window.location.search.includes('active=true');
+            if (!isActiveWorkspace) return;
+
+            if (e.button === 0) {
+                selectionType = 'KEEP';
+            } else if (e.button === 2) {
+                selectionType = 'DELETE';
+            } else {
+                return;
+            }
+
+            isDrawing = true;
+            startX = e.clientX;
+            startY = e.clientY;
+
+            const box = getSelectionBox();
+            box.className = 'selection-box' + (selectionType === 'DELETE' ? ' delete' : '');
+            box.style.left = startX + 'px';
+            box.style.top = startY + 'px';
+            box.style.width = '0px';
+            box.style.height = '0px';
+            box.style.display = 'block';
             
-            if (isActiveWorkspace) {
-                const btn = e.target.closest('.btn, .btn-sci, .btn-sci-excess, .screen');
-                if (btn) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const elementId = btn.innerText.trim() || btn.id;
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDrawing) return;
+
+            const currentX = e.clientX;
+            const currentY = e.clientY;
+
+            const x = Math.min(startX, currentX);
+            const y = Math.min(startY, currentY);
+            const width = Math.abs(startX - currentX);
+            const height = Math.abs(startY - currentY);
+
+            const box = getSelectionBox();
+            box.style.left = x + 'px';
+            box.style.top = y + 'px';
+            box.style.width = width + 'px';
+            box.style.height = height + 'px';
+        });
+
+        document.addEventListener('mouseup', (e) => {
+            if (!isDrawing) return;
+            isDrawing = false;
+            
+            const box = getSelectionBox();
+            const rect = box.getBoundingClientRect(); // Get viewport-relative rect first!
+            box.style.display = 'none'; // Hide it after!
+
+            const isSingleClick = rect.width < 8 && rect.height < 8;
+
+            const elements = document.querySelectorAll('.btn, .btn-sci, .btn-sci-excess, .screen');
+            elements.forEach(el => {
+                const elRect = el.getBoundingClientRect();
+                const intersects = !(elRect.right < rect.left || 
+                                     elRect.left > rect.right || 
+                                     elRect.bottom < rect.top || 
+                                     elRect.top > rect.bottom);
+
+                if (intersects || (isSingleClick && el === e.target)) {
+                    const elementId = el.innerText.trim() || el.id;
                     window.parent.postMessage({
                         type: 'annotation',
                         elementId: elementId,
-                        action: 'KEEP'
+                        action: selectionType
                     }, '*');
                 }
-            } else {
-                // Clicking anywhere in alternative options promotes it!
+            });
+        });
+
+        // Handle iframe communication for promoting options
+        document.addEventListener('click', (e) => {
+            const isActiveWorkspace = window.location.search.includes('active=true');
+            if (!isActiveWorkspace) {
                 e.preventDefault();
                 e.stopPropagation();
                 const currentFile = window.location.pathname.split('/').pop();
@@ -110,6 +340,7 @@ def generate_cinema_player(root: Path, name: str) -> Path:
             display: flex;
             justify-content: center;
             align-items: center;
+            user-select: none;
         }}
         .calc-body {{
             background: #1e293b;
@@ -195,6 +426,7 @@ def generate_cinema_player(root: Path, name: str) -> Path:
             display: flex;
             justify-content: center;
             align-items: center;
+            user-select: none;
         }}
         .calc-body {{
             background: #1e293b;
@@ -261,6 +493,7 @@ def generate_cinema_player(root: Path, name: str) -> Path:
             display: flex;
             justify-content: center;
             align-items: center;
+            user-select: none;
         }}
         .calc-body {{
             background: #1e293b;
@@ -327,6 +560,7 @@ def generate_cinema_player(root: Path, name: str) -> Path:
             display: flex;
             justify-content: center;
             align-items: center;
+            user-select: none;
         }}
         .calc-body {{
             background: #1e293b;
@@ -444,6 +678,7 @@ def generate_cinema_player(root: Path, name: str) -> Path:
         .btn-stage { background: #334155; color: #fff; }
         .btn-stage.active { background: #38bdf8; color: #0f172a; }
         .btn-action { background: #2ed573; color: #fff; }
+        .btn-action:disabled { background: #1e293b; color: #64748b; cursor: not-allowed; }
         
         .main-container {
             display: flex;
@@ -654,7 +889,7 @@ def generate_cinema_player(root: Path, name: str) -> Path:
             <div class="panel active-panel">
                 <div class="panel-header" style="color: #38bdf8;">
                     <span>🔵 1. ACTIVE WORKSPACE</span>
-                    <span style="font-size: 0.65rem;">[🖱️ Left Click = KEEP | 🖱️ Right Click = REDESIGN/DELETE]</span>
+                    <span style="font-size: 0.65rem;">[🖱️ Left Click & Drag = KEEP | 🖱️ Right Click & Drag = REDESIGN/DELETE]</span>
                 </div>
                 <div class="panel-body">
                     <iframe id="active-frame" name="active-frame" src="stage0.html?active=true"></iframe>
@@ -708,7 +943,7 @@ def generate_cinema_player(root: Path, name: str) -> Path:
             <div class="side-header">📝 Visual Feedback list</div>
             <div class="feedback-list" id="feedback-list">
                 <div style="color: #64748b; font-size: 0.85rem; text-align: center; margin-top: 40px;">
-                    Left-click or Right-click elements directly in Active Workspace to annotate!
+                    Left-click-drag or Right-click-drag directly in Window 1 to annotate multiple elements!
                 </div>
             </div>
             
@@ -717,8 +952,8 @@ def generate_cinema_player(root: Path, name: str) -> Path:
 Click anywhere on Options A-C to instantly promote them to Active Workspace!
             </div>
             
-            <button class="btn btn-action" style="margin-top: 15px; width: 100%;" onclick="submitEcosystemFeedback()">
-                🚀 Accept Iteration & Generate Prompt
+            <button class="btn btn-action" id="action-btn" style="margin-top: 15px; width: 100%;" onclick="runLiveIteration()">
+                🚀 Run Live Iteration (DeepSeek)
             </button>
         </div>
     </div>
@@ -726,6 +961,25 @@ Click anywhere on Options A-C to instantly promote them to Active Workspace!
     <script>
         let activeStage = 0;
         let annotations = [];
+
+        // Integrated logger function (Browser console + Server CSV logger endpoint)
+        function logEvent(action, details) {
+            console.log(`[NEXU SYSTEM] [${new Date().toISOString()}] Action: ${action} | Details: ${details}`);
+            
+            fetch('/log', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    action: action,
+                    details: details
+                })
+            }).catch(err => console.error("[NEXU SYSTEM] Logger API unreachable:", err));
+        }
+
+        // Log page initialization
+        logEvent('PAGE_LOAD', 'Cinema Player dashboard initialized');
 
         // Globally block context menu popup on the parent dashboard page
         document.addEventListener('contextmenu', (e) => {
@@ -767,6 +1021,7 @@ Click anywhere on Options A-C to instantly promote them to Active Workspace!
             const activeFrame = document.getElementById('active-frame');
             activeFrame.src = 'stage' + stageNum + '.html?active=true';
             addChatLog('system', '🔄 Loaded stage S' + stageNum + ' template.');
+            logEvent('SWITCH_STAGE', 'Switched Active Workspace stage to S' + stageNum);
         }
 
         function handleAnnotation(elementId, type) {
@@ -783,6 +1038,8 @@ Click anywhere on Options A-C to instantly promote them to Active Workspace!
             } else {
                 addChatLog('system', `✗ Element <strong>${elementId}</strong> marked for redesign.`);
             }
+
+            logEvent('ANNOTATE', `Element ID: ${elementId} | Type: ${type}`);
 
             // Sync visual highlights to ALL active child iframes using postMessage
             syncAllIframeVisuals();
@@ -854,15 +1111,50 @@ Click anywhere on Options A-C to instantly promote them to Active Workspace!
             activeFrame.src = altSrc.split('?')[0] + '?active=true';
             
             addChatLog('system', `🌟 Promoted <strong>${optName}</strong> to Active Workspace.`);
+            logEvent('PROMOTE', `Option: ${optName} | Source: ${altSrc}`);
         }
 
-        function submitEcosystemFeedback() {
-            if (annotations.length === 0) {
-                alert('Please annotate elements first (Left click to keep, Right click to delete).');
-                return;
-            }
-            addChatLog('system', '🚀 Refactored capsule dispatched to LLM pipeline!');
-            alert('🚀 Prompt dispatched to Nexu LLM Pipeline: Redrawing calculator with requested buttons deleted!');
+        function runLiveIteration() {
+            const promptBox = document.getElementById('prompt-box');
+            const actionBtn = document.getElementById('action-btn');
+            
+            addChatLog('system', '🤖 <strong>LLM is evolving the code... Running next capsule iteration in background!</strong>');
+            logEvent('ITERATION_STARTED', 'Ecosystem feedback iteration submitted to server.');
+            
+            actionBtn.disabled = true;
+            actionBtn.innerText = '⏳ Evolving Code (DeepSeek)...';
+
+            fetch('/iterate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    prompt: promptBox.innerText,
+                    current_stage: activeStage
+                })
+            })
+            .then(res => {
+                if (!res.ok) throw new Error("Iteration failed");
+                return res.json();
+            })
+            .then(data => {
+                actionBtn.disabled = false;
+                actionBtn.innerText = '🚀 Run Live Iteration (DeepSeek)';
+                
+                addChatLog('system', '🎯 <strong>Iteration successful! Evolved stage S' + data.new_stage + ' loaded live in Window 1!</strong>');
+                logEvent('ITERATION_COMPLETED_LIVE', 'New evolution stage: S' + data.new_stage);
+                
+                // Live hot-reload Window 1 frame on the fly to show evolved calculator!
+                const activeFrame = document.getElementById('active-frame');
+                activeFrame.src = activeFrame.src; // Force fresh iframe reload!
+            })
+            .catch(err => {
+                actionBtn.disabled = false;
+                actionBtn.innerText = '🚀 Run Live Iteration (DeepSeek)';
+                addChatLog('system', '❌ <strong>Error: Failed to process next live iteration on backend!</strong>');
+                console.error(err);
+            });
         }
     </script>
 </body>
@@ -870,12 +1162,15 @@ Click anywhere on Options A-C to instantly promote them to Active Workspace!
 
     player_path.write_text(player_html, encoding="utf-8")
     
-    # Automatically open in browser tab using a robust fallback chain for Linux
+    # Automatically open in browser tab using a robust fallback chain for Linux via HTTP server
     try:
-        url = f"file://{player_path.absolute()}"
+        port = start_persistent_http_server(cinema_dir, root, name)
+        url = f"http://127.0.0.1:{port}/cinema_player.html"
+        print(f"🎬 Live HTTP Server started for Cinema Player: {url}")
+        
         opened_via_system = False
         import subprocess
-        for cmd in [['xdg-open', str(player_path.absolute())],
+        for cmd in [['xdg-open', url],
                     ['sensible-browser', url],
                     ['firefox', url],
                     ['google-chrome', url]]:

@@ -14,6 +14,11 @@
 - Run targeted flow tests: `tests/test_capsule_next_stage.py`, `tests/test_capsule_runtime_report.py`, `tests/test_nexu.py`, `tests/test_capsule_flow.py` (pass).
 - Run full suite: `pytest -q` (11 passed).
 
+## [0.5.8] - 2026-05-31
+
+### Docs
+- Update README.md
+
 ## [0.5.7] - 2026-05-31
 
 ### Docs
