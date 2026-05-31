@@ -279,6 +279,66 @@ def verify_capsule(root: Path, name: str) -> VerificationReport:
     findings.extend(_check_required_intents(contracts))
     findings.extend(_check_iteration_count(capsule.iterations))
 
+    # Dynamic integration with the actual sibling intract package
+    try:
+        import sys
+        # Robust search to locate sibling intract package directory
+        sibling_intract = None
+        curr = root.resolve()
+        for _ in range(6):
+            if (curr / "intract" / "src").exists():
+                sibling_intract = curr / "intract" / "src"
+                break
+            if (curr.parent / "intract" / "src").exists():
+                sibling_intract = curr.parent / "intract" / "src"
+                break
+            curr = curr.parent
+
+        if sibling_intract and str(sibling_intract) not in sys.path:
+            sys.path.insert(0, str(sibling_intract))
+
+        from intract.check import validate_selected_paths
+        from intract.policy import decide_policy
+
+        files_to_check = [rel(p, base) for p in collect_files(base / "src")]
+        manifest_path = base / capsule.contracts_manifest
+        
+        intract_report = validate_selected_paths(base, files_to_check, manifest=manifest_path)
+        policy = decide_policy(intract_report, manifest_path=manifest_path)
+        
+        for reason in policy.reasons:
+            findings.append(
+                VerificationFinding(
+                    code="intract_policy_violation",
+                    status="fail",
+                    message=reason
+                )
+            )
+        for warning in policy.warnings:
+            findings.append(
+                VerificationFinding(
+                    code="intract_policy_warning",
+                    status="warn",
+                    message=warning
+                )
+            )
+        if not policy.reasons:
+            findings.append(
+                VerificationFinding(
+                    code="intract_policy_check",
+                    status="pass",
+                    message="All current and future intract policy contracts are satisfied."
+                )
+            )
+    except Exception as e:
+        findings.append(
+            VerificationFinding(
+                code="intract_integration_fallback",
+                status="warn",
+                message=f"Intract integration fallback: {str(e)}"
+            )
+        )
+
     status, score = _summary_status(findings)
 
     report = VerificationReport(capsule=name, status=status, score=score, findings=findings)

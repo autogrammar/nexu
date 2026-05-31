@@ -75,3 +75,18 @@ def build_promotion_plan(root: Path, name: str) -> dict:
     }
     write_yaml(base / "promotion-plan.yaml", plan)
     return plan
+
+def apply_promotion_plan(root: Path, plan: dict) -> None:
+    if not plan.get("ready_for_apply"):
+        raise ValueError("Cannot apply: plan is not ready_for_apply. Fix blocking findings or drift first.")
+    
+    import shutil
+    base = capsule_dir(root, plan["capsule"])
+    
+    for item in plan.get("promotion_map", []):
+        source = base / item["capsule_path"]
+        target = Path(item["target_absolute"])
+        
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if source.is_file():
+            shutil.copy2(source, target)

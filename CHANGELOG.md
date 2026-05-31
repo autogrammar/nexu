@@ -14,6 +14,31 @@
 - Run targeted flow tests: `tests/test_capsule_next_stage.py`, `tests/test_capsule_runtime_report.py`, `tests/test_nexu.py`, `tests/test_capsule_flow.py` (pass).
 - Run full suite: `pytest -q` (11 passed).
 
+## [0.5.5] - 2026-05-31
+
+### Docs
+- Update README.md
+- Update TODO/1.md
+- Update docs/examples.md
+- Update examples/web_app_calculator/README.md
+- Update examples/web_app_dashboard/README.md
+
+### Test
+- Update tests/test_promote_apply.py
+
+### Other
+- Update .env
+- Update .gitignore
+- Update examples/realtime_lane_nexu_sync.py
+- Update examples/scientific_calculator_demo2.py
+- Update examples/web_app_analytics/cinema/cinema_player.html
+- Update examples/web_app_analytics/cinema/stage0.html
+- Update examples/web_app_analytics/cinema/stage1.html
+- Update examples/web_app_analytics/cinema/stage2.html
+- Update examples/web_app_calculator/cinema/cinema_player.html
+- Update examples/web_app_calculator/cinema/stage0.html
+- ... and 20 more files
+
 ## [0.5.4] - 2026-05-30
 
 ### Docs

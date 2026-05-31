@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Nexu Iteration Cinema Player</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: radial-gradient(circle at top right, #1e1b4b, #0f172a);
+            color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background: rgba(30, 41, 59, 0.45);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 40px;
+            width: 900px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            gap: 40px;
+        }
+        .left-panel {
+            flex: 1.2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .right-panel {
+            flex: 0.8;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .screen-container {
+            width: 100%;
+            height: 400px;
+            background: #020617;
+            border-radius: 18px;
+            border: 1px solid rgba(255,255,255,0.05);
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
+            position: relative;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 25px;
+            width: 100%;
+        }
+        button {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #f8fafc;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        button.active {
+            background: #38bdf8;
+            color: #0f172a;
+            border-color: #38bdf8;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+        }
+        .progress-bar-container {
+            flex-grow: 1;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            position: relative;
+            cursor: pointer;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: #38bdf8;
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+        .stage-badge {
+            background: #38bdf8;
+            color: #0f172a;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 12px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        h2 {
+            margin: 0 0 10px 0;
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        p.desc {
+            color: #94a3b8;
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 0 0 25px 0;
+        }
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .timeline-step {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .timeline-step.active {
+            background: rgba(56, 189, 248, 0.1);
+            border-color: rgba(56, 189, 248, 0.3);
+        }
+        .timeline-step h4 {
+            margin: 0 0 5px 0;
+            font-size: 15px;
+            color: #f8fafc;
+        }
+        .timeline-step p {
+            margin: 0;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+    <div style="margin-bottom: 25px; text-align: center;">
+        <span class="stage-badge">Nexu Cinema</span>
+        <h1 style="margin: 10px 0 5px 0; font-size: 32px; font-weight: 800; color: #fff;">Application Evolution Player</h1>
+        <p style="color: #64748b; margin: 0;">Watch your web application evolve step-by-step through capsule iterations</p>
+    </div>
+
+    <div class="container">
+        <div class="left-panel">
+            <div class="screen-container">
+                <iframe id="app-frame" src="stage0.html"></iframe>
+            </div>
+            
+            <div class="controls">
+                <button id="play-btn" onclick="togglePlay()">
+                    <span id="play-icon">▶</span> <span id="play-text">Play</span>
+                </button>
+                <div class="progress-bar-container" onclick="seek(event)">
+                    <div class="progress-bar-fill" id="progress-fill"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div>
+                <h2>Dashboard UI</h2>
+                <p class="desc">Each stage represents a version of the component evolved inside an isolated Nexu capsule, bound by strict contract rules.</p>
+                
+                <div class="timeline">
+                    <div class="timeline-step active" id="step-0" onclick="setStage(0)">
+                        <h4>Stage 0: Baseline (S0)</h4>
+                        <p>Simple system stats container. No external dynamic feeds.</p>
+                    </div>
+                    <div class="timeline-step" id="step-1" onclick="setStage(1)">
+                        <h4>Stage 1: Backend Hook (S1)</h4>
+                        <p>Mock backend data structure integrated. Connection notice displayed.</p>
+                    </div>
+                    <div class="timeline-step" id="step-2" onclick="setStage(2)">
+                        <h4>Stage 2: Render UI (S2)</h4>
+                        <p>Complete dashboard UI displaying rich live system notifications.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStage = 0;
+        let isPlaying = false;
+        let playInterval = null;
+        const totalStages = 3;
+        const stages = ['stage0.html', 'stage1.html', 'stage2.html'];
+        
+        function setStage(idx) {
+            currentStage = idx;
+            document.getElementById('app-frame').src = stages[idx];
+            
+            // Update active timeline step
+            for (let i = 0; i < totalStages; i++) {
+                const step = document.getElementById('step-' + i);
+                if (i === idx) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.remove('active');
+                }
+            }
+            
+            // Update progress bar
+            const percent = ((idx + 1) / totalStages) * 100;
+            document.getElementById('progress-fill').style.width = percent + '%';
+        }
+
+        function togglePlay() {
+            isPlaying = !isPlaying;
+            const playBtn = document.getElementById('play-btn');
+            const playIcon = document.getElementById('play-icon');
+            const playText = document.getElementById('play-text');
+            
+            if (isPlaying) {
+                playBtn.classList.add('active');
+                playIcon.innerText = '⏸';
+                playText.innerText = 'Stop';
+                
+                playInterval = setInterval(() => {
+                    let next = (currentStage + 1) % totalStages;
+                    setStage(next);
+                }, 2000);
+            } else {
+                playBtn.classList.remove('active');
+                playIcon.innerText = '▶';
+                playText.innerText = 'Play';
+                clearInterval(playInterval);
+            }
+        }
+
+        function seek(event) {
+            const rect = event.currentTarget.getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+            const percent = clickX / rect.width;
+            const targetStage = Math.min(Math.floor(percent * totalStages), totalStages - 1);
+            setStage(targetStage);
+        }
+
+        // Initialize progress bar
+        setStage(0);
+    </script>
+</body>
+</html>

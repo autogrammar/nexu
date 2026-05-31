@@ -343,7 +343,13 @@ def capsule_promote(
     console.print(f"[green]promotion plan[/green] .nexu/capsules/{name}/promotion-plan.yaml")
     console.print(f"files to review: {len(plan['files_to_review'])}")
     if not dry_run:
-        console.print("[yellow]Apply mode is intentionally not implemented in MVP. Review the plan first.[/yellow]")
+        from .promote import apply_promotion_plan
+        try:
+            apply_promotion_plan(root, plan)
+            console.print("[green]Promotion applied successfully![/green] Files have been copied to the source project.")
+        except ValueError as e:
+            console.print(f"[red]Error:[/red] {str(e)}")
+            raise typer.Exit(code=1)
 
 
 @mcp_app.command("tools")

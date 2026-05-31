@@ -3,13 +3,13 @@
 
 ## AI Cost Tracking
 
-![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.5.4-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
+![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.5.5-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
 ![AI Cost](https://img.shields.io/badge/AI%20Cost-$1.71-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-4.5h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
 
-- 🤖 **LLM usage:** $1.7081 (10 commits)
+- 🤖 **LLM usage:** $1.7133 (11 commits)
 - 👤 **Human dev:** ~$451 (4.5h @ $100/h, 30min dedup)
 
-Generated on 2026-05-30 using [openrouter/qwen/qwen3-coder-next](https://openrouter.ai/qwen/qwen3-coder-next)
+Generated on 2026-05-31 using [openrouter/qwen/qwen3-coder-next](https://openrouter.ai/qwen/qwen3-coder-next)
 
 ---
 
@@ -87,6 +87,13 @@ nexu capsule diff menu-icons
 nexu capsule drift menu-icons
 nexu capsule promote menu-icons --dry-run
 ```
+
+## Key Features Added Recently
+
+- **Secure Workspace Promotion**: Support for applying capsule changes to the source workspace via the `nexu capsule promote --apply` command (and via the `nexu_capsule_promote_apply` MCP tool).
+- **Dynamic Intract Policy Engine Integration**: Runs the actual sibling `intract` package validations (including AST verification and contract compliance) during the capsule `verify` step to guarantee correctness.
+- **Web App Dashboard Evolution Example**: Fully details multi-stage sandbox visualization and evolution under `examples/web_app_dashboard`.
+- **Web App Calculator Mock Example**: Compares a simple arithmetic layout (S0) and a scientific layout (S2) under `examples/web_app_calculator`.
 
 ## Important folders
 

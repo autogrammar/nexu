@@ -215,7 +215,19 @@ TOOL_SPECS: list[dict[str, Any]] = [
         "inputSchema": _schema({"name": {"type": "string"}}, ["name"]),
         "handler": lambda root, args: build_promotion_plan(root, str(args["name"])),
     },
+    {
+        "name": "nexu_capsule_promote_apply",
+        "description": "Build and immediately apply the promotion plan to the source project, copying modified files.",
+        "inputSchema": _schema({"name": {"type": "string"}}, ["name"]),
+        "handler": lambda root, args: _apply_promotion_from_mcp(root, str(args["name"])),
+    },
 ]
+
+def _apply_promotion_from_mcp(root: Path, name: str) -> dict[str, str]:
+    from .promote import build_promotion_plan, apply_promotion_plan
+    plan = build_promotion_plan(root, name)
+    apply_promotion_plan(root, plan)
+    return {"status": "success", "message": f"Applied promotion plan for capsule {name}"}
 
 
 MCP_TOOLS: list[dict[str, Any]] = [

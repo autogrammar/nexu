@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+body { font-family: 'Outfit', sans-serif; background: #0f172a; color: #f8fafc; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+.card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 300px; transition: all 0.3s ease; }
+h2 { text-align: center; margin-top: 0; font-size: 20px; color: #38bdf8; }
+.display { background: #ecf0f1; color: #2c3e50; padding: 15px; font-size: 24px; text-align: right; border-radius: 6px; margin-bottom: 15px; font-weight: bold; }
+.grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+button { padding: 12px; font-size: 16px; font-weight: bold; border-radius: 8px; border: none; background: rgba(255,255,255,0.08); color: #fff; cursor: pointer; }
+button.op { background: #e67e22; }
+button.eq { background: #2ecc71; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h2>Simple Calc (S0)</h2>
+  <div class="display">12.5</div>
+  <div class="grid">
+    <button>7</button><button>8</button><button>9</button><button class="op">/</button>
+    <button>4</button><button>5</button><button>6</button><button class="op">*</button>
+    <button>1</button><button>2</button><button>3</button><button class="op">-</button>
+    <button>0</button><button>.</button><button class="eq">=</button><button class="op">+</button>
+  </div>
+</div>
+</body>
+</html>

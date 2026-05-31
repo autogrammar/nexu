@@ -45,6 +45,32 @@ python -m nexu capsule export-prompt flow
 python -m nexu capsule report flow
 ```
 
+## Web App Dashboard Capsule (with visual evolution)
+
+Folder: `examples/web_app_dashboard/`
+
+This example demonstrates how to safely evolve a Web Application Dashboard (Baseline) into a target version featuring a live notification feed ($S_2$), automatically compiling visual mock sandboxes (`index.html`) using `nexu capsule runtime`.
+
+Run the automated simulation:
+```bash
+cd examples/web_app_dashboard
+uv run python run.py
+```
+
+## Web App Calculator Capsule (Simple vs. Scientific Mocks)
+
+Folder: `examples/web_app_calculator/`
+
+This example showcases how `nexu` handles visual comparison of two web application mocks side-by-side:
+- **Simple Calculator (S0)**: Basic arithmetic interface.
+- **Scientific Calculator (S2)**: High-fidelity visual mock layout including advanced trigonometry operations (`sin`, `cos`, `tan`, `log`).
+
+Run the automated simulation:
+```bash
+cd examples/web_app_calculator
+uv run python run.py
+```
+
 ## Run all examples
 
 ```bash
@@ -56,4 +82,8 @@ python examples/run_examples.py
 
 Folder: `examples/mcp_service/`
 
-Shows how to expose nexu tools to an MCP-capable IDE/agent through `nexu mcp serve --path .`.
+Shows how to expose nexu tools to an MCP-capable IDE/agent through `nexu mcp serve --path .`. In addition, this covers the `nexu_capsule_promote_apply` command allowing direct remote workspaces synchronization.
+
+## Intract Policy Integration
+
+Nexu dynamically integrates with the sibling `intract` validation package. When `verify_capsule` is executed, the full AST-scanning, project graph analysis, and policy engine validations from `intract` are applied to the capsule files to verify if the future iteration satisfies the intent contracts.
