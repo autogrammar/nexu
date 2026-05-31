@@ -1819,9 +1819,10 @@ wheels = [
 
 [[package]]
 name = "nexu"
-version = "0.5.9"
+version = "0.5.10"
 source = { editable = "." }
 dependencies = [
+    { name = "litellm" },
     { name = "pyyaml" },
     { name = "rich" },
     { name = "typer" },
@@ -1836,9 +1837,6 @@ dev = [
     { name = "pytest" },
     { name = "ruff" },
 ]
-llm = [
-    { name = "litellm" },
-]
 mcp = [
     { name = "mcp" },
 ]
@@ -1850,7 +1848,7 @@ watch = [
 requires-dist = [
     { name = "costs", marker = "extra == 'dev'", specifier = ">=0.1.20" },
     { name = "goal", marker = "extra == 'dev'", specifier = ">=2.1.0" },
-    { name = "litellm", marker = "extra == 'llm'", specifier = ">=1.0" },
+    { name = "litellm", specifier = ">=1.0" },
     { name = "mcp", marker = "extra == 'mcp'", specifier = ">=1.9.0" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.8" },
     { name = "pfix", marker = "extra == 'dev'", specifier = ">=0.1.60" },
@@ -1861,7 +1859,7 @@ requires-dist = [
     { name = "typer", specifier = ">=0.12.0" },
     { name = "watchdog", marker = "extra == 'watch'", specifier = ">=4.0" },
 ]
-provides-extras = ["dev", "llm", "mcp", "watch"]
+provides-extras = ["dev", "mcp", "watch"]
 
 [[package]]
 name = "numpy"

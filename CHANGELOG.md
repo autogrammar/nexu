@@ -2,8 +2,14 @@
 
 ## [Unreleased]
 
+### Added
+- Cinema Intract policy panel: ledger view, manifest apply (`project` / `capsule` / `both`), LLM propose, capsule verify.
+- `nexu/cinema_policy.py` and generated `cinema/nexu_hooks.py` for manifest merge, verify, LLM propose, and artifact validation.
+- `make cinema-stop`, `make ci-cinema-smoke`, and `scripts/ci-cinema-smoke.sh`.
+
 ### Refactor
 - Refactor `verify_capsule` into focused checker helpers while preserving report format and scoring behavior.
+- Move Cinema manifest/verify/Intract helpers out of embedded `server.py` into `cinema_policy` + `nexu_hooks`.
 - Unify MCP tool registration into a single source of truth (`TOOL_SPECS`) and derive `MCP_TOOLS`/dispatch map from it.
 - Refactor JSON-RPC routing in `mcp_server` to method-handler mapping for cleaner control flow.
 - Refactor CLI path/YAML output duplication via shared helpers.
@@ -11,12 +17,35 @@
 
 ### Fix
 - Respect `llm.allow_network_calls` in `cinema` iteration flow to prevent unintended LLM network calls in offline mode.
-- Read API key env and model defaults for `cinema` from `nexu.yaml` (`llm.api_key_env`, `llm.model`) instead of hardcoded values.
+- Read API key env and model defaults for `cinema` from `nexu.yaml` (`llm.api_key_env`, `llm.model`) and workspace `.env` (`LLM_MODEL`) instead of hardcoded values.
+- Treat intract manifest-only `fail` as warn in `verify_capsule` (capsule code may lag manifest intent).
+- Safe LLM empty-content handling in Cinema server; preserve UI annotations when iteration is skipped.
 
 ### Test
-- Run targeted MCP tests: `tests/test_orchestration_mcp.py` (pass).
-- Run targeted flow tests: `tests/test_capsule_next_stage.py`, `tests/test_capsule_runtime_report.py`, `tests/test_nexu.py`, `tests/test_capsule_flow.py` (pass).
-- Run full suite: `pytest -q` (12 passed).
+- `tests/test_cinema_policy.py`, `tests/test_export_prompt_ledger.py`, `tests/test_verify_intract.py`; `tests/conftest.py` adds sibling intract.
+- Full suite: `pytest -q` (16 passed); `make ci-cinema-smoke`.
+
+## [0.5.10] - 2026-05-31
+
+### Docs
+- Update CHANGELOG.md
+- Update README.md
+- Update examples/web_app_calculator/README.md
+
+### Test
+- Update tests/conftest.py
+- Update tests/test_cinema_history.py
+- Update tests/test_cinema_policy.py
+- Update tests/test_cinema_scripts.py
+- Update tests/test_cinema_spatial_patch.py
+- Update tests/test_export_prompt_ledger.py
+- Update tests/test_verify_intract.py
+
+### Other
+- Update Makefile
+- Update examples/web_app_calculator/workspace/intract.yaml
+- Update scripts/ci-cinema-smoke.sh
+- Update uv.lock
 
 ## [0.5.9] - 2026-05-31
 

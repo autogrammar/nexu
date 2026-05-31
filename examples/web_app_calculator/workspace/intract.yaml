@@ -28,3 +28,120 @@ contracts:
   - input_presence
   - output_presence
   - no_forbidden_effect
+- id: cinema.S0.ui.remove.Mod
+  scope: ui
+  intent: ui:remove:Mod
+  priority: 3
+  domain: calculator
+  effect:
+  - ui_change
+  forbid:
+  - destructive_write
+  require:
+  - human_review
+  meaning: 'Cinema S0 removed #Mod'
+- id: cinema.scientific_calc.S0.ui.remove.Mod
+  scope: ui
+  intent: ui:remove:Mod
+  priority: 3
+  domain: calculator
+  effect:
+  - ui_change
+  forbid:
+  - destructive_write
+  - secret_leak
+  require:
+  - human_review
+  validate:
+  - no_forbidden_effect
+  meaning: 'Cinema S0 removed #Mod'
+- id: cinema.scientific_calc.S0.ui.remove.deg
+  scope: ui
+  intent: ui:remove:deg
+  priority: 3
+  domain: calculator
+  effect:
+  - ui_change
+  forbid:
+  - destructive_write
+  - secret_leak
+  require:
+  - human_review
+  validate:
+  - no_forbidden_effect
+  meaning: 'Cinema S0 removed #deg'
+- id: cinema.scientific_calc.S0.ui.remove.rad
+  scope: ui
+  intent: ui:remove:rad
+  priority: 3
+  domain: calculator
+  effect:
+  - ui_change
+  forbid:
+  - destructive_write
+  - secret_leak
+  require:
+  - human_review
+  validate:
+  - no_forbidden_effect
+  meaning: 'Cinema S0 removed #rad'
+- id: cinema.scientific_calc.S0.ui.remove.cos
+  scope: ui
+  intent: ui:remove:cos
+  priority: 3
+  domain: calculator
+  effect:
+  - ui_change
+  forbid:
+  - destructive_write
+  - secret_leak
+  require:
+  - human_review
+  validate:
+  - no_forbidden_effect
+  meaning: 'Cinema S0 removed #cos'
+- id: cinema.scientific_calc.S0.ui.remove.tan
+  scope: ui
+  intent: ui:remove:tan
+  priority: 3
+  domain: calculator
+  effect:
+  - ui_change
+  forbid:
+  - destructive_write
+  - secret_leak
+  require:
+  - human_review
+  validate:
+  - no_forbidden_effect
+  meaning: 'Cinema S0 removed #tan'
+- id: cinema.scientific_calc.S0.ui.remove.(
+  scope: ui
+  intent: ui:remove:(
+  priority: 3
+  domain: calculator
+  effect:
+  - ui_change
+  forbid:
+  - destructive_write
+  - secret_leak
+  require:
+  - human_review
+  validate:
+  - no_forbidden_effect
+  meaning: 'Cinema S0 removed #('
+- id: cinema.scientific_calc.S0.ui.remove.)
+  scope: ui
+  intent: ui:remove:)
+  priority: 3
+  domain: calculator
+  effect:
+  - ui_change
+  forbid:
+  - destructive_write
+  - secret_leak
+  require:
+  - human_review
+  validate:
+  - no_forbidden_effect
+  meaning: 'Cinema S0 removed #)'

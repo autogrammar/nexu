@@ -304,30 +304,84 @@ def verify_capsule(root: Path, name: str) -> VerificationReport:
         manifest_path = base / capsule.contracts_manifest
         
         intract_report = validate_selected_paths(base, files_to_check, manifest=manifest_path)
-        policy = decide_policy(intract_report, manifest_path=manifest_path)
-        
+        policy = decide_policy(
+            intract_report,
+            manifest_path=manifest_path,
+            fail_on=["violation", "invalid_manifest"],
+            warn_on=["partial", "unknown"],
+        )
+
+        intract_codes: set[str] = set()
+        for result in getattr(intract_report, "results", []) or []:
+            raw_status = getattr(getattr(result, "status", ""), "value", str(getattr(result, "status", "")))
+            contract = getattr(result, "contract", "unknown.contract")
+            file_path = getattr(result, "file_path", "")
+            evidence = getattr(result, "evidence", {}) or {}
+            is_manifest_gap = bool(evidence.get("manifest_contract")) and str(file_path).endswith(
+                ("intract.yaml", "intent.yaml", ".intract.yaml")
+            )
+            if raw_status == "violation":
+                intract_codes.add("intract_policy_violation")
+                findings.append(
+                    VerificationFinding(
+                        code="intract_policy_violation",
+                        status="fail",
+                        message=f"{raw_status}: {contract} {file_path}".strip(),
+                    )
+                )
+            elif raw_status == "fail" and is_manifest_gap:
+                intract_codes.add("intract_manifest_gap")
+                findings.append(
+                    VerificationFinding(
+                        code="intract_manifest_gap",
+                        status="warn",
+                        message=f"Manifest contract not yet reflected in capsule sources: {contract}",
+                        evidence=[str(file_path)] if file_path else [],
+                    )
+                )
+            elif raw_status == "fail":
+                intract_codes.add("intract_policy_violation")
+                findings.append(
+                    VerificationFinding(
+                        code="intract_policy_violation",
+                        status="fail",
+                        message=f"{raw_status}: {contract} {file_path}".strip(),
+                    )
+                )
+            elif raw_status == "partial":
+                intract_codes.add("intract_policy_warning")
+                findings.append(
+                    VerificationFinding(
+                        code="intract_policy_warning",
+                        status="warn",
+                        message=f"{raw_status}: {contract} {file_path}".strip(),
+                    )
+                )
+
         for reason in policy.reasons:
+            intract_codes.add("intract_policy_violation")
             findings.append(
                 VerificationFinding(
                     code="intract_policy_violation",
                     status="fail",
-                    message=reason
+                    message=reason,
                 )
             )
         for warning in policy.warnings:
+            intract_codes.add("intract_policy_warning")
             findings.append(
                 VerificationFinding(
                     code="intract_policy_warning",
                     status="warn",
-                    message=warning
+                    message=warning,
                 )
             )
-        if not policy.reasons:
+        if not intract_codes:
             findings.append(
                 VerificationFinding(
                     code="intract_policy_check",
                     status="pass",
-                    message="All current and future intract policy contracts are satisfied."
+                    message="All scanned intract contracts are satisfied.",
                 )
             )
     except Exception as e:

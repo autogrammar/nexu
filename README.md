@@ -3,11 +3,11 @@
 
 ## AI Cost Tracking
 
-![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.5.9-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
-![AI Cost](https://img.shields.io/badge/AI%20Cost-$1.95-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-6.5h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
+![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.5.10-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
+![AI Cost](https://img.shields.io/badge/AI%20Cost-$1.97-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-7.2h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
 
-- 🤖 **LLM usage:** $1.9492 (15 commits)
-- 👤 **Human dev:** ~$649 (6.5h @ $100/h, 30min dedup)
+- 🤖 **LLM usage:** $1.9749 (16 commits)
+- 👤 **Human dev:** ~$716 (7.2h @ $100/h, 30min dedup)
 
 Generated on 2026-05-31 using [openrouter/qwen/qwen3-coder-next](https://openrouter.ai/qwen/qwen3-coder-next)
 
@@ -174,16 +174,40 @@ llm:
 make cinema
 ```
 
+Use the URL printed in the log (`Live HTTP Server started for Cinema Player: http://127.0.0.1:…`) — not a fixed port (8080 may be taken by another service).
+
+Stop stale cinema servers before restarting:
+
+```bash
+make cinema-stop
+make cinema
+```
+
+**Simple iteration flow (3 steps):**
+
+1. **Goal** — type what you want (e.g. chemical calculator) → **Add goal** → **Generate Options A–C**.
+2. **Compare** — review Options A, B, C (workspace on the left stays unchanged).
+3. **Promote & refine** — click an option to save it to the workspace → drag on buttons (left = keep, right = remove) → **Apply marks to workspace**.
+
+**History & policy (bottom row, two columns):** left — **Change history** with **Restore UI + policy** (rewinds HTML, ledger, and merges contracts into manifests); right — **Policy contracts** (baseline + active ledger lines, manifest actions). Use the URL from `make cinema` output, not a fixed port.
+
 1. Run tests:
 
 ```bash
 make test
+make ci-cinema-smoke   # nexu + sibling intract + cinema policy dry-run
 ```
 
 You can override defaults from `Makefile` inline:
 
 ```bash
 make cinema CINEMA_CAPSULE=scientific_calc CINEMA_PATH=examples/web_app_calculator/workspace
+```
+
+Model override (otherwise `LLM_MODEL` from workspace `.env`):
+
+```bash
+make cinema CINEMA_MODEL=openrouter/google/gemini-3.1-flash-lite-preview
 ```
 
 ## License

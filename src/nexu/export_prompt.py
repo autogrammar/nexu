@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import yaml
@@ -10,6 +11,42 @@ from .diff import diff_capsule
 from .intract import read_manifest_contracts
 from .models import PromptExport, utc_now, write_yaml
 from .paths import capsule_dir
+
+
+def _cinema_policy_ledger_block(base: Path) -> str:
+    ledger_path = base / "cinema" / "intract_policy_ledger.json"
+    if not ledger_path.exists():
+        return ""
+
+    try:
+        ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return ""
+
+    if not isinstance(ledger, list) or not ledger:
+        return ""
+
+    lines: list[str] = []
+    for entry in ledger[-8:]:
+        if not isinstance(entry, dict):
+            continue
+        status = entry.get("status", "")
+        stage = entry.get("stage", "?")
+        lines.append(f"- iteration S{stage} ({status})")
+        for proposal in entry.get("proposed_contracts", []) or []:
+            if isinstance(proposal, dict) and proposal.get("line"):
+                lines.append(f"  - `{proposal['line']}`")
+
+    if not lines:
+        return ""
+
+    return (
+        "## Cinema policy ledger (proposed @intract.v1)\n\n"
+        "These lines were generated from Cinema iterations. Preserve intent when evolving code;\n"
+        "merge into `intract.yaml` with `intract manifest apply-ledger` or update manifests explicitly.\n\n"
+        + "\n".join(lines)
+        + "\n\n"
+    )
 
 
 def _latest_iteration(capsule) -> str:
@@ -48,6 +85,7 @@ def export_iteration_prompt(root: Path, name: str, *, iteration: str | None = No
     )
     blueprint_block = yaml.safe_dump(blueprint, sort_keys=False, allow_unicode=True)
     diff_block = yaml.safe_dump(diff.to_dict(), sort_keys=False, allow_unicode=True)
+    cinema_ledger_block = _cinema_policy_ledger_block(base)
 
     prompt = f"""# nexu LLM iteration prompt
 
@@ -69,7 +107,29 @@ Every change must remain compatible with the Intract intent contracts.
 - After changing the capsule, run `nexu capsule verify {name}`.
 - If the requested change needs writes, split preview and apply into separate contracts.
 
-## Intract contracts
+## Intract format for new or updated intent
+
+When you add or change behavior, emit intent as `@intract.v1` lines (inline) or YAML manifest entries:
+
+```text
+@intract.v1 id:<unique> scope:function|ui|file intent:<action>:<object> priority:1-5 domain:<area> input:<csv> output:<csv> effect:<csv> forbid:<csv> require:<csv> validate:input_presence,output_presence,no_forbidden_effect meaning:"why"
+```
+
+Optional LLM-assisted proposals (requires `intract[llm]`):
+
+```bash
+intract propose llm --file <artifact> --goal "<goal>"
+intract propose delta --delete <id> --keep <id> --stage 0 --capsule {name}
+```
+
+Validate deterministically (no LLM required for validation):
+
+```bash
+intract validate .
+vallm validate --file <path> --intract
+```
+
+{cinema_ledger_block}## Intract contracts
 
 ```yaml
 {contract_block}```
