@@ -23,8 +23,26 @@ def test_render_server_script_embeds_runtime_context() -> None:
     assert script.startswith("#!/usr/bin/python3")
     assert "WORKSPACE_PATH = '/tmp/workspace'" in script
     assert "CAPSULE_NAME = 'demo'" in script
+    assert "_load_cinema_ui_profile" in script
+    assert "_llm_prompt_rules" in script
+    assert "Intract LLM communication contract" in script
+    assert "build_llm_contract_block" in script
+    assert "build_llm_option_variants" in script
+    assert "KPI overview workflow" not in script
+    assert "Build chemical-calculator UIs" not in script
+    assert "call_cinema_html_llm" in script
+    assert "Markpact context pack" in script
+    assert "_mp_payload = nexu_hooks.export_markpact_readme" in script
+    assert "has_terminal_artifacts" in script
+    assert "ThreadPoolExecutor" in script
+    assert '"llx"' not in script
+    assert "proposed_options_offline" not in script
     assert "SYS_EXE = '/usr/bin/python3'" in script
     assert "ALLOW_NETWORK_CALLS = False" in script
+    assert "def _llm_network_allowed()" in script
+    assert "def _llm_status_payload()" in script
+    assert '"/llm/status"' in script
+    assert "_cached_config(ROOT_PATH).llm.allow_network_calls" in script
     assert "API_KEY_ENV = 'OPENROUTER_API_KEY'" in script
     assert "DEFAULT_MODEL = 'test-model'" in script
 
@@ -56,7 +74,18 @@ def test_cinema_player_template_is_externalized() -> None:
         'src="stage0.html?role=workspace&amp;active=true&amp;mark=1&amp;'
         'calc=0&amp;review=0&amp;stage=0"'
     ) in html
+    assert 'function calcEnabledForProject()' in html
+    assert 'function flushPendingLogEvents()' in html
     assert 'src="alt_a.html?role=option&amp;pane=a&amp;mark=0&amp;calc=0"' in html
+    assert 'id="goal-input"' in html
+    assert "goalContractPayload" in html
+    assert "focus_scope" in html
+    assert "offline templates" not in html
+    assert 'id="llm-status-badge"' in html
+    assert "refreshLlmStatus" in html
+    assert "user_goal" in html
+    assert "active_example_project" in html
+    assert "goal_bootstrap" in html
 
 
 def test_start_cinema_player_server_returns_url_without_opening(

@@ -1,12 +1,18 @@
-"""Offline Cinema option previews when LLM network calls are disabled."""
+"""Deprecated deterministic Cinema option previews.
+
+Live Cinema no longer calls this module for project activation or `/iterate`.
+It remains only for legacy tests, archived examples, and explicit migration paths.
+"""
 
 from __future__ import annotations
 
 import json
+from html import escape
 from importlib.resources import files
 from pathlib import Path
 from string import Template
 
+from .cinema_goal_contracts import goal_traits_from_contract_lines, is_chemical_goal
 from .cinema_scripts import apply_spatial_deletes_to_html, finalize_cinema_html
 
 _TRIGGERS = frozenset({"sin", "cos", "tan", "log", "ln"})
@@ -38,30 +44,6 @@ _NUMPAD_LAYOUT: tuple[tuple[str, ...], ...] = (
 )
 
 
-def _hints_text(hints: list[str]) -> str:
-    return " ".join(str(h).strip() for h in hints if str(h).strip()).lower()
-
-
-def is_chemical_goal(hints: list[str]) -> bool:
-    text = _hints_text(hints)
-    return any(
-        token in text
-        for token in (
-            "chem",
-            "chemicz",
-            "molar",
-            "element",
-            "formula",
-            "periodic",
-            "scientific",
-            "naukow",
-            "molow",
-            "wzór",
-            "wzor",
-        )
-    )
-
-
 def _btn(label: str, el_id: str, *, extra_class: str = "", style: str = "") -> str:
     classes = "btn"
     if extra_class:
@@ -72,7 +54,30 @@ def _btn(label: str, el_id: str, *, extra_class: str = "", style: str = "") -> s
 
 
 def _keep_ids_lower(keep_els: list[str]) -> set[str]:
-    return {str(k).strip().lower() for k in keep_els if str(k).strip()}
+    return {_normal_id(k) for k in keep_els if _normal_id(k)}
+
+
+def _normal_id(value: object) -> str:
+    raw = str(value).strip()
+    if not raw:
+        return ""
+    lower = raw.lower()
+    if lower.startswith("btn-"):
+        lower = lower[4:]
+    if raw in _TOKEN_TO_ID:
+        return _TOKEN_TO_ID[raw].lower()
+    if lower in _TOKEN_TO_ID:
+        return _TOKEN_TO_ID[lower].lower()
+    return lower
+
+
+def _delete_without_keeps(
+    delete_els: list[str],
+    keep_els: list[str],
+) -> list[str]:
+    """Current KEEP is stronger than old DELETE entries from the ledger."""
+    kept = _keep_ids_lower(keep_els)
+    return [d for d in delete_els if _normal_id(d) not in kept]
 
 
 def _mandatory_trig(keep_els: list[str]) -> list[str]:
@@ -125,19 +130,48 @@ def _numpad_from_policy(keep_els: list[str], *, max_rows: int | None = None) -> 
     if len(numpad_ids) < 4:
         return _numpad_rows(max_rows=max_rows)
     parts: list[str] = []
+    emitted: set[str] = set()
+
+    def append_token(token: str) -> None:
+        el_id = _TOKEN_TO_ID.get(token, token)
+        if el_id not in keep_lower or el_id in emitted:
+            return
+        parts.append(_numpad_token_btn(token))
+        emitted.add(el_id)
+
     for i, row in enumerate(_NUMPAD_LAYOUT):
         if max_rows is not None and i >= max_rows:
-            break
+            continue
         for token in row:
-            el_id = _TOKEN_TO_ID.get(token, token)
-            if el_id in keep_lower:
-                parts.append(_numpad_token_btn(token))
+            append_token(token)
+
+    # Compact variants may limit visual rows, but KEEP-marked keys are mandatory.
+    for row in _NUMPAD_LAYOUT:
+        for token in row:
+            append_token(token)
     return "".join(parts) if parts else _numpad_rows(max_rows=max_rows)
 
 
-def _policy_screen_text(variant: str, keep_els: list[str]) -> str:
+def _short_goal_label(goal: str, *, max_len: int = 42) -> str:
+    compact = " ".join((goal or "").split())
+    if len(compact) <= max_len:
+        return compact
+    return compact[: max_len - 1] + "…"
+
+
+def _policy_screen_text(
+    variant: str,
+    keep_els: list[str],
+    *,
+    user_goal: str = "",
+) -> str:
     trig = _mandatory_trig(keep_els)
     prefix = {"a": "A", "b": "B", "c": "C"}.get(variant, variant.upper())
+    goal_note = _short_goal_label(user_goal) if user_goal else ""
+    if goal_note and trig:
+        return f"🎯 {goal_note} · {prefix} · {','.join(trig)}"
+    if goal_note:
+        return f"🎯 {goal_note} · {prefix}"
     if trig:
         return f"12.5 · {prefix} · {','.join(trig)}"
     return f"12.5 · {prefix}"
@@ -166,7 +200,13 @@ def _chemical_shell(
     screen_text: str,
     grid_cols: int,
     body_buttons: str,
+    caption: str = "",
 ) -> str:
+    caption_html = (
+        f'<div class="calc-title" id="calc-title">{escape(caption)}</div>'
+        if caption.strip()
+        else ""
+    )
     return f"""<!DOCTYPE html>
 <html>
 <head>
@@ -192,6 +232,10 @@ def _chemical_shell(
             text-align: right; padding: 8px; border-radius: 6px; margin-bottom: 8px;
             min-height: 2.2em;
         }}
+        .calc-title {{
+            color: {accent}; font-size: calc(6px + 1vh); font-weight: 600;
+            text-align: center; margin: 0 0 6px; line-height: 1.25;
+        }}
         .grid {{
             display: grid; grid-template-columns: repeat({grid_cols}, 1fr);
             grid-auto-rows: 1fr; gap: 6px; flex: 1;
@@ -210,6 +254,7 @@ def _chemical_shell(
 </head>
 <body>
     <div class="calc-body">
+        {caption_html}
         <div class="screen" id="screen">{screen_text}</div>
         <div class="grid">
             {body_buttons}
@@ -221,11 +266,20 @@ def _chemical_shell(
 
 def _cinema_is_calculator(cinema_dir: Path) -> bool:
     active = _active_project_meta(cinema_dir)
-    if str(active.get("kind") or "").lower() == "calculator":
+    kind = str(active.get("kind") or "").lower()
+    if kind in ("dashboard", "monitor", "ecosystem", "api", "mcp", "frontend", "slice"):
+        return False
+    if kind == "calculator":
         return True
     path = cinema_dir / "stage0.html"
-    if path.is_file() and "calc-body" in path.read_text(encoding="utf-8"):
-        return True
+    if path.is_file():
+        text = path.read_text(encoding="utf-8").lower()
+        return (
+            "btn-eq" in text
+            or "simple calc" in text
+            or "scientific calculator" in text
+            or "chemical calculator" in text
+        )
     return False
 
 
@@ -256,31 +310,130 @@ def _project_option_label(meta: dict[str, str], variant: str) -> str:
     return title[variant]
 
 
+def _inject_goal_banner(html: str, goal: str, variant: str) -> str:
+    """Stamp visible goal context so offline iterations reflect the active project goal."""
+    if not goal.strip():
+        return html
+    label = _short_goal_label(goal, max_len=120)
+    import re
+
+    banner = (
+        f'<div class="nexu-goal-banner" data-variant="{variant}" '
+        f'style="font-size:0.75rem;opacity:0.9;margin:0 0 8px;padding:6px 10px;'
+        f'border-radius:6px;background:rgba(56,189,248,0.15);color:#7dd3fc;">'
+        f"🎯 Goal · {label}</div>"
+    )
+    if "nexu-goal-banner" in html:
+        return re.sub(
+            r'<div class="nexu-goal-banner"[^>]*>.*?</div>',
+            banner,
+            html,
+            count=1,
+            flags=re.I | re.S,
+        )
+    body_match = re.search(r"<body[^>]*>", html, flags=re.I)
+    if body_match:
+        pos = body_match.end()
+        return html[:pos] + banner + html[pos:]
+    return banner + html
+
+
 def _write_project_options_from_stages(
     cinema_dir: Path,
     *,
     delete_els: list[str],
+    keep_els: list[str],
+    user_goal: str = "",
+    focus_scope: str = "",
 ) -> list[str]:
     """Use active project's stage0/stage1/stage2 as default A-C proposals."""
+    from .cinema_scope import (
+        inject_scope_style,
+        normalize_focus_scope,
+        scope_option_variants,
+        ui_type_for_kind,
+    )
+
     meta = _active_project_meta(cinema_dir)
+    kind = str(meta.get("kind") or "").lower()
+    scope = normalize_focus_scope(focus_scope, kind)
+    ui_type = ui_type_for_kind(kind)
+    variant_specs = scope_option_variants(scope, ui_type)
     stage_map = [
-        ("stage0.html", "alt_a.html", "a"),
-        ("stage1.html", "alt_b.html", "b"),
-        ("stage2.html", "alt_c.html", "c"),
+        ("stage0.html", "a"),
+        ("stage1.html", "b"),
+        ("stage2.html", "c"),
     ]
     labels: list[str] = []
-    for stage_name, alt_name, variant in stage_map:
+    for (alt_name, label, _note), (stage_name, variant) in zip(
+        variant_specs, stage_map, strict=True
+    ):
         source = cinema_dir / stage_name
         if not source.exists():
             source = cinema_dir / "stage0.html"
         if not source.exists():
             return []
         out = finalize_cinema_html(source.read_text(encoding="utf-8"))
-        if delete_els:
-            out, _ = apply_spatial_deletes_to_html(out, delete_els)
+        out = _inject_goal_banner(out, user_goal, variant)
+        out = inject_scope_style(out, scope, variant, project_kind=kind)
+        effective_delete = _delete_without_keeps(delete_els, keep_els)
+        if effective_delete:
+            out, _ = apply_spatial_deletes_to_html(out, effective_delete)
             out = finalize_cinema_html(out)
         (cinema_dir / alt_name).write_text(out, encoding="utf-8")
-        labels.append(_project_option_label(meta, variant))
+        labels.append(label)
+    return labels
+
+
+def _write_scoped_calculator_options(
+    cinema_dir: Path,
+    *,
+    scope: str,
+    delete_els: list[str],
+    keep_els: list[str],
+    user_goal: str = "",
+    use_chemical: bool = False,
+    use_scientific: bool = False,
+) -> list[str]:
+    """Scope-first offline A–C for calculator/chemical projects (colors, shapes, …)."""
+    from .cinema_scope import inject_scope_style, scope_option_variants, ui_type_for_kind
+
+    meta = _active_project_meta(cinema_dir)
+    kind = str(meta.get("kind") or "calculator").lower()
+    ui_type = ui_type_for_kind(kind)
+    variant_specs = scope_option_variants(scope, ui_type)
+    variant_keys = ("a", "b", "c")
+    labels: list[str] = []
+    for (alt_name, label, _note), variant in zip(variant_specs, variant_keys, strict=True):
+        if use_chemical:
+            html = build_chemical_option_html(variant, keep_els, user_goal=user_goal)
+        elif use_scientific:
+            html = build_policy_scientific_option_html(
+                variant, keep_els, user_goal=user_goal
+            )
+        else:
+            html = build_policy_scientific_option_html(
+                variant, keep_els, user_goal=user_goal
+            )
+        out = finalize_cinema_html(html)
+        out = inject_scope_style(out, scope, variant, project_kind="calculator")
+        out = _inject_goal_banner(out, user_goal, variant)
+        effective_delete = _delete_without_keeps(delete_els, keep_els)
+        if effective_delete:
+            out, _ = apply_spatial_deletes_to_html(out, effective_delete)
+            out = finalize_cinema_html(out)
+        (cinema_dir / alt_name).write_text(out, encoding="utf-8")
+        labels.append(label)
+    alt_b = cinema_dir / "alt_b.html"
+    alt_c = cinema_dir / "alt_c.html"
+    if labels and alt_b.is_file():
+        (cinema_dir / "stage1.html").write_text(
+            alt_b.read_text(encoding="utf-8"), encoding="utf-8"
+        )
+    if labels and alt_c.is_file():
+        (cinema_dir / "stage2.html").write_text(
+            alt_c.read_text(encoding="utf-8"), encoding="utf-8"
+        )
     return labels
 
 
@@ -387,12 +540,17 @@ def _option_shell(
 </html>"""
 
 
-def build_policy_scientific_option_html(variant: str, keep_els: list[str]) -> str:
+def build_policy_scientific_option_html(
+    variant: str,
+    keep_els: list[str],
+    *,
+    user_goal: str = "",
+) -> str:
     """
     Build alt_a/b/c from Intract policy KEEP/DELETE (must-have controls in every variant).
     """
     trig = _trig_row(keep_els)
-    screen = _policy_screen_text(variant, keep_els)
+    screen = _policy_screen_text(variant, keep_els, user_goal=user_goal)
     if variant == "a":
         util = (
             _btn("x²", "pow2", extra_class="btn-sci")
@@ -437,23 +595,33 @@ def build_policy_scientific_option_html(variant: str, keep_els: list[str]) -> st
     )
 
 
-def build_chemical_option_html(variant: str, keep_els: list[str]) -> str:
+def build_chemical_option_html(
+    variant: str,
+    keep_els: list[str],
+    *,
+    user_goal: str = "",
+) -> str:
     """Return full HTML document for alt_a | alt_b | alt_c chemical variants."""
+    goal_line = _short_goal_label(user_goal) if user_goal else ""
     if variant == "a":
         elems = ["H", "O", "C", "N", "S", "Cl", "Na", "K"]
         chem = "".join(_btn(e, e, extra_class="btn-chem") for e in elems)
+        mandatory_science = _trig_row(keep_els) if _mandatory_trig(keep_els) else ""
         body = (
-            chem
+            mandatory_science
+            + chem
             + _btn("MW", "molar-mass", extra_class="btn-sci", style="grid-column: span 2;")
             + _btn("⌫", "clear", style="background:#e67e22;")
             + _numpad_rows()
         )
+        screen = "H₂O → 18.02 g/mol"
         return _chemical_shell(
             title="Option A: Chemical (minimal)",
             accent="#34d399",
-            screen_text="H₂O → 18.02 g/mol",
+            screen_text=screen,
             grid_cols=4,
             body_buttons=body,
+            caption=goal_line,
         )
     if variant == "b":
         chem = "".join(
@@ -461,12 +629,14 @@ def build_chemical_option_html(variant: str, keep_els: list[str]) -> str:
             for e in ("H", "O", "C", "N", "Fe", "Cu", "Zn", "Ag")
         )
         body = _trig_row(keep_els) + chem + _numpad_rows()
+        screen = "Formula: C₆H₁₂O₆ · tap element keys"
         return _chemical_shell(
             title="Option B: Chemical (balanced)",
             accent="#38bdf8",
-            screen_text="Formula: C₆H₁₂O₆ · tap element keys",
+            screen_text=screen,
             grid_cols=4,
             body_buttons=body,
+            caption=goal_line,
         )
     # variant c — expanded
     light = ["H", "He", "Li", "Be", "B", "C", "N", "O", "F", "Ne"]
@@ -477,12 +647,14 @@ def build_chemical_option_html(variant: str, keep_els: list[str]) -> str:
     extra += _btn("π", "pi", extra_class="btn-sci")
     extra += _btn("EXP", "EXP", extra_class="btn-sci-excess")
     body = _trig_row(keep_els) + chem + extra + _numpad_rows()
+    screen = "molar mass + formula"
     return _chemical_shell(
         title="Option C: Chemical (expanded)",
         accent="#a78bfa",
-        screen_text="Chemical & scientific · molar mass + formula",
+        screen_text=screen,
         grid_cols=5,
         body_buttons=body,
+        caption=goal_line or "Chemical & scientific",
     )
 
 
@@ -499,6 +671,9 @@ def write_goal_options_offline(
     keep_els: list[str] | None = None,
     delete_els: list[str] | None = None,
     hints: list[str] | None = None,
+    user_goal: str = "",
+    goal_contract_lines: list[str] | None = None,
+    focus_scope: str = "",
 ) -> list[str]:
     """
     Write alt_a/b/c.html without LLM. Returns human labels for options written.
@@ -507,14 +682,49 @@ def write_goal_options_offline(
     keep = list(keep_els or [])
     delete = list(delete_els or [])
     hint_list = list(hints or [])
-    labels: list[str] = []
-    use_chemical = is_chemical_goal(hint_list)
+    goal_text = (user_goal or "").strip()
+    traits = goal_traits_from_contract_lines(goal_contract_lines)
+    chem_sources = ([goal_text] if goal_text else []) + hint_list
+    use_chemical = traits.get("chemical") or is_chemical_goal(chem_sources)
     use_policy = _policy_constrained(keep, delete)
     use_calculator = _cinema_is_calculator(cinema_dir)
-    use_project_stages = not use_calculator and not use_chemical and _has_stage0(cinema_dir)
+    active_kind = str(_active_project_meta(cinema_dir).get("kind") or "").lower()
+    use_dashboard = traits.get("dashboard") or traits.get("api") or (
+        not use_calculator
+        and not use_chemical
+        and active_kind
+        in ("dashboard", "monitor", "ecosystem", "api", "frontend", "slice", "mcp")
+    )
+    use_project_stages = (
+        (use_dashboard or (not use_calculator and not use_chemical))
+        and _has_stage0(cinema_dir)
+    )
     use_scientific = use_policy or (use_calculator and not use_chemical)
+    raw_scope = (focus_scope or "").strip().lower()
+    labels: list[str] = []
     if use_project_stages:
-        labels = _write_project_options_from_stages(cinema_dir, delete_els=delete)
+        labels = _write_project_options_from_stages(
+            cinema_dir,
+            delete_els=delete,
+            keep_els=keep,
+            user_goal=goal_text,
+            focus_scope=focus_scope,
+        )
+        if labels:
+            return labels
+    if raw_scope and (use_calculator or use_chemical):
+        from .cinema_scope import normalize_focus_scope
+
+        scope = normalize_focus_scope(raw_scope, active_kind or "calculator")
+        labels = _write_scoped_calculator_options(
+            cinema_dir,
+            scope=scope,
+            delete_els=delete,
+            keep_els=keep,
+            user_goal=goal_text,
+            use_chemical=use_chemical,
+            use_scientific=use_scientific,
+        )
         if labels:
             return labels
     if use_chemical:
@@ -537,15 +747,18 @@ def write_goal_options_offline(
         ]
     for filename, variant, label in mapping:
         if use_chemical:
-            html = build_chemical_option_html(variant, keep)
+            html = build_chemical_option_html(variant, keep, user_goal=goal_text)
         elif use_scientific:
-            html = build_policy_scientific_option_html(variant, keep)
+            html = build_policy_scientific_option_html(
+                variant, keep, user_goal=goal_text
+            )
         else:
             tmpl = f"alt_{variant}.html.tmpl"
             html = _render_packaged_alt(tmpl)
         out = finalize_cinema_html(html)
-        if delete:
-            out, _ = apply_spatial_deletes_to_html(out, delete)
+        effective_delete = _delete_without_keeps(delete, keep)
+        if effective_delete:
+            out, _ = apply_spatial_deletes_to_html(out, effective_delete)
             out = finalize_cinema_html(out)
         (cinema_dir / filename).write_text(out, encoding="utf-8")
         labels.append(label)

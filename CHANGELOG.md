@@ -16,6 +16,8 @@
 - Use package `__version__` in MCP `serverInfo` to avoid version drift.
 
 ### Fix
+- Cinema project switch: reset policy ledger, seed goal/options from active project (`backend_service`, dashboards), distinct A–C from stages; KPI/dashboard spatial DELETE; policy panel shows `active_example_project`.
+- `sync_cinema_templates` on each Cinema server start so `cinema_player.html` and `nexu_hooks.py` stay aligned with package templates.
 - Respect `llm.allow_network_calls` in `cinema` iteration flow to prevent unintended LLM network calls in offline mode.
 - Read API key env and model defaults for `cinema` from `nexu.yaml` (`llm.api_key_env`, `llm.model`) and workspace `.env` (`LLM_MODEL`) instead of hardcoded values.
 - Treat intract manifest-only `fail` as warn in `verify_capsule` (capsule code may lag manifest intent).
@@ -24,6 +26,39 @@
 ### Test
 - `tests/test_cinema_policy.py`, `tests/test_export_prompt_ledger.py`, `tests/test_verify_intract.py`; `tests/conftest.py` adds sibling intract.
 - Full suite: `pytest -q` (16 passed); `make ci-cinema-smoke`.
+
+## [0.5.19] - 2026-05-31
+
+### Docs
+- Update CHANGELOG.md
+- Update README.md
+- Update docs/llm-orchestration.md
+- Update docs/llm-review.md
+
+### Test
+- Update tests/test_cinema_goal_contracts.py
+- Update tests/test_cinema_llm.py
+- Update tests/test_cinema_llm_contracts.py
+- Update tests/test_cinema_offline_options.py
+- Update tests/test_cinema_project_imports.py
+- Update tests/test_cinema_projects.py
+- Update tests/test_cinema_scope.py
+- Update tests/test_cinema_scripts.py
+- Update tests/test_cinema_server.py
+- Update tests/test_cinema_spatial_patch.py
+
+### Other
+- Update Makefile
+- Update examples/web_app_analytics/cinema/stage0.html
+- Update examples/web_app_analytics/cinema/stage1.html
+- Update examples/web_app_analytics/cinema/stage2.html
+- Update examples/web_app_calculator/cinema/cinema_player.html
+- Update examples/web_app_calculator/cinema/nexu_hooks.py
+- Update examples/web_app_calculator/workspace/nexu.yaml
+- Update examples/web_app_dashboard/cinema/stage0.html
+- Update examples/web_app_dashboard/cinema/stage1.html
+- Update examples/web_app_dashboard/cinema/stage2.html
+- ... and 7 more files
 
 ## [0.5.18] - 2026-05-31
 

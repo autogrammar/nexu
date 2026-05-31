@@ -31,7 +31,7 @@ Network calls are disabled unless explicitly enabled.
 ```yaml
 llm:
   provider: openrouter
-  model: openrouter/qwen/qwen3-coder-next
+  model: openrouter/deepseek/deepseek-v4-pro
   base_url: https://openrouter.ai/api/v1
   api_key_env: OPENROUTER_API_KEY
   allow_network_calls: true

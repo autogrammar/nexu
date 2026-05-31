@@ -108,6 +108,16 @@ def build_intract_policy_snapshot(root: Path, name: str) -> dict[str, Any]:
     }
 
 
+def sync_cinema_templates(cinema_dir: Path, root: Path, name: str) -> None:
+    """Refresh generated Cinema assets from package templates (player, hooks)."""
+    cinema_dir.mkdir(parents=True, exist_ok=True)
+    write_cinema_nexu_hooks(cinema_dir, root, name)
+    (cinema_dir / "cinema_player.html").write_text(
+        _cinema_template_text("cinema_player.html.tmpl"),
+        encoding="utf-8",
+    )
+
+
 def write_intract_policy_files(cinema_dir: Path, root: Path, name: str) -> None:
     snapshot = build_intract_policy_snapshot(root, name)
     (cinema_dir / "intract_policy.json").write_text(
@@ -163,16 +173,11 @@ def generate_cinema_player(root: Path, name: str) -> Path:
     (cinema_dir / "stage1.html").write_text(alt_b_html, encoding="utf-8")
     (cinema_dir / "stage2.html").write_text(alt_c_html, encoding="utf-8")
 
-    if is_calculator_capsule(root, name):
-        from .cinema_offline_options import write_goal_options_offline
-
-        write_goal_options_offline(cinema_dir, keep_els=[], delete_els=[], hints=[])
-
-    player_path = cinema_dir / "cinema_player.html"
-    player_html = _cinema_template_text("cinema_player.html.tmpl")
-    player_path.write_text(player_html, encoding="utf-8")
+    sync_cinema_templates(cinema_dir, root, name)
 
     _start_cinema_server(cinema_dir, root, name)
+
+    player_path = cinema_dir / "cinema_player.html"
 
     return player_path
 

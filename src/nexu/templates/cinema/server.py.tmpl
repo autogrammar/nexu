@@ -7,8 +7,8 @@ import re
 import json
 import csv
 import mimetypes
-import subprocess
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from datetime import datetime
 
@@ -31,6 +31,152 @@ ALLOW_NETWORK_CALLS = $ALLOW_NETWORK_CALLS
 API_KEY_ENV = $API_KEY_ENV
 DEFAULT_MODEL = $DEFAULT_MODEL
 MAX_TOKENS = int(os.environ.get("CINEMA_MAX_TOKENS", "4096"))
+
+_DASHBOARD_KINDS = frozenset(
+    {"dashboard", "monitor", "ecosystem", "api", "mcp", "frontend", "slice"}
+)
+
+
+def _load_cinema_ui_profile() -> dict:
+    """Active example project kind drives LLM/offline semantics."""
+    active: dict = {}
+    try:
+        import nexu_hooks
+
+        raw = nexu_hooks.active_project()
+        if isinstance(raw, dict):
+            active = raw
+    except Exception:
+        active = {}
+    kind = str(active.get("kind") or "").lower()
+    title = str(active.get("title") or active.get("id") or "").strip()
+    if kind in _DASHBOARD_KINDS:
+        ui_type = "dashboard"
+    elif kind == "calculator":
+        ui_type = "calculator"
+    else:
+        stage0 = DIRECTORY / "stage0.html"
+        if stage0.is_file():
+            text = stage0.read_text(encoding="utf-8").lower()
+            if "calc-body" in text or "btn-eq" in text:
+                ui_type = "calculator"
+            elif "app-shell" in text or "kpi-card" in text or "kpi-grid" in text:
+                ui_type = "dashboard"
+            else:
+                ui_type = "web"
+        else:
+            ui_type = "web"
+    return {"kind": kind, "title": title, "ui_type": ui_type, "active": active}
+
+
+def _goal_entry_kwargs(data: dict) -> dict:
+    """Optional scope fields from cinema_player goal form."""
+    out: dict = {}
+    for key in (
+        "focus_scope",
+        "focus_scope_label",
+        "current_state",
+        "expected_version",
+        "project_context",
+    ):
+        val = str(data.get(key, "") or "").strip()
+        if val:
+            out[key] = val
+    return out
+
+
+def _llm_prompt_intro(profile: dict) -> str:
+    ui_type = profile.get("ui_type") or "web"
+    title = profile.get("title") or "the active project"
+    if ui_type == "dashboard":
+        return (
+            f"You are evolving a web dashboard/analytics UI for {title}. "
+            "Below is the current HTML."
+        )
+    if ui_type == "calculator":
+        return "You are evolving a calculator web UI. Below is the current HTML."
+    return f"You are evolving a web application UI for {title}. Below is the current HTML."
+
+
+def _llm_prompt_rules(profile: dict) -> str:
+    ui_type = profile.get("ui_type") or "web"
+    shared = [
+        "1. Return ONLY the complete evolved HTML document, nothing else.",
+        "2. Keep the same overall structure (full <!DOCTYPE html> page).",
+        "3. Preserve elements marked KEEP - do not change their function.",
+    ]
+    if ui_type == "calculator":
+        return "\n".join(
+            shared
+            + [
+                "4. For DELETE elements: remove ONLY those buttons from the HTML — do not remove anything else.",
+                "5. Do NOT simplify the calculator or drop scientific buttons unless they are in the DELETE list.",
+                "6. Improve visual design only when explicitly asked in hints; otherwise preserve layout.",
+                "7. Keep the same CSS class names (.btn, .btn-sci, .btn-sci-excess, .btn-op, .screen) so buttons work.",
+                "8. Do NOT include any <script> tags — runtime is injected by Nexu after generation.",
+                "9. Each option variant must be visually and functionally distinct.",
+                "10. Use id=screen for the display and class=btn / btn-sci / btn-op on buttons.",
+                "11. Domain-specific controls from the current HTML or KEEP list are mandatory "
+                "unless they appear under DELETE.",
+                "12. Respect Intract baseline contracts (calc.app.kind, display, keypad) — goal contracts "
+                "only ADD traits; never remove baseline structure unless DELETE list says so.",
+                "13. The element #screen is an output display only: put only a number, formula, "
+                "or current expression there. Do not put the app title, goal, variant name, "
+                "or text like 'Chemical & scientific keypad evolution' inside #screen; place "
+                "that title above or below the display.",
+            ]
+        )
+    return "\n".join(
+        shared
+        + [
+            "4. For DELETE elements: remove ONLY those marked panels/cards/controls — do not strip unrelated layout.",
+            "5. Do NOT replace the current application type with a different application type unless the goal explicitly asks.",
+            "6. Improve visual design only when explicitly asked in hints; otherwise preserve layout.",
+            "7. Keep data-nexu-target, id=btn-*, and existing CSS class names on selectable widgets.",
+            "8. Do NOT include any <script> tags — runtime is injected by Nexu after generation.",
+            "9. Each option variant must be visually and functionally distinct (overview → workflow → expanded).",
+            "10. Preserve existing shell/card/control patterns unless the selected scope requires changing them.",
+            "11. Align labels and visible data with the project goal and current project metadata.",
+            "12. Respect Intract baseline contracts — goal extensions only ADD traits; never regress unless DELETE says so.",
+        ]
+    )
+
+
+def _llm_communication_contract_block(
+    *,
+    ui_type: str,
+    focus_scope: str,
+    variant_label: str,
+    keep_els: list,
+    delete_els: list,
+    project_goal: str = "",
+    current_state: str = "",
+    expected_version: str = "",
+    element_hints: list | None = None,
+) -> str:
+    try:
+        from nexu.cinema_llm_contracts import build_llm_contract_block
+
+        return build_llm_contract_block(
+            ui_type=ui_type,
+            focus_scope=focus_scope,
+            variant_label=variant_label,
+            keep_els=keep_els,
+            delete_els=delete_els,
+            project_goal=project_goal,
+            current_state=current_state,
+            expected_version=expected_version,
+            element_hints=element_hints,
+        )
+    except Exception:
+        return (
+            "- @intract.v1 id:llm.cinema.html scope:llm_call "
+            "intent:generate:complete_html priority:1 domain:llm.ui "
+            "input:current_html,goal,ui_constraints output:complete_html "
+            "effect:read,generate forbid:script_tags,secret_leak "
+            "require:complete_html_document validate:html_document,no_script_tags"
+        )
+
 
 ENV_PATH_CANDIDATES = [
     ROOT_PATH / ".env",
@@ -77,10 +223,59 @@ def _resolve_model() -> str:
     )
 
 
-def _litellm_available() -> bool:
-    import importlib.util
+def _llm_network_allowed() -> bool:
+    """Read llm.allow_network_calls from workspace nexu.yaml (not startup snapshot)."""
+    try:
+        from nexu.cinema_llm import _cached_config
 
-    return importlib.util.find_spec("litellm") is not None
+        return bool(_cached_config(ROOT_PATH).llm.allow_network_calls)
+    except Exception:
+        return ALLOW_NETWORK_CALLS
+
+
+def _litellm_available() -> bool:
+    try:
+        from nexu.cinema_llm import _litellm_completion
+
+        _litellm_completion()
+        return True
+    except Exception:
+        return False
+
+
+def _llm_status_payload() -> dict:
+    _ensure_api_key_env()
+    try:
+        from nexu.cinema_llm import _cached_config
+
+        config = _cached_config(ROOT_PATH)
+        llm = config.llm
+        provider = str(llm.provider)
+        model = _resolve_model() or str(llm.model)
+        api_key_env = str(llm.api_key_env)
+        allow_network = bool(llm.allow_network_calls)
+        base_url = str(llm.base_url)
+        temperature = float(llm.temperature)
+        timeout = int(llm.timeout)
+    except Exception:
+        provider = "openrouter"
+        model = _resolve_model()
+        api_key_env = API_KEY_ENV
+        allow_network = bool(ALLOW_NETWORK_CALLS)
+        base_url = ""
+        temperature = 0.0
+        timeout = 0
+    return {
+        "provider": provider,
+        "model": model,
+        "api_key_env": api_key_env,
+        "api_key_present": bool(os.environ.get(api_key_env, "")),
+        "allow_network_calls": allow_network,
+        "litellm_available": _litellm_available(),
+        "base_url": base_url,
+        "temperature": temperature,
+        "timeout": timeout,
+    }
 
 
 def _ensure_api_key_env() -> None:
@@ -101,6 +296,17 @@ def _strip_markdown_fences(text: str) -> str:
             lines = lines[:-1]
         return chr(10).join(lines).strip()
     return raw
+
+
+def _extract_html_document(text: str) -> str:
+    cleaned = _strip_markdown_fences(text)
+    match = re.search(r"<!DOCTYPE\s+html[\s\S]*?</html>", cleaned, flags=re.I)
+    if match:
+        return match.group(0).strip()
+    match = re.search(r"<html[\s\S]*?</html>", cleaned, flags=re.I)
+    if match:
+        return "<!DOCTYPE html>\n" + match.group(0).strip()
+    return cleaned
 
 
 def _extract_llm_content(response: object) -> str | None:
@@ -127,17 +333,13 @@ def _extract_llm_content(response: object) -> str | None:
 
 
 def _compact_llm_error(err_text: str) -> str:
-    if "OpenrouterException - " in err_text:
-        payload = err_text.split("OpenrouterException - ", 1)[1].strip()
-        try:
-            data = json.loads(payload)
-            msg = data.get("error", {}).get("message")
-            if isinstance(msg, str) and msg.strip():
-                return msg.strip()
-        except Exception:
-            pass
-    compact = " ".join(err_text.split())
-    return compact[:260]
+    try:
+        from nexu.cinema_llm import compact_llm_error
+
+        return compact_llm_error(err_text)
+    except Exception:
+        compact = " ".join(str(err_text).split())
+        return compact[:260]
 
 
 def _load_policy_payload() -> dict:
@@ -457,6 +659,22 @@ def _activate_project(project_id: str) -> dict:
     return nexu_hooks.activate_project(project_id)
 
 
+def _import_project(data: dict) -> dict:
+    try:
+        import nexu_hooks
+    except ImportError:
+        return {"error": "nexu_hooks.py missing; regenerate cinema (make cinema)"}
+    kind = str(data.get("kind") or "").strip()
+    if kind == "git":
+        return nexu_hooks.import_project_from_git(str(data.get("git_url") or ""))
+    if kind == "zip":
+        return nexu_hooks.import_project_from_zip(
+            str(data.get("filename") or "project.zip"),
+            str(data.get("content_base64") or ""),
+        )
+    return {"error": "unsupported import kind"}
+
+
 def _export_markpact_markdown(*, stage: int = 0, user_goal: str = "") -> dict:
     try:
         import nexu_hooks
@@ -579,6 +797,22 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(body)
             return
+        if self.path in ("/llm/status", "/llm/status/"):
+            try:
+                payload = _llm_status_payload()
+                body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-type", "application/json; charset=utf-8")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(body)
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(str(e).encode("utf-8"))
+                return
         if self.path in ("/history", "/history/"):
             try:
                 payload = _list_history()
@@ -717,6 +951,40 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(str(e).encode('utf-8'))
                 return
+
+        elif self.path == '/propose/goal':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            try:
+                data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+                stage = int(data.get('current_stage', 0))
+                goal = str(data.get('goal', '') or data.get('user_goal', '') or '').strip()
+                if not goal:
+                    payload = {"error": "goal required"}
+                else:
+                    import nexu_hooks
+                    entry = nexu_hooks.append_goal_policy_entry(
+                        stage, goal, **_goal_entry_kwargs(data)
+                    )
+                    proposals = entry.get("proposed_contracts") or []
+                    payload = {
+                        "status": "goal_defined",
+                        "count": len(proposals),
+                        "user_goal": goal,
+                        "proposals": proposals,
+                    }
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json; charset=utf-8')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(str(e).encode('utf-8'))
+                return
                 
         elif self.path == '/history/restore':
             content_length = int(self.headers['Content-Length'])
@@ -836,6 +1104,25 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(str(e).encode('utf-8'))
                 return
 
+        elif self.path == '/projects/import':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            try:
+                data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+                payload = _import_project(data)
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json; charset=utf-8')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(str(e).encode('utf-8'))
+                return
+
         elif self.path == '/promote':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
@@ -891,11 +1178,47 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 spatial_feedback = data.get('prompt', '')
                 current_stage = int(data.get('current_stage', 0))
                 annotations = data.get('annotations', [])
+                user_goal = str(data.get('user_goal', '') or '').strip()
+                focus_scope = str(data.get('focus_scope', '') or '').strip()
+                focus_scope_label = str(data.get('focus_scope_label', '') or '').strip()
+                focus_scope_display = focus_scope_label or (f"#{focus_scope}" if focus_scope else "")
+                current_state = str(data.get('current_state', '') or '').strip()
+                expected_version = str(data.get('expected_version', '') or '').strip()
+                element_hints_raw = data.get('element_hints', [])
+                if not isinstance(element_hints_raw, list):
+                    element_hints_raw = []
+                normalized_element_hints = [
+                    str(item).strip() for item in element_hints_raw if str(item).strip()
+                ]
                 user_hints = data.get('user_hints', [])
                 if not isinstance(user_hints, list):
                     user_hints = []
-                normalized_hints = [str(item).strip() for item in user_hints if str(item).strip()]
-                hints_block = "\n".join(f"- {hint}" for hint in normalized_hints) if normalized_hints else "none provided"
+                legacy_hints = [str(item).strip() for item in user_hints if str(item).strip()]
+                if not user_goal and legacy_hints:
+                    user_goal = legacy_hints[0]
+                if not normalized_element_hints and len(legacy_hints) > 1:
+                    normalized_element_hints = legacy_hints[1:]
+                elif not normalized_element_hints and legacy_hints and legacy_hints[0] != user_goal:
+                    normalized_element_hints = legacy_hints
+                normalized_hints = []
+                if user_goal:
+                    normalized_hints.append(user_goal)
+                normalized_hints.extend(normalized_element_hints)
+                if focus_scope_display:
+                    normalized_hints.append(f"Focus scope {focus_scope_display}")
+                goal_block = user_goal if user_goal else "none provided"
+                scope_block = (
+                    f"{focus_scope_display}"
+                    + (f"\nCurrent slice: {current_state}" if current_state else "")
+                    + (f"\nExpected version/actions: {expected_version}" if expected_version else "")
+                    if focus_scope_display
+                    else "none selected"
+                )
+                element_hints_block = (
+                    "\n".join(f"- {hint}" for hint in normalized_element_hints)
+                    if normalized_element_hints
+                    else "none provided"
+                )
                 
                 # Read current active stage HTML
                 stage_file = DIRECTORY / f'stage{current_stage}.html'
@@ -909,6 +1232,19 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 if session_delete or session_keep:
                     pending_goal = False
                 policy_payload = _load_policy_payload()
+                goal_contract_lines: list[str] = []
+                ui_profile = _load_cinema_ui_profile()
+                try:
+                    import nexu_hooks
+                    if user_goal:
+                        nexu_hooks.append_goal_policy_entry(
+                            current_stage,
+                            user_goal,
+                            **_goal_entry_kwargs(data),
+                        )
+                    goal_contract_lines = list(nexu_hooks.goal_contract_lines() or [])
+                except Exception:
+                    goal_contract_lines = []
                 ledger_ui = policy_payload.get("effective_ui") or {}
                 ledger_keep = list(ledger_ui.get("keep") or [])
                 ledger_delete = list(ledger_ui.get("delete") or [])
@@ -919,17 +1255,19 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 if requested_mode == 'goal_options':
                     apply_active = False
                     apply_options = bool(
-                        normalized_hints
+                        user_goal
+                        or normalized_element_hints
                         or session_keep
                         or session_delete
                         or ledger_keep
                         or ledger_delete
                         or pending_goal
+                        or focus_scope
                     )
                 elif requested_mode == 'active_workspace':
                     apply_active = bool(session_delete or session_keep or delete_els or keep_els)
                     apply_options = False
-                elif (pending_goal or normalized_hints) and not (session_delete or session_keep):
+                elif (pending_goal or user_goal or normalized_element_hints) and not (session_delete or session_keep):
                     apply_active = False
                     apply_options = True
                 elif session_delete or session_keep:
@@ -939,8 +1277,43 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                     apply_active = False
                     apply_options = False
 
+                markpact_context = ""
+                try:
+                    import nexu_hooks
+
+                    _mp_payload = nexu_hooks.export_markpact_readme(current_stage, user_goal)
+                    _mp_body = str(_mp_payload.get("markdown") or "")
+                    if _mp_body:
+                        _mp_max = int(os.environ.get("CINEMA_MARKPACT_CONTEXT_CHARS", "24000"))
+                        _mp_suffix = (
+                            "\n\n<!-- markpact context truncated -->"
+                            if len(_mp_body) > _mp_max
+                            else ""
+                        )
+                        markpact_context = (
+                            "Markpact context pack (active app, contracts, runnable HTML):\n"
+                            "```markdown\n"
+                            + _mp_body[:_mp_max]
+                            + _mp_suffix
+                            + "\n```\n\n"
+                        )
+                except Exception:
+                    markpact_context = ""
+
                 def _build_llm_prompt(*, variant_note: str = "") -> str:
                     variant_block = f"Variant direction:\n{variant_note}\n\n" if variant_note else ""
+                    variant_label = variant_note.split(":", 1)[0].strip() if variant_note else "active"
+                    llm_contract_block = _llm_communication_contract_block(
+                        ui_type=str(ui_profile.get("ui_type") or "web"),
+                        focus_scope=focus_scope or "functions",
+                        variant_label=variant_label,
+                        keep_els=keep_els,
+                        delete_els=delete_els,
+                        project_goal=user_goal,
+                        current_state=current_state,
+                        expected_version=expected_version,
+                        element_hints=normalized_element_hints,
+                    )
                     ledger_block = ""
                     if ledger_keep or ledger_delete:
                         ledger_block = (
@@ -948,33 +1321,61 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                             "- KEEP from ledger: " + (', '.join(ledger_keep) if ledger_keep else 'none') + "\n"
                             "- DELETE from ledger: " + (', '.join(ledger_delete) if ledger_delete else 'none') + "\n\n"
                         )
+                    goal_contract_block = ""
+                    if goal_contract_lines:
+                        goal_contract_block = (
+                            "Intract goal extensions (extend frozen baseline; do NOT regress layout/contracts):\n"
+                            + "\n".join(f"- {line}" for line in goal_contract_lines)
+                            + "\n\n"
+                        )
+                    active_ctx = ""
+                    active = ui_profile.get("active") or {}
+                    if active.get("title") or active.get("id"):
+                        active_ctx = (
+                            f"Active example project: {active.get('title') or active.get('id')} "
+                            f"({active.get('kind') or ui_profile.get('ui_type')}).\n\n"
+                        )
                     prompt = (
-                        "You are evolving a calculator web UI. Below is the current HTML.\n\n"
-                        "Current HTML:\n```html\n" + current_html + "\n```\n\n"
+                        _llm_prompt_intro(ui_profile)
+                        + "\n\n"
+                        + active_ctx
+                        + markpact_context
+                        + "Current HTML:\n```html\n"
+                        + current_html
+                        + "\n```\n\n"
                         + variant_block
+                        + goal_contract_block
+                        + "Intract LLM communication contract (this model call must satisfy):\n"
+                        + llm_contract_block
+                        + "\n\n"
+                        + "Contract precedence:\n"
+                        "1. The Intract LLM communication contract is canonical.\n"
+                        "2. Goal/scope/hints below are supporting evidence only.\n"
+                        "3. If text conflicts with KEEP/DELETE or baseline contracts, follow the contracts.\n\n"
                         + ledger_block
                         + "Effective UI constraints for this request (ledger + current marks):\n"
                         "- KEEP these elements (user likes them): "
-                        + (', '.join(keep_els) if keep_els else 'none specified') + "\n"
+                        + (', '.join(keep_els) if keep_els else 'none specified')
+                        + "\n"
                         "- REDESIGN/DELETE these elements (user wants them changed or removed): "
-                        + (', '.join(delete_els) if delete_els else 'none specified') + "\n\n"
-                        "User goal/hints:\n" + hints_block + "\n\n"
-                        "Additional context: " + spatial_feedback + "\n\n"
+                        + (', '.join(delete_els) if delete_els else 'none specified')
+                        + "\n\n"
+                        "Project goal (overall target):\n"
+                        + goal_block
+                        + "\n\n"
+                        "Focus scope for this iteration (single-choice hashtag):\n"
+                        + scope_block
+                        + "\n\n"
+                        "Element hints (notes about marked controls):\n"
+                        + element_hints_block
+                        + "\n\n"
+                        "Compiled summary from player:\n"
+                        + spatial_feedback
+                        + "\n\n"
                         "Rules:\n"
-                        "1. Return ONLY the complete evolved HTML document, nothing else.\n"
-                        "2. Keep the same overall structure (full <!DOCTYPE html> page).\n"
-                        "3. Preserve elements marked KEEP - do not change their function.\n"
-                        "4. For DELETE elements: remove ONLY those buttons from the HTML — do not remove anything else.\n"
-                        "5. Do NOT simplify the calculator or drop scientific buttons unless they are in the DELETE list.\n"
-                        "6. Improve visual design only when explicitly asked in hints; otherwise preserve layout.\n"
-                        "7. Keep the same CSS class names (.btn, .btn-sci, .btn-sci-excess, .btn-op, .screen) so buttons work.\n"
-                        "8. Do NOT include any <script> tags — runtime is injected by Nexu after generation.\n"
-                        "9. Each option variant must be visually and functionally distinct.\n"
-                        "10. Use id=screen for the display and class=btn / btn-sci / btn-op on buttons.\n"
-                        "11. When generating chemical-calculator variants, still include buttons listed under KEEP "
-                        "(e.g. sin, cos, tan, log, ln) unless they appear under DELETE.\n"
+                        + _llm_prompt_rules(ui_profile)
                     )
-                    if keep_els and apply_options:
+                    if ui_profile.get("ui_type") == "calculator" and keep_els and apply_options:
                         trig = [t for t in keep_els if t in ('sin', 'cos', 'tan', 'log', 'ln')]
                         if trig:
                             prompt += (
@@ -983,11 +1384,18 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                             )
                     if delete_els and not variant_note:
                         delete_list = ", ".join(delete_els)
-                        prompt += (
-                            "\n\nCRITICAL: Remove ONLY these controls: "
-                            + delete_list
-                            + ". Every other button (sin, cos, tan, log, ln, EXP, pi, digits, operators) must remain."
-                        )
+                        if ui_profile.get("ui_type") == "calculator":
+                            prompt += (
+                                "\n\nCRITICAL: Remove ONLY these controls: "
+                                + delete_list
+                                + ". Every other button (sin, cos, tan, log, ln, EXP, pi, digits, operators) must remain."
+                            )
+                        else:
+                            prompt += (
+                                "\n\nCRITICAL: Remove or redesign ONLY these targets: "
+                                + delete_list
+                                + ". Keep all other dashboard widgets unless listed."
+                            )
                     prompt += "\n\nReturn the full HTML:"
                     return prompt
 
@@ -1000,10 +1408,47 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
 
                 def _finalize_llm_html(html: str) -> str:
                     import re
+                    from html import escape
+
                     if not html:
                         return html
                     cleaned = re.sub(
                         r'<script\b[^>]*>[\s\S]*?</script>', '', html, flags=re.I
+                    )
+                    def _screen_repl(match):
+                        attrs = match.group(1)
+                        inner = match.group(2)
+                        text = re.sub(r"<[^>]+>", " ", inner)
+                        text = re.sub(r"\s+", " ", text).strip()
+                        lower_text = text.lower()
+                        if (
+                            "🎯" not in text
+                            and "chemical &" not in lower_text
+                            and "keypad evolution" not in lower_text
+                            and "variant" not in lower_text
+                        ):
+                            return match.group(0)
+                        parts = [part.strip() for part in re.split(r"\s*[·|]\s*", text) if part.strip()]
+                        display = parts[-1] if parts else "0"
+                        caption = " · ".join(parts[:-1]) if len(parts) > 1 else text
+                        if not caption or caption == display:
+                            return match.group(0)
+                        return (
+                            '<div class="nexu-screen-caption">'
+                            + escape(caption)
+                            + '</div><div'
+                            + attrs
+                            + '>'
+                            + escape(display)
+                            + '</div>'
+                        )
+
+                    cleaned = re.sub(
+                        r'<div([^>]*\bid=["\']screen["\'][^>]*)>([\s\S]*?)</div>',
+                        _screen_repl,
+                        cleaned,
+                        count=1,
+                        flags=re.I,
                     )
                     inject = ''
                     for name in ('_inject_shield.html', '_inject_runtime.html'):
@@ -1018,45 +1463,77 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
 
                 def _call_llm(prompt: str) -> tuple[str | None, str | None]:
                     _ensure_api_key_env()
-                    api_key = os.environ.get(API_KEY_ENV, '')
-                    model = _resolve_model()
-                    if not ALLOW_NETWORK_CALLS:
+                    if not _llm_network_allowed():
                         return None, 'llm.allow_network_calls disabled in nexu.yaml'
                     if not _litellm_available():
                         return None, (
-                            'litellm is not installed for the cinema server Python '
-                            f'({SYS_EXE}). From the nexu repo run: uv sync && make cinema'
+                            'litellm is not available. From the nexu repo run: uv sync'
                         )
-                    if not api_key:
-                        return None, f'{API_KEY_ENV} not set'
                     try:
-                        from litellm import completion as llm_completion
-                        response = llm_completion(
-                            model=model,
-                            messages=[
-                                {"role": "system", "content": "You are a UI evolution engine. Return only complete HTML documents. No markdown fences, no explanation."},
-                                {"role": "user", "content": prompt},
-                            ],
-                            temperature=0.35,
+                        from nexu.cinema_llm import has_terminal_artifacts
+                        from nexu.cinema_llm import call_cinema_html_llm
+
+                        raw, err = call_cinema_html_llm(
+                            prompt,
+                            ROOT_PATH,
+                            model=_resolve_model(),
                             max_tokens=MAX_TOKENS,
-                            timeout=90,
-                            api_key=api_key,
-                            api_base='https://openrouter.ai/api/v1',
                         )
-                        content = _extract_llm_content(response)
-                        if content is None:
-                            return None, 'LLM returned empty content'
-                        raw = _strip_markdown_fences(str(content))
-                        if raw and '<!DOCTYPE' in raw.upper()[:50]:
+                        if err:
+                            return None, err
+                        if raw:
+                            if has_terminal_artifacts(raw):
+                                return None, 'LLM output contained terminal artifacts, not clean HTML'
                             return _finalize_llm_html(raw), None
-                        return None, 'Invalid HTML returned'
-                    except ModuleNotFoundError:
-                        return None, (
-                            'litellm is not installed for the cinema server Python '
-                            f'({SYS_EXE}). From the nexu repo run: uv sync && make cinema'
-                        )
+                        return None, 'LLM did not return a complete HTML document'
                     except Exception as llm_exc:
                         return None, _compact_llm_error(str(llm_exc))
+
+                def _llm_option_variants(
+                    scope: str, focus_text: str, ui_type: str
+                ) -> list[tuple[str, str, str]]:
+                    try:
+                        from nexu.cinema_scope import scope_option_variants
+
+                        return list(
+                            scope_option_variants(
+                                scope or "functions",
+                                ui_type or "web",
+                                focus_text,
+                            )
+                        )
+                    except Exception:
+                        pass
+                    try:
+                        from nexu.cinema_llm_contracts import build_llm_option_variants
+
+                        return build_llm_option_variants(
+                            focus_scope=scope or "functions",
+                            focus_text=focus_text,
+                        )
+                    except Exception:
+                        active_scope = (scope or "functions").strip().lower()
+                        suffix = (" " + focus_text.strip()) if focus_text.strip() else ""
+                        return [
+                            (
+                                "alt_a.html",
+                                f"Option A ({active_scope}: conservative)",
+                                "INTRACT-SCOPED VARIANT. Conservative change inside the selected scope only."
+                                + suffix,
+                            ),
+                            (
+                                "alt_b.html",
+                                f"Option B ({active_scope}: balanced)",
+                                "INTRACT-SCOPED VARIANT. Balanced change inside the selected scope only."
+                                + suffix,
+                            ),
+                            (
+                                "alt_c.html",
+                                f"Option C ({active_scope}: ambitious)",
+                                "INTRACT-SCOPED VARIANT. Ambitious change inside the selected scope only."
+                                + suffix,
+                            ),
+                        ]
 
                 _ensure_api_key_env()
                 model = _resolve_model()
@@ -1071,63 +1548,42 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 elif apply_options:
                     iteration_mode = "options_only"
                     hints_text = "; ".join(normalized_hints)
-                    goal_focus = (" Primary user goal: " + hints_text + ".") if hints_text else ""
-                    if any("chem" in h.lower() for h in normalized_hints):
+                    goal_focus = (" Primary project goal: " + user_goal + ".") if user_goal else ""
+                    if focus_scope_display:
                         goal_focus += (
-                            " Build chemical-calculator UIs: element buttons (H,O,C,N),"
-                            " molar mass display, formula entry."
+                            " Focus this variant on " + focus_scope_display
+                            + " only; keep other evolution axes stable unless required by the goal."
                         )
-                        if keep_els:
-                            goal_focus += (
-                                " Preserve all KEEP controls from policy: "
-                                + ", ".join(keep_els[:24])
-                                + ("…" if len(keep_els) > 24 else "")
-                                + "."
-                            )
-                    option_variants = [
-                        (
-                            "alt_a.html",
-                            "Option A (minimal)",
-                            "Minimalist UI: fewer buttons, clean layout, essential functions only." + goal_focus,
-                        ),
-                        (
-                            "alt_b.html",
-                            "Option B (balanced)",
-                            "Balanced calculator implementing the user goal with moderate complexity." + goal_focus,
-                        ),
-                        (
-                            "alt_c.html",
-                            "Option C (expanded)",
-                            "Expanded UI: richer feature set toward the user goal." + goal_focus,
-                        ),
-                    ]
-                    for filename, label, variant_note in option_variants:
+                    if normalized_element_hints:
+                        goal_focus += " Element hints: " + "; ".join(normalized_element_hints) + "."
+                    option_variants = _llm_option_variants(
+                        focus_scope,
+                        goal_focus,
+                        str(ui_profile.get("ui_type") or "web"),
+                    )
+
+                    def _generate_option(filename: str, label: str, variant_note: str):
                         prompt = _build_llm_prompt(variant_note=variant_note)
                         html, err = _call_llm(prompt)
-                        if html:
-                            (DIRECTORY / filename).write_text(html, encoding="utf-8")
-                            options_written.append(label)
-                        elif not llm_error:
-                            llm_error = err
+                        return filename, label, html, err
+
+                    with ThreadPoolExecutor(max_workers=len(option_variants)) as pool:
+                        futures = [
+                            pool.submit(_generate_option, filename, label, variant_note)
+                            for filename, label, variant_note in option_variants
+                        ]
+                        for future in as_completed(futures):
+                            filename, label, html, err = future.result()
+                            if html:
+                                (DIRECTORY / filename).write_text(html, encoding="utf-8")
+                                options_written.append(label)
+                            elif not llm_error:
+                                llm_error = err
                     if options_written:
                         status_msg = 'proposed_options_by_llm'
                         llm_error = None
                     else:
-                        try:
-                            import nexu_hooks
-                            offline_labels = nexu_hooks.write_offline_goal_options(
-                                keep_els=keep_els,
-                                delete_els=delete_els,
-                                hints=normalized_hints,
-                            )
-                            if offline_labels:
-                                options_written = offline_labels
-                                status_msg = 'proposed_options_offline'
-                                llm_error = None
-                        except Exception as offline_exc:
-                            llm_error = llm_error or str(offline_exc)
-                        if not options_written:
-                            status_msg = f'llm_skipped: {llm_error or "No option HTML generated"}'
+                        status_msg = f'llm_failed: {llm_error or "No option HTML generated"}'
                 else:
                     iteration_mode = "active_workspace"
                     if delete_els:
@@ -1142,7 +1598,7 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                             stage_file.write_text(evolved_html, encoding="utf-8")
                             status_msg = 'evolved_by_llm'
                         else:
-                            status_msg = f'llm_skipped: {llm_error or "Invalid HTML returned"}'
+                            status_msg = f'llm_failed: {llm_error or "Invalid HTML returned"}'
                 
                 # Log iteration
                 file_exists = LOG_CSV.exists()
@@ -1153,7 +1609,7 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                     writer.writerow([datetime.now().isoformat(), 'ITERATION_LLM', f"Stage: {current_stage} | Status: {status_msg} | Keep: {len(keep_els)} | Delete: {len(delete_els)}" ])
 
                 options_sync = None
-                if status_msg in ('proposed_options_offline', 'proposed_options_by_llm') and options_written:
+                if status_msg == 'proposed_options_by_llm' and options_written:
                     # Fresh alts already reflect merged keep/delete; ledger-only patch
                     # would strip re-marked keys (e.g. digit 5 after DELETE then KEEP).
                     options_sync = {
@@ -1161,8 +1617,7 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                         "files": list(options_written or []),
                     }
                 elif status_msg in ('evolved_by_spatial_patch', 'evolved_by_llm') or (
-                    status_msg in ('proposed_options_by_llm', 'proposed_options_offline')
-                    and options_written
+                    status_msg == 'proposed_options_by_llm' and options_written
                 ):
                     options_sync = _patch_option_previews(
                         current_stage,
@@ -1186,7 +1641,6 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 history_checkpoint = None
                 if status_msg in (
                     'proposed_options_by_llm',
-                    'proposed_options_offline',
                     'evolved_by_llm',
                     'evolved_by_spatial_patch',
                     'promoted',

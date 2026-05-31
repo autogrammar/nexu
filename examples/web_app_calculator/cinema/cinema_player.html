@@ -474,6 +474,69 @@
             overflow: hidden;
             min-width: 0;
         }
+
+        .scope-options-bar {
+            flex: 0 0 auto;
+            border: 1px solid rgba(56, 189, 248, 0.24);
+            background: rgba(15, 23, 42, 0.82);
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .scope-options-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            color: #94a3b8;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .scope-options-active {
+            color: #38bdf8;
+            font-size: 0.68rem;
+            text-transform: none;
+            letter-spacing: 0;
+            white-space: nowrap;
+        }
+        .scope-options-chips {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 6px;
+        }
+        .scope-chip {
+            min-width: 0;
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            background: rgba(15, 23, 42, 0.95);
+            color: #cbd5e1;
+            border-radius: 6px;
+            padding: 7px 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+            font-weight: 700;
+            cursor: pointer;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .scope-chip:hover {
+            border-color: rgba(56, 189, 248, 0.65);
+            color: #7dd3fc;
+        }
+        .scope-chip.active {
+            border-color: #fbbf24;
+            background: rgba(251, 191, 36, 0.16);
+            color: #facc15;
+        }
+        .scope-options-help {
+            color: #64748b;
+            font-size: 0.7rem;
+            line-height: 1.35;
+        }
         
         .panel {
             background: #020617;
@@ -598,6 +661,46 @@
             border-left: 3px solid #2ed573;
             align-self: flex-start;
         }
+        .chat-msg.goal {
+            background: rgba(251, 191, 36, 0.12);
+            color: #fbbf24;
+            border-left: 3px solid #fbbf24;
+            align-self: flex-start;
+        }
+        .chat-msg.hint {
+            background: rgba(129, 140, 248, 0.12);
+            color: #a5b4fc;
+            border-left: 3px solid #818cf8;
+            align-self: flex-start;
+        }
+        .goal-input {
+            border-color: rgba(251, 191, 36, 0.35);
+        }
+        .goal-input:focus {
+            border-color: #fbbf24;
+        }
+        .element-hint-input {
+            border-color: rgba(129, 140, 248, 0.35);
+        }
+        .element-hint-input:focus {
+            border-color: #818cf8;
+        }
+        .btn-goal {
+            background: #d97706;
+            margin-bottom: 14px;
+        }
+        .btn-goal:hover { background: #b45309; }
+        .btn-element-hint {
+            background: #6366f1;
+            margin-bottom: 10px;
+        }
+        .btn-element-hint:hover { background: #4f46e5; }
+        .btn-element-hint:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+        .prompt-section-goal { color: #fbbf24; }
+        .prompt-section-hint { color: #a5b4fc; }
         
         .feedback-list {
             flex: 1;
@@ -835,7 +938,7 @@
 
     <div id="editor-app-shell" class="editor-app-shell" hidden>
     <div class="workflow-guide" id="workflow-guide">
-        <div class="wf-step active" id="wf-step-1"><strong>1. Goal or marks</strong>Describe intent or drag on workspace (keep/remove).</div>
+        <div class="wf-step active" id="wf-step-1"><strong>1. Goal or marks</strong>Set project goal (yellow) or mark elements (purple hints).</div>
         <div class="wf-step" id="wf-step-2"><strong>2. Options A–C</strong>Refreshed live after each change — workspace unchanged.</div>
         <div class="wf-step" id="wf-step-3"><strong>3. Promote</strong>Click A, B, or C → refine with more marks or goals.</div>
     </div>
@@ -858,6 +961,16 @@
         
         <!-- 2. Middle Column: Stacked Alternative Options -->
         <div class="options-column">
+            <div class="scope-options-bar" aria-label="Scope contract filter for Options A-C">
+                <div class="scope-options-title">
+                    <span>Scope contract</span>
+                    <span class="scope-options-active" id="scope-active-label">#functions</span>
+                </div>
+                <div class="scope-options-chips" id="scope-options-chips"></div>
+                <div class="scope-options-help" id="scope-options-help">
+                    Filters Options A-C and tells AI which evolution axis to generate now.
+                </div>
+            </div>
             <!-- Option A -->
             <div class="panel option-panel" onclick="promoteAlt('alt_a.html', 'Option A')">
                 <div class="panel-header">
@@ -896,13 +1009,13 @@
         <div class="side-panel">
             <div class="side-header">💬 Live Chat & Automated Logs</div>
             <div class="chat-logs" id="chat-logs">
-                <div class="chat-msg system"><strong>System:</strong> Type a goal or drag on the workspace — <strong>Options A–C</strong> refresh automatically. Click A/B/C to promote, then keep marking to get the next three variants.</div>
+                <div class="chat-msg system"><strong>System:</strong> Set a <strong>project goal</strong> (yellow) or mark workspace elements (purple hints) — <strong>Options A–C</strong> refresh automatically.</div>
             </div>
 
-            <div class="side-header">1. Your goal</div>
-            <textarea id="hint-input" class="hint-input" placeholder="e.g. chemical calculator with element keys and molar mass…"></textarea>
-            <button class="btn-hint" onclick="addUserHint()">➕ Add goal</button>
-            
+            <div class="side-header">1. Project goal</div>
+            <textarea id="goal-input" class="hint-input goal-input" placeholder="Docelowy kierunek projektu — zapisany jako kontrakty Intract (require: freeze.baseline), rozbudowa bez regresji modelu bazowego calc.*"></textarea>
+            <button type="button" class="btn-hint btn-goal" onclick="setProjectGoal()">🎯 Set project goal</button>
+
             <div class="side-header">2. Mark workspace (drag)</div>
             <button type="button" class="btn-review" id="btn-review-mode" onclick="toggleElementReviewMode()">🖱️ Drag marking (default)</button>
             <div class="feedback-list" id="feedback-list">
@@ -910,12 +1023,16 @@
                     Drag over controls: <strong>left mouse</strong> = keep (green), <strong>right mouse</strong> = remove (red). Box can cover many buttons at once.
                 </div>
             </div>
+
+            <div class="side-header">3. Element hint (optional note)</div>
+            <textarea id="element-hint-input" class="hint-input element-hint-input" placeholder="Note about marked elements, e.g. keep digit 5, redesign trig row…"></textarea>
+            <button type="button" class="btn-hint btn-element-hint" id="btn-element-hint" onclick="addElementHint()">💡 Add element hint</button>
             
             <div class="side-header">Summary for AI</div>
-            <div class="prompt-box" id="prompt-box">Add a goal to begin.</div>
+            <div class="prompt-box" id="prompt-box">Set a project goal or mark elements to begin.</div>
             
             <button class="btn btn-action" id="action-btn" style="margin-top: 15px; width: 100%;" disabled onclick="runLiveIteration({ manual: true })">
-                Add a goal or mark to start
+                Set a goal or mark elements to start
             </button>
         </div>
     </div>
@@ -956,7 +1073,9 @@
         let annotations = [];
         let annotationHistory = [];
         let lastIteration = null;
-        let userHints = [];
+        let projectGoal = '';
+        let elementHints = [];
+        let lastTouchedElementIds = [];
         let pendingGoalOptions = false;
         let workspaceEngaged = false;
         let intractPolicyData = null;
@@ -971,6 +1090,56 @@
         let selectedDomainFilter = 'all';
         let selectedKindFilter = 'all';
         let servicesCatalog = [];
+        const allScopeOptions = [
+            { id: 'functions', label: '#functions', help: 'Features, workflows, data behavior, and interactions.' },
+            { id: 'keypad', label: '#keypad', help: 'Control set, button grouping, shortcuts, and input surface.' },
+            { id: 'display', label: '#display', help: 'Readouts, dashboards, tables, charts, labels, and hierarchy.' },
+            { id: 'colors', label: '#colors', help: 'Palette, contrast, state colors, and visual emphasis.' },
+            { id: 'shapes', label: '#shapes', help: 'Component geometry, spacing, density, and visual rhythm.' },
+            { id: 'orientation', label: '#orientation', help: 'Layout direction, responsive framing, and screen organization.' },
+        ];
+        let currentFocusScope = 'functions';
+
+        function allowedScopeIdsForKind(kind) {
+            const k = String(kind || 'web').toLowerCase();
+            const dashboardKinds = ['dashboard', 'monitor', 'ecosystem', 'api', 'mcp', 'frontend', 'slice'];
+            if (dashboardKinds.includes(k)) {
+                return ['functions', 'display', 'colors', 'shapes', 'orientation'];
+            }
+            if (k === 'calculator') {
+                return ['functions', 'keypad', 'display', 'colors', 'shapes', 'orientation'];
+            }
+            return ['functions', 'display', 'colors', 'shapes', 'orientation'];
+        }
+
+        function defaultScopeForKind(kind) {
+            const k = String(kind || 'web').toLowerCase();
+            if (['dashboard', 'monitor', 'ecosystem', 'api', 'mcp', 'frontend', 'slice'].includes(k)) {
+                return 'functions';
+            }
+            if (k === 'calculator') return 'keypad';
+            return 'functions';
+        }
+
+        function visibleScopeOptions() {
+            const proj = activeProjectRecord();
+            const allowed = new Set(allowedScopeIdsForKind(proj ? proj.kind : 'web'));
+            return allScopeOptions.filter(opt => allowed.has(opt.id));
+        }
+
+        function normalizeFocusScopeForActiveProject(opts) {
+            const options = opts || {};
+            const visible = visibleScopeOptions();
+            const ids = visible.map(o => o.id);
+            const projKind = activeProjectRecord() ? activeProjectRecord().kind : 'web';
+            const fallback = options.defaultScope || defaultScopeForKind(projKind);
+            const next = ids.includes(currentFocusScope) ? currentFocusScope : fallback;
+            if (next !== currentFocusScope || options.force) {
+                selectFocusScope(next, { quiet: true, force: true });
+            } else {
+                renderScopeOptions();
+            }
+        }
 
         function logEvent(action, details) {
             const ts = new Date().toISOString();
@@ -1010,6 +1179,7 @@
             p.set('review', elementReviewMode ? '1' : '0');
             p.set('mark', '1');
             p.set('annotations', String(annotations.length));
+            if (currentFocusScope) p.set('scope', currentFocusScope);
             if (pendingGoalOptions) p.set('pending', '1');
             if (workspaceEngaged) p.set('workspace', '1');
             p.set('mode', resolveIterationMode());
@@ -1033,6 +1203,9 @@
 
         let cinemaServerOnline = false;
 
+        let bootProjectId = null;
+        let bootTab = null;
+
         (function applyBootUrlParams() {
             const boot = new URLSearchParams(location.search);
             if (boot.has('review')) elementReviewMode = boot.get('review') !== '0';
@@ -1040,9 +1213,18 @@
                 const s = parseInt(boot.get('stage'), 10);
                 if (!isNaN(s)) activeStage = s;
             }
+            if (boot.has('scope')) {
+                const scope = boot.get('scope');
+                if (allScopeOptions.some(opt => opt.id === scope)) {
+                    currentFocusScope = scope;
+                }
+            }
+            if (boot.has('tab')) bootTab = boot.get('tab');
+            if (boot.has('project')) bootProjectId = boot.get('project');
         })();
 
         logEvent('PAGE_LOAD', { href: location.href, review: elementReviewMode, stage: activeStage });
+        renderScopeOptions();
         syncReviewModeToFrames();
         document.addEventListener('click', (e) => {
             const t = e.target;
@@ -1065,16 +1247,31 @@
         bindFrameLoad('alt-a-frame', 'option_a');
         bindFrameLoad('alt-b-frame', 'option_b');
         bindFrameLoad('alt-c-frame', 'option_c');
-        loadProjectsCatalog();
-        pingCinemaServer().then(() => {
-            return fetch('/projects/active').then(res => res.ok ? res.json() : null);
-        }).then(data => {
-            if (data && data.active && data.active.id) {
-                activeProjectId = data.active.id;
-                document.getElementById('tab-editor').disabled = false;
+        loadProjectsCatalog().then(() => {
+            const finishBoot = (projectId) => {
+                if (!projectId) return;
+                activeProjectId = projectId;
+                normalizeFocusScopeForActiveProject();
+                const tabEditor = document.getElementById('tab-editor');
+                if (tabEditor) tabEditor.disabled = false;
                 updateProjectActiveBar();
-                switchMainTab('editor', { skipLog: true });
-            }
+                const tab = bootTab === 'projects' || bootTab === 'services' ? bootTab : 'editor';
+                switchMainTab(tab, { skipLog: true });
+            };
+            const activateBootProject = () => {
+                if (!bootProjectId) return Promise.resolve(null);
+                return activateProject(bootProjectId, { skipEditorSwitch: true, quiet: true }).catch(() => null);
+            };
+            return pingCinemaServer()
+                .then(() => fetch('/projects/active').then(res => res.ok ? res.json() : null))
+                .then(data => {
+                    const serverId = data && data.active && data.active.id ? data.active.id : null;
+                    if (bootProjectId && bootProjectId !== serverId) {
+                        return activateBootProject().then(() => finishBoot(bootProjectId));
+                    }
+                    if (serverId) finishBoot(serverId);
+                    else if (bootProjectId) return activateBootProject().then(() => finishBoot(bootProjectId));
+                });
         }).catch(() => {});
 
         function switchMainTab(tab, opts) {
@@ -1111,12 +1308,117 @@
         }
 
         function currentUserGoal() {
-            const prompt = document.getElementById('prompt-box');
-            if (prompt && prompt.innerText.trim()) return prompt.innerText.trim();
-            const hint = document.getElementById('hint-input');
-            if (hint && hint.value.trim()) return hint.value.trim();
+            if (projectGoal) return projectGoal;
+            const goalEl = document.getElementById('goal-input');
+            if (goalEl && goalEl.value.trim()) return goalEl.value.trim();
             const proj = activeProjectRecord();
             return (proj && proj.subtitle) ? proj.subtitle : '';
+        }
+
+        function focusScopeRecord() {
+            const visible = visibleScopeOptions();
+            return visible.find(opt => opt.id === currentFocusScope) || visible[0] || allScopeOptions[0];
+        }
+
+        function renderScopeOptions() {
+            const chips = document.getElementById('scope-options-chips');
+            const activeLabel = document.getElementById('scope-active-label');
+            const help = document.getElementById('scope-options-help');
+            const active = focusScopeRecord();
+            if (activeLabel) activeLabel.textContent = active.label;
+            if (help) help.textContent = active.help;
+            if (!chips) return;
+            chips.innerHTML = '';
+            visibleScopeOptions().forEach(opt => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'scope-chip' + (opt.id === currentFocusScope ? ' active' : '');
+                btn.textContent = opt.label;
+                btn.title = opt.help;
+                btn.onclick = (event) => {
+                    event.stopPropagation();
+                    selectFocusScope(opt.id);
+                };
+                chips.appendChild(btn);
+            });
+        }
+
+        function selectFocusScope(scopeId, opts) {
+            const options = opts || {};
+            if (!visibleScopeOptions().some(opt => opt.id === scopeId)) return;
+            const changed = currentFocusScope !== scopeId;
+            currentFocusScope = scopeId;
+            if (changed && !options.quiet) {
+                pendingGoalOptions = true;
+            }
+            renderScopeOptions();
+            updatePromptBox();
+            updateWorkflowUI();
+            updatePlayerUrl();
+            if ((!changed && !options.force) || options.quiet) return;
+            const active = focusScopeRecord();
+            addChatLog('system', `<strong>Scope contract:</strong> ${active.label} — Options A–C will focus on ${active.help.toLowerCase()}`);
+            logEvent('SCOPE_CONTRACT', { scope: active.id, label: active.label });
+            scheduleAutoIteration('scope');
+        }
+
+        function goalContractPayload() {
+            const goalEl = document.getElementById('goal-input');
+            const goalText = (goalEl && goalEl.value.trim()) || projectGoal || currentUserGoal();
+            const proj = activeProjectRecord();
+            const projectContext = proj
+                ? `${proj.title} (${proj.kind}/${proj.domain})`
+                : String(activeProjectId || '');
+            const scope = focusScopeRecord();
+            return {
+                goal: goalText,
+                user_goal: goalText,
+                current_stage: activeStage,
+                focus_scope: scope.id,
+                focus_scope_label: scope.label,
+                current_state: `Current project slice: ${scope.label} for ${projectContext}`,
+                expected_version: goalText,
+                project_context: projectContext,
+            };
+        }
+
+        function buildLegacyHintsPayload() {
+            const out = [];
+            const goal = projectGoal || currentUserGoal();
+            if (goal) out.push(goal);
+            elementHints.forEach(h => {
+                const text = (h && h.text) ? String(h.text).trim() : '';
+                if (text) out.push(text);
+            });
+            return out;
+        }
+
+        function recentMarkedElementIds() {
+            const ids = [];
+            const seen = new Set();
+            [...lastTouchedElementIds].reverse().forEach(id => {
+                if (id && !seen.has(id)) {
+                    seen.add(id);
+                    ids.push(id);
+                }
+            });
+            annotations.forEach(a => {
+                if (a.id && !seen.has(a.id)) {
+                    seen.add(a.id);
+                    ids.push(a.id);
+                }
+            });
+            return ids;
+        }
+
+        function updateElementHintButton() {
+            const btn = document.getElementById('btn-element-hint');
+            const ids = recentMarkedElementIds();
+            if (!btn) return;
+            btn.disabled = ids.length === 0;
+            btn.title = ids.length
+                ? 'Applies to: ' + ids.join(', ')
+                : 'Mark workspace elements first';
         }
 
         function updateProjectActiveBar() {
@@ -1260,7 +1562,7 @@
         }
 
         function loadProjectsCatalog() {
-            fetch('/projects/catalog')
+            return fetch('/projects/catalog')
                 .then(res => {
                     if (!res.ok) throw new Error('catalog HTTP ' + res.status);
                     return res.json();
@@ -1337,10 +1639,11 @@
             `).join('');
         }
 
-        function activateProject(projectId) {
+        function activateProject(projectId, opts) {
+            const options = opts || {};
             const card = document.querySelector('.project-card[data-id="' + projectId + '"]');
             if (card) card.classList.add('selected');
-            fetch('/projects/activate', {
+            return fetch('/projects/activate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: projectId })
@@ -1348,30 +1651,65 @@
             .then(res => res.json())
             .then(data => {
                 if (data.error) {
-                    addChatLog('system', '❌ <strong>Project load failed: ' + data.error + '</strong>');
-                    return;
+                    if (!options.quiet) {
+                        addChatLog('system', '❌ <strong>Project load failed: ' + data.error + '</strong>');
+                    }
+                    return data;
                 }
                 activeProjectId = projectId;
+                const scopeMeta = data.scope || {};
+                const defScope = scopeMeta.default_focus_scope
+                    || defaultScopeForKind((data.project && data.project.kind) || 'web');
+                normalizeFocusScopeForActiveProject({ defaultScope: defScope, force: true });
                 pendingGoalOptions = true;
                 workspaceEngaged = false;
                 annotations = [];
-                userHints = [];
+                projectGoal = '';
+                elementHints = [];
+                lastTouchedElementIds = [];
                 updateFeedbackList();
+                updateElementHintButton();
                 document.getElementById('tab-editor').disabled = false;
-                const hint = document.getElementById('hint-input');
-                if (hint && !hint.value.trim()) {
-                    hint.value = (data.project && data.project.subtitle) ? data.project.subtitle : '';
+                const goalEl = document.getElementById('goal-input');
+                const subtitle = (data.project && data.project.subtitle) ? data.project.subtitle : '';
+                if (goalEl && !goalEl.value.trim()) {
+                    goalEl.value = subtitle;
                 }
-                reloadCinemaFrames();
-                switchMainTab('editor');
+                if (subtitle) {
+                    projectGoal = subtitle;
+                }
+                const boot = data.goal_bootstrap || {};
+                const bootOpts = boot.options_written || [];
+                if (boot.status === 'goal_options_seeded' && bootOpts.length) {
+                    reloadCinemaFrames(Date.now());
+                    pendingGoalOptions = false;
+                    if (!options.quiet) {
+                        addChatLog('system', `✨ <strong>Options ready (${bootOpts.join(', ')}).</strong> Pick A, B, or C — marks apply on the workspace.`);
+                    }
+                } else {
+                    reloadCinemaFrames();
+                }
+                if (!options.skipEditorSwitch) {
+                    switchMainTab('editor');
+                }
                 updateWorkflowUI();
-                addChatLog('system', `✏️ <strong>Editor:</strong> ${data.project.title} — refine the workspace, then publish to Services.`);
+                if (!options.quiet) {
+                    addChatLog('system', `✏️ <strong>Editor:</strong> ${data.project.title} — refine the workspace, then publish to Services.`);
+                }
                 logEvent('PROJECT_ACTIVATE', projectId);
                 renderProjectsGrid();
                 updateProjectActiveBar();
+                refreshIntractPolicy();
+                if (boot.status !== 'goal_options_seeded') {
+                    scheduleAutoIteration('project_activate');
+                }
+                return data;
             })
             .catch(err => {
-                addChatLog('system', '❌ <strong>Project activate error: ' + err.message + '</strong>');
+                if (!options.quiet) {
+                    addChatLog('system', '❌ <strong>Project activate error: ' + err.message + '</strong>');
+                }
+                throw err;
             });
         }
 
@@ -1559,6 +1897,16 @@
             if (capsule.path) html += `path: ${capsule.path}<br>`;
             if (capsule.intract_path) html += `manifest: ${capsule.intract_path}<br>`;
 
+            const activeExample = snap.active_example_project || {};
+            html += '<div class="policy-section-title">Active example (Cinema UI)</div>';
+            if (activeExample.id) {
+                html += `<span class="policy-status-ok">${activeExample.title || activeExample.id}</span> `;
+                html += `(${activeExample.kind || '—'} / ${activeExample.domain || '—'})<br>`;
+                if (activeExample.source) html += `source: ${activeExample.source}<br>`;
+            } else {
+                html += '<span class="policy-status-miss">(none — pick a project in the catalog)</span><br>';
+            }
+
             const renderBaseline = (title, items) => {
                 html += `<div class="policy-section-title">Baseline — ${title}</div>`;
                 if (!items || !items.length) {
@@ -1571,13 +1919,31 @@
                 });
             };
             renderBaseline('project', baseline.project);
-            renderBaseline('capsule', baseline.capsule);
+            renderBaseline('capsule (frozen model)', baseline.capsule);
 
-            html += '<div class="policy-section-title">Active evolution contracts (ledger)</div>';
-            if (!ledger.length) {
-                html += '<span class="policy-status-miss">(none — iterate or restore a checkpoint)</span><br>';
+            const goalEntries = ledger.filter(e => e && e.status === 'goal_defined');
+            const evolveEntries = ledger.filter(e => e && e.status !== 'goal_defined');
+
+            html += '<div class="policy-section-title">Goal extensions (from project goal)</div>';
+            if (!goalEntries.length) {
+                html += '<span class="policy-status-miss">(none — set project goal to generate Intract extensions)</span><br>';
             } else {
-                ledger.forEach(entry => {
+                goalEntries.slice().reverse().forEach(entry => {
+                    if (entry.user_goal) {
+                        html += `<span class="policy-status-ok">goal:</span> ${entry.user_goal}<br>`;
+                    }
+                    (entry.proposed_contracts || []).forEach(p => {
+                        const line = p.line || p.delta_text || `@intract.v1 id:${p.id || 'unknown'}`;
+                        html += `<code class="policy-contract-line">${line}</code>`;
+                    });
+                });
+            }
+
+            html += '<div class="policy-section-title">UI deltas (marks / iterations)</div>';
+            if (!evolveEntries.length) {
+                html += '<span class="policy-status-miss">(none — mark elements or iterate)</span><br>';
+            } else {
+                evolveEntries.forEach(entry => {
                     (entry.proposed_contracts || []).forEach(p => {
                         const line = p.line || p.delta_text || `@intract.v1 id:${p.id || 'unknown'}`;
                         html += `<code class="policy-contract-line">${line}</code>`;
@@ -1589,7 +1955,7 @@
             if (meta) {
                 const pCount = (baseline.project || []).length;
                 const cCount = (baseline.capsule || []).length;
-                meta.textContent = `baseline ${pCount}+${cCount} · ledger ${ledger.length}`;
+                meta.textContent = `baseline ${pCount}+${cCount} · goal ${goalEntries.length} · deltas ${evolveEntries.length}`;
             }
         }
 
@@ -1758,17 +2124,17 @@
                 }
                 if (hintEl) {
                     hintEl.textContent = isIterating
-                        ? 'Sending your latest marks and goals to AI…'
-                        : 'Options A–C update after each goal or mark. Promote one to change the workspace.';
+                        ? 'Sending project goal and element hints to AI…'
+                        : 'Options A–C update after each goal (yellow) or element hint (purple). Promote one to change the workspace.';
                 }
             } else {
                 document.getElementById('wf-step-1')?.classList.add('active');
                 if (btn) {
                     btn.disabled = true;
-                    btn.innerText = isIterating ? '⏳ Working…' : 'Add a goal or mark to start';
+                    btn.innerText = isIterating ? '⏳ Working…' : 'Set a goal or mark elements to start';
                 }
                 if (hintEl) {
-                    hintEl.textContent = 'Type a goal (Enter or Add goal) or drag on workspace buttons to start live options.';
+                    hintEl.textContent = 'Set a project goal (Enter) or mark workspace elements to start live options.';
                 }
             }
         }
@@ -1777,34 +2143,80 @@
             const container = document.getElementById('chat-logs');
             const msg = document.createElement('div');
             msg.className = 'chat-msg ' + sender;
-            msg.innerHTML = sender === 'user' ? `<strong>User:</strong> ${text}` : `<strong>System:</strong> ${text}`;
+            const labels = {
+                goal: 'Goal',
+                hint: 'Hint',
+                user: 'User',
+                system: 'System'
+            };
+            const label = labels[sender] || 'System';
+            msg.innerHTML = `<strong>${label}:</strong> ${text}`;
             container.appendChild(msg);
             container.scrollTop = container.scrollHeight;
         }
 
         function resolveIterationMode() {
-            if (userHints.length > 0 || annotations.length > 0) return 'goal_options';
+            if (projectGoal || elementHints.length > 0 || annotations.length > 0) return 'goal_options';
             if (pendingGoalOptions) return 'goal_options';
             return 'none';
         }
 
-        function addUserHint() {
-            const input = document.getElementById('hint-input');
-            const hint = input.value.trim();
-            if (!hint) return;
-            userHints.push(hint);
+        function setProjectGoal() {
+            const payload = goalContractPayload();
+            if (!payload.user_goal) return;
+            projectGoal = payload.user_goal;
             if (!workspaceEngaged) {
                 pendingGoalOptions = true;
             }
-            updateFeedbackList();
-            syncAllIframeVisuals();
-            addChatLog('user', hint);
-            addChatLog('system', '🧭 <strong>Goal saved.</strong> Updating Options A–C…');
-            logEvent('USER_HINT', hint.length > 180 ? hint.slice(0, 180) + '...' : hint);
-            input.value = '';
+            addChatLog('goal', payload.user_goal);
+            logEvent('PROJECT_GOAL', payload.user_goal.length > 180 ? payload.user_goal.slice(0, 180) + '...' : payload.user_goal);
             updatePromptBox();
             updateWorkflowUI();
-            scheduleAutoIteration('hint');
+            fetch('/propose/goal', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    addChatLog('system', '⚠️ <strong>Goal contracts:</strong> ' + data.error);
+                } else {
+                    const n = data.count || 0;
+                    addChatLog('system', `📜 <strong>Intract goal model:</strong> ${n} extension contract(s) (baseline frozen).`);
+                    refreshIntractPolicy();
+                }
+                addChatLog('system', '🎯 <strong>Updating Options A–C…</strong>');
+                scheduleAutoIteration('goal');
+            })
+            .catch(err => {
+                addChatLog('system', '⚠️ <strong>Goal contracts skipped:</strong> ' + err.message);
+                scheduleAutoIteration('goal');
+            });
+        }
+
+        function addElementHint() {
+            const input = document.getElementById('element-hint-input');
+            const text = (input && input.value.trim()) || '';
+            if (!text) return;
+            const elementIds = recentMarkedElementIds();
+            if (!elementIds.length) {
+                addChatLog('system', '⚠️ <strong>Mark workspace elements first</strong> (drag or review mode), then add an element hint.');
+                return;
+            }
+            const entry = { text: text, elementIds: elementIds.slice(), at: new Date().toISOString() };
+            elementHints.push(entry);
+            if (!workspaceEngaged) {
+                pendingGoalOptions = true;
+            }
+            const tag = elementIds.map(id => '#' + id).join(', ');
+            addChatLog('hint', `${text} <span style="opacity:0.75">(${tag})</span>`);
+            addChatLog('system', '💡 <strong>Element hint saved.</strong> Updating Options A–C…');
+            logEvent('ELEMENT_HINT', { text: text.slice(0, 120), elements: elementIds });
+            if (input) input.value = '';
+            updatePromptBox();
+            updateWorkflowUI();
+            scheduleAutoIteration('element_hint');
         }
 
         function switchStage(stageNum) {
@@ -1843,17 +2255,21 @@
             annotations.push(entry);
             annotationHistory.push(entry);
 
-            // Post annotation log
+            lastTouchedElementIds.push(elementId);
+            if (lastTouchedElementIds.length > 24) {
+                lastTouchedElementIds = lastTouchedElementIds.slice(-24);
+            }
             if (type === 'KEEP') {
-                addChatLog('system', `✓ Element <strong>${elementId}</strong> accepted.`);
+                addChatLog('hint', `✓ <strong>#${elementId}</strong> — keep`);
             } else {
-                addChatLog('system', `✗ Element <strong>${elementId}</strong> marked for redesign.`);
+                addChatLog('hint', `✗ <strong>#${elementId}</strong> — remove / redesign`);
             }
 
             logEvent('ANNOTATE', { elementId: elementId, type: type, total: annotations.length });
 
             syncAllIframeVisuals();
             updateFeedbackList();
+            updateElementHintButton();
             updatePromptBox();
             updateWorkflowUI();
             updatePlayerUrl();
@@ -1925,6 +2341,7 @@
             if (annotations.length === 0) {
                 list.innerHTML = `<div style="color: #64748b; font-size: 0.85rem; text-align: center; margin-top: 40px;">No elements marked yet. Drag on the workspace: left = keep, right = remove.</div>`;
                 updatePromptBox();
+                updateElementHintButton();
                 return;
             }
 
@@ -1946,29 +2363,39 @@
             });
             
             updatePromptBox();
+            updateElementHintButton();
         }
 
         function updatePromptBox() {
             const box = document.getElementById('prompt-box');
             const deletes = annotations.filter(a => a.type === 'DELETE').map(a => a.id);
             const keeps = annotations.filter(a => a.type === 'KEEP').map(a => a.id);
+            const goalLine = projectGoal || currentUserGoal();
+            const scope = focusScopeRecord();
             
-            let promptText = `### SPATIAL FEEDBACK COMPILED\n\n`;
-            if (userHints.length > 0) {
-                promptText += `🧭 GOAL / HINTS:\n`;
-                userHints.forEach(h => promptText += `  - ${h}\n`);
-                promptText += `\n`;
+            let promptText = `### SUMMARY FOR AI\n\n`;
+            promptText += `# FOCUS SCOPE (single-choice hashtag):\n`;
+            promptText += `  ${scope.label} — ${scope.help}\n\n`;
+            promptText += `🎯 PROJECT GOAL (→ Intract extensions, baseline calc.* frozen):\n`;
+            promptText += goalLine ? `  ${goalLine}\n` : `  (not set — describe the overall target)\n`;
+            promptText += `\n`;
+            const hasMarks = keeps.length > 0 || deletes.length > 0;
+            const hasNotes = elementHints.length > 0;
+            if (hasMarks || hasNotes) {
+                promptText += `💡 ELEMENT HINTS (marks & notes):\n`;
+                if (keeps.length > 0) {
+                    promptText += `  ✓ RETAIN: ${keeps.map(k => '#' + k).join(', ')}\n`;
+                }
+                if (deletes.length > 0) {
+                    promptText += `  ✗ DELETE / REDESIGN: ${deletes.map(d => '#' + d).join(', ')}\n`;
+                }
+                elementHints.forEach(h => {
+                    const tags = (h.elementIds || []).map(id => '#' + id).join(', ');
+                    promptText += `  - ${h.text}${tags ? ' [' + tags + ']' : ''}\n`;
+                });
             }
-            if (keeps.length > 0) {
-                promptText += `✓ RETAIN:\n`;
-                keeps.forEach(k => promptText += `  - Keep function: #${k}\n`);
-            }
-            if (deletes.length > 0) {
-                promptText += `\n✗ DELETE / REDESIGN:\n`;
-                deletes.forEach(d => promptText += `  - Delete button: #${d}\n`);
-            }
-            if (userHints.length === 0 && keeps.length === 0 && deletes.length === 0) {
-                promptText += `Add a goal to begin, or mark buttons after promoting an option.`;
+            if (!goalLine && !hasMarks && !hasNotes) {
+                promptText += `Set a project goal or mark workspace elements to begin.`;
             }
             box.innerText = promptText;
         }
@@ -2024,7 +2451,7 @@
                 updateWorkflowUI();
                 return;
             }
-            logEvent('ITERATION_STARTED', `mode=${iterationMode} auto=${!!opts.auto} spatial=${annotations.length} hints=${userHints.length}`);
+            logEvent('ITERATION_STARTED', `mode=${iterationMode} auto=${!!opts.auto} spatial=${annotations.length} element_hints=${elementHints.length} goal=${projectGoal ? 1 : 0}`);
             
             if (actionBtn) {
                 actionBtn.disabled = true;
@@ -2032,20 +2459,33 @@
             }
             updateWorkflowUI();
 
-            const runIterate = () => fetch('/iterate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    prompt: promptBox.innerText,
-                    current_stage: activeStage,
-                    annotations: annotations,
-                    user_hints: userHints,
-                    iteration_mode: iterationMode,
-                    pending_goal: pendingGoalOptions
+            const runIterate = () => {
+                const scopePayload = goalContractPayload();
+                const goalForIterate = projectGoal || scopePayload.user_goal || currentUserGoal();
+                if (goalForIterate && goalForIterate !== projectGoal) {
+                    projectGoal = goalForIterate;
+                }
+                return fetch('/iterate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        prompt: promptBox.innerText,
+                        current_stage: activeStage,
+                        annotations: annotations,
+                        user_goal: goalForIterate,
+                        element_hints: elementHints.map(h => h.text),
+                        user_hints: buildLegacyHintsPayload(),
+                        iteration_mode: iterationMode,
+                        pending_goal: pendingGoalOptions,
+                        focus_scope: scopePayload.focus_scope,
+                        focus_scope_label: scopePayload.focus_scope_label,
+                        current_state: scopePayload.current_state,
+                        expected_version: scopePayload.expected_version,
+                        project_context: scopePayload.project_context,
+                    })
                 })
-            })
             .then(res => {
                 if (!res.ok) throw new Error('Iteration request failed: ' + res.status);
                 return res.json();
@@ -2066,16 +2506,13 @@
                     spatial_removed: data.spatial_removed || [],
                     error: data.error || null
                 };
-                if (data.status === 'proposed_options_by_llm' || data.status === 'proposed_options_offline') {
+                if (data.status === 'proposed_options_by_llm') {
                     pendingGoalOptions = false;
                     const opts = (data.options_written || []).join(', ') || 'A, B, C';
                     document.getElementById('wf-step-2')?.classList.add('done');
                     document.getElementById('wf-step-3')?.classList.add('active');
-                    const offlineNote = data.status === 'proposed_options_offline'
-                        ? ' (offline templates — LLM disabled)'
-                        : '';
                     if (!opts.auto) {
-                        addChatLog('system', `✨ <strong>Options ready (${opts}).</strong>${offlineNote} Click A, B, or C to promote.`);
+                        addChatLog('system', `✨ <strong>Options ready (${opts}).</strong> Click A, B, or C to promote.`);
                     }
                     logEvent('ITERATION_OPTIONS', `status=${data.status} options=${opts}`);
                     reloadCinemaFrames(data.options_stamp);
@@ -2102,7 +2539,8 @@
                     reloadCinemaFrames();
                     refreshHistory();
                 } else {
-                    const errMsg = (data.error || data.status || 'unknown').replace(/^llm_skipped:\\s*/i, '');
+                    const errMsg = (data.error || data.status || 'unknown')
+                        .replace(/^llm_(skipped|failed):\\s*/i, '');
                     addChatLog('system', `⚠️ <strong>Could not run AI: ${errMsg}</strong>`);
                     logEvent('ITERATION_SKIPPED', data.error || data.status);
                     addChatLog('system', '📝 <strong>Your marks were kept — adjust and try again.</strong>');
@@ -2136,6 +2574,7 @@
                 }
                 console.error('[NEXU SYSTEM] Iteration error:', err);
             });
+            };
 
             pingCinemaServer(true).then(() => runIterate()).catch(() => {
                 isIterating = false;
@@ -2336,7 +2775,9 @@
                     deleteCount: allMarks.filter(a => a.type === 'DELETE').length,
                     historyEvents: annotationHistory.length
                 },
-                userHints: userHints,
+                projectGoal: projectGoal,
+                elementHints: elementHints,
+                userHints: buildLegacyHintsPayload(),
                 history: {
                     selectedCheckpointId: selectedHistoryId,
                     checkpoints: historyCheckpoints,
@@ -2381,15 +2822,25 @@
         document.addEventListener('DOMContentLoaded', () => {
             switchMainTab(mainTab, { skipLog: true });
             updateWorkflowUI();
-            const hintInput = document.getElementById('hint-input');
-            if (hintInput) {
-                hintInput.addEventListener('keydown', (e) => {
+            const goalInput = document.getElementById('goal-input');
+            if (goalInput) {
+                goalInput.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
-                        addUserHint();
+                        setProjectGoal();
                     }
                 });
             }
+            const elementHintInput = document.getElementById('element-hint-input');
+            if (elementHintInput) {
+                elementHintInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        addElementHint();
+                    }
+                });
+            }
+            updateElementHintButton();
         });
     </script>
 </body>

@@ -31,10 +31,11 @@ from nexu.cinema_publish import (
     start_published_service,
     stop_published_service,
 )
+from nexu.cinema_offline_options import write_goal_options_offline
 from nexu.cinema_scripts import apply_spatial_deletes_to_html, finalize_cinema_html
 
-ROOT = Path(__ROOT_PATH__)
-CAPSULE = __CAPSULE_NAME__
+ROOT = Path('/home/tom/github/semcod/nexu/examples/web_app_calculator/workspace')
+CAPSULE = 'scientific_calc'
 
 
 def apply_manifest_from_ledger(*, dry_run: bool = False, target: str = "both"):
@@ -125,6 +126,26 @@ def sync_option_previews(stage: int = 0, delete_ids=None):
     )
 
 
+def write_offline_goal_options(
+    *,
+    keep_els=None,
+    delete_els=None,
+    hints=None,
+    user_goal="",
+    goal_contract_lines=None,
+):
+    cinema = Path(__file__).resolve().parent
+    labels = write_goal_options_offline(
+        cinema,
+        keep_els=list(keep_els or []),
+        delete_els=list(delete_els or []),
+        hints=list(hints or []),
+        user_goal=str(user_goal or ""),
+        goal_contract_lines=list(goal_contract_lines or []),
+    )
+    return labels
+
+
 def patch_option_previews(
     stage: int = 0,
     session_keep=None,
@@ -182,7 +203,6 @@ def export_markpact_readme(stage: int = 0, user_goal: str = ""):
         capsule_name=CAPSULE,
         user_goal=user_goal or "",
         effective_ui=effective,
-        workspace_root=ROOT,
     )
     return {
         "filename": markpact_download_filename(CAPSULE, stage),

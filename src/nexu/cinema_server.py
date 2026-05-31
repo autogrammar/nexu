@@ -109,6 +109,9 @@ def start_cinema_player_server(
     *,
     open_browser: bool = True,
 ) -> str:
+    from .cinema import sync_cinema_templates
+
+    sync_cinema_templates(cinema_dir, root, name)
     port = start_persistent_http_server(cinema_dir, root, name)
     url = f"http://127.0.0.1:{port}/cinema_player.html"
     print(f"🎬 Live HTTP Server started for Nexu: {url}")

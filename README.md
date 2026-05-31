@@ -1,12 +1,18 @@
 # Nexu
 
+Projects
+![alt text](image.png)
+
+Evolution in scope: functions
+![alt text](image-1.png)
+
 ## AI Cost Tracking
 
-![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.5.18-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
-![AI Cost](https://img.shields.io/badge/AI%20Cost-$3.49-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-9.7h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
+![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.5.19-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
+![AI Cost](https://img.shields.io/badge/AI%20Cost-$4.01-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-11.1h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
 
-- 🤖 **LLM usage:** $3.4942 (25 commits)
-- 👤 **Human dev:** ~$966 (9.7h @ $100/h, 30min dedup)
+- 🤖 **LLM usage:** $4.0098 (26 commits)
+- 👤 **Human dev:** ~$1110 (11.1h @ $100/h, 30min dedup)
 
 Generated on 2026-05-31 using [openrouter/qwen/qwen3-coder-next](https://openrouter.ai/qwen/qwen3-coder-next)
 
@@ -222,6 +228,21 @@ make cinema
 
 Open the URL printed by the command. Do not assume a fixed port.
 
+### Switching example projects in the player
+
+The Cinema server runs inside one workspace capsule (for example `scientific_calc`), but the
+player can load any catalog project (calculator, dashboard, `backend_service`, analytics, …)
+without restarting the server:
+
+1. Open the **Projects** tab and pick a card, or use a deep link:
+   `http://127.0.0.1:<port>/cinema_player.html?project=backend_service`
+2. Activation resets the policy ledger for the previous example, seeds goal contracts from the
+   project subtitle, and rebuilds **distinct** Options A–C from that project's stages.
+3. Mark elements on the **workspace** frame (drag or review mode), then iterate or promote.
+
+The Intract panel shows **Active example (Cinema UI)** separately from the frozen capsule
+baseline (`calc.*` contracts stay tied to the workspace capsule).
+
 Useful commands:
 
 ```bash
@@ -251,6 +272,9 @@ OPENROUTER_API_KEY=...
 
 ```yaml
 llm:
+  provider: openrouter
+  model: openrouter/deepseek/deepseek-v4-pro
+  base_url: https://openrouter.ai/api/v1
   allow_network_calls: true
   api_key_env: OPENROUTER_API_KEY
 ```

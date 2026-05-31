@@ -122,7 +122,9 @@ SHIELD_SCRIPT = """
                 text-align: center;
             }
             .btn.nexu-focus-pulse,
-            button.nexu-focus-pulse {
+            button.nexu-focus-pulse,
+            [data-nexu-target].nexu-focus-pulse,
+            .nexu-selectable.nexu-focus-pulse {
                 outline: 3px solid #38bdf8 !important;
                 outline-offset: 2px !important;
                 box-shadow: 0 0 16px rgba(56, 189, 248, 0.55) !important;
@@ -138,8 +140,23 @@ SHIELD_SCRIPT = """
             '.btn-sci-excess',
             '.btn-op',
             '.screen',
+            '[data-nexu-target]',
+            '[id^="btn-"]',
+            '.kpi-card',
+            '.chart-card',
+            '.table-card',
+            '.detail-panel',
+            '.workflow-panel',
+            '.nav-item',
+            '.service-card',
+            '.project-card',
+            '.card',
+            '.notification-item',
+            '.badge',
             '.grid > button',
+            '.grid > div',
             '.sci-grid > button',
+            '.sci-grid > div',
         ].join(', ');
         let selectionBox = null;
         let isDrawing = false;
@@ -171,6 +188,8 @@ SHIELD_SCRIPT = """
         function elementIdFromEl(el) {
             const rawId = (el.id || '').trim();
             if (rawId) return rawId.replace(/^btn-/, '');
+            const target = (el.dataset && el.dataset.nexuTarget || '').trim();
+            if (target) return target;
             const text = (el.innerText || '').trim();
             if (el.tagName === 'BUTTON' && text) return text;
             return text;
@@ -538,6 +557,10 @@ _BTN_DIV_RE = re.compile(
     r'<div\b([^>]*\bclass="[^"]*\bbtn[^"]*"[^>]*)>([^<]*)</div>',
     re.IGNORECASE,
 )
+_SELECTABLE_BLOCK_RE = re.compile(
+    r"<(section|div|aside|nav)\b([^>]*)>([\s\S]*?)</\1>",
+    re.IGNORECASE,
+)
 
 
 def _delete_match_keys(element_id: str) -> set[str]:
@@ -554,11 +577,44 @@ def _delete_match_keys(element_id: str) -> set[str]:
     return keys
 
 
+def _selectable_block_attrs(attrs: str) -> bool:
+    lower = attrs.lower()
+    if "nexu-selectable" in lower:
+        return True
+    for token in (
+        "kpi-card",
+        "chart-card",
+        "table-card",
+        "workflow-panel",
+        "detail-panel",
+        "nav-item",
+        "service-card",
+        "project-card",
+    ):
+        if token in lower:
+            return True
+    return bool(re.search(r'\bid="btn-', lower))
+
+
+def _element_delete_candidates(attrs: str, inner_text: str) -> set[str]:
+    id_match = re.search(r'\bid="([^"]*)"', attrs, re.IGNORECASE)
+    el_id = id_match.group(1) if id_match else ""
+    target_match = re.search(r'data-nexu-target="([^"]*)"', attrs, re.IGNORECASE)
+    target = target_match.group(1) if target_match else ""
+    label = re.sub(r"<[^>]+>", "", inner_text or "").strip()
+    candidates: set[str] = set()
+    for raw in (el_id, target, label):
+        if raw:
+            candidates |= _delete_match_keys(raw)
+    return candidates
+
+
 def apply_spatial_deletes_to_html(html: str, delete_ids: list[str]) -> tuple[str, list[str]]:
     """
-    Remove only annotated DELETE controls from calculator HTML (no LLM rewrite).
+    Remove only annotated DELETE controls from calculator/dashboard HTML (no LLM rewrite).
 
-    Matches .btn / .btn-sci / .btn-sci-excess / .btn-op by id or visible label (e.g. Mod → btn-Mod).
+    Matches calculator .btn rows and dashboard .kpi-card / chart / nav targets by id,
+    data-nexu-target, or visible label.
     """
     if not html or not delete_ids:
         return html, []
@@ -569,17 +625,35 @@ def apply_spatial_deletes_to_html(html: str, delete_ids: list[str]) -> tuple[str
 
     removed: list[str] = []
 
-    def _replacer(match: re.Match[str]) -> str:
+    def _btn_replacer(match: re.Match[str]) -> str:
         attrs, label = match.group(1), match.group(2).strip()
-        id_match = re.search(r'\bid="([^"]*)"', attrs, re.IGNORECASE)
-        el_id = id_match.group(1) if id_match else ""
-        candidates = _delete_match_keys(el_id) | _delete_match_keys(label)
+        candidates = _element_delete_candidates(attrs, label)
         if delete_keys.intersection(candidates):
+            id_match = re.search(r'\bid="([^"]*)"', attrs, re.IGNORECASE)
+            el_id = id_match.group(1) if id_match else ""
             removed.append(label or el_id or "unknown")
             return ""
         return match.group(0)
 
-    patched = _BTN_DIV_RE.sub(_replacer, html)
+    def _block_replacer(match: re.Match[str]) -> str:
+        _tag, attrs, inner = match.group(1), match.group(2), match.group(3)
+        if not _selectable_block_attrs(attrs):
+            return match.group(0)
+        candidates = _element_delete_candidates(attrs, inner)
+        if delete_keys.intersection(candidates):
+            id_match = re.search(r'\bid="([^"]*)"', attrs, re.IGNORECASE)
+            target_match = re.search(r'data-nexu-target="([^"]*)"', attrs, re.IGNORECASE)
+            removed.append(
+                (id_match.group(1) if id_match else "")
+                or (target_match.group(1) if target_match else "")
+                or re.sub(r"<[^>]+>", "", inner).strip()
+                or "unknown"
+            )
+            return ""
+        return match.group(0)
+
+    patched = _BTN_DIV_RE.sub(_btn_replacer, html)
+    patched = _SELECTABLE_BLOCK_RE.sub(_block_replacer, patched)
     return patched, removed
 
 

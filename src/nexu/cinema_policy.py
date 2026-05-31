@@ -277,6 +277,31 @@ def enforce_deletes_on_option_previews(
     }
 
 
+def reset_cinema_policy_ledger(cinema_dir: Path) -> None:
+    """Clear UI marks/goals from a prior example project in this cinema directory."""
+    cinema_dir = Path(cinema_dir)
+    (cinema_dir / "intract_policy_ledger.json").write_text("[]\n", encoding="utf-8")
+
+
+def refresh_cinema_policy_snapshot(
+    cinema_dir: Path,
+    root: Path,
+    capsule_name: str,
+) -> None:
+    """Rebuild intract_policy.json and attach the active example project metadata."""
+    from .cinema import build_intract_policy_snapshot
+    from .cinema_projects import load_active_project
+
+    snapshot = build_intract_policy_snapshot(root, capsule_name)
+    active = load_active_project(cinema_dir)
+    if active:
+        snapshot["active_example_project"] = active
+    (cinema_dir / "intract_policy.json").write_text(
+        json.dumps(snapshot, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+
+
 def load_effective_ui_constraints(
     root: Path,
     capsule_name: str,
@@ -488,8 +513,26 @@ def propose_ui_delta_contract_dicts(
     return proposals
 
 
-def append_policy_ledger_entry(root: Path, capsule_name: str, entry: dict[str, Any]) -> None:
-    ledger_path = policy_ledger_path(root, capsule_name)
+def _resolve_ledger_path(
+    root: Path,
+    capsule_name: str,
+    *,
+    cinema_dir: Path | None = None,
+) -> Path:
+    if cinema_dir is not None:
+        return Path(cinema_dir) / "intract_policy_ledger.json"
+    return policy_ledger_path(root, capsule_name)
+
+
+def append_policy_ledger_entry(
+    root: Path,
+    capsule_name: str,
+    entry: dict[str, Any],
+    *,
+    cinema_dir: Path | None = None,
+) -> None:
+    ledger_path = _resolve_ledger_path(root, capsule_name, cinema_dir=cinema_dir)
+    ledger_path.parent.mkdir(parents=True, exist_ok=True)
     ledger: list[Any] = []
     if ledger_path.exists():
         data = json.loads(ledger_path.read_text(encoding="utf-8"))
@@ -536,6 +579,87 @@ def normalize_proposals_for_ledger(
         item.setdefault("delta_text", delta)
         normalized.append(item)
     return normalized
+
+
+def append_goal_ledger_entry(
+    root: Path,
+    capsule_name: str,
+    *,
+    stage: int,
+    goal: str,
+    focus_scope: str = "",
+    focus_scope_label: str = "",
+    current_state: str = "",
+    expected_version: str = "",
+    project_context: str = "",
+    project_kind: str = "",
+    cinema_dir: Path | None = None,
+) -> dict[str, Any]:
+    from .cinema_goal_contracts import propose_goal_extension_contracts
+
+    proposals = normalize_proposals_for_ledger(
+        stage,
+        capsule_name,
+        propose_goal_extension_contracts(
+            goal,
+            capsule_name=capsule_name,
+            stage=stage,
+            focus_scope=focus_scope,
+            focus_scope_label=focus_scope_label,
+            current_state=current_state,
+            expected_version=expected_version,
+            project_context=project_context,
+            project_kind=project_kind,
+        ),
+    )
+    entry = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "capsule": capsule_name,
+        "workspace": str(project_root(root)),
+        "stage": stage,
+        "status": "goal_defined",
+        "model": "goal_to_intract",
+        "user_goal": (goal or "").strip(),
+        "focus_scope": (focus_scope or "").strip(),
+        "focus_scope_label": (focus_scope_label or "").strip(),
+        "current_state": (current_state or "").strip(),
+        "expected_version": (expected_version or "").strip(),
+        "project_context": (project_context or "").strip(),
+        "keep": [],
+        "delete": [],
+        "proposed_contracts": proposals,
+    }
+    append_policy_ledger_entry(root, capsule_name, entry, cinema_dir=cinema_dir)
+    return entry
+
+
+def load_goal_contract_lines(
+    root: Path,
+    capsule_name: str,
+    *,
+    cinema_dir: Path | None = None,
+) -> list[str]:
+    """Latest goal-defined contracts for LLM / verify context."""
+    ledger_path = _resolve_ledger_path(root, capsule_name, cinema_dir=cinema_dir)
+    if not ledger_path.exists():
+        return []
+    data = json.loads(ledger_path.read_text(encoding="utf-8"))
+    if not isinstance(data, list):
+        return []
+    for entry in reversed(data):
+        if not isinstance(entry, dict):
+            continue
+        if entry.get("status") != "goal_defined":
+            continue
+        lines: list[str] = []
+        for proposal in entry.get("proposed_contracts") or []:
+            if isinstance(proposal, dict):
+                line = proposal.get("line") or proposal.get("delta_text")
+                if line:
+                    lines.append(str(line))
+        if lines:
+            return lines
+    return []
 
 
 def append_iteration_ledger_entry(

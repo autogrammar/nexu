@@ -45,4 +45,41 @@ assert "error" not in result or result.get("added_total", 0) >= 0
 print("cinema policy dry-run ok:", result.get("added_total", result))
 PY
 
+echo "== cinema project activate (backend_service) =="
+uv run python - <<PY
+from pathlib import Path
+import shutil
+import sys
+
+repo = Path("${ROOT}")
+ws = repo / "examples/web_app_calculator/workspace"
+if not (ws / ".nexu/capsules/scientific_calc").exists():
+    print("skip project activate smoke (example workspace missing)")
+    sys.exit(0)
+
+from nexu.cinema_projects import activate_example_project
+from nexu.cinema_policy import option_previews_are_distinct
+
+cinema = repo / "examples" / "_ci_cinema_activate"
+if cinema.exists():
+    shutil.rmtree(cinema)
+cinema.mkdir(parents=True)
+result = activate_example_project(
+    cinema,
+    "backend_service",
+    workspace_root=ws,
+    capsule_name="scientific_calc",
+    repo_root=repo,
+)
+assert result["status"] == "project_activated"
+assert result.get("ledger_reset") is True
+assert result["goal_bootstrap"]["status"] == "goal_options_seeded"
+assert option_previews_are_distinct(cinema)
+html = (cinema / "alt_a.html").read_text(encoding="utf-8").lower()
+assert "calc-body" not in html
+assert "backend service" in html
+shutil.rmtree(cinema)
+print("project activate smoke ok")
+PY
+
 echo "== ci-cinema-smoke: OK =="
