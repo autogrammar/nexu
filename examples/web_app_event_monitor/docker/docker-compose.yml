@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  # 1. Silnik Telemetrii (Analytics Engine Backend)
+  analytics:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+      args:
+        SERVICE_NAME: analytics
+    ports:
+      - "9101:9101"
+    environment:
+      - MARKPACT_PORT=9101
+      - MARKPACT_NO_VENV=1  # Wyłączamy wewnętrzne .venv, bo kontener Docker zapewnia już pełną izolację
+    networks:
+      - monitor-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9101/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # 2. System Analizy i Alarmów (Alerting Rule Engine)
+  alerts:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+      args:
+        SERVICE_NAME: alerts
+    ports:
+      - "9102:9102"
+    environment:
+      - MARKPACT_PORT=9102
+      - MARKPACT_NO_VENV=1
+      - ANALYTICS_SERVICE_URL=http://analytics:9101
+    depends_on:
+      analytics:
+        condition: service_healthy
+    networks:
+      - monitor-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9102/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # 3. Szklany Dashboard Wizualny (Frontend UI)
+  dashboard:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+      args:
+        SERVICE_NAME: dashboard
+    ports:
+      - "9103:9103"
+    environment:
+      - MARKPACT_PORT=9103
+      - MARKPACT_NO_VENV=1
+      - ANALYTICS_SERVICE_URL=http://analytics:9101
+      - ALERTS_SERVICE_URL=http://alerts:9102
+    depends_on:
+      analytics:
+        condition: service_healthy
+      alerts:
+        condition: service_healthy
+    networks:
+      - monitor-network
+
+networks:
+  monitor-network:
+    driver: bridge

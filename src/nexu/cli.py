@@ -17,6 +17,7 @@ from .export_prompt import export_iteration_prompt
 from .freeze import freeze_project
 from .init_project import init_project
 from .iterate import iterate_capsule
+from .cinema import generate_cinema_player
 from .journal import append_journal, read_journal
 from .plan import build_iteration_plan
 from .orchestrate import build_capsule_orchestration
@@ -142,12 +143,16 @@ def capsule_iterate(
     path: Annotated[str, typer.Option("--path", "-p", help="Project root.")] = ".",
     steps: Annotated[int, typer.Option("--steps", "-s", help="How many planned iterations to create.")] = 1,
     goal: Annotated[str, typer.Option("--goal", "-g", help="Iteration goal.")] = "Evolve capsule safely.",
+    cinema: Annotated[bool, typer.Option("--cinema", "-c", help="Generate an interactive Cinema Player for visual approval.")] = False,
 ) -> None:
     """Create planned S1..Sn iteration folders and prompts."""
     root = project_root(path)
     created = iterate_capsule(root, name, steps=steps, goal=goal)
     append_journal(root, name, "iterate.planned", f"Planned {len(created)} iteration(s).", data={"goal": goal, "iterations": created})
     console.print(f"[green]created iterations[/green] {', '.join(created)}")
+    if cinema:
+        player_path = generate_cinema_player(root, name)
+        console.print(f"[bold green]🎬 Cinema Player generated successfully:[/bold green] {player_path}")
 
 
 @capsule_app.command("blueprint")

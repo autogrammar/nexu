@@ -11,7 +11,7 @@ from .models import read_yaml
 @dataclass
 class LLMConfig:
     provider: str = "offline"
-    model: str = "openrouter/qwen/qwen3-coder-next"
+    model: str = "openrouter/deepseek/deepseek-v4-pro"
     base_url: str = "https://openrouter.ai/api/v1"
     api_key_env: str = "OPENROUTER_API_KEY"
     temperature: float = 0.1
@@ -56,7 +56,12 @@ def load_config(root: Path) -> nexuConfig:
 
     llm = LLMConfig(
         provider=str(llm_data.get("provider", "offline")),
-        model=str(llm_data.get("model", os.getenv("nexu_MODEL", "openrouter/qwen/qwen3-coder-next"))),
+        model=str(
+            llm_data.get(
+                "model",
+                os.getenv("LLM_MODEL") or os.getenv("NEXU_MODEL") or os.getenv("nexu_MODEL") or "openrouter/deepseek/deepseek-v4-pro"
+            )
+        ),
         base_url=str(llm_data.get("base_url", "https://openrouter.ai/api/v1")),
         api_key_env=str(llm_data.get("api_key_env", "OPENROUTER_API_KEY")),
         temperature=float(llm_data.get("temperature", 0.1)),

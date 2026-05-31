@@ -3,10 +3,10 @@
 
 ## AI Cost Tracking
 
-![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.5.6-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
-![AI Cost](https://img.shields.io/badge/AI%20Cost-$1.83-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-5.5h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
+![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.5.7-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
+![AI Cost](https://img.shields.io/badge/AI%20Cost-$1.88-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-5.5h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
 
-- 🤖 **LLM usage:** $1.8336 (12 commits)
+- 🤖 **LLM usage:** $1.8755 (13 commits)
 - 👤 **Human dev:** ~$551 (5.5h @ $100/h, 30min dedup)
 
 Generated on 2026-05-31 using [openrouter/qwen/qwen3-coder-next](https://openrouter.ai/qwen/qwen3-coder-next)
@@ -110,10 +110,10 @@ tests/          unit tests
 Start here:
 
 - [Docs index](docs/README.md)
-- [New Project Web Integration Guide](file:///home/tom/.gemini/antigravity/brain/11d50127-74ee-4bf3-958b-8ace8bb45973/nexu_web_integration_guide.md)
-- [Calculator UI & Shell Evolution Guide](file:///home/tom/.gemini/antigravity/brain/11d50127-74ee-4bf3-958b-8ace8bb45973/nexu_calculator_evolution.md)
-- [Database Analytics Dashboard Evolution Guide](file:///home/tom/.gemini/antigravity/brain/11d50127-74ee-4bf3-958b-8ace8bb45973/nexu_analytics_evolution.md)
-- [OpenRouter Real-Time Integration Guide](file:///home/tom/.gemini/antigravity/brain/11d50127-74ee-4bf3-958b-8ace8bb45973/nexu_openrouter_realtime.md)
+- [New Project Web Integration Guide](examples/web_app_pactown_ecosystem/services/web/README.md)
+- [Calculator UI & Shell Evolution Guide](examples/web_app_calculator/README.md)
+- [Database Analytics Dashboard Evolution Guide](examples/web_app_analytics/)
+- [OpenRouter Real-Time Integration Guide](examples/realtime_lane_nexu_sync.py)
 - [Getting started](docs/getting-started.md)
 - [Architecture](docs/architecture.md)
 - [Commands](docs/commands.md)

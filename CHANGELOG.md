@@ -14,6 +14,17 @@
 - Run targeted flow tests: `tests/test_capsule_next_stage.py`, `tests/test_capsule_runtime_report.py`, `tests/test_nexu.py`, `tests/test_capsule_flow.py` (pass).
 - Run full suite: `pytest -q` (11 passed).
 
+## [0.5.7] - 2026-05-31
+
+### Docs
+- Update README.md
+- Update examples/web_app_event_monitor/docker/README.md
+
+### Other
+- Update examples/web_app_calculator/workspace/nexu.yaml
+- Update examples/web_app_event_monitor/docker/Dockerfile
+- Update examples/web_app_event_monitor/docker/docker-compose.yml
+
 ## [0.5.6] - 2026-05-31
 
 ### Docs
