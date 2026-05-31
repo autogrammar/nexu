@@ -1,0 +1,124 @@
+
+    <script>
+        (function () {
+            const calcParams = new URLSearchParams(window.location.search);
+            if (calcParams.get('calc') !== '1') {
+                console.log(
+                    '[NEXU CALC] disabled — use ?calc=1 to enable keypad',
+                    window.location.search
+                );
+                return;
+            }
+            console.log('[NEXU CALC] enabled', window.location.search);
+
+            function calcButtonTarget(node) {
+                return node && node.closest
+                    ? node.closest('.btn, .btn-sci, .btn-sci-excess, .btn-op')
+                    : null;
+            }
+
+            const screen = document.getElementById('screen');
+            if (!screen) return;
+
+            const ATOMIC = {
+                H: 1.008, He: 4.003, Li: 6.94, C: 12.011, N: 14.007, O: 15.999,
+                F: 18.998, Na: 22.99, Mg: 24.305, P: 30.974, S: 32.06, Cl: 35.45,
+                K: 39.098, Ca: 40.078, Fe: 55.845, Cu: 63.546, Zn: 65.38,
+            };
+
+            let expr = String(screen.textContent || '0').trim();
+            const isActive = () => window.location.search.includes('active=true');
+
+            function render() {
+                screen.textContent = expr || '0';
+            }
+
+            function molarMass(formula) {
+                let i = 0;
+                let total = 0;
+                const raw = formula.replace(/\s+/g, '');
+                while (i < raw.length) {
+                    if (!/[A-Z]/.test(raw[i])) return null;
+                    let sym = raw[i++];
+                    if (i < raw.length && /[a-z]/.test(raw[i])) sym += raw[i++];
+                    let digits = '';
+                    while (i < raw.length && /\d/.test(raw[i])) digits += raw[i++];
+                    const count = digits ? parseInt(digits, 10) : 1;
+                    if (!ATOMIC[sym]) return null;
+                    total += ATOMIC[sym] * count;
+                }
+                return total > 0 ? total : null;
+            }
+
+            function safeMathEval(input) {
+                const sanitized = input.replace(/\s+/g, '');
+                if (!/^[0-9+\-*/().]+$/.test(sanitized)) return null;
+                try {
+                    // eslint-disable-next-line no-new-func
+                    const value = Function('"use strict"; return (' + sanitized + ')')();
+                    return Number.isFinite(value) ? value : null;
+                } catch (_) {
+                    return null;
+                }
+            }
+
+            function tokenFromButton(btn) {
+                const id = (btn.id || '').toLowerCase();
+                const text = (btn.innerText || '').trim();
+                if (/^btn-([0-9])$/.test(id)) return id.slice(-1);
+                if (id === 'btn-0' || text === '0') return '0';
+                if (id === 'btn-dot' || text === '.') return '.';
+                if (id === 'btn-add' || text === '+') return '+';
+                if (id === 'btn-sub' || text === '-') return '-';
+                if (id === 'btn-mul' || text === '*') return '*';
+                if (id === 'btn-div' || text === '/') return '/';
+                if (id === 'btn-eq' || text === '=') return '=';
+                if (id === 'btn-clr' || id === 'btn-clear' || text === 'C') return 'C';
+                if (text.length <= 3 && /^[A-Z][a-z]?$/.test(text)) return text;
+                if (text.length <= 6) return text;
+                return text;
+            }
+
+            function onCalcPress(token) {
+                if (token === 'C') {
+                    expr = '0';
+                    render();
+                    return;
+                }
+                if (token === '=') {
+                    const mass = molarMass(expr);
+                    if (mass != null) {
+                        expr = expr + ': ' + mass.toFixed(2) + ' g/mol';
+                        render();
+                        return;
+                    }
+                    const math = safeMathEval(expr);
+                    if (math != null) {
+                        expr = String(math);
+                        render();
+                        return;
+                    }
+                    render();
+                    return;
+                }
+                if (expr === '0' && token !== '.' && !'+-*/'.includes(token)) {
+                    expr = token;
+                } else {
+                    expr += token;
+                }
+                render();
+            }
+
+            document.addEventListener('click', (e) => {
+                if (!isActive()) return;
+                if (window.__NEXU_REVIEW_MODE__) return;
+                const btn = calcButtonTarget(e.target);
+                if (!btn) return;
+                e.stopPropagation();
+                e.preventDefault();
+                onCalcPress(tokenFromButton(btn));
+            }, true);
+
+            render();
+        })();
+    </script>

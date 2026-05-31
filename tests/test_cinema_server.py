@@ -54,7 +54,7 @@ def test_cinema_player_template_is_externalized() -> None:
     assert "<title>Nexu" in html
     assert (
         'src="stage0.html?role=workspace&amp;active=true&amp;mark=1&amp;'
-        'calc=0&amp;review=1&amp;stage=0"'
+        'calc=0&amp;review=0&amp;stage=0"'
     ) in html
     assert 'src="alt_a.html?role=option&amp;pane=a&amp;mark=0&amp;calc=0"' in html
 

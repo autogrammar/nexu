@@ -1,124 +1,333 @@
 # Nexu
 
-
 ## AI Cost Tracking
 
-![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.5.16-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
-![AI Cost](https://img.shields.io/badge/AI%20Cost-$3.02-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-9.3h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
+![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.5.17-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
+![AI Cost](https://img.shields.io/badge/AI%20Cost-$3.22-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-9.4h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
 
-- 🤖 **LLM usage:** $3.0240 (22 commits)
-- 👤 **Human dev:** ~$926 (9.3h @ $100/h, 30min dedup)
+- 🤖 **LLM usage:** $3.2243 (23 commits)
+- 👤 **Human dev:** ~$936 (9.4h @ $100/h, 30min dedup)
 
 Generated on 2026-05-31 using [openrouter/qwen/qwen3-coder-next](https://openrouter.ai/qwen/qwen3-coder-next)
 
 ---
 
-**Nexu** — **Visual Intent Contract Orchestrator**.
+**Nexu** is a **Visual Intent Contract Orchestrator** for controlled code and UI evolution.
 
-Nexu is a Python package and CLI for creating small, isolated project capsules from a large codebase.
-It helps you freeze a baseline, extract a slice of code/data/contracts, evolve that slice through multiple
-LLM or human iterations, and verify the result against formal intent contracts before promoting it back.
-
-The core workflow is:
+It helps you take a large project, freeze its current state, extract a small isolated slice called a
+capsule, evolve that capsule through human or LLM-assisted iterations, verify the result against
+intent contracts, and only then promote the changes back into the source project.
 
 ```text
-freeze → capsule create → plan → blueprint → iterate → runtime → export-prompt → verify → report → promote
+init -> freeze -> capsule create -> plan/blueprint -> iterate -> verify -> review -> promote
 ```
 
-Nexu is designed to work with **Intract**-style intent contracts, but it can run as a standalone prototype.
-The goal is not to make an LLM magically correct. The goal is to keep the LLM inside a small, versioned,
-contract-bound sandbox and detect when its output diverges from declared intent.
+Nexu is useful when a task is too risky or too broad for direct edits in the main workspace. Instead
+of asking an LLM to operate on the whole repository, Nexu gives it a smaller, versioned sandbox with
+explicit files, contracts, evidence, reports and promotion checks.
 
-## Current status
+## Current State
 
-The 0.5.x line includes capsule orchestration, MCP tools, live Cinema UI evolution and dynamic Intract validation:
+Current release: **0.5.16**.
 
-- `capsule orchestrate` creates an offline or optional LLM-assisted step-by-step capsule evolution plan,
-- orchestration writes `orchestration.yaml`, `orchestration.md`, `orchestration-prompt.md` and context YAML,
-- `nexu mcp tools` lists tools available to IDE/agent clients,
-- `nexu mcp serve` exposes Nexu operations through a conservative MCP-compatible stdio JSON-RPC service,
-- MCP exposes both dry-run promotion planning and an explicit apply tool,
-- Cinema assets are generated from package templates under `src/nexu/templates/cinema/`,
-- LLM network calls remain disabled unless explicitly allowed in `nexu.yaml`.
+The project currently provides:
 
-## Why Nexu?
+- a Typer-based CLI: `nexu init`, `nexu freeze`, `nexu capsule ...`, `nexu mcp ...`,
+- project snapshots with lightweight file-hash baselines,
+- isolated capsules under `.nexu/capsules/<name>/`,
+- deterministic capsule planning and iteration folders,
+- UI/API/test blueprints generated from capsule metadata and Intract contracts,
+- static runtime previews for capsules,
+- LLM-ready prompt export with hard capsule boundaries,
+- verification reports with contract, drift and evidence checks,
+- human/LLM review packets and portable review bundles,
+- dry-run and apply promotion modes,
+- MCP-compatible stdio tools for IDE/agent clients,
+- Cinema: an interactive browser workspace for visual UI evolution,
+- local quality profile using pytest, Markdown link checks, Intract, redup and ruff.
 
-Long-running IDE prompting has a common failure mode:
+Network LLM calls are disabled by default. They are only used when enabled in `nexu.yaml` and when
+the required API key environment variable is present.
 
-```text
-large repo + vague task + many steps = context drift and hallucinated implementation
-```
+## Installation
 
-Nexu changes the operating model:
-
-```text
-large repo
-  ↓ freeze baseline
-small capsule
-  ↓ evolve only this capsule
-verified result
-  ↓ promote to the real project
-```
-
-## Install locally
+From PyPI:
 
 ```bash
 python -m venv .venv
 . .venv/bin/activate
-pip install -e .[dev]
+pip install nexu
 nexu --help
 ```
 
-## First run
+For local development:
+
+```bash
+git clone https://github.com/semcod/nexu.git
+cd nexu
+python -m venv .venv
+. .venv/bin/activate
+pip install -e .[dev]
+python -m nexu --help
+```
+
+Nexu requires Python **3.10+**.
+
+## What Nexu Creates
+
+After `nexu init .`, a project gets:
+
+```text
+nexu.yaml      project configuration
+intract.yaml   project-level intent contracts
+.nexu/         local Nexu state
+```
+
+A capsule stores its own metadata, copied source slice, baseline hashes, contracts, plans, reports
+and generated artifacts:
+
+```text
+.nexu/capsules/<name>/
+  capsule.yaml
+  intract.yaml
+  src/
+  iterations/
+  baseline/
+  plan/
+  blueprints/
+  runtime/
+  evidence/
+  reviews/
+  reports/
+  bundles/
+  cinema/
+```
+
+## Quick Start
 
 ```bash
 nexu init .
 nexu freeze . --name baseline
-nexu capsule create . --name menu-icons --domain menu --include "examples/frontend_view/src/**" --route /menu-icons
-nexu capsule plan menu-icons --steps 10 --goal "Add preview, confidence and reason fields"
-nexu capsule blueprint menu-icons --print
-nexu capsule iterate menu-icons --steps 3 --goal "Add preview, confidence and reason fields"
-nexu capsule runtime menu-icons
-nexu capsule orchestrate menu-icons --steps 10 --goal "Add preview, confidence and reason fields"
-nexu capsule export-prompt menu-icons
-nexu capsule verify menu-icons
-nexu capsule review menu-icons
-nexu capsule report menu-icons
-nexu capsule bundle menu-icons
-nexu capsule diff menu-icons
-nexu capsule drift menu-icons
-nexu capsule promote menu-icons --dry-run
+
+nexu capsule create . \
+  --name users-api \
+  --domain backend \
+  --include "src/users/**" \
+  --endpoint "POST:/api/users"
+
+nexu capsule plan users-api --steps 5 --goal "Improve create-user flow" --print
+nexu capsule blueprint users-api --print
+nexu capsule iterate users-api --steps 3 --goal "Improve create-user flow"
+nexu capsule export-prompt users-api
+nexu capsule verify users-api
+nexu capsule review users-api
+nexu capsule report users-api
+nexu capsule promote users-api --dry-run
 ```
 
-## Key Features Added Recently
+When the promotion plan is acceptable and verification is clean:
 
-- **Secure Workspace Promotion**: Support for applying capsule changes to the source workspace via the `nexu capsule promote --apply` command (and via the `nexu_capsule_promote_apply` MCP tool).
-- **Dynamic Intract Policy Engine Integration**: Runs the actual sibling `intract` package validations (including AST verification and contract compliance) during the capsule `verify` step to guarantee correctness.
-- **Web App Dashboard Evolution Example**: Fully details multi-stage sandbox visualization and evolution under `examples/web_app_dashboard`.
-- **Web App Calculator Mock Example**: Compares a simple arithmetic layout (S0) and a scientific layout (S2) under `examples/web_app_calculator` (evolving the `calc` capsule).
-- **Web App Database Analytics Example**: Showcases transition from raw SQL/NoSQL table logs to glassmorphic visual charts under `examples/web_app_analytics`.
-
-## Important folders
-
-```text
-src/nexu/       Python package
-docs/           documentation
-examples/       runnable example projects
-tests/          unit tests
+```bash
+nexu capsule promote users-api --apply
 ```
+
+## Main Commands
+
+Project setup:
+
+```bash
+nexu init .
+nexu freeze . --name baseline
+```
+
+Capsule lifecycle:
+
+```bash
+nexu capsule create . --name my-slice --include "src/my_module/**"
+nexu capsule list
+nexu capsule status my-slice
+nexu capsule plan my-slice --steps 10 --goal "Evolve the selected workflow"
+nexu capsule blueprint my-slice --print
+nexu capsule iterate my-slice --steps 3 --goal "Evolve the selected workflow"
+nexu capsule runtime my-slice
+nexu capsule export-prompt my-slice
+nexu capsule diff my-slice
+nexu capsule drift my-slice
+nexu capsule verify my-slice
+nexu capsule journal my-slice
+nexu capsule review my-slice
+nexu capsule bundle my-slice
+nexu capsule report my-slice
+nexu capsule promote my-slice --dry-run
+nexu capsule promote my-slice --apply
+```
+
+MCP integration:
+
+```bash
+nexu mcp tools
+nexu mcp serve --path .
+```
+
+Use `python -m nexu ...` instead of `nexu ...` when running directly from an editable checkout
+without installing the console script.
+
+## Typical Workflows
+
+### Human-controlled refactor
+
+1. Freeze the project with `nexu freeze`.
+2. Create a capsule containing only the files relevant to the change.
+3. Edit files inside `.nexu/capsules/<name>/src/`.
+4. Run `nexu capsule verify <name>`.
+5. Review `nexu capsule diff <name>` and `nexu capsule report <name>`.
+6. Promote with `--dry-run` first, then `--apply` after review.
+
+### LLM-assisted implementation
+
+1. Create a capsule and run `nexu capsule blueprint`.
+2. Export a constrained prompt with `nexu capsule export-prompt`.
+3. Give the prompt to an IDE agent or external LLM.
+4. Keep the agent working only inside the capsule.
+5. Verify, review and promote through Nexu.
+
+### IDE agent integration
+
+Run the MCP stdio server:
+
+```bash
+nexu mcp serve --path .
+```
+
+The MCP service exposes conservative tools for capsule creation, status, planning, blueprinting,
+iteration, prompt export, runtime generation, verification, review, reports and promotion planning.
+
+## Cinema: Visual UI Evolution
+
+Cinema is Nexu's browser-based UI evolution mode. It generates a local player for a capsule with:
+
+- one active workspace frame,
+- three option frames for alternative UI proposals,
+- visual selection and keep/remove marking,
+- a policy ledger backed by Intract-style constraints,
+- restoreable UI history checkpoints,
+- local service publishing for selected stages,
+- Markpact export for portable handoff.
+
+Run the default calculator Cinema example:
+
+```bash
+make cinema
+```
+
+Open the URL printed by the command. Do not assume a fixed port.
+
+Useful commands:
+
+```bash
+make cinema-open
+make cinema-stop
+make cinema-restart
+make cinema-repair
+NEXU_CINEMA_NO_OPEN=1 make cinema
+```
+
+Override the capsule, workspace path or model:
+
+```bash
+make cinema \
+  CINEMA_CAPSULE=scientific_calc \
+  CINEMA_PATH=examples/web_app_calculator/workspace \
+  CINEMA_GOAL="Convert the calculator into a scientific calculator"
+
+make cinema CINEMA_MODEL=openrouter/google/gemini-3.1-flash-lite-preview
+```
+
+To allow real LLM calls, add an API key and enable network calls in the workspace config:
+
+```bash
+OPENROUTER_API_KEY=...
+```
+
+```yaml
+llm:
+  allow_network_calls: true
+  api_key_env: OPENROUTER_API_KEY
+```
+
+## Examples
+
+Smoke-tested examples:
+
+```bash
+python examples/run_examples.py
+```
+
+Direct UI examples:
+
+```bash
+python examples/web_app_calculator/run.py
+python examples/web_app_dashboard/run.py
+```
+
+Additional examples:
+
+- [Frontend view](examples/frontend_view/README.md)
+- [Backend service](examples/backend_service/README.md)
+- [Vertical slice](examples/vertical_slice/README.md)
+- [Calculator UI evolution](examples/web_app_calculator/README.md)
+- [Dashboard UI evolution](examples/web_app_dashboard/README.md)
+- [Analytics dashboard evolution](examples/web_app_analytics/README.md)
+- [Pactown ecosystem integration](examples/web_app_pactown_ecosystem/run.py)
+- [Event monitor integration](examples/web_app_event_monitor/run.py)
+- [Realtime OpenRouter lane sync](examples/realtime_lane_nexu_sync.py)
+
+Pactown examples require `uv`, `pactown` and free local ports:
+
+```bash
+python examples/web_app_pactown_ecosystem/run.py
+python examples/web_app_event_monitor/run.py
+docker compose -f examples/web_app_event_monitor/docker/docker-compose.yml config --quiet
+```
+
+## Quality Checks
+
+Fast project profile:
+
+```bash
+make quality
+```
+
+It runs:
+
+- `pytest -q`,
+- local Markdown link validation,
+- `intract check src`,
+- `intract coverage src`,
+- `redup scan src`,
+- the currently clean ruff subset.
+
+Other useful checks:
+
+```bash
+make test
+make examples
+make docs-links
+make quality-strict
+make ci-cinema-smoke
+```
+
+`quality-strict` is intentionally broader and may be more useful as a backlog report than as a
+release gate.
 
 ## Documentation
 
 Start here:
 
 - [Docs index](docs/README.md)
-- [New Project Web Integration Guide](examples/web_app_pactown_ecosystem/services/web/README.md)
-- [Calculator UI & Shell Evolution Guide](examples/web_app_calculator/README.md)
-- [Database Analytics Dashboard Evolution Guide](examples/web_app_analytics/)
-- [OpenRouter Real-Time Integration Guide](examples/realtime_lane_nexu_sync.py)
 - [Getting started](docs/getting-started.md)
-- [Architecture](docs/architecture.md)
 - [Commands](docs/commands.md)
+- [Architecture](docs/architecture.md)
 - [Capsule format](docs/capsule-format.md)
 - [Intent contracts](docs/intent-contracts.md)
 - [Verification model](docs/verification.md)
@@ -129,137 +338,30 @@ Start here:
 - [Examples](docs/examples.md)
 - [Roadmap](docs/roadmap.md)
 
-## Main commands
+## Important Project Paths
 
-```bash
-nexu init .
-nexu freeze . --name baseline
-nexu capsule create . --name my-slice --include "src/my_module/**"
-nexu capsule list
-nexu capsule status my-slice
-nexu capsule blueprint my-slice
-nexu capsule iterate my-slice --steps 10 --goal "Evolve final screen"
-nexu capsule orchestrate my-slice --steps 10 --goal "Evolve final screen"
-nexu capsule export-prompt my-slice
-nexu capsule diff my-slice
-nexu capsule review my-slice
-nexu capsule bundle my-slice
-nexu capsule drift my-slice
-nexu capsule verify my-slice
-nexu capsule review my-slice
-nexu capsule bundle my-slice
-nexu capsule promote my-slice --dry-run
-nexu mcp tools
-nexu mcp serve --path .
+```text
+src/nexu/                       Python package
+src/nexu/templates/cinema/      packaged Cinema templates
+docs/                           documentation
+examples/                       runnable examples
+scripts/check-doc-links.py      local Markdown link validator
+tests/                          unit tests
+pyqual.yaml                     declarative quality profile
+Makefile                        local development commands
 ```
 
-## Verified examples
+## Related Local Tools
 
-The local example smoke runner covers `frontend_view`, `backend_service`, `vertical_slice` and `mcp_service`:
+Nexu can benefit from sibling Semcod tools when they are installed locally:
 
-```bash
-python examples/run_examples.py
-```
+- `intract` for intent contracts and contract coverage,
+- `redup` for duplicate-code scanning,
+- `regix` for regression-oriented quality tracking,
+- `pyqual` for declarative quality pipelines,
+- `vallm`, `llx`, `docval` and `testless` for deeper validation and automation workflows.
 
-The calculator and dashboard examples can be run directly:
-
-```bash
-python examples/web_app_calculator/run.py
-python examples/web_app_dashboard/run.py
-```
-
-The Pactown examples require `uv`, `pactown` and local ports to be free:
-
-```bash
-python examples/web_app_pactown_ecosystem/run.py
-python examples/web_app_event_monitor/run.py
-docker compose -f examples/web_app_event_monitor/docker/docker-compose.yml config --quiet
-```
-
-## Quality checks
-
-Use the lightweight local quality profile before changing release-facing code:
-
-```bash
-make quality
-```
-
-It runs tests, local Markdown link validation, source-level Intract checks, duplication scanning and the lint subset that is currently clean. For a full backlog-oriented report, use:
-
-```bash
-make quality-strict
-```
-
-The same fast profile is described in `pyqual.yaml` for tools that prefer declarative pipelines.
-
-## Cinema (LLM live mode)
-
-To run Cinema with real LLM evolution:
-
-1. Add API key to `.env` in repo root:
-
-```bash
-OPENROUTER_API_KEY=...
-```
-
-1. Enable network calls in workspace config (`examples/web_app_calculator/workspace/nexu.yaml`):
-
-```yaml
-llm:
-  allow_network_calls: true
-  api_key_env: OPENROUTER_API_KEY
-```
-
-1. Run Cinema iteration:
-
-```bash
-make cinema
-```
-
-Use the URL printed in the log (`Live HTTP Server started for Nexu: http://127.0.0.1:…`) — not a fixed port (8080 may be taken by another service).
-
-Stop stale cinema servers before restarting:
-
-```bash
-make cinema-stop
-make cinema
-```
-
-Useful helpers:
-
-```bash
-make cinema-open      # run and open current player URL
-make cinema-restart   # stop old server and start fresh player
-make cinema-repair    # re-inject runtime scripts into generated HTML files
-NEXU_CINEMA_NO_OPEN=1 make cinema
-```
-
-**Simple iteration flow (3 steps):**
-
-1. **Goal** — type what you want (e.g. chemical calculator) → **Add goal** → **Generate Options A–C**.
-2. **Compare** — review Options A, B, C (workspace on the left stays unchanged).
-3. **Promote & refine** — click an option to save it to the workspace → drag on buttons (left = keep, right = remove) → **Apply marks to workspace**.
-
-**History & policy (bottom row, two columns):** left — **Change history** with **Restore UI + policy** (rewinds HTML, ledger, and merges contracts into manifests); right — **Policy contracts** (baseline + active ledger lines, manifest actions). Use the URL from `make cinema` output, not a fixed port.
-
-1. Run tests:
-
-```bash
-make test
-make ci-cinema-smoke   # nexu + sibling intract + cinema policy dry-run
-```
-
-You can override defaults from `Makefile` inline:
-
-```bash
-make cinema CINEMA_CAPSULE=scientific_calc CINEMA_PATH=examples/web_app_calculator/workspace
-```
-
-Model override (otherwise `LLM_MODEL` from workspace `.env`):
-
-```bash
-make cinema CINEMA_MODEL=openrouter/google/gemini-3.1-flash-lite-preview
-```
+The default `make quality` profile already uses `intract` and `redup`.
 
 ## License
 

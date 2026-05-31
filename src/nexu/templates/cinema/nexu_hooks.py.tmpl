@@ -29,6 +29,7 @@ from nexu.cinema_publish import (
     start_published_service,
     stop_published_service,
 )
+from nexu.cinema_offline_options import write_goal_options_offline
 from nexu.cinema_scripts import apply_spatial_deletes_to_html, finalize_cinema_html
 
 ROOT = Path(__ROOT_PATH__)
@@ -97,6 +98,17 @@ def sync_option_previews(stage: int = 0, delete_ids=None):
         root=ROOT,
         capsule_name=CAPSULE,
     )
+
+
+def write_offline_goal_options(*, keep_els=None, delete_els=None, hints=None):
+    cinema = Path(__file__).resolve().parent
+    labels = write_goal_options_offline(
+        cinema,
+        keep_els=list(keep_els or []),
+        delete_els=list(delete_els or []),
+        hints=list(hints or []),
+    )
+    return labels
 
 
 def patch_option_previews(stage: int = 0):

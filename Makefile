@@ -23,7 +23,7 @@ quality-redup:
 	redup scan src --format toon --min-lines 8
 
 quality: test docs-links quality-intract quality-redup
-	ruff check src/nexu/cinema.py src/nexu/cinema_server.py src/nexu/verify.py src/nexu/intract_adapter.py tests/test_cinema_server.py
+	ruff check src/nexu/cinema.py src/nexu/cinema_server.py src/nexu/cinema_offline_options.py src/nexu/verify.py src/nexu/intract_adapter.py tests/test_cinema_server.py tests/test_cinema_offline_options.py
 
 quality-strict:
 	pytest -q

@@ -32,7 +32,10 @@ SHIELD_SCRIPT = """
         function isMarkingEnabled() {
             return NEXU_MARK && isActiveWorkspace();
         }
+        const NEXU_DEBUG = nexuBool('debug', false);
+        const NEXU_QUIET_EVENTS = new Set(['sync', 'review_mode']);
         function nexuLog(event, detail) {
+            if (!NEXU_DEBUG && NEXU_QUIET_EVENTS.has(event)) return;
             const payload = {
                 type: 'nexu_log',
                 event: event,
@@ -44,11 +47,13 @@ SHIELD_SCRIPT = """
                 mark: NEXU_MARK,
                 calc: NEXU_CALC,
             };
-            console.log('[NEXU IFRAME]', event, detail || '', window.location.search);
+            if (NEXU_DEBUG) {
+                console.log('[NEXU IFRAME]', event, detail || '', window.location.search);
+            }
             try { window.parent.postMessage(payload, '*'); } catch (_) {}
         }
 
-        window.__NEXU_REVIEW_MODE__ = nexuBool('review', NEXU_ROLE === 'workspace');
+        window.__NEXU_REVIEW_MODE__ = nexuBool('review', false);
 
         const style = document.createElement('style');
         style.innerHTML = `
@@ -381,7 +386,6 @@ SHIELD_SCRIPT = """
             if (!e.data) return;
             if (e.data.type === 'review_mode') {
                 window.__NEXU_REVIEW_MODE__ = !!e.data.enabled;
-                nexuLog('review_mode', { enabled: window.__NEXU_REVIEW_MODE__ });
                 updateDockVisibility();
                 if (window.__NEXU_REVIEW_MODE__ && isMarkingEnabled()) {
                     advanceToNext();
@@ -390,7 +394,6 @@ SHIELD_SCRIPT = """
             }
             if (e.data.type === 'sync') {
                 applyAnnotationStyles(e.data.annotations);
-                nexuLog('sync', { count: (e.data.annotations || []).length });
                 if (window.__NEXU_REVIEW_MODE__ && isMarkingEnabled() && !focusedId) {
                     advanceToNext();
                 }

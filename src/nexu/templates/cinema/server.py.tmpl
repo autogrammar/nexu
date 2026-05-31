@@ -906,15 +906,26 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 keep_els, delete_els = _merge_ui_constraints(
                     ledger_keep, ledger_delete, session_keep, session_delete
                 )
-                if delete_els or keep_els or requested_mode == 'active_workspace':
-                    apply_active = bool(delete_els or keep_els)
+                # goal_options: refresh A–C only; marks/hints constrain variants, workspace unchanged.
+                if requested_mode == 'goal_options':
+                    apply_active = False
+                    apply_options = bool(
+                        normalized_hints
+                        or session_keep
+                        or session_delete
+                        or ledger_keep
+                        or ledger_delete
+                        or pending_goal
+                    )
+                elif requested_mode == 'active_workspace':
+                    apply_active = bool(session_delete or session_keep or delete_els or keep_els)
                     apply_options = False
-                elif (pending_goal or requested_mode == 'goal_options') and normalized_hints:
+                elif (pending_goal or normalized_hints) and not (session_delete or session_keep):
                     apply_active = False
                     apply_options = True
-                elif normalized_hints:
-                    apply_active = False
-                    apply_options = True
+                elif session_delete or session_keep:
+                    apply_active = True
+                    apply_options = False
                 else:
                     apply_active = False
                     apply_options = False
@@ -1093,7 +1104,21 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                         status_msg = 'proposed_options_by_llm'
                         llm_error = None
                     else:
-                        status_msg = f'llm_skipped: {llm_error or "No option HTML generated"}'
+                        try:
+                            import nexu_hooks
+                            offline_labels = nexu_hooks.write_offline_goal_options(
+                                keep_els=keep_els,
+                                delete_els=delete_els,
+                                hints=normalized_hints,
+                            )
+                            if offline_labels:
+                                options_written = offline_labels
+                                status_msg = 'proposed_options_offline'
+                                llm_error = None
+                        except Exception as offline_exc:
+                            llm_error = llm_error or str(offline_exc)
+                        if not options_written:
+                            status_msg = f'llm_skipped: {llm_error or "No option HTML generated"}'
                 else:
                     iteration_mode = "active_workspace"
                     if delete_els:
@@ -1120,7 +1145,8 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
 
                 options_sync = None
                 if status_msg in ('evolved_by_spatial_patch', 'evolved_by_llm') or (
-                    status_msg == 'proposed_options_by_llm' and options_written
+                    status_msg in ('proposed_options_by_llm', 'proposed_options_offline')
+                    and options_written
                 ):
                     options_sync = _patch_option_previews(current_stage)
 
@@ -1140,6 +1166,7 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 history_checkpoint = None
                 if status_msg in (
                     'proposed_options_by_llm',
+                    'proposed_options_offline',
                     'evolved_by_llm',
                     'evolved_by_spatial_patch',
                     'promoted',
