@@ -1,5 +1,6 @@
 # Project local state
 .nexu/
+.pactown-sandboxes
 .code2llm_cache/
 .tmp_nexu_run/
 .tmp_calculator/

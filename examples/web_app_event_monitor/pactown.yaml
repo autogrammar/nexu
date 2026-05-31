@@ -1,0 +1,31 @@
+name: nexu-event-monitor-ecosystem
+version: 1.0.0
+base_port: 9100
+sandbox_root: ./.pactown-sandboxes
+
+services:
+  analytics:
+    readme: services/analytics/README.md
+    port: 9101
+    health_check: /health
+
+  alerts:
+    readme: services/alerts/README.md
+    port: 9102
+    health_check: /health
+    depends_on:
+      - name: analytics
+        endpoint: http://localhost:9101
+        env_var: ANALYTICS_SERVICE_URL
+
+  dashboard:
+    readme: services/dashboard/README.md
+    port: 9103
+    health_check: /health
+    depends_on:
+      - name: analytics
+        endpoint: http://localhost:9101
+        env_var: ANALYTICS_SERVICE_URL
+      - name: alerts
+        endpoint: http://localhost:9102
+        env_var: ALERTS_SERVICE_URL

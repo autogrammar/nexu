@@ -1,0 +1,19 @@
+name: nexu-pactown-ecosystem
+version: 1.0.0
+base_port: 9000
+sandbox_root: ./.pactown-sandboxes
+
+services:
+  api:
+    readme: services/api/README.md
+    port: 9001
+    health_check: /health
+
+  web:
+    readme: services/web/README.md
+    port: 9002
+    health_check: /health
+    depends_on:
+      - name: api
+        endpoint: http://localhost:9001
+        env_var: API_SERVICE_URL

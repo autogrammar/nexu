@@ -14,6 +14,27 @@
 - Run targeted flow tests: `tests/test_capsule_next_stage.py`, `tests/test_capsule_runtime_report.py`, `tests/test_nexu.py`, `tests/test_capsule_flow.py` (pass).
 - Run full suite: `pytest -q` (11 passed).
 
+## [0.5.6] - 2026-05-31
+
+### Docs
+- Update README.md
+- Update examples/web_app_calculator/markpact_sandbox/README.md
+- Update examples/web_app_event_monitor/services/alerts/README.md
+- Update examples/web_app_event_monitor/services/analytics/README.md
+- Update examples/web_app_event_monitor/services/dashboard/README.md
+- Update examples/web_app_pactown_ecosystem/services/api/README.md
+- Update examples/web_app_pactown_ecosystem/services/web/README.md
+
+### Other
+- Update .gitignore
+- Update examples/nexu_markpact_exporter.py
+- Update examples/web_app_calculator/markpact_sandbox/sandbox/requirements.txt
+- Update examples/web_app_calculator/markpact_sandbox/sandbox/src/calculator.py
+- Update examples/web_app_event_monitor/pactown.yaml
+- Update examples/web_app_event_monitor/run.py
+- Update examples/web_app_pactown_ecosystem/pactown.yaml
+- Update examples/web_app_pactown_ecosystem/run.py
+
 ## [0.5.5] - 2026-05-31
 
 ### Docs
