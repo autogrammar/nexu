@@ -9,7 +9,7 @@ SHIELD_SCRIPT = """
     <script>
         console.log("[NEXU CHILD] IFrame loaded: " + window.location.pathname);
 
-        window.__NEXU_REVIEW_MODE__ = true;
+        window.__NEXU_REVIEW_MODE__ = false;
 
         const style = document.createElement('style');
         style.innerHTML = `

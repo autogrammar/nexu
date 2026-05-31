@@ -16,6 +16,93 @@ ManifestTarget = Literal["project", "capsule", "both"]
 _VALID_TARGETS = frozenset({"project", "capsule", "both"})
 
 
+def effective_ui_constraints_from_ledger(
+    ledger: list[Any],
+    *,
+    stage: int | None = None,
+) -> dict[str, Any]:
+    """
+    Effective KEEP/DELETE per UI element from the cinema policy ledger.
+
+    Walks entries in order; later keep/delete for the same element wins.
+    Also reads ``proposed_contracts`` when present.
+    """
+    state: dict[str, str] = {}
+    if not isinstance(ledger, list):
+        return {"keep": [], "delete": [], "by_element": {}}
+
+    for entry in ledger:
+        if not isinstance(entry, dict):
+            continue
+        if stage is not None:
+            raw_stage = entry.get("stage")
+            if raw_stage is not None and int(raw_stage) != stage:
+                continue
+        for element_id in entry.get("keep") or []:
+            key = str(element_id).strip()
+            if key:
+                state[key] = "keep"
+        for element_id in entry.get("delete") or []:
+            key = str(element_id).strip()
+            if key:
+                state[key] = "delete"
+        for proposal in entry.get("proposed_contracts") or []:
+            if not isinstance(proposal, dict):
+                continue
+            kind, element = _proposal_kind_and_element(proposal)
+            if not element or element == "unknown":
+                continue
+            if kind == "keep":
+                state[element] = "keep"
+            elif kind == "delete":
+                state[element] = "delete"
+
+    keep = sorted(key for key, value in state.items() if value == "keep")
+    delete = sorted(key for key, value in state.items() if value == "delete")
+    return {"keep": keep, "delete": delete, "by_element": state}
+
+
+def merge_ui_constraint_lists(
+    *,
+    ledger_keep: list[str],
+    ledger_delete: list[str],
+    session_keep: list[str],
+    session_delete: list[str],
+) -> tuple[list[str], list[str]]:
+    """Ledger baseline; current session annotations override per element."""
+    state: dict[str, str] = {}
+    for element_id in ledger_keep:
+        key = str(element_id).strip()
+        if key:
+            state[key] = "keep"
+    for element_id in ledger_delete:
+        key = str(element_id).strip()
+        if key:
+            state[key] = "delete"
+    for element_id in session_keep:
+        key = str(element_id).strip()
+        if key:
+            state[key] = "keep"
+    for element_id in session_delete:
+        key = str(element_id).strip()
+        if key:
+            state[key] = "delete"
+    keep = sorted(key for key, value in state.items() if value == "keep")
+    delete = sorted(key for key, value in state.items() if value == "delete")
+    return keep, delete
+
+
+def load_effective_ui_constraints(root: Path, capsule_name: str, *, stage: int = 0) -> dict[str, Any]:
+    """Load ledger from disk and return effective UI constraints for a stage."""
+    ledger_path = policy_ledger_path(root, capsule_name)
+    ledger: list[Any] = []
+    if ledger_path.exists():
+        data = json.loads(ledger_path.read_text(encoding="utf-8"))
+        if isinstance(data, list):
+            ledger = data
+    return effective_ui_constraints_from_ledger(ledger, stage=stage)
+
+
 def resolve_iteration_mode(
     *,
     has_hints: bool = False,

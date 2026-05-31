@@ -1,4 +1,4 @@
-.PHONY: test examples cinema cinema-open cinema-test cinema-stop cinema-repair ci-cinema-smoke
+.PHONY: test examples cinema cinema-open cinema-test cinema-stop cinema-restart cinema-repair ci-cinema-smoke
 
 CINEMA_MODEL ?=
 CINEMA_CAPSULE ?= scientific_calc
@@ -29,7 +29,12 @@ cinema-test: cinema
 	pytest -q
 
 cinema-stop:
-	@pkill -f '/cinema/server.py' 2>/dev/null && echo 'Stopped cinema server.py process(es).' || echo 'No cinema server.py processes found.'
+	@pkill -f '[/]cinema/server.py' >/dev/null 2>&1 || true
+	@echo 'Stopped cinema server.py process(es) if any were running.'
+
+cinema-restart:
+	@$(MAKE) cinema-stop
+	@$(MAKE) cinema
 
 cinema-repair:
 	@uv run python -c "from pathlib import Path; from nexu.cinema_scripts import repair_cinema_html_files; d=Path('$(CINEMA_PATH)')/'.nexu/capsules/$(CINEMA_CAPSULE)/cinema'; n=repair_cinema_html_files(d); print(f'Repaired {n} HTML file(s) in {d}')"
