@@ -202,10 +202,43 @@ def ensure_initial_checkpoint(cinema_dir: Path) -> dict[str, Any] | None:
     """Save baseline snapshot once when history is empty."""
     if _load_index(cinema_dir):
         return None
+    ledger_len = len(_ledger_snapshot(cinema_dir))
+    label = (
+        "Initial baseline"
+        if ledger_len == 0
+        else f"Snapshot at cinema restart (ledger had {ledger_len} entries)"
+    )
     return save_history_checkpoint(
         cinema_dir,
         action="baseline",
         stage=0,
         status="initial",
-        label="Initial baseline",
+        label=label,
     )
+
+
+def ledger_archive_for_display(cinema_dir: Path) -> list[dict[str, Any]]:
+    """Ledger iterations without HTML snapshots (read-only in history UI)."""
+    ledger = _ledger_snapshot(cinema_dir)
+    archive: list[dict[str, Any]] = []
+    for i, entry in enumerate(reversed(ledger)):
+        if not isinstance(entry, dict):
+            continue
+        delete = entry.get("delete") or []
+        keep = entry.get("keep") or []
+        archive.append(
+            {
+                "id": f"ledger_{len(ledger) - 1 - i}",
+                "restorable": False,
+                "timestamp": entry.get("timestamp", ""),
+                "label": _build_label(
+                    stage=int(entry.get("stage", 0)),
+                    status=str(entry.get("status", "ledger")),
+                    action="ledger",
+                    keep=list(keep),
+                    delete=list(delete),
+                ),
+                "ledger_length": i + 1,
+            }
+        )
+    return archive

@@ -9,6 +9,8 @@ SHIELD_SCRIPT = """
     <script>
         console.log("[NEXU CHILD] IFrame loaded: " + window.location.pathname);
 
+        window.__NEXU_REVIEW_MODE__ = true;
+
         const style = document.createElement('style');
         style.innerHTML = `
             .selection-box {
@@ -16,23 +18,172 @@ SHIELD_SCRIPT = """
                 border: 2px dashed #2ed573;
                 background: rgba(46, 213, 115, 0.15);
                 pointer-events: none;
-                z-index: 99999;
+                z-index: 99998;
                 display: none;
                 border-radius: 4px;
-                box-shadow: 0 0 8px rgba(46, 213, 115, 0.3);
             }
             .selection-box.delete {
                 border-color: #ff4757;
                 background: rgba(255, 71, 87, 0.15);
-                box-shadow: 0 0 8px rgba(255, 71, 87, 0.3);
+            }
+            .nexu-review-dock {
+                position: fixed;
+                left: 50%;
+                bottom: 12px;
+                transform: translateX(-50%);
+                display: none;
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+                z-index: 100000;
+                font-family: 'Outfit', sans-serif;
+                pointer-events: auto;
+            }
+            .nexu-review-dock.visible { display: flex; }
+            .nexu-review-label {
+                background: rgba(15, 23, 42, 0.92);
+                color: #e2e8f0;
+                padding: 6px 14px;
+                border-radius: 20px;
+                font-size: 13px;
+                border: 1px solid rgba(255,255,255,0.12);
+            }
+            .nexu-review-actions {
+                display: flex;
+                gap: 16px;
+                align-items: center;
+            }
+            .nexu-review-btn {
+                width: 56px;
+                height: 56px;
+                border-radius: 50%;
+                border: none;
+                font-size: 26px;
+                cursor: pointer;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+                transition: transform 0.15s ease;
+            }
+            .nexu-review-btn:hover { transform: scale(1.08); }
+            .nexu-review-btn.reject {
+                background: linear-gradient(135deg, #ff6b81, #ff4757);
+                color: #fff;
+            }
+            .nexu-review-btn.accept {
+                background: linear-gradient(135deg, #2ed573, #26de81);
+                color: #0f172a;
+            }
+            .nexu-review-hint {
+                font-size: 10px;
+                color: #94a3b8;
+                text-align: center;
+            }
+            .btn.nexu-focus-pulse {
+                outline: 3px solid #38bdf8 !important;
+                outline-offset: 2px !important;
+                box-shadow: 0 0 16px rgba(56, 189, 248, 0.55) !important;
+                z-index: 99990;
+                position: relative;
             }
         `;
         document.head.appendChild(style);
 
+        const SELECTOR = '.btn, .btn-sci, .btn-sci-excess, .btn-op, .screen';
         let selectionBox = null;
         let isDrawing = false;
         let startX = 0, startY = 0;
         let selectionType = 'KEEP';
+        let focusedEl = null;
+        let focusedId = '';
+        let annotatedIds = new Set();
+        let swipeStartX = 0;
+
+        const dock = document.createElement('div');
+        dock.className = 'nexu-review-dock';
+        dock.innerHTML = `
+            <div class="nexu-review-label" id="nexu-review-label">Tap a control</div>
+            <div class="nexu-review-actions">
+                <button type="button" class="nexu-review-btn reject" id="nexu-btn-reject" title="Remove">✗</button>
+                <button type="button" class="nexu-review-btn accept" id="nexu-btn-accept" title="Keep">✓</button>
+            </div>
+            <div class="nexu-review-hint">← remove · → keep · swipe on card</div>
+        `;
+        document.body.appendChild(dock);
+
+        function isActiveWorkspace() {
+            return window.location.search.includes('active=true');
+        }
+
+        function calcButtonTarget(node) {
+            return node && node.closest ? node.closest(SELECTOR) : null;
+        }
+
+        function elementIdFromEl(el) {
+            const rawId = (el.id || '').trim();
+            return rawId ? rawId.replace(/^btn-/, '') : (el.innerText || '').trim();
+        }
+
+        function allTargets() {
+            return Array.from(document.querySelectorAll(SELECTOR));
+        }
+
+        function clearFocusPulse() {
+            allTargets().forEach(el => el.classList.remove('nexu-focus-pulse'));
+        }
+
+        function setFocus(el) {
+            clearFocusPulse();
+            focusedEl = el;
+            focusedId = elementIdFromEl(el);
+            if (el) {
+                el.classList.add('nexu-focus-pulse');
+                const label = document.getElementById('nexu-review-label');
+                if (label) label.textContent = '#' + focusedId;
+            }
+        }
+
+        function updateDockVisibility() {
+            if (!isActiveWorkspace() || !window.__NEXU_REVIEW_MODE__) {
+                dock.classList.remove('visible');
+                return;
+            }
+            dock.classList.add('visible');
+        }
+
+        function postAnnotation(action) {
+            if (!focusedId) return;
+            window.parent.postMessage({
+                type: 'annotation',
+                elementId: focusedId,
+                action: action,
+            }, '*');
+            annotatedIds.add(focusedId);
+            setTimeout(() => {
+                window.parent.postMessage({ type: 'selection_updated' }, '*');
+                advanceToNext();
+            }, 80);
+        }
+
+        function advanceToNext() {
+            const next = allTargets().find(el => !annotatedIds.has(elementIdFromEl(el)));
+            if (next) {
+                setFocus(next);
+            } else {
+                clearFocusPulse();
+                focusedEl = null;
+                focusedId = '';
+                const label = document.getElementById('nexu-review-label');
+                if (label) label.textContent = 'All reviewed ✓';
+            }
+        }
+
+        document.getElementById('nexu-btn-accept').addEventListener('click', (e) => {
+            e.stopPropagation();
+            postAnnotation('KEEP');
+        });
+        document.getElementById('nexu-btn-reject').addEventListener('click', (e) => {
+            e.stopPropagation();
+            postAnnotation('DELETE');
+        });
 
         function getSelectionBox() {
             if (!selectionBox) {
@@ -43,33 +194,31 @@ SHIELD_SCRIPT = """
             return selectionBox;
         }
 
-        function calcButtonTarget(node) {
-            return node && node.closest
-                ? node.closest('.btn, .btn-sci, .btn-sci-excess, .btn-op')
-                : null;
-        }
-
         document.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             e.stopPropagation();
         }, true);
 
         document.addEventListener('mousedown', (e) => {
-            const isActiveWorkspace = window.location.search.includes('active=true');
-            if (!isActiveWorkspace) return;
+            if (!isActiveWorkspace()) return;
+            if (window.__NEXU_REVIEW_MODE__) {
+                if (e.target.closest('.nexu-review-dock')) return;
+                const onBtn = calcButtonTarget(e.target);
+                if (onBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setFocus(onBtn);
+                    swipeStartX = e.clientX;
+                }
+                return;
+            }
 
             const onBtn = calcButtonTarget(e.target);
-            if (onBtn && e.button === 0) {
-                return;
-            }
+            if (onBtn && e.button === 0) return;
 
-            if (e.button === 0) {
-                selectionType = 'KEEP';
-            } else if (e.button === 2) {
-                selectionType = 'DELETE';
-            } else {
-                return;
-            }
+            if (e.button === 0) selectionType = 'KEEP';
+            else if (e.button === 2) selectionType = 'DELETE';
+            else return;
 
             isDrawing = true;
             startX = e.clientX;
@@ -86,89 +235,108 @@ SHIELD_SCRIPT = """
 
         document.addEventListener('mousemove', (e) => {
             if (!isDrawing) return;
-            const currentX = e.clientX;
-            const currentY = e.clientY;
-            const x = Math.min(startX, currentX);
-            const y = Math.min(startY, currentY);
-            const width = Math.abs(startX - currentX);
-            const height = Math.abs(startY - currentY);
+            const x = Math.min(startX, e.clientX);
+            const y = Math.min(startY, e.clientY);
             const box = getSelectionBox();
             box.style.left = x + 'px';
             box.style.top = y + 'px';
-            box.style.width = width + 'px';
-            box.style.height = height + 'px';
+            box.style.width = Math.abs(startX - e.clientX) + 'px';
+            box.style.height = Math.abs(startY - e.clientY) + 'px';
         });
 
         document.addEventListener('mouseup', (e) => {
+            if (window.__NEXU_REVIEW_MODE__ && isActiveWorkspace() && focusedEl) {
+                const dx = e.clientX - swipeStartX;
+                if (Math.abs(dx) > 48) {
+                    postAnnotation(dx > 0 ? 'KEEP' : 'DELETE');
+                    return;
+                }
+            }
             if (!isDrawing) return;
             isDrawing = false;
             const box = getSelectionBox();
             const rect = box.getBoundingClientRect();
             box.style.display = 'none';
             const isSingleClick = rect.width < 8 && rect.height < 8;
-            const elements = document.querySelectorAll(
-                '.btn, .btn-sci, .btn-sci-excess, .btn-op, .screen'
-            );
-            elements.forEach(el => {
+            allTargets().forEach(el => {
                 const elRect = el.getBoundingClientRect();
                 const intersects = !(
-                    elRect.right < rect.left ||
-                    elRect.left > rect.right ||
-                    elRect.bottom < rect.top ||
-                    elRect.top > rect.bottom
+                    elRect.right < rect.left || elRect.left > rect.right ||
+                    elRect.bottom < rect.top || elRect.top > rect.bottom
                 );
                 if (intersects || (isSingleClick && el === e.target)) {
-                    const rawId = (el.id || '').trim();
-                    const elementId = rawId ? rawId.replace(/^btn-/, '') : (el.innerText || '').trim();
                     window.parent.postMessage({
                         type: 'annotation',
-                        elementId: elementId,
+                        elementId: elementIdFromEl(el),
                         action: selectionType,
                     }, '*');
                 }
             });
-            setTimeout(() => {
-                window.parent.postMessage({ type: 'selection_updated' }, '*');
-            }, 100);
+            setTimeout(() => window.parent.postMessage({ type: 'selection_updated' }, '*'), 100);
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (!window.__NEXU_REVIEW_MODE__ || !isActiveWorkspace() || !focusedId) return;
+            if (e.key === 'ArrowRight') { e.preventDefault(); postAnnotation('KEEP'); }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); postAnnotation('DELETE'); }
         });
 
         document.addEventListener('click', (e) => {
-            const isActiveWorkspace = window.location.search.includes('active=true');
-            if (!isActiveWorkspace) {
+            if (!isActiveWorkspace()) {
                 e.preventDefault();
                 e.stopPropagation();
                 const currentFile = window.location.pathname.split('/').pop();
                 window.parent.postMessage({ type: 'promote', altSrc: currentFile }, '*');
+                return;
+            }
+            if (window.__NEXU_REVIEW_MODE__ && calcButtonTarget(e.target)) {
+                e.preventDefault();
+                e.stopPropagation();
             }
         }, true);
 
-        window.addEventListener('message', (e) => {
-            if (e.data && e.data.type === 'sync') {
-                const annotations = e.data.annotations;
-                const elements = document.querySelectorAll(
-                    '.btn, .btn-sci, .btn-sci-excess, .btn-op, .screen'
-                );
-                elements.forEach(el => {
-                    const rawId = (el.id || '').trim();
-                    const elementId = rawId ? rawId.replace(/^btn-/, '') : (el.innerText || '').trim();
-                    const match = annotations.find(a => a.id === elementId);
-                    if (match) {
-                        if (match.type === 'KEEP') {
-                            el.style.outline = '3px solid #2ed573';
-                            el.style.outlineOffset = '-3px';
-                            el.style.boxShadow = '0 0 12px rgba(46, 213, 115, 0.4)';
-                        } else {
-                            el.style.outline = '3px solid #ff4757';
-                            el.style.outlineOffset = '-3px';
-                            el.style.boxShadow = '0 0 12px rgba(255, 71, 87, 0.4)';
-                        }
+        function applyAnnotationStyles(annotations) {
+            annotatedIds = new Set((annotations || []).map(a => a.id));
+            allTargets().forEach(el => {
+                const elementId = elementIdFromEl(el);
+                const match = (annotations || []).find(a => a.id === elementId);
+                if (match) {
+                    if (match.type === 'KEEP') {
+                        el.style.outline = '3px solid #2ed573';
+                        el.style.boxShadow = '0 0 12px rgba(46, 213, 115, 0.4)';
                     } else {
-                        el.style.outline = 'none';
-                        el.style.boxShadow = 'none';
+                        el.style.outline = '3px solid #ff4757';
+                        el.style.boxShadow = '0 0 12px rgba(255, 71, 87, 0.4)';
                     }
-                });
+                } else {
+                    el.style.outline = 'none';
+                    el.style.boxShadow = 'none';
+                }
+            });
+        }
+
+        window.addEventListener('message', (e) => {
+            if (!e.data) return;
+            if (e.data.type === 'review_mode') {
+                window.__NEXU_REVIEW_MODE__ = !!e.data.enabled;
+                updateDockVisibility();
+                if (window.__NEXU_REVIEW_MODE__ && isActiveWorkspace()) {
+                    advanceToNext();
+                }
+                return;
+            }
+            if (e.data.type === 'sync') {
+                applyAnnotationStyles(e.data.annotations);
+                if (window.__NEXU_REVIEW_MODE__ && isActiveWorkspace() && !focusedId) {
+                    advanceToNext();
+                }
             }
         });
+
+        updateDockVisibility();
+        if (isActiveWorkspace() && window.__NEXU_REVIEW_MODE__) {
+            setTimeout(advanceToNext, 300);
+        }
     </script>
 """
 
@@ -275,6 +443,7 @@ CALCULATOR_RUNTIME_SCRIPT = """
 
             document.addEventListener('click', (e) => {
                 if (!isActive()) return;
+                if (window.__NEXU_REVIEW_MODE__) return;
                 const btn = calcButtonTarget(e.target);
                 if (!btn) return;
                 e.stopPropagation();

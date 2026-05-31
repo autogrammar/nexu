@@ -81,7 +81,13 @@ def save_history(**kwargs):
 
 
 def list_history():
-    return list_history_checkpoints(Path(__file__).resolve().parent)
+    cinema = Path(__file__).resolve().parent
+    from nexu.cinema_history import ledger_archive_for_display, list_history_checkpoints
+
+    return {
+        "checkpoints": list_history_checkpoints(cinema),
+        "ledger_archive": ledger_archive_for_display(cinema),
+    }
 
 
 def restore_history(checkpoint_id: str, *, apply_manifest: bool = True, target: str = "both"):
@@ -534,12 +540,15 @@ def _save_history_checkpoint(**kwargs) -> dict | None:
         return None
 
 
-def _list_history() -> list:
+def _list_history() -> dict:
     try:
         import nexu_hooks
     except ImportError:
-        return []
-    return nexu_hooks.list_history()
+        return {{"checkpoints": [], "ledger_archive": []}}
+    payload = nexu_hooks.list_history()
+    if isinstance(payload, dict):
+        return payload
+    return {{"checkpoints": payload if isinstance(payload, list) else [], "ledger_archive": []}}
 
 
 def _restore_history(checkpoint_id: str, *, apply_manifest: bool = True, target: str = "both") -> dict:
@@ -575,7 +584,7 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 return
         if self.path in ("/history", "/history/"):
             try:
-                payload = {{"checkpoints": _list_history()}}
+                payload = _list_history()
                 body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
                 self.send_response(200)
                 self.send_header("Content-type", "application/json; charset=utf-8")
@@ -1808,6 +1817,20 @@ def generate_cinema_player(root: Path, name: str) -> Path:
             cursor: pointer;
         }
         .btn-hint:hover { background: #0284c7; }
+        .btn-review {
+            width: 100%;
+            margin-bottom: 10px;
+            background: rgba(129, 140, 248, 0.25);
+            color: #c7d2fe;
+            border: 1px solid rgba(129, 140, 248, 0.45);
+            border-radius: 6px;
+            padding: 8px 10px;
+            font-weight: 600;
+            font-size: 0.82rem;
+            cursor: pointer;
+        }
+        .btn-review:hover { background: rgba(129, 140, 248, 0.4); }
+        .btn-review.active { background: #6366f1; color: #fff; border-color: #818cf8; }
         
         .promote-indicator {
             color: #818cf8;
@@ -1898,7 +1921,7 @@ def generate_cinema_player(root: Path, name: str) -> Path:
     <div class="workflow-guide" id="workflow-guide">
         <div class="wf-step active" id="wf-step-1"><strong>1. Goal</strong>Describe what you want (e.g. chemical calculator).</div>
         <div class="wf-step" id="wf-step-2"><strong>2. Options A–C</strong>AI generates three variants — workspace unchanged.</div>
-        <div class="wf-step" id="wf-step-3"><strong>3. Promote &amp; refine</strong>Click an option to save it, then mark buttons to keep or remove.</div>
+        <div class="wf-step" id="wf-step-3"><strong>3. Promote &amp; refine</strong>Tap each control → ✓ keep or ✗ remove (like Tinder).</div>
     </div>
     <div class="workflow-hint" id="workflow-hint">Start with step 1: add your goal, then click the action button below.</div>
     
@@ -1909,7 +1932,7 @@ def generate_cinema_player(root: Path, name: str) -> Path:
             <div class="panel active-panel">
                 <div class="panel-header" style="color: #38bdf8;">
                     <span>🔵 1. ACTIVE WORKSPACE</span>
-                    <span style="font-size: 0.65rem;">[Drag on buttons: left = keep · right = remove]</span>
+                    <span id="workspace-hint" style="font-size: 0.65rem;">[Review mode: tap control → ✓ / ✗]</span>
                 </div>
                 <div class="panel-body">
                     <iframe id="active-frame" name="active-frame" src="stage0.html?active=true"></iframe>
@@ -1964,10 +1987,11 @@ def generate_cinema_player(root: Path, name: str) -> Path:
             <textarea id="hint-input" class="hint-input" placeholder="e.g. chemical calculator with element keys and molar mass…"></textarea>
             <button class="btn-hint" onclick="addUserHint()">➕ Add goal</button>
             
-            <div class="side-header">2. Marks on workspace (after promote)</div>
+            <div class="side-header">2. Review controls (after promote)</div>
+            <button type="button" class="btn-review active" id="btn-review-mode" onclick="toggleElementReviewMode()">👆 Review mode: ON (tap ✓ / ✗)</button>
             <div class="feedback-list" id="feedback-list">
                 <div style="color: #64748b; font-size: 0.85rem; text-align: center; margin-top: 40px;">
-                    After you promote an option, drag on buttons in the workspace (left = keep, right = remove).
+                    Tap a button in the workspace, then ✓ keep or ✗ remove. Swipe right/left or use arrow keys.
                 </div>
             </div>
             
@@ -2017,7 +2041,9 @@ def generate_cinema_player(root: Path, name: str) -> Path:
         let pendingGoalOptions = false;
         let intractPolicyData = null;
         let historyCheckpoints = [];
+        let ledgerArchive = [];
         let selectedHistoryId = null;
+        let elementReviewMode = true;
 
         // Integrated logger function (Browser console + Server CSV logger endpoint)
         function logEvent(action, details) {
@@ -2048,6 +2074,7 @@ def generate_cinema_player(root: Path, name: str) -> Path:
                 })
                 .then(data => {
                     historyCheckpoints = Array.isArray(data.checkpoints) ? data.checkpoints : [];
+                    ledgerArchive = Array.isArray(data.ledger_archive) ? data.ledger_archive : [];
                     renderHistoryPanel();
                 })
                 .catch(err => {
@@ -2062,12 +2089,16 @@ def generate_cinema_player(root: Path, name: str) -> Path:
             const body = document.getElementById('history-panel-body');
             const meta = document.getElementById('history-meta');
             if (!body) return;
-            if (!historyCheckpoints.length) {
+            let html = '';
+            if (!historyCheckpoints.length && !ledgerArchive.length) {
                 body.innerHTML = '<span class="policy-status-miss">No checkpoints yet — run an iteration or promote an option.</span>';
                 if (meta) meta.textContent = '0 checkpoints';
                 return;
             }
-            let html = '';
+            html += '<div class="policy-section-title">Restorable checkpoints</div>';
+            if (!historyCheckpoints.length) {
+                html += '<span class="policy-status-miss">(none yet)</span><br>';
+            }
             historyCheckpoints.forEach(cp => {
                 const sel = cp.id === selectedHistoryId ? ' selected' : '';
                 const ts = (cp.timestamp || '').replace('T', ' ').slice(0, 19);
@@ -2077,8 +2108,23 @@ def generate_cinema_player(root: Path, name: str) -> Path:
                 html += `<button type="button" class="btn-restore" onclick="event.stopPropagation(); restoreHistoryCheckpoint('${cp.id}')">↩ Restore UI + policy</button>`;
                 html += '</div>';
             });
+            if (ledgerArchive.length) {
+                html += '<div class="policy-section-title">Ledger archive (no HTML snapshot)</div>';
+                ledgerArchive.slice(0, 12).forEach(entry => {
+                    const ts = (entry.timestamp || '').replace('T', ' ').slice(0, 19);
+                    html += '<div class="history-entry" style="border-left-color:#64748b;opacity:0.85;">';
+                    html += `<div class="history-entry-label">${entry.label || entry.id}</div>`;
+                    html += `<div class="history-entry-meta">${ts} · read-only</div>`;
+                    html += '</div>';
+                });
+                if (ledgerArchive.length > 12) {
+                    html += `<div class="history-entry-meta">… +${ledgerArchive.length - 12} older ledger entries</div>`;
+                }
+            }
             body.innerHTML = html;
-            if (meta) meta.textContent = `${historyCheckpoints.length} checkpoint(s)`;
+            if (meta) {
+                meta.textContent = `${historyCheckpoints.length} restore · ${ledgerArchive.length} archive`;
+            }
         }
 
         function selectHistoryEntry(id) {
@@ -2438,12 +2484,49 @@ def generate_cinema_player(root: Path, name: str) -> Path:
             updateWorkflowUI();
         }
 
+        function syncReviewModeToFrames() {
+            document.querySelectorAll('iframe').forEach(iframe => {
+                if (iframe.contentWindow) {
+                    iframe.contentWindow.postMessage({
+                        type: 'review_mode',
+                        enabled: elementReviewMode
+                    }, '*');
+                }
+            });
+            const btn = document.getElementById('btn-review-mode');
+            const hint = document.getElementById('workspace-hint');
+            if (btn) {
+                btn.classList.toggle('active', elementReviewMode);
+                btn.textContent = elementReviewMode
+                    ? '👆 Review mode: ON (tap ✓ / ✗)'
+                    : '🖱️ Review mode: OFF (drag to mark)';
+            }
+            if (hint) {
+                hint.textContent = elementReviewMode
+                    ? '[Review: tap control → ✓ keep · ✗ remove · swipe or ← →]'
+                    : '[Drag: left = keep · right = remove]';
+            }
+        }
+
+        function toggleElementReviewMode() {
+            elementReviewMode = !elementReviewMode;
+            syncReviewModeToFrames();
+            addChatLog('system', elementReviewMode
+                ? '👆 <strong>Review mode ON</strong> — tap each control, then ✓ or ✗ (Tinder-style).'
+                : '🖱️ <strong>Review mode OFF</strong> — classic drag box to mark many at once.');
+            logEvent('REVIEW_MODE', elementReviewMode ? 'on' : 'off');
+        }
+
         function syncAllIframeVisuals() {
             document.querySelectorAll('iframe').forEach(iframe => {
                 if (iframe.contentWindow) {
                     iframe.contentWindow.postMessage({
                         type: 'sync',
                         annotations: annotations
+                    }, '*');
+                    iframe.contentWindow.postMessage({
+                        type: 'review_mode',
+                        enabled: elementReviewMode
                     }, '*');
                 }
             });
@@ -2523,7 +2606,9 @@ def generate_cinema_player(root: Path, name: str) -> Path:
                 const activeFrame = document.getElementById('active-frame');
                 activeFrame.src = 'stage' + activeStage + '.html?active=true&t=' + Date.now();
                 pendingGoalOptions = false;
-                addChatLog('system', `🌟 <strong>Promoted ${optName} → workspace saved.</strong> Now drag buttons to keep or remove, then Apply marks.`);
+                elementReviewMode = true;
+                syncReviewModeToFrames();
+                addChatLog('system', `🌟 <strong>Promoted ${optName} → workspace saved.</strong> Review each button with ✓ / ✗, then Apply marks.`);
                 updateWorkflowUI();
                 refreshHistory();
                 logEvent('PROMOTE', `Option: ${optName} | Source: ${altFile} | Stage: S${activeStage}`);
@@ -2678,7 +2763,10 @@ def generate_cinema_player(root: Path, name: str) -> Path:
             });
         }
 
-        document.addEventListener('DOMContentLoaded', () => updateWorkflowUI());
+        document.addEventListener('DOMContentLoaded', () => {
+            updateWorkflowUI();
+            syncReviewModeToFrames();
+        });
     </script>
 </body>
 </html>"""
