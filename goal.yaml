@@ -31,7 +31,7 @@ versioning:
 git:
   commit:
     strategy: conventional
-    scope: vico
+    scope: nexu
     abstraction_level: auto
     abstraction_levels:
       high: '{type}({domain}): {benefit}'

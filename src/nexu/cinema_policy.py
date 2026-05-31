@@ -1,4 +1,4 @@
-"""Cinema policy ledger, manifest merge, and capsule verification (shared with generated server hooks)."""
+"""Cinema policy ledger, manifest merge, and capsule verification."""
 
 from __future__ import annotations
 
@@ -23,6 +23,54 @@ ManifestTarget = Literal["project", "capsule", "both"]
 _VALID_TARGETS = frozenset({"project", "capsule", "both"})
 
 
+def _process_ledger_entry(
+    entry: dict[str, Any],
+    state: dict[str, str],
+    stage: int | None,
+) -> None:
+    """Process a single ledger entry and update the state."""
+    if stage is not None:
+        raw_stage = entry.get("stage")
+        if raw_stage is not None and int(raw_stage) != stage:
+            return
+    
+    _process_keep_delete_entries(entry, state)
+    _process_proposed_contracts(entry, state)
+
+
+def _process_keep_delete_entries(entry: dict[str, Any], state: dict[str, str]) -> None:
+    """Process keep and delete entries from a ledger entry."""
+    for element_id in entry.get("keep") or []:
+        key = str(element_id).strip()
+        if key:
+            state[key] = "keep"
+    for element_id in entry.get("delete") or []:
+        key = str(element_id).strip()
+        if key:
+            state[key] = "delete"
+
+
+def _process_proposed_contracts(entry: dict[str, Any], state: dict[str, str]) -> None:
+    """Process proposed contracts from a ledger entry."""
+    for proposal in entry.get("proposed_contracts") or []:
+        if not isinstance(proposal, dict):
+            continue
+        kind, element = _proposal_kind_and_element(proposal)
+        if not element or element == "unknown":
+            continue
+        if kind == "keep":
+            state[element] = "keep"
+        elif kind == "delete":
+            state[element] = "delete"
+
+
+def _build_constraint_result(state: dict[str, str]) -> dict[str, Any]:
+    """Build the final result dictionary from the state."""
+    keep = sorted(key for key, value in state.items() if value == "keep")
+    delete = sorted(key for key, value in state.items() if value == "delete")
+    return {"keep": keep, "delete": delete, "by_element": state}
+
+
 def effective_ui_constraints_from_ledger(
     ledger: list[Any],
     *,
@@ -41,32 +89,9 @@ def effective_ui_constraints_from_ledger(
     for entry in ledger:
         if not isinstance(entry, dict):
             continue
-        if stage is not None:
-            raw_stage = entry.get("stage")
-            if raw_stage is not None and int(raw_stage) != stage:
-                continue
-        for element_id in entry.get("keep") or []:
-            key = str(element_id).strip()
-            if key:
-                state[key] = "keep"
-        for element_id in entry.get("delete") or []:
-            key = str(element_id).strip()
-            if key:
-                state[key] = "delete"
-        for proposal in entry.get("proposed_contracts") or []:
-            if not isinstance(proposal, dict):
-                continue
-            kind, element = _proposal_kind_and_element(proposal)
-            if not element or element == "unknown":
-                continue
-            if kind == "keep":
-                state[element] = "keep"
-            elif kind == "delete":
-                state[element] = "delete"
+        _process_ledger_entry(entry, state, stage)
 
-    keep = sorted(key for key, value in state.items() if value == "keep")
-    delete = sorted(key for key, value in state.items() if value == "delete")
-    return {"keep": keep, "delete": delete, "by_element": state}
+    return _build_constraint_result(state)
 
 
 def merge_ui_constraint_lists(
@@ -240,7 +265,12 @@ def enforce_deletes_on_option_previews(
     }
 
 
-def load_effective_ui_constraints(root: Path, capsule_name: str, *, stage: int = 0) -> dict[str, Any]:
+def load_effective_ui_constraints(
+    root: Path,
+    capsule_name: str,
+    *,
+    stage: int = 0,
+) -> dict[str, Any]:
     """Load ledger from disk and return effective UI constraints for a stage."""
     ledger_path = policy_ledger_path(root, capsule_name)
     ledger: list[Any] = []
@@ -422,7 +452,8 @@ def propose_ui_delta_contract_dicts(
                 "element": element_id,
                 "line": (
                     f"@intract.v1 id:{contract_id} scope:ui intent:ui:remove:{element_id} "
-                    f"priority:3 domain:{domain} effect:ui_change forbid:destructive_write,secret_leak "
+                    f"priority:3 domain:{domain} effect:ui_change "
+                    f"forbid:destructive_write,secret_leak "
                     f"require:human_review validate:no_forbidden_effect "
                     f'meaning:"Cinema S{stage} removed #{element_id}"'
                 ),

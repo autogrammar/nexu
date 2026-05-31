@@ -129,7 +129,9 @@ def _write_service_readme(
 ) -> str:
     html = (service_dir / "index.html").read_text(encoding="utf-8")
     title_match = re.search(r"<title[^>]*>([^<]*)</title>", html, flags=re.I)
-    app_title = (title_match.group(1).strip() if title_match else None) or f"{capsule_name} S{stage}"
+    app_title = (
+        title_match.group(1).strip() if title_match else None
+    ) or f"{capsule_name} S{stage}"
     goal_line = user_goal.strip() or "(none recorded)"
     meta = {
         "published_at": datetime.now(timezone.utc).isoformat(),
@@ -172,6 +174,118 @@ Open **http://127.0.0.1:{port}/** after start.
     return readme
 
 
+def _prepare_service_directory(
+    cinema_dir: Path,
+    stage_file: Path,
+    service_id: str,
+) -> tuple[Path, dict[str, Any]]:
+    """Create service directory and copy HTML file."""
+    service_dir = services_root(cinema_dir) / service_id
+    service_dir.mkdir(parents=True, exist_ok=True)
+    
+    html = stage_file.read_text(encoding="utf-8")
+    (service_dir / "index.html").write_text(html, encoding="utf-8")
+    
+    return service_dir, {}
+
+
+def _generate_markpact_export(
+    service_dir: Path,
+    cinema_dir: Path,
+    root: Path,
+    capsule_name: str,
+    stage: int,
+    user_goal: str,
+) -> None:
+    """Generate and write the Markpact export file."""
+    markpact_body = build_markpact_readme(
+        cinema_dir,
+        stage=stage,
+        capsule_name=capsule_name,
+        user_goal=user_goal,
+        effective_ui=load_effective_ui_constraints(root, capsule_name, stage=stage),
+    )
+    (service_dir / "export-markpact.md").write_text(markpact_body, encoding="utf-8")
+
+
+def _allocate_service_port(
+    cinema_dir: Path,
+    service_id: str,
+) -> tuple[int, dict[str, Any]]:
+    """Allocate a port for the service, reusing existing if available."""
+    data = _load_registry(cinema_dir)
+    services: list[dict[str, Any]] = list(data.get("services") or [])
+    existing = next((s for s in services if s.get("id") == service_id), None)
+    used_ports = {
+        int(s["port"])
+        for s in services
+        if s.get("port") and s.get("id") != service_id
+    }
+    port = (
+        int(existing["port"])
+        if existing and existing.get("port")
+        else (_pick_port(used_ports) or 0)
+    )
+
+    if not port:
+        return 0, {"error": "no free port in range 9200–9298 for published services"}
+
+    return port, {}
+
+
+def _create_service_entry(
+    service_id: str,
+    capsule_name: str,
+    project_id: str,
+    project_title: str,
+    stage: int,
+    port: int,
+) -> dict[str, Any]:
+    """Create a new service registry entry."""
+    return {
+        "id": service_id,
+        "title": project_title or capsule_name,
+        "project_id": project_id or capsule_name,
+        "capsule": capsule_name,
+        "stage": stage,
+        "published_at": datetime.now(timezone.utc).isoformat(),
+        "port": port,
+        "url": f"http://127.0.0.1:{port}/",
+        "status": "stopped",
+        "pid": None,
+        "readme_path": f"{SERVICES_DIR_NAME}/{service_id}/README.md",
+        "markpact": True,
+        "published": True,
+    }
+
+
+def _register_service(
+    cinema_dir: Path,
+    service_entry: dict[str, Any],
+) -> None:
+    """Register the service in the registry."""
+    data = _load_registry(cinema_dir)
+    services: list[dict[str, Any]] = list(data.get("services") or [])
+    service_id = service_entry["id"]
+    
+    services = [s for s in services if s.get("id") != service_id]
+    services.insert(0, service_entry)
+    _save_registry(cinema_dir, {"services": services})
+
+
+def _handle_existing_service(
+    cinema_dir: Path,
+    service_id: str,
+) -> None:
+    """Stop existing service if it's running."""
+    data = _load_registry(cinema_dir)
+    services: list[dict[str, Any]] = list(data.get("services") or [])
+    existing = next((s for s in services if s.get("id") == service_id), None)
+    
+    if existing and existing.get("pid") and _service_alive(existing):
+        stop_published_service(cinema_dir, service_id)
+
+
 def publish_project_service(
     cinema_dir: Path,
     root: Path,
@@ -189,29 +303,20 @@ def publish_project_service(
         return {"error": f"missing {stage_file.name}"}
 
     service_id = _slug_service_id(project_id, capsule_name, stage)
-    service_dir = services_root(cinema_dir) / service_id
-    service_dir.mkdir(parents=True, exist_ok=True)
-
-    html = stage_file.read_text(encoding="utf-8")
-    (service_dir / "index.html").write_text(html, encoding="utf-8")
-
-    markpact_body = build_markpact_readme(
-        cinema_dir,
-        stage=stage,
-        capsule_name=capsule_name,
-        user_goal=user_goal,
-        effective_ui=load_effective_ui_constraints(root, capsule_name, stage=stage),
-    )
-    (service_dir / "export-markpact.md").write_text(markpact_body, encoding="utf-8")
-
-    data = _load_registry(cinema_dir)
-    services: list[dict[str, Any]] = list(data.get("services") or [])
-    existing = next((s for s in services if s.get("id") == service_id), None)
-    used_ports = {int(s["port"]) for s in services if s.get("port") and s.get("id") != service_id}
-    port = int(existing["port"]) if existing and existing.get("port") else (_pick_port(used_ports) or 0)
-    if not port:
-        return {"error": "no free port in range 9200–9298 for published services"}
-
+    
+    # Prepare service directory and files
+    service_dir, prep_error = _prepare_service_directory(cinema_dir, stage_file, service_id)
+    if prep_error:
+        return prep_error
+    
+    _generate_markpact_export(service_dir, cinema_dir, root, capsule_name, stage, user_goal)
+    
+    # Allocate port
+    port, port_error = _allocate_service_port(cinema_dir, service_id)
+    if port_error:
+        return port_error
+    
+    # Write service README
     effective = load_effective_ui_constraints(root, capsule_name, stage=stage)
     _write_service_readme(
         service_dir,
@@ -223,27 +328,14 @@ def publish_project_service(
         port=port,
     )
 
-    if existing and existing.get("pid") and _service_alive(existing):
-        stop_published_service(cinema_dir, service_id)
+    # Handle existing service
+    _handle_existing_service(cinema_dir, service_id)
 
-    entry = {
-        "id": service_id,
-        "title": project_title or capsule_name,
-        "project_id": project_id or capsule_name,
-        "capsule": capsule_name,
-        "stage": stage,
-        "published_at": datetime.now(timezone.utc).isoformat(),
-        "port": port,
-        "url": f"http://127.0.0.1:{port}/",
-        "status": "stopped",
-        "pid": None,
-        "readme_path": f"{SERVICES_DIR_NAME}/{service_id}/README.md",
-        "markpact": True,
-        "published": True,
-    }
-    services = [s for s in services if s.get("id") != service_id]
-    services.insert(0, entry)
-    _save_registry(cinema_dir, {"services": services})
+    # Create and register service entry
+    entry = _create_service_entry(
+        service_id, capsule_name, project_id, project_title, stage, port
+    )
+    _register_service(cinema_dir, entry)
 
     result: dict[str, Any] = {
         "status": "published",

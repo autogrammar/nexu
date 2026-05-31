@@ -5,7 +5,7 @@ project_root: /home/tom/github/semcod/nexu
 tickets:
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: base'
-  description: 'code2llm reports `Shotgun Surgery: base` in `src/vico/status.py:11`.
+  description: 'code2llm reports `Shotgun Surgery: base` in `src/nexu/status.py:11`.
 
 
     Mutation of variable ''base'' spans 20 functions. Changing this logic requires
@@ -20,8 +20,8 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/vico/status.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/vico/status.py:11:Shotgun Surgery:
+  - src/nexu/status.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/status.py:11:Shotgun Surgery:
     base'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: blueprint'
@@ -45,7 +45,7 @@ tickets:
     blueprint'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: capsule'
-  description: 'code2llm reports `Shotgun Surgery: capsule` in `src/vico/status.py:11`.
+  description: 'code2llm reports `Shotgun Surgery: capsule` in `src/nexu/status.py:11`.
 
 
     Mutation of variable ''capsule'' spans 20 functions. Changing this logic requires
@@ -60,8 +60,8 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/vico/status.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/vico/status.py:11:Shotgun Surgery:
+  - src/nexu/status.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/status.py:11:Shotgun Surgery:
     capsule'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: contracts'
@@ -345,7 +345,7 @@ tickets:
     relative'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: report'
-  description: 'code2llm reports `Shotgun Surgery: report` in `src/vico/drift.py:11`.
+  description: 'code2llm reports `Shotgun Surgery: report` in `src/nexu/drift.py:11`.
 
 
     Mutation of variable ''report'' spans 9 functions. Changing this logic requires
@@ -360,12 +360,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/vico/drift.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/vico/drift.py:11:Shotgun Surgery:
+  - src/nexu/drift.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/drift.py:11:Shotgun Surgery:
     report'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: result'
-  description: 'code2llm reports `Shotgun Surgery: result` in `src/vico/git.py:7`.
+  description: 'code2llm reports `Shotgun Surgery: result` in `src/nexu/git.py:7`.
 
 
     Mutation of variable ''result'' spans 6 functions. Changing this logic requires
@@ -380,8 +380,8 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/vico/git.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/vico/git.py:7:Shotgun Surgery: result'
+  - src/nexu/git.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/git.py:7:Shotgun Surgery: result'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: root'
   description: 'code2llm reports `Shotgun Surgery: root` in `src/nexu/cli.py:294`.
@@ -424,7 +424,7 @@ tickets:
     Surgery: snapshot'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: status'
-  description: 'code2llm reports `Shotgun Surgery: status` in `src/vico/drift.py:11`.
+  description: 'code2llm reports `Shotgun Surgery: status` in `src/nexu/drift.py:11`.
 
 
     Mutation of variable ''status'' spans 7 functions. Changing this logic requires
@@ -439,8 +439,8 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/vico/drift.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/vico/drift.py:11:Shotgun Surgery:
+  - src/nexu/drift.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/drift.py:11:Shotgun Surgery:
     status'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: subprocess'
@@ -814,7 +814,7 @@ tickets:
   dedupe_key: 'code2llm:smell:god_function:src/nexu/verify.py:270:God Function: _summary_status'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: _tokenize_contract'
-  description: 'code2llm reports `God Function: _tokenize_contract` in `src/vico/intract.py:39`.
+  description: 'code2llm reports `God Function: _tokenize_contract` in `src/nexu/intract.py:39`.
 
 
     Function ''_tokenize_contract'' is oversized: CC=5, fan-out=10, mutations=12.
@@ -828,8 +828,8 @@ tickets:
   - code-smell
   - god-function
   files:
-  - src/vico/intract.py
-  dedupe_key: 'code2llm:smell:god_function:src/vico/intract.py:39:God Function: _tokenize_contract'
+  - src/nexu/intract.py
+  dedupe_key: 'code2llm:smell:god_function:src/nexu/intract.py:39:God Function: _tokenize_contract'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: _write_service_readme'
   description: 'code2llm reports `God Function: _write_service_readme` in `src/nexu/cinema_publish.py:120`.
@@ -1164,7 +1164,7 @@ tickets:
     check_links'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: check_source_drift'
-  description: 'code2llm reports `God Function: check_source_drift` in `src/vico/drift.py:11`.
+  description: 'code2llm reports `God Function: check_source_drift` in `src/nexu/drift.py:11`.
 
 
     Function ''check_source_drift'' is oversized: CC=7, fan-out=10, mutations=8.
@@ -1178,8 +1178,8 @@ tickets:
   - code-smell
   - god-function
   files:
-  - src/vico/drift.py
-  dedupe_key: 'code2llm:smell:god_function:src/vico/drift.py:11:God Function: check_source_drift'
+  - src/nexu/drift.py
+  dedupe_key: 'code2llm:smell:god_function:src/nexu/drift.py:11:God Function: check_source_drift'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: create_capsule'
   description: 'code2llm reports `God Function: create_capsule` in `src/nexu/capsule.py:38`.
@@ -1200,7 +1200,7 @@ tickets:
   dedupe_key: 'code2llm:smell:god_function:src/nexu/capsule.py:38:God Function: create_capsule'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: diff_capsule'
-  description: 'code2llm reports `God Function: diff_capsule` in `src/vico/diff.py:12`.
+  description: 'code2llm reports `God Function: diff_capsule` in `src/nexu/diff.py:12`.
 
 
     Function ''diff_capsule'' is oversized: CC=12, fan-out=10, mutations=9.
@@ -1214,8 +1214,8 @@ tickets:
   - code-smell
   - god-function
   files:
-  - src/vico/diff.py
-  dedupe_key: 'code2llm:smell:god_function:src/vico/diff.py:12:God Function: diff_capsule'
+  - src/nexu/diff.py
+  dedupe_key: 'code2llm:smell:god_function:src/nexu/diff.py:12:God Function: diff_capsule'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: enforce_deletes_on_option_previews'
   description: 'code2llm reports `God Function: enforce_deletes_on_option_previews`
@@ -1258,7 +1258,7 @@ tickets:
     export_iteration_prompt'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: freeze_project'
-  description: 'code2llm reports `God Function: freeze_project` in `src/vico/freeze.py:12`.
+  description: 'code2llm reports `God Function: freeze_project` in `src/nexu/freeze.py:12`.
 
 
     Function ''freeze_project'' is oversized: CC=2, fan-out=12, mutations=3.
@@ -1272,8 +1272,8 @@ tickets:
   - code-smell
   - god-function
   files:
-  - src/vico/freeze.py
-  dedupe_key: 'code2llm:smell:god_function:src/vico/freeze.py:12:God Function: freeze_project'
+  - src/nexu/freeze.py
+  dedupe_key: 'code2llm:smell:god_function:src/nexu/freeze.py:12:God Function: freeze_project'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: generate_cinema_player'
   description: 'code2llm reports `God Function: generate_cinema_player` in `src/nexu/cinema.py:124`.

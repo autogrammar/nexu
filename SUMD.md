@@ -281,7 +281,7 @@ pip install -e .[dev]
 ## Release Management (`goal.yaml`)
 
 - **versioning**: `semver`
-- **commits**: `conventional` scope=`vico`
+- **commits**: `conventional` scope=`nexu`
 - **changelog**: `keep-a-changelog`
 - **build strategies**: `python`, `nodejs`, `rust`
 - **version files**: `VERSION`, `pyproject.toml:version`, `venv/lib/python3.13/site-packages/cryptography/__init__.py:__version__`
@@ -1365,7 +1365,7 @@ sumd_workflow_step('ci-cinema-smoke', 1, './scripts/ci-cinema-smoke.sh').
 | Function | CC | in | out | total |
 |----------|----|----|-----|-------|
 | `load_config` *(in src.nexu.config)* | 6 | 4 | 42 | **46** |
-| `read_manifest_contracts` *(in src.vico.intract)* | 12 ⚠ | 8 | 32 | **40** |
+| `read_manifest_contracts` *(in src.nexu.intract)* | 12 ⚠ | 8 | 32 | **40** |
 | `main` *(in examples.web_app_dashboard.run)* | 2 | 0 | 35 | **35** |
 | `publish_project_service` *(in src.nexu.cinema_publish)* | 21 ⚠ | 0 | 34 | **34** |
 | `build_capsule_report` *(in src.nexu.report)* | 1 | 2 | 32 | **34** |
@@ -1382,7 +1382,7 @@ sumd_workflow_step('ci-cinema-smoke', 1, './scripts/ci-cinema-smoke.sh').
 HUBS[20]:
   src.nexu.config.load_config
     CC=6  in:4  out:42  total:46
-  src.vico.intract.read_manifest_contracts
+  src.nexu.intract.read_manifest_contracts
     CC=12  in:8  out:32  total:40
   examples.web_app_dashboard.run.main
     CC=2  in:0  out:35  total:35
@@ -1406,7 +1406,7 @@ HUBS[20]:
     CC=2  in:1  out:26  total:27
   src.nexu.review.build_review_packet
     CC=5  in:2  out:24  total:26
-  src.vico.models.write_yaml
+  src.nexu.models.write_yaml
     CC=1  in:22  out:3  total:25
   src.nexu.cinema_projects.activate_example_project
     CC=16  in:0  out:24  total:24
@@ -1414,7 +1414,7 @@ HUBS[20]:
     CC=1  in:23  out:1  total:24
   src.nexu.orchestrate._render_orchestration_markdown
     CC=9  in:1  out:22  total:23
-  src.vico.diff.diff_capsule
+  src.nexu.diff.diff_capsule
     CC=12  in:9  out:14  total:23
   examples.web_app_calculator.run.main
     CC=2  in:0  out:23  total:23
@@ -1616,37 +1616,37 @@ MODULES:
     _scan_capsule_contracts  CC=2  out:4
     _text  CC=2  out:1
     verify_capsule  CC=1  out:26
-  src.vico.diff  [1 funcs]
+  src.nexu.diff  [1 funcs]
     diff_capsule  CC=12  out:14
-  src.vico.drift  [1 funcs]
+  src.nexu.drift  [1 funcs]
     check_source_drift  CC=7  out:10
-  src.vico.freeze  [1 funcs]
+  src.nexu.freeze  [1 funcs]
     freeze_project  CC=2  out:12
-  src.vico.git  [1 funcs]
+  src.nexu.git  [1 funcs]
     current_git_sha  CC=4  out:3
-  src.vico.hashing  [1 funcs]
+  src.nexu.hashing  [1 funcs]
     sha256_file  CC=2  out:6
-  src.vico.intract  [6 funcs]
+  src.nexu.intract  [6 funcs]
     _split_csv  CC=4  out:4
     _tokenize_contract  CC=5  out:10
     parse_intract_line  CC=3  out:22
     read_manifest_contracts  CC=12  out:32
     scan_contracts_in_file  CC=3  out:5
     scan_contracts_in_text  CC=3  out:4
-  src.vico.models  [4 funcs]
+  src.nexu.models  [4 funcs]
     from_dict  CC=2  out:6
     read_yaml  CC=3  out:4
     utc_now  CC=1  out:2
     write_yaml  CC=1  out:3
-  src.vico.status  [1 funcs]
+  src.nexu.status  [1 funcs]
     capsule_status  CC=3  out:10
 
 EDGES:
   examples.scientific_calculator_demo.main → src.nexu.init_project.init_project
-  examples.scientific_calculator_demo.main → src.vico.freeze.freeze_project
+  examples.scientific_calculator_demo.main → src.nexu.freeze.freeze_project
   examples.scientific_calculator_demo.main → src.nexu.capsule.create_capsule
   examples.run_examples.run_example → src.nexu.init_project.init_project
-  examples.run_examples.run_example → src.vico.freeze.freeze_project
+  examples.run_examples.run_example → src.nexu.freeze.freeze_project
   examples.run_examples.run_example → src.nexu.capsule.create_capsule
   examples.run_examples.run_example → src.nexu.plan.build_iteration_plan
   examples.run_examples.run_example → src.nexu.blueprint.build_blueprint
@@ -1656,42 +1656,42 @@ EDGES:
   examples.run_examples.main → examples.run_examples.run_example
   examples.scientific_calculator_demo2.main → examples.scientific_calculator_demo2.print_code
   examples.scientific_calculator_demo2.main → src.nexu.init_project.init_project
-  examples.scientific_calculator_demo2.main → src.vico.freeze.freeze_project
+  examples.scientific_calculator_demo2.main → src.nexu.freeze.freeze_project
   examples.scientific_calculator_demo2.main → src.nexu.capsule.create_capsule
   examples.scientific_calculator_demo2.main → src.nexu.iterate.iterate_capsule
   examples.web_app_calculator.run.main → src.nexu.init_project.init_project
-  examples.web_app_calculator.run.main → src.vico.freeze.freeze_project
+  examples.web_app_calculator.run.main → src.nexu.freeze.freeze_project
   examples.web_app_calculator.run.main → src.nexu.capsule.create_capsule
   examples.web_app_dashboard.run.main → src.nexu.init_project.init_project
-  examples.web_app_dashboard.run.main → src.vico.freeze.freeze_project
+  examples.web_app_dashboard.run.main → src.nexu.freeze.freeze_project
   examples.web_app_dashboard.run.main → src.nexu.capsule.create_capsule
   src.nexu.runtime._collect_fixtures → src.nexu.runtime._read_fixture
   src.nexu.runtime.build_capsule_runtime → src.nexu.capsule.load_capsule
   src.nexu.runtime.build_capsule_runtime → src.nexu.paths.capsule_dir
   src.nexu.runtime.build_capsule_runtime → src.nexu.blueprint.build_blueprint
-  src.nexu.runtime.build_capsule_runtime → src.vico.intract.read_manifest_contracts
-  src.nexu.runtime.build_capsule_runtime → src.vico.models.write_yaml
+  src.nexu.runtime.build_capsule_runtime → src.nexu.intract.read_manifest_contracts
+  src.nexu.runtime.build_capsule_runtime → src.nexu.models.write_yaml
   src.nexu.runtime.build_capsule_runtime → src.nexu.journal.append_journal
-  src.nexu.runtime.build_capsule_runtime → src.vico.models.utc_now
+  src.nexu.runtime.build_capsule_runtime → src.nexu.models.utc_now
   src.nexu.init_project.init_project → src.nexu.paths.ensure_project_dirs
-  src.nexu.init_project.init_project → src.vico.models.write_yaml
+  src.nexu.init_project.init_project → src.nexu.models.write_yaml
   src.nexu.config.load_env_files → src.nexu.config._load_env_file
   src.nexu.config.load_config → src.nexu.config.load_env_files
-  src.nexu.config.load_config → src.vico.models.read_yaml
-  src.vico.intract.parse_intract_line → src.vico.intract._tokenize_contract
-  src.vico.intract.parse_intract_line → src.vico.intract._split_csv
-  src.vico.intract.scan_contracts_in_text → src.vico.intract.parse_intract_line
-  src.vico.intract.scan_contracts_in_file → src.vico.intract.scan_contracts_in_text
+  src.nexu.config.load_config → src.nexu.models.read_yaml
+  src.nexu.intract.parse_intract_line → src.nexu.intract._tokenize_contract
+  src.nexu.intract.parse_intract_line → src.nexu.intract._split_csv
+  src.nexu.intract.scan_contracts_in_text → src.nexu.intract.parse_intract_line
+  src.nexu.intract.scan_contracts_in_file → src.nexu.intract.scan_contracts_in_text
   src.nexu.llm.call_litellm_json → src.nexu.llm._strip_fences
   src.nexu.llm.call_litellm_json → src.nexu.llm._extract_content
   src.nexu.llm.call_litellm_review → src.nexu.llm.call_litellm_json
   src.nexu.bundle._should_include → src.nexu.files.rel
   src.nexu.bundle.build_capsule_bundle → src.nexu.paths.capsule_dir
-  src.nexu.bundle.build_capsule_bundle → src.vico.models.write_yaml
+  src.nexu.bundle.build_capsule_bundle → src.nexu.models.write_yaml
   src.nexu.bundle.build_capsule_bundle → src.nexu.journal.append_journal
-  src.nexu.bundle.build_capsule_bundle → src.vico.models.utc_now
-  src.vico.freeze.freeze_project → src.nexu.paths.ensure_project_dirs
-  src.vico.freeze.freeze_project → src.vico.models.write_yaml
+  src.nexu.bundle.build_capsule_bundle → src.nexu.models.utc_now
+  src.nexu.freeze.freeze_project → src.nexu.paths.ensure_project_dirs
+  src.nexu.freeze.freeze_project → src.nexu.models.write_yaml
 ```
 
 ## Test Contracts

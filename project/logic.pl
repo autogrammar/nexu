@@ -1,5 +1,5 @@
 % ── Project Metadata ─────────────────────────────────────
-project_metadata('nexu', '0.5.13', 'python').
+project_metadata('nexu', '0.5.15', 'python').
 
 % ── Project Files ────────────────────────────────────────
 project_file('app.doql.less', 117, 'less').
@@ -490,4 +490,3 @@ sumd_workflow('cinema-repair', 'manual').
 sumd_workflow_step('cinema-repair', 1, 'uv run python -c "from pathlib import Path').
 sumd_workflow('ci-cinema-smoke', 'manual').
 sumd_workflow_step('ci-cinema-smoke', 1, './scripts/ci-cinema-smoke.sh').
-

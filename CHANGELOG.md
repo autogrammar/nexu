@@ -25,6 +25,32 @@
 - `tests/test_cinema_policy.py`, `tests/test_export_prompt_ledger.py`, `tests/test_verify_intract.py`; `tests/conftest.py` adds sibling intract.
 - Full suite: `pytest -q` (16 passed); `make ci-cinema-smoke`.
 
+## [0.5.16] - 2026-05-31
+
+### Docs
+- Update CHANGELOG.md
+- Update README.md
+- Update SUMD.md
+- Update SUMR.md
+- Update project/context.md
+
+### Test
+- Update tests/test_cinema_scripts.py
+- Update tests/test_cinema_server.py
+
+### Other
+- Update LICENSE
+- Update project/analysis.toon.yaml
+- Update project/calls.mmd
+- Update project/calls.toon.yaml
+- Update project/calls.yaml
+- Update project/compact_flow.mmd
+- Update project/flow.mmd
+- Update project/index.html
+- Update project/logic.pl
+- Update project/mermaid.export
+- ... and 2 more files
+
 ## [0.5.15] - 2026-05-31
 
 ### Docs
@@ -273,27 +299,27 @@
 
 ## 0.5.0
 
-- Added `vico capsule orchestrate` for offline or optional LLM-assisted capsule orchestration.
-- Added `src/vico/orchestrate.py` with orchestration context, prompt, deterministic plan and markdown output.
+- Added `nexu capsule orchestrate` for offline or optional LLM-assisted capsule orchestration.
+- Added `src/nexu/orchestrate.py` with orchestration context, prompt, deterministic plan and markdown output.
 - Added generic LiteLLM JSON helper for orchestration/review while keeping network calls disabled by default.
 - Added conservative MCP-compatible stdio service with tools, resources and prompt templates.
-- Added `vico mcp tools` and `vico mcp serve`.
+- Added `nexu mcp tools` and `nexu mcp serve`.
 - Added MCP service example and documentation.
 
 ## 0.4.0
 
 - Added offline/optional LLM review packets with strict JSON review schema.
-- Added `vico capsule review` to generate evidence-based review prompts and review YAML/Markdown.
-- Added `vico capsule bundle` for portable ZIP bundles of capsule context, prompts and evidence.
-- Added `vico.config` and LLM/review settings in `vico.yaml`.
+- Added `nexu capsule review` to generate evidence-based review prompts and review YAML/Markdown.
+- Added `nexu capsule bundle` for portable ZIP bundles of capsule context, prompts and evidence.
+- Added `nexu.config` and LLM/review settings in `nexu.yaml`.
 - Strengthened promotion plans with prechecks, drift status, blocking findings and file mapping.
 
 ## 0.3.0
 
-- Added `vico capsule plan` for deterministic S1..Sn iteration planning.
-- Added `vico capsule runtime` to build a static HTML mock/runtime from capsule blueprint, contracts and fixtures.
-- Added `vico capsule report` with Markdown, HTML and YAML verification evidence.
-- Added `vico capsule journal` for capsule event history.
+- Added `nexu capsule plan` for deterministic S1..Sn iteration planning.
+- Added `nexu capsule runtime` to build a static HTML mock/runtime from capsule blueprint, contracts and fixtures.
+- Added `nexu capsule report` with Markdown, HTML and YAML verification evidence.
+- Added `nexu capsule journal` for capsule event history.
 - Added journal hooks for capsule creation, planning, runtime and reports.
 - Updated examples and docs for the runtime/report workflow.
 

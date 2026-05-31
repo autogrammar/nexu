@@ -9,6 +9,6 @@ document.addEventListener('mouseup', () => {
   const x = elRect.left ></script></body></html>"""
     out = finalize_cinema_html(broken)
     assert "elRect.left ></script>" not in out
-    assert "[NEXU CHILD]" in out
+    assert "[NEXU IFRAME]" in out
     assert "molarMass" in out
     assert out.lower().count("<script") >= 2

@@ -202,30 +202,30 @@ LAYERS:
   │ generated-cli-tests.testql.toon.yaml    20L  0C    0m  CC=0.0    ←0
   │
   ── zero ──
-     src/vico/__main__.py                      0L
-     src/vico/diff.py                          0L
-     src/vico/drift.py                         0L
-     src/vico/freeze.py                        0L
-     src/vico/git.py                           0L
-     src/vico/hashing.py                       0L
-     src/vico/intract.py                       0L
-     src/vico/models.py                        0L
-     src/vico/status.py                        0L
+     src/nexu/__main__.py                      0L
+     src/nexu/diff.py                          0L
+     src/nexu/drift.py                         0L
+     src/nexu/freeze.py                        0L
+     src/nexu/git.py                           0L
+     src/nexu/hashing.py                       0L
+     src/nexu/intract.py                       0L
+     src/nexu/models.py                        0L
+     src/nexu/status.py                        0L
 
 COUPLING:
-                                                  src.nexu                     src.vico                     examples   examples.web_app_dashboard  examples.web_app_calculator
+                                                  src.nexu                     src.nexu                     examples   examples.web_app_dashboard  examples.web_app_calculator
                      src.nexu                           ──                           62                          ←21                           ←9                           ←5  hub
-                     src.vico                           12                           ──                           ←5                           ←1                           ←1  hub
+                     src.nexu                           12                           ──                           ←5                           ←1                           ←1  hub
                      examples                           21                            5                           ──                                                            !! fan-out
    examples.web_app_dashboard                            9                            1                                                        ──                               !! fan-out
   examples.web_app_calculator                            5                            1                                                                                     ──
   CYCLES: none
   HUB: src.nexu/ (fan-in=47)
-  HUB: src.vico/ (fan-in=69)
+  HUB: src.nexu/ (fan-in=69)
   SMELL: src.nexu/ fan-out=62 → split needed
   SMELL: examples.web_app_dashboard/ fan-out=10 → split needed
   SMELL: examples/ fan-out=26 → split needed
-  SMELL: src.vico/ fan-out=12 → split needed
+  SMELL: src.nexu/ fan-out=12 → split needed
 
 EXTERNAL:
   validation: run `vallm batch .` → validation.toon

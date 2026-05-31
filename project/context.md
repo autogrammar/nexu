@@ -38,7 +38,7 @@
 - **Functions**: 13
 - **File**: `mcp_server.py`
 
-### src.vico.models
+### src.nexu.models
 - **Functions**: 10
 - **Classes**: 9
 - **File**: `models.py`
@@ -60,7 +60,7 @@
 - **Functions**: 8
 - **File**: `check-doc-links.py`
 
-### src.vico.intract
+### src.nexu.intract
 - **Functions**: 6
 - **Classes**: 1
 - **File**: `intract.py`
@@ -120,28 +120,28 @@ Main execution flows into the system:
 - **Calls**: next, src.nexu.cinema_projects._resolve_source_cinema, src.nexu.cinema_scripts.write_cinema_inject_files, None.write_text, src.nexu.cinema_projects.find_nexu_repo_root, src.nexu.cinema_projects.find_nexu_repo_root, src.nexu.cinema_projects._copy_cinema_files, src.nexu.cinema_projects._write_seed_variants
 
 ### examples.scientific_calculator_demo.main
-- **Calls**: work.exists, work.mkdir, None.mkdir, None.write_text, print, src.nexu.init_project.init_project, src.vico.freeze.freeze_project, src.nexu.capsule.create_capsule
+- **Calls**: work.exists, work.mkdir, None.mkdir, None.write_text, print, src.nexu.init_project.init_project, src.nexu.freeze.freeze_project, src.nexu.capsule.create_capsule
 
 ### examples.web_app_calculator.run.main
-- **Calls**: work.exists, work.mkdir, src_dir.mkdir, shutil.copy, fixtures_dir.mkdir, shutil.copy, src.nexu.init_project.init_project, src.vico.freeze.freeze_project
+- **Calls**: work.exists, work.mkdir, src_dir.mkdir, shutil.copy, fixtures_dir.mkdir, shutil.copy, src.nexu.init_project.init_project, src.nexu.freeze.freeze_project
 
 ### examples.nexu_markpact_exporter.main
 - **Calls**: print, src_file.read_text, print, print, output_dir.mkdir, readme_path.write_text, print, print
 
 ### src.nexu.cli.capsule_diff
 > Compare capsule src files against the frozen baseline lock.
-- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.vico.diff.diff_capsule, Table, table.add_row, table.add_row, table.add_row, table.add_row
+- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.diff.diff_capsule, Table, table.add_row, table.add_row, table.add_row, table.add_row
 
 ### src.nexu.cinema_history.restore_history_checkpoint
 > Restore HTML + ledger from a checkpoint; optionally merge ledger into manifests.
 - **Calls**: src.nexu.paths.project_root, src.nexu.cinema_policy.cinema_dir_for, json.loads, ledger_path.exists, src.nexu.cinema_history._refresh_policy_snapshot, src.nexu.cinema_history.history_dir, meta_path.exists, meta_path.read_text
 
 ### examples.scientific_calculator_demo2.main
-- **Calls**: work.exists, work.mkdir, None.mkdir, original_file.write_text, examples.scientific_calculator_demo2.print_code, src.nexu.init_project.init_project, src.vico.freeze.freeze_project, src.nexu.capsule.create_capsule
+- **Calls**: work.exists, work.mkdir, None.mkdir, original_file.write_text, examples.scientific_calculator_demo2.print_code, src.nexu.init_project.init_project, src.nexu.freeze.freeze_project, src.nexu.capsule.create_capsule
 
 ### src.nexu.cli.capsule_status_command
 > Show capsule status, latest iteration, diff counters and verification summary.
-- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.vico.status.capsule_status, console.print, console.print, console.print, Table, files.items
+- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.status.capsule_status, console.print, console.print, console.print, Table, files.items
 
 ### src.nexu.cli.capsule_journal
 > Show capsule event journal.
@@ -157,7 +157,7 @@ Called after window-1 changes so preview panels stay aligned with s
 > Ledger iterations without HTML snapshots (read-only in history UI).
 - **Calls**: src.nexu.cinema_history._ledger_snapshot, enumerate, reversed, archive.append, isinstance, entry.get, entry.get, entry.get
 
-### src.vico.models.Capsule.from_dict
+### src.nexu.models.Capsule.from_dict
 - **Calls**: CapsuleSelection, CapsuleRuntime, cls, data.get, data.get, data.get, data.get, data.get
 
 ### src.nexu.cli.capsule_create
@@ -196,11 +196,11 @@ Called after window-1 changes so preview panels stay aligned with s
 
 ### src.nexu.cli.freeze
 > Freeze a lightweight hash snapshot of the current project.
-- **Calls**: app.command, src.nexu.paths.project_root, src.vico.freeze.freeze_project, console.print, console.print, console.print, typer.Argument, typer.Option
+- **Calls**: app.command, src.nexu.paths.project_root, src.nexu.freeze.freeze_project, console.print, console.print, console.print, typer.Argument, typer.Option
 
 ### src.nexu.cli.capsule_drift
 > Check whether the original source files changed since capsule creation.
-- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.vico.drift.check_source_drift, console.print, console.print, console.print, typer.Argument, typer.Option
+- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.drift.check_source_drift, console.print, console.print, console.print, typer.Argument, typer.Option
 
 ### src.nexu.cli.capsule_verify
 > Verify a capsule against basic intent-contract gates.
@@ -297,34 +297,34 @@ ledger_archive_for_display [src.nexu.cinema_history]
 
 ### Flow 10: from_dict
 ```
-from_dict [src.vico.models.Capsule]
+from_dict [src.nexu.models.Capsule]
 ```
 
 ## Key Classes
 
-### src.vico.models.FrozenSnapshot
+### src.nexu.models.FrozenSnapshot
 - **Methods**: 2
-- **Key Methods**: src.vico.models.FrozenSnapshot.to_dict, src.vico.models.FrozenSnapshot.from_dict
+- **Key Methods**: src.nexu.models.FrozenSnapshot.to_dict, src.nexu.models.FrozenSnapshot.from_dict
 
-### src.vico.models.Capsule
+### src.nexu.models.Capsule
 - **Methods**: 2
-- **Key Methods**: src.vico.models.Capsule.to_dict, src.vico.models.Capsule.from_dict
+- **Key Methods**: src.nexu.models.Capsule.to_dict, src.nexu.models.Capsule.from_dict
 
-### src.vico.intract.IntentContract
+### src.nexu.intract.IntentContract
 - **Methods**: 1
-- **Key Methods**: src.vico.intract.IntentContract.key
+- **Key Methods**: src.nexu.intract.IntentContract.key
 
-### src.vico.models.VerificationReport
+### src.nexu.models.VerificationReport
 - **Methods**: 1
-- **Key Methods**: src.vico.models.VerificationReport.to_dict
+- **Key Methods**: src.nexu.models.VerificationReport.to_dict
 
-### src.vico.models.CapsuleDiff
+### src.nexu.models.CapsuleDiff
 - **Methods**: 1
-- **Key Methods**: src.vico.models.CapsuleDiff.to_dict
+- **Key Methods**: src.nexu.models.CapsuleDiff.to_dict
 
-### src.vico.models.PromptExport
+### src.nexu.models.PromptExport
 - **Methods**: 1
-- **Key Methods**: src.vico.models.PromptExport.to_dict
+- **Key Methods**: src.nexu.models.PromptExport.to_dict
 
 ### src.nexu.cinema_projects.ExampleProject
 - **Methods**: 1
@@ -339,24 +339,24 @@ from_dict [src.vico.models.Capsule]
 ### src.nexu.config.nexuConfig
 - **Methods**: 0
 
-### src.vico.models.FrozenFile
+### src.nexu.models.FrozenFile
 - **Methods**: 0
 
-### src.vico.models.CapsuleSelection
+### src.nexu.models.CapsuleSelection
 - **Methods**: 0
 
-### src.vico.models.CapsuleRuntime
+### src.nexu.models.CapsuleRuntime
 - **Methods**: 0
 
-### src.vico.models.VerificationFinding
+### src.nexu.models.VerificationFinding
 - **Methods**: 0
 
 ## Data Transformation Functions
 
 Key functions that process and transform data:
 
-### src.vico.intract.parse_intract_line
-- **Output to**: src.vico.intract._tokenize_contract, line.strip, IntentContract, fields.get, fields.get
+### src.nexu.intract.parse_intract_line
+- **Output to**: src.nexu.intract._tokenize_contract, line.strip, IntentContract, fields.get, fields.get
 
 ### src.nexu.cinema.format_intract_v1_line
 - **Output to**: contract.meaning.replace
@@ -373,7 +373,7 @@ Functions exposed as public API (no underscore prefix):
 - `examples.web_app_event_monitor.run.main` - 37 calls
 - `examples.web_app_dashboard.run.main` - 35 calls
 - `src.nexu.cinema_publish.publish_project_service` - 34 calls
-- `src.vico.intract.read_manifest_contracts` - 32 calls
+- `src.nexu.intract.read_manifest_contracts` - 32 calls
 - `src.nexu.report.build_capsule_report` - 32 calls
 - `src.nexu.cinema.build_intract_policy_snapshot` - 29 calls
 - `src.nexu.cinema_publish.start_published_service` - 29 calls
@@ -386,7 +386,7 @@ Functions exposed as public API (no underscore prefix):
 - `examples.scientific_calculator_demo.main` - 23 calls
 - `examples.web_app_calculator.run.main` - 23 calls
 - `examples.nexu_markpact_exporter.main` - 22 calls
-- `src.vico.intract.parse_intract_line` - 22 calls
+- `src.nexu.intract.parse_intract_line` - 22 calls
 - `src.nexu.orchestrate.offline_orchestration_from_context` - 22 calls
 - `scripts.check-doc-links.check_links` - 21 calls
 - `src.nexu.cinema_history.save_history_checkpoint` - 19 calls
@@ -404,7 +404,7 @@ Functions exposed as public API (no underscore prefix):
 - `src.nexu.runtime.build_capsule_runtime` - 16 calls
 - `src.nexu.cinema_history.ledger_archive_for_display` - 16 calls
 - `src.nexu.promote.build_promotion_plan` - 16 calls
-- `src.vico.models.Capsule.from_dict` - 16 calls
+- `src.nexu.models.Capsule.from_dict` - 16 calls
 - `src.nexu.bundle.build_capsule_bundle` - 15 calls
 - `src.nexu.plan.build_iteration_plan` - 15 calls
 - `src.nexu.cli.capsule_create` - 15 calls

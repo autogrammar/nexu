@@ -826,10 +826,10 @@
             <div class="panel active-panel">
                 <div class="panel-header" style="color: #38bdf8;">
                     <span>🔵 1. ACTIVE WORKSPACE</span>
-                    <span id="workspace-hint" style="font-size: 0.65rem;">[Drag: left = keep · right = remove]</span>
+                    <span id="workspace-hint" style="font-size: 0.65rem;">[Review: tap → ✓ keep · ✗ remove · swipe ← →]</span>
                 </div>
                 <div class="panel-body">
-                    <iframe id="active-frame" name="active-frame" src="stage0.html?active=true"></iframe>
+                    <iframe id="active-frame" name="active-frame" src="stage0.html?role=workspace&amp;active=true&amp;mark=1&amp;calc=0&amp;review=1&amp;stage=0"></iframe>
                 </div>
             </div>
         </div>
@@ -843,7 +843,7 @@
                     <span class="promote-indicator">🖱️ Click</span>
                 </div>
                 <div class="panel-body">
-                    <iframe id="alt-a-frame" name="alt-a-frame" src="alt_a.html"></iframe>
+                    <iframe id="alt-a-frame" name="alt-a-frame" src="alt_a.html?role=option&amp;pane=a&amp;mark=0&amp;calc=0"></iframe>
                 </div>
             </div>
             
@@ -854,7 +854,7 @@
                     <span class="promote-indicator">🖱️ Click</span>
                 </div>
                 <div class="panel-body">
-                    <iframe id="alt-b-frame" name="alt-b-frame" src="alt_b.html"></iframe>
+                    <iframe id="alt-b-frame" name="alt-b-frame" src="alt_b.html?role=option&amp;pane=b&amp;mark=0&amp;calc=0"></iframe>
                 </div>
             </div>
             
@@ -865,7 +865,7 @@
                     <span class="promote-indicator">🖱️ Click</span>
                 </div>
                 <div class="panel-body">
-                    <iframe id="alt-c-frame" name="alt-c-frame" src="alt_c.html"></iframe>
+                    <iframe id="alt-c-frame" name="alt-c-frame" src="alt_c.html?role=option&amp;pane=c&amp;mark=0&amp;calc=0"></iframe>
                 </div>
             </div>
         </div>
@@ -882,7 +882,7 @@
             <button class="btn-hint" onclick="addUserHint()">➕ Add goal</button>
             
             <div class="side-header">2. Mark workspace (after promote)</div>
-            <button type="button" class="btn-review" id="btn-review-mode" onclick="toggleElementReviewMode()">🖱️ Drag selection (default)</button>
+            <button type="button" class="btn-review active" id="btn-review-mode" onclick="toggleElementReviewMode()">👆 One-by-one review (✓ / ✗)</button>
             <div class="feedback-list" id="feedback-list">
                 <div style="color: #64748b; font-size: 0.85rem; text-align: center; margin-top: 40px;">
                     Drag over controls: <strong>left mouse</strong> = keep (green), <strong>right mouse</strong> = remove (red). Box can cover many buttons at once.
@@ -939,7 +939,7 @@
         let historyCheckpoints = [];
         let ledgerArchive = [];
         let selectedHistoryId = null;
-        let elementReviewMode = false;
+        let elementReviewMode = true;
         let mainTab = 'projects';
         let projectCatalog = [];
         let projectFilters = { domains: [], kinds: [], tags: [] };
@@ -948,26 +948,97 @@
         let selectedKindFilter = 'all';
         let servicesCatalog = [];
 
-        // Integrated logger function (Browser console + Server CSV logger endpoint)
         function logEvent(action, details) {
-            console.log(`[NEXU SYSTEM] [${new Date().toISOString()}] Action: ${action} | Details: ${details}`);
-            
+            const ts = new Date().toISOString();
+            const payload = typeof details === 'object' && details !== null
+                ? { tab: mainTab, project: activeProjectId, stage: activeStage, review: elementReviewMode, annotations: annotations.length, ...details }
+                : { tab: mainTab, project: activeProjectId, stage: activeStage, review: elementReviewMode, annotations: annotations.length, msg: String(details || '') };
+            console.log('[NEXU]', ts, action, payload);
             fetch('/log', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    action: action,
-                    details: details
-                })
-            }).catch(err => console.error("[NEXU SYSTEM] Logger API unreachable:", err));
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: action, details: JSON.stringify(payload) })
+            }).catch(err => console.warn('[NEXU] Logger API unreachable:', err.message));
         }
 
-        // Log page initialization
+        function buildFrameQuery(spec) {
+            const p = new URLSearchParams();
+            if (spec.role) p.set('role', spec.role);
+            if (spec.active) p.set('active', 'true');
+            if (spec.pane) p.set('pane', spec.pane);
+            if (spec.mark != null) p.set('mark', spec.mark ? '1' : '0');
+            if (spec.calc != null) p.set('calc', spec.calc ? '1' : '0');
+            if (spec.review != null) p.set('review', spec.review ? '1' : '0');
+            if (spec.stage != null) p.set('stage', String(spec.stage));
+            p.set('t', String(spec.t != null ? spec.t : Date.now()));
+            return '?' + p.toString();
+        }
+
+        function frameUrl(file, spec) {
+            return file + buildFrameQuery(spec);
+        }
+
+        function updatePlayerUrl() {
+            const p = new URLSearchParams();
+            p.set('tab', mainTab);
+            if (activeProjectId) p.set('project', activeProjectId);
+            p.set('stage', String(activeStage));
+            p.set('review', elementReviewMode ? '1' : '0');
+            p.set('mark', '1');
+            p.set('annotations', String(annotations.length));
+            if (pendingGoalOptions) p.set('pending', '1');
+            if (workspaceEngaged) p.set('workspace', '1');
+            p.set('mode', resolveIterationMode());
+            const qs = p.toString();
+            const next = 'cinema_player.html' + (qs ? '?' + qs : '');
+            if (location.pathname.endsWith('cinema_player.html') && location.search !== '?' + qs) {
+                history.replaceState(null, '', next);
+            }
+        }
+
+        function bindFrameLoad(id, label) {
+            const fr = document.getElementById(id);
+            if (!fr || fr.dataset.nexuBound === '1') return;
+            fr.dataset.nexuBound = '1';
+            fr.addEventListener('load', () => {
+                logEvent('FRAME_LOAD', { frame: label, src: fr.src });
+                syncAllIframeVisuals();
+            });
+        }
+
         let cinemaServerOnline = false;
 
-        logEvent('PAGE_LOAD', 'Nexu dashboard initialized');
+        (function applyBootUrlParams() {
+            const boot = new URLSearchParams(location.search);
+            if (boot.has('review')) elementReviewMode = boot.get('review') !== '0';
+            if (boot.has('stage')) {
+                const s = parseInt(boot.get('stage'), 10);
+                if (!isNaN(s)) activeStage = s;
+            }
+        })();
+
+        logEvent('PAGE_LOAD', { href: location.href, review: elementReviewMode, stage: activeStage });
+        document.addEventListener('click', (e) => {
+            const t = e.target;
+            if (!t || !t.closest) return;
+            const tag = (t.tagName || '').toLowerCase();
+            const role = t.getAttribute('role');
+            const id = t.id || '';
+            const cls = typeof t.className === 'string' ? t.className : '';
+            if (tag === 'iframe' || t.closest('iframe')) return;
+            if (['button', 'a'].includes(tag) || role === 'button' || t.closest('button, .btn-stage, .project-card, .tab-btn, .nexu-review-btn')) {
+                logEvent('UI_CLICK', {
+                    tag: tag,
+                    id: id,
+                    class: cls.slice(0, 80),
+                    text: (t.innerText || '').trim().slice(0, 40)
+                });
+            }
+        }, true);
+        bindFrameLoad('active-frame', 'workspace');
+        bindFrameLoad('alt-a-frame', 'option_a');
+        bindFrameLoad('alt-b-frame', 'option_b');
+        bindFrameLoad('alt-c-frame', 'option_c');
         loadProjectsCatalog();
         pingCinemaServer().then(() => {
             return fetch('/projects/active').then(res => res.ok ? res.json() : null);
@@ -1004,8 +1075,9 @@
             }
             if (tab === 'services') loadServicesCatalog();
             if (!options.skipLog) {
-                logEvent('MAIN_TAB', tab);
+                logEvent('MAIN_TAB', { tab: tab });
             }
+            updatePlayerUrl();
         }
 
         function activeProjectRecord() {
@@ -1365,10 +1437,21 @@
 
         function reloadCinemaFrames() {
             const t = Date.now();
-            document.getElementById('active-frame').src = 'stage' + activeStage + '.html?active=true&t=' + t;
-            document.getElementById('alt-a-frame').src = 'alt_a.html?t=' + t;
-            document.getElementById('alt-b-frame').src = 'alt_b.html?t=' + t;
-            document.getElementById('alt-c-frame').src = 'alt_c.html?t=' + t;
+            const ws = {
+                role: 'workspace',
+                active: true,
+                mark: 1,
+                calc: 0,
+                review: elementReviewMode ? 1 : 0,
+                stage: activeStage,
+                t: t
+            };
+            document.getElementById('active-frame').src = frameUrl('stage' + activeStage + '.html', ws);
+            document.getElementById('alt-a-frame').src = frameUrl('alt_a.html', { role: 'option', pane: 'a', mark: 0, calc: 0, review: 0, t: t });
+            document.getElementById('alt-b-frame').src = frameUrl('alt_b.html', { role: 'option', pane: 'b', mark: 0, calc: 0, review: 0, t: t });
+            document.getElementById('alt-c-frame').src = frameUrl('alt_c.html', { role: 'option', pane: 'c', mark: 0, calc: 0, review: 0, t: t });
+            logEvent('FRAMES_RELOAD', ws);
+            updatePlayerUrl();
         }
 
         function restoreHistoryCheckpoint(checkpointId) {
@@ -1586,7 +1669,16 @@
         // Ultimate cross-origin postMessage listener
         window.addEventListener('message', (e) => {
             if (!e.data) return;
-            
+
+            if (e.data.type === 'nexu_log') {
+                logEvent('IFRAME_' + (e.data.event || 'log'), e.data.detail || { href: e.data.href });
+                return;
+            }
+
+            if (['annotation', 'promote', 'selection_updated'].includes(e.data.type)) {
+                logEvent('IFRAME_MSG', { type: e.data.type, origin: e.origin || '' });
+            }
+
             if (e.data.type === 'annotation') {
                 handleAnnotation(e.data.elementId, e.data.action);
             }
@@ -1683,16 +1775,24 @@
             });
             
             const activeFrame = document.getElementById('active-frame');
-            activeFrame.src = 'stage' + stageNum + '.html?active=true';
+            activeFrame.src = frameUrl('stage' + stageNum + '.html', {
+                role: 'workspace',
+                active: true,
+                mark: 1,
+                calc: 0,
+                review: elementReviewMode ? 1 : 0,
+                stage: stageNum,
+                t: Date.now()
+            });
             addChatLog('system', '🔄 Loaded stage S' + stageNum + ' template.');
-            logEvent('SWITCH_STAGE', 'Switched Active Workspace stage to S' + stageNum);
+            logEvent('SWITCH_STAGE', { stage: stageNum, src: activeFrame.src });
             updateProjectActiveBar();
+            updatePlayerUrl();
         }
 
         function handleAnnotation(elementId, type) {
             if (pendingGoalOptions && !workspaceEngaged) {
-                addChatLog('system', '⚠️ <strong>Generate Options A–C first</strong> (marks unlock after you promote an option to the workspace).');
-                return;
+                logEvent('ANNOTATE_PRE_OPTIONS', { elementId: elementId, type: type });
             }
             const existingIdx = annotations.findIndex(a => a.id === elementId);
             if (existingIdx >= 0) {
@@ -1708,13 +1808,13 @@
                 addChatLog('system', `✗ Element <strong>${elementId}</strong> marked for redesign.`);
             }
 
-            logEvent('ANNOTATE', `Element ID: ${elementId} | Type: ${type}`);
+            logEvent('ANNOTATE', { elementId: elementId, type: type, total: annotations.length });
 
-            // Sync visual highlights to ALL active child iframes using postMessage
             syncAllIframeVisuals();
             updateFeedbackList();
             updatePromptBox();
             updateWorkflowUI();
+            updatePlayerUrl();
         }
 
         function syncReviewModeToFrames() {
@@ -1747,7 +1847,8 @@
             addChatLog('system', elementReviewMode
                 ? '👆 <strong>One-by-one review ON</strong> — tap each control, then ✓ or ✗.'
                 : '🖱️ <strong>Drag selection</strong> — draw a box: left = keep, right = remove (many at once).');
-            logEvent('REVIEW_MODE', elementReviewMode ? 'on' : 'off');
+            logEvent('REVIEW_MODE', { enabled: elementReviewMode });
+            updatePlayerUrl();
         }
 
         function syncAllIframeVisuals() {
@@ -1839,6 +1940,7 @@
                 reloadCinemaFrames();
                 pendingGoalOptions = false;
                 workspaceEngaged = true;
+                elementReviewMode = true;
                 syncReviewModeToFrames();
                 addChatLog('system', `🌟 <strong>Promoted ${optName} → workspace saved.</strong> Drag to mark (left = keep, right = remove), then Apply marks. You can add or change goals without losing marks.`);
                 updateWorkflowUI();

@@ -7,9 +7,48 @@ from pathlib import Path
 
 SHIELD_SCRIPT = """
     <script>
-        console.log("[NEXU CHILD] IFrame loaded: " + window.location.pathname);
+        const NEXU_PARAMS = new URLSearchParams(window.location.search);
+        function nexuParam(name, fallback) {
+            const v = NEXU_PARAMS.get(name);
+            return v !== null && v !== '' ? v : fallback;
+        }
+        function nexuBool(name, defaultVal) {
+            const v = NEXU_PARAMS.get(name);
+            if (v === null || v === '') return defaultVal;
+            return v === '1' || v === 'true' || v === 'yes';
+        }
+        const NEXU_ROLE = nexuParam(
+            'role',
+            NEXU_PARAMS.get('active') === 'true' ? 'workspace' : 'option'
+        );
+        const NEXU_PANE = nexuParam('pane', '');
+        const NEXU_MARK = nexuBool('mark', NEXU_ROLE === 'workspace');
+        const NEXU_CALC = nexuBool('calc', false);
+        const NEXU_STAGE = nexuParam('stage', '0');
 
-        window.__NEXU_REVIEW_MODE__ = false;
+        function isActiveWorkspace() {
+            return NEXU_ROLE === 'workspace' || NEXU_PARAMS.get('active') === 'true';
+        }
+        function isMarkingEnabled() {
+            return NEXU_MARK && isActiveWorkspace();
+        }
+        function nexuLog(event, detail) {
+            const payload = {
+                type: 'nexu_log',
+                event: event,
+                detail: detail || {},
+                href: window.location.pathname + window.location.search,
+                role: NEXU_ROLE,
+                pane: NEXU_PANE,
+                stage: NEXU_STAGE,
+                mark: NEXU_MARK,
+                calc: NEXU_CALC,
+            };
+            console.log('[NEXU IFRAME]', event, detail || '', window.location.search);
+            try { window.parent.postMessage(payload, '*'); } catch (_) {}
+        }
+
+        window.__NEXU_REVIEW_MODE__ = nexuBool('review', NEXU_ROLE === 'workspace');
 
         const style = document.createElement('style');
         style.innerHTML = `
@@ -77,7 +116,8 @@ SHIELD_SCRIPT = """
                 color: #94a3b8;
                 text-align: center;
             }
-            .btn.nexu-focus-pulse {
+            .btn.nexu-focus-pulse,
+            button.nexu-focus-pulse {
                 outline: 3px solid #38bdf8 !important;
                 outline-offset: 2px !important;
                 box-shadow: 0 0 16px rgba(56, 189, 248, 0.55) !important;
@@ -87,7 +127,15 @@ SHIELD_SCRIPT = """
         `;
         document.head.appendChild(style);
 
-        const SELECTOR = '.btn, .btn-sci, .btn-sci-excess, .btn-op, .screen';
+        const SELECTOR = [
+            '.btn',
+            '.btn-sci',
+            '.btn-sci-excess',
+            '.btn-op',
+            '.screen',
+            '.grid > button',
+            '.sci-grid > button',
+        ].join(', ');
         let selectionBox = null;
         let isDrawing = false;
         let startX = 0, startY = 0;
@@ -102,16 +150,14 @@ SHIELD_SCRIPT = """
         dock.innerHTML = `
             <div class="nexu-review-label" id="nexu-review-label">Tap a control</div>
             <div class="nexu-review-actions">
-                <button type="button" class="nexu-review-btn reject" id="nexu-btn-reject" title="Remove">✗</button>
-                <button type="button" class="nexu-review-btn accept" id="nexu-btn-accept" title="Keep">✓</button>
+                <button type="button" class="nexu-review-btn reject"
+                    id="nexu-btn-reject" title="Remove">✗</button>
+                <button type="button" class="nexu-review-btn accept"
+                    id="nexu-btn-accept" title="Keep">✓</button>
             </div>
             <div class="nexu-review-hint">← remove · → keep · swipe on card</div>
         `;
         document.body.appendChild(dock);
-
-        function isActiveWorkspace() {
-            return window.location.search.includes('active=true');
-        }
 
         function calcButtonTarget(node) {
             return node && node.closest ? node.closest(SELECTOR) : null;
@@ -119,12 +165,21 @@ SHIELD_SCRIPT = """
 
         function elementIdFromEl(el) {
             const rawId = (el.id || '').trim();
-            return rawId ? rawId.replace(/^btn-/, '') : (el.innerText || '').trim();
+            if (rawId) return rawId.replace(/^btn-/, '');
+            const text = (el.innerText || '').trim();
+            if (el.tagName === 'BUTTON' && text) return text;
+            return text;
         }
 
         function allTargets() {
             return Array.from(document.querySelectorAll(SELECTOR));
         }
+
+        nexuLog('iframe_boot', {
+            review: window.__NEXU_REVIEW_MODE__,
+            marking: isMarkingEnabled(),
+            targets: allTargets().length,
+        });
 
         function clearFocusPulse() {
             allTargets().forEach(el => el.classList.remove('nexu-focus-pulse'));
@@ -142,7 +197,7 @@ SHIELD_SCRIPT = """
         }
 
         function updateDockVisibility() {
-            if (!isActiveWorkspace() || !window.__NEXU_REVIEW_MODE__) {
+            if (!isMarkingEnabled() || !window.__NEXU_REVIEW_MODE__) {
                 dock.classList.remove('visible');
                 return;
             }
@@ -151,6 +206,7 @@ SHIELD_SCRIPT = """
 
         function postAnnotation(action) {
             if (!focusedId) return;
+            nexuLog('annotate', { elementId: focusedId, action: action, mode: 'review' });
             window.parent.postMessage({
                 type: 'annotation',
                 elementId: focusedId,
@@ -200,7 +256,7 @@ SHIELD_SCRIPT = """
         }, true);
 
         document.addEventListener('mousedown', (e) => {
-            if (!isActiveWorkspace()) return;
+            if (!isMarkingEnabled()) return;
             if (window.__NEXU_REVIEW_MODE__) {
                 if (e.target.closest('.nexu-review-dock')) return;
                 const onBtn = calcButtonTarget(e.target);
@@ -209,12 +265,10 @@ SHIELD_SCRIPT = """
                     e.stopPropagation();
                     setFocus(onBtn);
                     swipeStartX = e.clientX;
+                    nexuLog('review_focus', { elementId: focusedId });
                 }
                 return;
             }
-
-            const onBtn = calcButtonTarget(e.target);
-            if (onBtn && e.button === 0) return;
 
             if (e.button === 0) selectionType = 'KEEP';
             else if (e.button === 2) selectionType = 'DELETE';
@@ -231,6 +285,7 @@ SHIELD_SCRIPT = """
             box.style.height = '0px';
             box.style.display = 'block';
             e.preventDefault();
+            nexuLog('drag_start', { button: e.button, type: selectionType, x: startX, y: startY });
         });
 
         document.addEventListener('mousemove', (e) => {
@@ -264,10 +319,13 @@ SHIELD_SCRIPT = """
                     elRect.right < rect.left || elRect.left > rect.right ||
                     elRect.bottom < rect.top || elRect.top > rect.bottom
                 );
-                if (intersects || (isSingleClick && el === e.target)) {
+                const hit = calcButtonTarget(e.target);
+                if (intersects || (isSingleClick && hit === el)) {
+                    const eid = elementIdFromEl(el);
+                    nexuLog('annotate', { elementId: eid, action: selectionType, mode: 'drag' });
                     window.parent.postMessage({
                         type: 'annotation',
-                        elementId: elementIdFromEl(el),
+                        elementId: eid,
                         action: selectionType,
                     }, '*');
                 }
@@ -282,16 +340,20 @@ SHIELD_SCRIPT = """
         });
 
         document.addEventListener('click', (e) => {
+            if (isMarkingEnabled()) {
+                if (window.__NEXU_REVIEW_MODE__ && calcButtonTarget(e.target)) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                return;
+            }
             if (!isActiveWorkspace()) {
                 e.preventDefault();
                 e.stopPropagation();
                 const currentFile = window.location.pathname.split('/').pop();
+                nexuLog('promote_click', { altSrc: currentFile, pane: NEXU_PANE });
                 window.parent.postMessage({ type: 'promote', altSrc: currentFile }, '*');
                 return;
-            }
-            if (window.__NEXU_REVIEW_MODE__ && calcButtonTarget(e.target)) {
-                e.preventDefault();
-                e.stopPropagation();
             }
         }, true);
 
@@ -319,22 +381,24 @@ SHIELD_SCRIPT = """
             if (!e.data) return;
             if (e.data.type === 'review_mode') {
                 window.__NEXU_REVIEW_MODE__ = !!e.data.enabled;
+                nexuLog('review_mode', { enabled: window.__NEXU_REVIEW_MODE__ });
                 updateDockVisibility();
-                if (window.__NEXU_REVIEW_MODE__ && isActiveWorkspace()) {
+                if (window.__NEXU_REVIEW_MODE__ && isMarkingEnabled()) {
                     advanceToNext();
                 }
                 return;
             }
             if (e.data.type === 'sync') {
                 applyAnnotationStyles(e.data.annotations);
-                if (window.__NEXU_REVIEW_MODE__ && isActiveWorkspace() && !focusedId) {
+                nexuLog('sync', { count: (e.data.annotations || []).length });
+                if (window.__NEXU_REVIEW_MODE__ && isMarkingEnabled() && !focusedId) {
                     advanceToNext();
                 }
             }
         });
 
         updateDockVisibility();
-        if (isActiveWorkspace() && window.__NEXU_REVIEW_MODE__) {
+        if (isMarkingEnabled() && window.__NEXU_REVIEW_MODE__) {
             setTimeout(advanceToNext, 300);
         }
     </script>
@@ -343,6 +407,16 @@ SHIELD_SCRIPT = """
 CALCULATOR_RUNTIME_SCRIPT = """
     <script>
         (function () {
+            const calcParams = new URLSearchParams(window.location.search);
+            if (calcParams.get('calc') !== '1') {
+                console.log(
+                    '[NEXU CALC] disabled — use ?calc=1 to enable keypad',
+                    window.location.search
+                );
+                return;
+            }
+            console.log('[NEXU CALC] enabled', window.location.search);
+
             function calcButtonTarget(node) {
                 return node && node.closest
                     ? node.closest('.btn, .btn-sci, .btn-sci-excess, .btn-op')

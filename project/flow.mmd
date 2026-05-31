@@ -5,27 +5,27 @@ flowchart TD
     classDef entry fill:#4dabf7,stroke:#1971c2,color:#fff
 
     subgraph Core
-        src__vico__status__capsule_status["capsule_status"]
+        src__nexu__status__capsule_status["capsule_status"]
         src__nexu__cinema_history__list_history_checkpoints["list_history_checkpoints"]
         src__nexu__cinema_history__restore_history_checkpoint["restore_history_checkpoint"]
         src__nexu__cinema_history__ledger_archive_for_display["ledger_archive_for_display"]
-        src__vico__hashing__sha256_text["sha256_text"]
+        src__nexu__hashing__sha256_text["sha256_text"]
         src__nexu__paths__nexu_dir["nexu_dir"]
         src__nexu__paths__capsules_dir["capsules_dir"]
         src__nexu__paths__capsule_dir["capsule_dir"]
-        src__vico__models__FrozenSnapshot__to_dict["to_dict"]
-        src__vico__models__FrozenSnapshot__from_dict["from_dict"]
-        src__vico__models__Capsule__to_dict["to_dict"]
-        src__vico__models__Capsule__from_dict["from_dict"]
-        src__vico__models__VerificationReport__to_dict["to_dict"]
-        src__vico__models__CapsuleDiff__to_dict["to_dict"]
-        src__vico__diff__diff_capsule("diff_capsule CC=12")
+        src__nexu__models__FrozenSnapshot__to_dict["to_dict"]
+        src__nexu__models__FrozenSnapshot__from_dict["from_dict"]
+        src__nexu__models__Capsule__to_dict["to_dict"]
+        src__nexu__models__Capsule__from_dict["from_dict"]
+        src__nexu__models__VerificationReport__to_dict["to_dict"]
+        src__nexu__models__CapsuleDiff__to_dict["to_dict"]
+        src__nexu__diff__diff_capsule("diff_capsule CC=12")
         ...["+48 more"]
     end
 
     subgraph Exporters
-        src__vico__models__PromptExport__to_dict["to_dict"]
+        src__nexu__models__PromptExport__to_dict["to_dict"]
         src__nexu__cli__capsule_export_prompt["capsule_export_prompt"]
     end
 
-    class src__nexu__cinema_history__list_history_checkpoints,src__nexu__cinema_history__restore_history_checkpoint,src__nexu__cinema_history__ledger_archive_for_display,src__vico__hashing__sha256_text,src__vico__models__FrozenSnapshot__to_dict,src__vico__models__FrozenSnapshot__from_dict,src__vico__models__Capsule__to_dict,src__vico__models__Capsule__from_dict,src__vico__models__VerificationReport__to_dict,src__vico__models__CapsuleDiff__to_dict entry
+    class src__nexu__cinema_history__list_history_checkpoints,src__nexu__cinema_history__restore_history_checkpoint,src__nexu__cinema_history__ledger_archive_for_display,src__nexu__hashing__sha256_text,src__nexu__models__FrozenSnapshot__to_dict,src__nexu__models__FrozenSnapshot__from_dict,src__nexu__models__Capsule__to_dict,src__nexu__models__Capsule__from_dict,src__nexu__models__VerificationReport__to_dict,src__nexu__models__CapsuleDiff__to_dict entry
