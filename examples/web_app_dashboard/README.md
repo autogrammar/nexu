@@ -16,4 +16,4 @@ From the repo root run:
 make cinema
 ```
 
-Use the URL printed in logs. Workflow is the same as calculator Cinema: **Goal -> Options A-C -> Promote -> Mark workspace -> Apply marks**.
+Use the URL printed in logs. Workflow is the same as calculator Cinema: **Goal -> iterate (Options A-C) -> Promote -> Mark workspace -> Apply marks**.

@@ -11,6 +11,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from datetime import datetime
+from threading import Lock
 
 # Force correct MIME types and UTF-8 charsets for clean encoding
 mimetypes.add_type("text/html; charset=utf-8", ".html")
@@ -22,6 +23,9 @@ DIRECTORY = Path(__file__).parent.absolute()
 LOG_CSV = DIRECTORY / "log.csv"
 POLICY_SNAPSHOT_PATH = DIRECTORY / "intract_policy.json"
 POLICY_LEDGER_PATH = DIRECTORY / "intract_policy_ledger.json"
+LLM_TRACE_DIR = DIRECTORY / "llm_traces"
+LLM_TRACE_INDEX = LLM_TRACE_DIR / "index.json"
+LLM_TRACE_LOCK = Lock()
 
 WORKSPACE_PATH = $WORKSPACE_PATH
 ROOT_PATH = Path(WORKSPACE_PATH).absolute()
@@ -30,7 +34,15 @@ SYS_EXE = $PYTHON_EXECUTABLE
 ALLOW_NETWORK_CALLS = $ALLOW_NETWORK_CALLS
 API_KEY_ENV = $API_KEY_ENV
 DEFAULT_MODEL = $DEFAULT_MODEL
-MAX_TOKENS = int(os.environ.get("CINEMA_MAX_TOKENS", "4096"))
+MAX_TOKENS = int(os.environ.get("CINEMA_MAX_TOKENS", $CINEMA_MAX_TOKENS))
+OPTION_GENERATION_MODE = os.environ.get(
+    "CINEMA_OPTION_GENERATION_MODE",
+    $CINEMA_OPTION_GENERATION_MODE,
+).strip().lower()
+DEFAULT_MARKPACT_CONTEXT_CHARS = $CINEMA_MARKPACT_CONTEXT_CHARS
+DEFAULT_MARKPACT_CONTEXT_MODE = $CINEMA_MARKPACT_CONTEXT_MODE
+DEFAULT_HTML_CONTEXT_CHARS = $CINEMA_HTML_CONTEXT_CHARS
+DEFAULT_LLM_TRACE_KEEP = $CINEMA_LLM_TRACE_KEEP
 
 _DASHBOARD_KINDS = frozenset(
     {"dashboard", "monitor", "ecosystem", "api", "mcp", "frontend", "slice"}
@@ -275,7 +287,78 @@ def _llm_status_payload() -> dict:
         "base_url": base_url,
         "temperature": temperature,
         "timeout": timeout,
+        "cinema": {
+            "markpact_context_chars": int(
+                os.environ.get("CINEMA_MARKPACT_CONTEXT_CHARS", str(DEFAULT_MARKPACT_CONTEXT_CHARS))
+            ),
+            "markpact_context_mode": os.environ.get(
+                "CINEMA_MARKPACT_CONTEXT_MODE",
+                DEFAULT_MARKPACT_CONTEXT_MODE,
+            ),
+            "html_context_chars": int(
+                os.environ.get("CINEMA_HTML_CONTEXT_CHARS", str(DEFAULT_HTML_CONTEXT_CHARS))
+            ),
+            "max_tokens": MAX_TOKENS,
+            "option_generation_mode": OPTION_GENERATION_MODE,
+            "llm_trace_keep": int(
+                os.environ.get("CINEMA_LLM_TRACE_KEEP", str(DEFAULT_LLM_TRACE_KEEP))
+            ),
+        },
     }
+
+
+def _trace_slug(value: str) -> str:
+    from nexu.cinema_traces import trace_slug
+
+    return trace_slug(value)
+
+
+def _read_trace_index() -> list[dict]:
+    from nexu.cinema_traces import read_trace_index
+
+    return read_trace_index(LLM_TRACE_INDEX)
+
+
+def _write_llm_trace(
+    *,
+    label: str,
+    prompt: str,
+    output: str = "",
+    error: str = "",
+    model: str = "",
+    duration_ms: int = 0,
+) -> None:
+    from nexu.cinema_traces import write_llm_trace
+
+    redact_values: tuple[str, ...] = ()
+    key = os.environ.get(API_KEY_ENV, "")
+    if key:
+        redact_values = (key,)
+    write_llm_trace(
+        LLM_TRACE_DIR,
+        LLM_TRACE_INDEX,
+        LLM_TRACE_LOCK,
+        label=label,
+        prompt=prompt,
+        output=output,
+        error=error,
+        model=model or _resolve_model(),
+        duration_ms=duration_ms,
+        keep=int(os.environ.get("CINEMA_LLM_TRACE_KEEP", str(DEFAULT_LLM_TRACE_KEEP))),
+        redact_values=redact_values,
+    )
+
+
+def _list_llm_traces() -> dict:
+    from nexu.cinema_traces import list_llm_traces
+
+    return list_llm_traces(LLM_TRACE_DIR)
+
+
+def _read_llm_trace(trace_id: str) -> dict:
+    from nexu.cinema_traces import read_llm_trace
+
+    return read_llm_trace(LLM_TRACE_DIR, trace_id)
 
 
 def _ensure_api_key_env() -> None:
@@ -307,6 +390,45 @@ def _extract_html_document(text: str) -> str:
     if match:
         return "<!DOCTYPE html>\n" + match.group(0).strip()
     return cleaned
+
+
+def _compact_html_for_llm(html: str) -> str:
+    cleaned = re.sub(r"<script\b[^>]*>[\s\S]*?</script>", "", str(html or ""), flags=re.I)
+    cleaned = re.sub(r"\n\s*\n\s*\n+", "\n\n", cleaned).strip()
+    limit = int(os.environ.get("CINEMA_HTML_CONTEXT_CHARS", str(DEFAULT_HTML_CONTEXT_CHARS)))
+    if len(cleaned) > limit:
+        return cleaned[:limit].rstrip() + "\n<!-- current html context truncated -->"
+    return cleaned
+
+
+def _compact_markpact_for_llm(markdown: str) -> str:
+    text = str(markdown or "")
+    mode = os.environ.get(
+        "CINEMA_MARKPACT_CONTEXT_MODE",
+        DEFAULT_MARKPACT_CONTEXT_MODE,
+    ).strip().lower()
+    text = re.sub(
+        r"\n## Application UI\n\n```html markpact:file path=index\.html[\s\S]*?```\n",
+        "\n## Application UI\n\n(omitted from Markpact context; see Current HTML block below)\n",
+        text,
+        flags=re.I,
+    )
+    if mode in {"off", "none", "0"}:
+        return "(Markpact context disabled for this LLM call)"
+    if mode in {"summary", "fast"}:
+        sections: list[str] = []
+        for heading in ("## Nexu context", "## Intract baseline model", "## Project context"):
+            match = re.search(
+                rf"{re.escape(heading)}\n[\s\S]*?(?=\n## |\Z)",
+                text,
+                flags=re.I,
+            )
+            if match:
+                sections.append(match.group(0).strip())
+        text = "\n\n".join(sections) if sections else text
+    limit = int(os.environ.get("CINEMA_MARKPACT_CONTEXT_CHARS", str(DEFAULT_MARKPACT_CONTEXT_CHARS)))
+    suffix = "\n\n<!-- markpact context truncated -->" if len(text) > limit else ""
+    return text[:limit].rstrip() + suffix
 
 
 def _extract_llm_content(response: object) -> str | None:
@@ -813,6 +935,44 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(str(e).encode("utf-8"))
                 return
+        if self.path in ("/llm/traces", "/llm/traces/"):
+            try:
+                payload = _list_llm_traces()
+                body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-type", "application/json; charset=utf-8")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(body)
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(str(e).encode("utf-8"))
+                return
+        if self.path.startswith("/llm/trace"):
+            try:
+                from urllib.parse import parse_qs, urlparse
+
+                parsed = urlparse(self.path)
+                qs = parse_qs(parsed.query)
+                trace_id = str((qs.get("id") or [""])[0])
+                payload = _read_llm_trace(trace_id)
+                status = 404 if payload.get("error") else 200
+                body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+                self.send_response(status)
+                self.send_header("Content-type", "application/json; charset=utf-8")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(body)
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(str(e).encode("utf-8"))
+                return
         if self.path in ("/history", "/history/"):
             try:
                 payload = _list_history()
@@ -1223,6 +1383,7 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 # Read current active stage HTML
                 stage_file = DIRECTORY / f'stage{current_stage}.html'
                 current_html = stage_file.read_text(encoding='utf-8') if stage_file.exists() else '<p>No stage found</p>'
+                current_html_for_prompt = _compact_html_for_llm(current_html)
                 
                 # Build structured LLM prompt from spatial annotations
                 pending_goal = bool(data.get('pending_goal', False))
@@ -1284,17 +1445,10 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                     _mp_payload = nexu_hooks.export_markpact_readme(current_stage, user_goal)
                     _mp_body = str(_mp_payload.get("markdown") or "")
                     if _mp_body:
-                        _mp_max = int(os.environ.get("CINEMA_MARKPACT_CONTEXT_CHARS", "24000"))
-                        _mp_suffix = (
-                            "\n\n<!-- markpact context truncated -->"
-                            if len(_mp_body) > _mp_max
-                            else ""
-                        )
                         markpact_context = (
                             "Markpact context pack (active app, contracts, runnable HTML):\n"
                             "```markdown\n"
-                            + _mp_body[:_mp_max]
-                            + _mp_suffix
+                            + _compact_markpact_for_llm(_mp_body)
                             + "\n```\n\n"
                         )
                 except Exception:
@@ -1341,7 +1495,7 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                         + active_ctx
                         + markpact_context
                         + "Current HTML:\n```html\n"
-                        + current_html
+                        + current_html_for_prompt
                         + "\n```\n\n"
                         + variant_block
                         + goal_contract_block
@@ -1461,14 +1615,30 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                         return cleaned[:idx] + inject + cleaned[idx:]
                     return cleaned.rstrip() + inject + '\n</body>\n</html>\n'
 
-                def _call_llm(prompt: str) -> tuple[str | None, str | None]:
+                def _call_llm(prompt: str, trace_label: str = "active") -> tuple[str | None, str | None]:
                     _ensure_api_key_env()
+                    started = time.time()
+                    model_name = _resolve_model()
                     if not _llm_network_allowed():
-                        return None, 'llm.allow_network_calls disabled in nexu.yaml'
-                    if not _litellm_available():
-                        return None, (
-                            'litellm is not available. From the nexu repo run: uv sync'
+                        err = 'llm.allow_network_calls disabled in nexu.yaml'
+                        _write_llm_trace(
+                            label=trace_label,
+                            prompt=prompt,
+                            error=err,
+                            model=model_name,
+                            duration_ms=int((time.time() - started) * 1000),
                         )
+                        return None, err
+                    if not _litellm_available():
+                        err = 'litellm is not available. From the nexu repo run: uv sync'
+                        _write_llm_trace(
+                            label=trace_label,
+                            prompt=prompt,
+                            error=err,
+                            model=model_name,
+                            duration_ms=int((time.time() - started) * 1000),
+                        )
+                        return None, err
                     try:
                         from nexu.cinema_llm import has_terminal_artifacts
                         from nexu.cinema_llm import call_cinema_html_llm
@@ -1476,18 +1646,190 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                         raw, err = call_cinema_html_llm(
                             prompt,
                             ROOT_PATH,
-                            model=_resolve_model(),
+                            model=model_name,
                             max_tokens=MAX_TOKENS,
                         )
                         if err:
+                            _write_llm_trace(
+                                label=trace_label,
+                                prompt=prompt,
+                                error=err,
+                                model=model_name,
+                                duration_ms=int((time.time() - started) * 1000),
+                            )
                             return None, err
                         if raw:
                             if has_terminal_artifacts(raw):
-                                return None, 'LLM output contained terminal artifacts, not clean HTML'
-                            return _finalize_llm_html(raw), None
-                        return None, 'LLM did not return a complete HTML document'
+                                err = 'LLM output contained terminal artifacts, not clean HTML'
+                                _write_llm_trace(
+                                    label=trace_label,
+                                    prompt=prompt,
+                                    output=raw,
+                                    error=err,
+                                    model=model_name,
+                                    duration_ms=int((time.time() - started) * 1000),
+                                )
+                                return None, err
+                            html = _finalize_llm_html(raw)
+                            _write_llm_trace(
+                                label=trace_label,
+                                prompt=prompt,
+                                output=html,
+                                model=model_name,
+                                duration_ms=int((time.time() - started) * 1000),
+                            )
+                            return html, None
+                        err = 'LLM did not return a complete HTML document'
+                        _write_llm_trace(
+                            label=trace_label,
+                            prompt=prompt,
+                            error=err,
+                            model=model_name,
+                            duration_ms=int((time.time() - started) * 1000),
+                        )
+                        return None, err
                     except Exception as llm_exc:
-                        return None, _compact_llm_error(str(llm_exc))
+                        err = _compact_llm_error(str(llm_exc))
+                        _write_llm_trace(
+                            label=trace_label,
+                            prompt=prompt,
+                            error=err,
+                            model=model_name,
+                            duration_ms=int((time.time() - started) * 1000),
+                        )
+                        return None, err
+
+                def _parse_batch_options(text: str) -> dict[str, str]:
+                    from nexu.cinema_llm import parse_batch_alt_options
+
+                    return parse_batch_alt_options(text or "")
+
+                def _generate_parallel_options(
+                    option_variants: list[tuple[str, str, str]],
+                ) -> tuple[dict[str, str], str | None]:
+                    batch: dict[str, str] = {}
+                    llm_err: str | None = None
+
+                    def _generate_option(filename: str, label: str, variant_note: str):
+                        prompt = _build_llm_prompt(variant_note=variant_note)
+                        html, err = _call_llm(prompt, trace_label=label)
+                        return filename, label, html, err
+
+                    with ThreadPoolExecutor(max_workers=len(option_variants)) as pool:
+                        futures = [
+                            pool.submit(_generate_option, filename, label, variant_note)
+                            for filename, label, variant_note in option_variants
+                        ]
+                        for future in as_completed(futures):
+                            filename, _label, html, err = future.result()
+                            if html:
+                                batch[filename] = html
+                            elif not llm_err:
+                                llm_err = err
+                    return batch, llm_err
+
+                def _build_batch_options_prompt(option_variants: list[tuple[str, str, str]]) -> str:
+                    notes = "\n".join(
+                        f"- {label}: {variant_note}"
+                        for _filename, label, variant_note in option_variants
+                    )
+                    base = _build_llm_prompt(
+                        variant_note=(
+                            "BATCH OPTIONS REQUEST. Generate all three option variants in one response. "
+                            "Use the option directions listed below."
+                        )
+                    )
+                    return (
+                        base
+                        + "\n\nBatch option directions:\n"
+                        + notes
+                        + "\n\nReturn exactly this structure, with no markdown fences or prose:\n"
+                        "<!-- NEXU_ALT_A -->\n"
+                        "<!DOCTYPE html>...complete Option A HTML...</html>\n"
+                        "<!-- NEXU_ALT_B -->\n"
+                        "<!DOCTYPE html>...complete Option B HTML...</html>\n"
+                        "<!-- NEXU_ALT_C -->\n"
+                        "<!DOCTYPE html>...complete Option C HTML...</html>\n"
+                    )
+
+                def _call_llm_batch_options(
+                    option_variants: list[tuple[str, str, str]]
+                ) -> tuple[dict[str, str], str | None]:
+                    prompt = _build_batch_options_prompt(option_variants)
+                    _ensure_api_key_env()
+                    started = time.time()
+                    model_name = _resolve_model()
+                    if not _llm_network_allowed():
+                        err = 'llm.allow_network_calls disabled in nexu.yaml'
+                        _write_llm_trace(
+                            label="Options A-C batch",
+                            prompt=prompt,
+                            error=err,
+                            model=model_name,
+                            duration_ms=int((time.time() - started) * 1000),
+                        )
+                        return {}, err
+                    try:
+                        from nexu.cinema_llm import call_cinema_text_llm
+
+                        text, err = call_cinema_text_llm(
+                            prompt,
+                            ROOT_PATH,
+                            model=model_name,
+                            max_tokens=max(MAX_TOKENS, 8192),
+                            system_prompt=(
+                                "You are a UI evolution engine. Return exactly three complete HTML "
+                                "documents using the requested NEXU_ALT_A/B/C markers. "
+                                "No markdown fences, no explanation."
+                            ),
+                        )
+                        if err:
+                            _write_llm_trace(
+                                label="Options A-C batch",
+                                prompt=prompt,
+                                error=err,
+                                model=model_name,
+                                duration_ms=int((time.time() - started) * 1000),
+                            )
+                            return {}, err
+                        parsed = _parse_batch_options(text or "")
+                        if not parsed:
+                            preview = " ".join(str(text or "").split())[:800]
+                            err = (
+                                "LLM batch response did not contain NEXU_ALT_A/B/C HTML markers"
+                                + (f"; response_preview={preview}" if preview else "")
+                            )
+                            _write_llm_trace(
+                                label="Options A-C batch",
+                                prompt=prompt,
+                                output=text or "",
+                                error=err,
+                                model=model_name,
+                                duration_ms=int((time.time() - started) * 1000),
+                            )
+                            return {}, err
+                        finalized = {
+                            filename: _finalize_llm_html(html)
+                            for filename, html in parsed.items()
+                        }
+                        _write_llm_trace(
+                            label="Options A-C batch",
+                            prompt=prompt,
+                            output=text or "",
+                            model=model_name,
+                            duration_ms=int((time.time() - started) * 1000),
+                        )
+                        return finalized, None
+                    except Exception as exc:
+                        err = _compact_llm_error(str(exc))
+                        _write_llm_trace(
+                            label="Options A-C batch",
+                            prompt=prompt,
+                            error=err,
+                            model=model_name,
+                            duration_ms=int((time.time() - started) * 1000),
+                        )
+                        return {}, err
 
                 def _llm_option_variants(
                     scope: str, focus_text: str, ui_type: str
@@ -1561,29 +1903,42 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                         goal_focus,
                         str(ui_profile.get("ui_type") or "web"),
                     )
+                    label_by_file = {
+                        filename: label for filename, label, _note in option_variants
+                    }
 
-                    def _generate_option(filename: str, label: str, variant_note: str):
-                        prompt = _build_llm_prompt(variant_note=variant_note)
-                        html, err = _call_llm(prompt)
-                        return filename, label, html, err
+                    def _write_option_files(batch: dict[str, str]) -> list[str]:
+                        written: list[str] = []
+                        for filename, html in batch.items():
+                            (DIRECTORY / filename).write_text(html, encoding="utf-8")
+                            written.append(label_by_file.get(filename, filename))
+                        return written
 
-                    with ThreadPoolExecutor(max_workers=len(option_variants)) as pool:
-                        futures = [
-                            pool.submit(_generate_option, filename, label, variant_note)
-                            for filename, label, variant_note in option_variants
-                        ]
-                        for future in as_completed(futures):
-                            filename, label, html, err = future.result()
-                            if html:
-                                (DIRECTORY / filename).write_text(html, encoding="utf-8")
-                                options_written.append(label)
-                            elif not llm_error:
-                                llm_error = err
-                    if options_written:
-                        status_msg = 'proposed_options_by_llm'
-                        llm_error = None
+                    if OPTION_GENERATION_MODE in {"batch", "single", "1"}:
+                        batch_html, batch_err = _call_llm_batch_options(option_variants)
+                        if not batch_html:
+                            batch_html, batch_err = _call_llm_batch_options(option_variants)
+                        options_written = _write_option_files(batch_html)
+                        if options_written:
+                            status_msg = 'proposed_options_by_llm'
+                            llm_error = None
+                        else:
+                            parallel_html, parallel_err = _generate_parallel_options(option_variants)
+                            options_written = _write_option_files(parallel_html)
+                            if options_written:
+                                status_msg = 'proposed_options_by_llm'
+                                llm_error = None
+                            else:
+                                llm_error = parallel_err or batch_err
+                                status_msg = f'llm_failed: {llm_error or "No option HTML generated"}'
                     else:
-                        status_msg = f'llm_failed: {llm_error or "No option HTML generated"}'
+                        parallel_html, parallel_err = _generate_parallel_options(option_variants)
+                        options_written = _write_option_files(parallel_html)
+                        if options_written:
+                            status_msg = 'proposed_options_by_llm'
+                            llm_error = None
+                        else:
+                            status_msg = f'llm_failed: {parallel_err or "No option HTML generated"}'
                 else:
                     iteration_mode = "active_workspace"
                     if delete_els:
@@ -1593,7 +1948,10 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                         status_msg = 'evolved_by_spatial_patch'
                         llm_error = None
                     else:
-                        evolved_html, llm_error = _call_llm(_build_llm_prompt())
+                        evolved_html, llm_error = _call_llm(
+                            _build_llm_prompt(),
+                            trace_label="active workspace",
+                        )
                         if evolved_html:
                             stage_file.write_text(evolved_html, encoding="utf-8")
                             status_msg = 'evolved_by_llm'

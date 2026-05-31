@@ -200,6 +200,111 @@
             background: radial-gradient(ellipse at top, rgba(34, 197, 94, 0.06), transparent 55%), #090d16;
         }
         .services-shell[hidden] { display: none !important; }
+        .llm-shell {
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+            padding: 18px 22px 24px;
+            background: #080c14;
+            display: grid;
+            grid-template-columns: minmax(260px, 28vw) 1fr;
+            gap: 14px;
+        }
+        .llm-shell[hidden] { display: none !important; }
+        .llm-trace-list {
+            min-height: 0;
+            overflow: auto;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            background: rgba(15, 23, 42, 0.78);
+        }
+        .llm-trace-item {
+            width: 100%;
+            display: block;
+            text-align: left;
+            padding: 10px 12px;
+            border: 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            background: transparent;
+            color: #dbeafe;
+            cursor: pointer;
+            font: inherit;
+        }
+        .llm-trace-item:hover,
+        .llm-trace-item.active { background: rgba(56, 189, 248, 0.12); }
+        .llm-trace-item strong {
+            display: block;
+            font-size: 0.78rem;
+            color: #7dd3fc;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .llm-trace-item span {
+            display: block;
+            margin-top: 4px;
+            color: #94a3b8;
+            font-size: 0.68rem;
+            line-height: 1.35;
+        }
+        .llm-trace-view {
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .llm-trace-toolbar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .llm-trace-toolbar p {
+            margin: 0;
+            flex: 1;
+            color: #94a3b8;
+            font-size: 0.82rem;
+        }
+        .llm-trace-md {
+            flex: 1;
+            min-height: 0;
+            overflow: auto;
+            border: 1px solid rgba(56, 189, 248, 0.18);
+            border-radius: 8px;
+            padding: 14px 16px;
+            background: #020617;
+            color: #dbeafe;
+            font-size: 0.82rem;
+            line-height: 1.55;
+        }
+        .llm-trace-md h1, .llm-trace-md h2, .llm-trace-md h3 {
+            color: #7dd3fc;
+            margin: 0.8em 0 0.35em;
+            font-size: 1rem;
+        }
+        .llm-trace-md h1 { font-size: 1.1rem; }
+        .llm-trace-md p, .llm-trace-md ul { margin: 0.45em 0; color: #cbd5e1; }
+        .llm-trace-md li { margin: 0.2em 0; }
+        .llm-trace-md code {
+            font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+            font-size: 0.76rem;
+            background: rgba(15, 23, 42, 0.9);
+            padding: 0.1em 0.35em;
+            border-radius: 4px;
+        }
+        .llm-trace-md pre {
+            margin: 0.55em 0;
+            padding: 10px 12px;
+            overflow: auto;
+            border-radius: 6px;
+            background: #0f172a;
+            border: 1px solid rgba(255,255,255,0.08);
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+            font-size: 0.74rem;
+            line-height: 1.45;
+        }
+        .llm-trace-md pre code { background: transparent; padding: 0; }
         .services-toolbar {
             display: flex;
             flex-wrap: wrap;
@@ -886,6 +991,22 @@
         .intract-policy-panel.collapsed .intract-policy-actions,
         .intract-policy-panel.collapsed .intract-policy-meta { display: none; }
         .btn-action:disabled { opacity: 0.45; cursor: not-allowed; }
+        .server-offline-banner {
+            flex-shrink: 0;
+            padding: 10px 30px;
+            background: rgba(127, 29, 29, 0.92);
+            border-bottom: 1px solid rgba(248, 113, 113, 0.45);
+            color: #fecaca;
+            font-size: 0.85rem;
+            line-height: 1.45;
+        }
+        .server-offline-banner code {
+            background: rgba(0, 0, 0, 0.25);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+        }
         @media (max-width: 1280px) {
             .main-container {
                 grid-template-columns: minmax(500px, 1fr) minmax(280px, 25vw) minmax(300px, 27vw);
@@ -900,12 +1021,14 @@
 </head>
 <body>
     <div id="toast" class="toast-notification">📋 JSON copied to clipboard!</div>
+    <div id="server-offline-banner" class="server-offline-banner" hidden></div>
     <div class="header">
         <div class="header-left">
             <h1>🎬 Nexu</h1>
             <div class="header-tabs" role="tablist">
                 <button type="button" class="header-tab active" id="tab-projects" data-tab="projects" onclick="switchMainTab('projects')">Projects</button>
                 <button type="button" class="header-tab" id="tab-editor" data-tab="editor" onclick="switchMainTab('editor')" disabled title="Pick a project to open the editor">Editor</button>
+                <button type="button" class="header-tab" id="tab-llm" data-tab="llm" onclick="switchMainTab('llm')">LLM</button>
                 <button type="button" class="header-tab" id="tab-services" data-tab="services" onclick="switchMainTab('services')">Services</button>
             </div>
         </div>
@@ -953,13 +1076,26 @@
         </div>
     </div>
 
+    <div id="llm-shell" class="llm-shell" hidden>
+        <div class="llm-trace-list" id="llm-trace-list">
+            <div class="services-empty">No LLM traces yet.</div>
+        </div>
+        <div class="llm-trace-view">
+            <div class="llm-trace-toolbar">
+                <p>Prompt and response markdown exchanged between Nexu and the configured LLM.</p>
+                <button type="button" class="btn btn-service" onclick="loadLlmTraces()">↻ Refresh</button>
+            </div>
+            <div class="llm-trace-md" id="llm-trace-md">Run Refresh Options A–C to capture the next LLM exchange.</div>
+        </div>
+    </div>
+
     <div id="editor-app-shell" class="editor-app-shell" hidden>
     <div class="workflow-guide" id="workflow-guide">
         <div class="wf-step active" id="wf-step-1"><strong>1. Goal or marks</strong>Set project goal (yellow) or mark elements (purple hints).</div>
-        <div class="wf-step" id="wf-step-2"><strong>2. Options A–C</strong>Refreshed live after each change — workspace unchanged.</div>
+        <div class="wf-step" id="wf-step-2"><strong>2. Options A–C</strong>Updated by iteration after each goal/mark change — workspace unchanged.</div>
         <div class="wf-step" id="wf-step-3"><strong>3. Promote</strong>Click A, B, or C → refine with more marks or goals.</div>
     </div>
-    <div class="workflow-hint" id="workflow-hint">Each goal or mark sends feedback to AI and updates Options A–C within a moment.</div>
+    <div class="workflow-hint" id="workflow-hint">Each goal or mark sends feedback to AI and triggers iteration for Options A–C.</div>
     
     <div class="workspace-shell">
     <div class="main-container">
@@ -1026,7 +1162,7 @@
         <div class="side-panel">
             <div class="side-header">💬 Live Chat & Automated Logs</div>
             <div class="chat-logs" id="chat-logs">
-                <div class="chat-msg system"><strong>System:</strong> Set a <strong>project goal</strong> (yellow) or mark workspace elements (purple hints) — <strong>Options A–C</strong> refresh automatically.</div>
+                <div class="chat-msg system"><strong>System:</strong> Set a <strong>project goal</strong> (yellow) or mark workspace elements (purple hints) — then run iteration to refresh <strong>Options A–C</strong>.</div>
             </div>
 
             <div class="side-header">1. Project goal</div>
@@ -1221,6 +1357,111 @@
                 });
         }
 
+        let selectedLlmTraceId = '';
+
+        function escapeHtml(text) {
+            return String(text || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function renderTraceMarkdown(text) {
+            const src = String(text || '');
+            const parts = src.split(/(```[\s\S]*?```)/g);
+            return parts.map(part => {
+                if (part.startsWith('```') && part.endsWith('```')) {
+                    const inner = part.slice(3, -3).replace(/^\w*\n?/, '');
+                    return '<pre><code>' + escapeHtml(inner.trim()) + '</code></pre>';
+                }
+                return escapeHtml(part)
+                    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+                    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+                    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+                    .replace(/^- (.+)$/gm, '<li>$1</li>')
+                    .replace(/(<li>[\s\S]*?<\/li>)/g, block => '<ul>' + block + '</ul>')
+                    .replace(/`([^`\n]+)`/g, '<code>$1</code>')
+                    .replace(/\n\n+/g, '</p><p>')
+                    .replace(/^(.+)$/gm, (line) => {
+                        if (/^<(h[123]|ul|pre)/.test(line)) return line;
+                        return line ? '<p>' + line + '</p>' : '';
+                    });
+            }).join('');
+        }
+
+        function setLlmTraceMarkdown(text) {
+            const out = document.getElementById('llm-trace-md');
+            if (!out) return;
+            if (!text) {
+                out.textContent = '(empty trace)';
+                return;
+            }
+            out.innerHTML = renderTraceMarkdown(text);
+        }
+
+        function loadLlmTraces() {
+            const list = document.getElementById('llm-trace-list');
+            if (list) {
+                list.innerHTML = '<div class="services-empty">Loading LLM traces…</div>';
+            }
+            fetch('/llm/traces')
+                .then(res => {
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    return res.json();
+                })
+                .then(data => {
+                    const traces = Array.isArray(data.traces) ? data.traces : [];
+                    renderLlmTraceList(traces);
+                    if (traces.length && !selectedLlmTraceId) {
+                        loadLlmTrace(traces[0].id);
+                    }
+                })
+                .catch(err => {
+                    if (list) {
+                        list.innerHTML = `<div class="services-empty">Could not load traces: ${err.message}</div>`;
+                    }
+                });
+        }
+
+        function renderLlmTraceList(traces) {
+            const list = document.getElementById('llm-trace-list');
+            if (!list) return;
+            if (!traces.length) {
+                list.innerHTML = '<div class="services-empty">No LLM traces yet.</div>';
+                return;
+            }
+            list.innerHTML = traces.map(t => {
+                const active = t.id === selectedLlmTraceId ? ' active' : '';
+                const status = t.status === 'error' ? 'error' : 'ok';
+                const ms = t.duration_ms != null ? `${t.duration_ms} ms` : '? ms';
+                const size = `${t.prompt_chars || 0} → ${t.output_chars || 0} chars`;
+                return `
+                    <button type="button" class="llm-trace-item${active}" onclick="loadLlmTrace('${t.id}')">
+                        <strong>${t.label || t.id}</strong>
+                        <span>${status} · ${ms}<br>${size}<br>${t.model || ''}</span>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function loadLlmTrace(traceId) {
+            selectedLlmTraceId = traceId;
+            setLlmTraceMarkdown('Loading trace…');
+            fetch('/llm/trace?id=' + encodeURIComponent(traceId))
+                .then(res => {
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    return res.json();
+                })
+                .then(data => {
+                    setLlmTraceMarkdown(data.markdown || data.error || '(empty trace)');
+                    loadLlmTraces();
+                })
+                .catch(err => {
+                    setLlmTraceMarkdown('Could not load trace: ' + err.message);
+                });
+        }
+
         function calcEnabledForProject() {
             const proj = activeProjectRecord();
             if (!proj) return 0;
@@ -1355,12 +1596,15 @@
             const projectsShell = document.getElementById('projects-shell');
             const editorShell = document.getElementById('editor-app-shell');
             const servicesShell = document.getElementById('services-shell');
+            const llmShell = document.getElementById('llm-shell');
             const editorControls = document.getElementById('editor-header-controls');
             document.getElementById('tab-projects').classList.toggle('active', tab === 'projects');
             document.getElementById('tab-editor').classList.toggle('active', tab === 'editor');
+            document.getElementById('tab-llm').classList.toggle('active', tab === 'llm');
             document.getElementById('tab-services').classList.toggle('active', tab === 'services');
             if (projectsShell) projectsShell.hidden = tab !== 'projects';
             if (editorShell) editorShell.hidden = tab !== 'editor';
+            if (llmShell) llmShell.hidden = tab !== 'llm';
             if (servicesShell) servicesShell.hidden = tab !== 'services';
             if (editorControls) editorControls.hidden = tab !== 'editor';
             if (tab === 'projects') updateProjectActiveBar();
@@ -1370,6 +1614,7 @@
                 reloadCinemaFrames();
                 syncReviewModeToFrames();
             }
+            if (tab === 'llm') loadLlmTraces();
             if (tab === 'services') loadServicesCatalog();
             if (!options.skipLog) {
                 logEvent('MAIN_TAB', { tab: tab });
@@ -1387,6 +1632,55 @@
             if (goalEl && goalEl.value.trim()) return goalEl.value.trim();
             const proj = activeProjectRecord();
             return (proj && proj.subtitle) ? proj.subtitle : '';
+        }
+
+        function ledgerGoalFromPolicy(data) {
+            const ledger = Array.isArray(data?.ledger) ? data.ledger : [];
+            for (let i = ledger.length - 1; i >= 0; i--) {
+                const entry = ledger[i];
+                if (entry && entry.status === 'goal_defined' && entry.user_goal) {
+                    return String(entry.user_goal).trim();
+                }
+            }
+            return '';
+        }
+
+        function ledgerHasEffectiveUi(data) {
+            const eff = data?.effective_ui || {};
+            return Boolean((eff.keep || []).length || (eff.delete || []).length);
+        }
+
+        function syncGoalFromLedger(data) {
+            if (projectGoal) return;
+            const fromLedger = ledgerGoalFromPolicy(data);
+            if (!fromLedger) return;
+            projectGoal = fromLedger;
+            const goalEl = document.getElementById('goal-input');
+            if (goalEl && !goalEl.value.trim()) goalEl.value = fromLedger;
+        }
+
+        function hasIterationContext() {
+            if (projectGoal || elementHints.length > 0 || annotations.length > 0) return true;
+            if (pendingGoalOptions) return true;
+            if (currentUserGoal()) return true;
+            if (ledgerHasEffectiveUi(intractPolicyData)) return true;
+            if (ledgerGoalFromPolicy(intractPolicyData)) return true;
+            return false;
+        }
+
+        function updateServerOfflineBanner(offline) {
+            const banner = document.getElementById('server-offline-banner');
+            if (!banner) return;
+            if (!offline) {
+                banner.hidden = true;
+                return;
+            }
+            const port = location.port || (location.protocol === 'https:' ? '443' : '80');
+            banner.hidden = false;
+            banner.innerHTML =
+                'Editor server unreachable at <strong>' + location.hostname + ':' + port + '</strong>. '
+                + 'This tab may use a stale port — run <code>make cinema-stop && make cinema</code> '
+                + 'and open the new URL from the terminal, then reload.';
         }
 
         function focusScopeRecord() {
@@ -1792,13 +2086,15 @@
                 .then(res => {
                     if (!res.ok) throw new Error('health ' + res.status);
                     cinemaServerOnline = true;
+                    updateServerOfflineBanner(false);
                     flushPendingLogEvents();
                     return res.json();
                 })
                 .catch(() => {
                     cinemaServerOnline = false;
+                    updateServerOfflineBanner(true);
                     if (!silent) {
-                        addChatLog('system', '⚠️ <strong>Editor server offline.</strong> In terminal: <code>make cinema-stop && make cinema</code>, then reload this page.');
+                        addChatLog('system', '⚠️ <strong>Editor server offline.</strong> In terminal: <code>make cinema-stop && make cinema</code>, then open the new URL from the log.');
                     }
                     throw new Error('server offline');
                 });
@@ -1938,7 +2234,10 @@
                 })
                 .then(data => {
                     intractPolicyData = data;
+                    syncGoalFromLedger(data);
                     renderIntractPolicy(data);
+                    updateWorkflowUI();
+                    updatePromptBox();
                 })
                 .catch(err => {
                     const body = document.getElementById('intract-policy-body');
@@ -2201,7 +2500,7 @@
                 if (hintEl) {
                     hintEl.textContent = isIterating
                         ? 'Sending project goal and element hints to AI…'
-                        : 'Options A–C update after each goal (yellow) or element hint (purple). Promote one to change the workspace.';
+                        : 'Run iteration after each goal (yellow) or element hint (purple) to update Options A–C. Promote one to change the workspace.';
                 }
             } else {
                 document.getElementById('wf-step-1')?.classList.add('active');
@@ -2210,7 +2509,13 @@
                     btn.innerText = isIterating ? '⏳ Working…' : 'Set a goal or mark elements to start';
                 }
                 if (hintEl) {
-                    hintEl.textContent = 'Set a project goal (Enter) or mark workspace elements to start live options.';
+                    if (ledgerHasEffectiveUi(intractPolicyData) && !projectGoal && !currentUserGoal()) {
+                        hintEl.textContent = 'Ledger has KEEP/DELETE marks — press Enter in the yellow goal field or click Refresh Options to continue.';
+                    } else if (currentUserGoal() && !projectGoal) {
+                        hintEl.textContent = 'Goal typed but not committed — press Enter in the yellow field, then refresh Options A–C.';
+                    } else {
+                        hintEl.textContent = 'Set a project goal (Enter) or mark workspace elements to start live options.';
+                    }
                 }
             }
         }
@@ -2232,9 +2537,7 @@
         }
 
         function resolveIterationMode() {
-            if (projectGoal || elementHints.length > 0 || annotations.length > 0) return 'goal_options';
-            if (pendingGoalOptions) return 'goal_options';
-            return 'none';
+            return hasIterationContext() ? 'goal_options' : 'none';
         }
 
         function setProjectGoal() {
@@ -2521,7 +2824,11 @@
                 }
             } else {
                 if (!opts.auto) {
-                    addChatLog('system', '⚠️ <strong>Add a goal, or mark buttons on the workspace.</strong>');
+                    if (currentUserGoal() && !projectGoal) {
+                        addChatLog('system', '⚠️ <strong>Press Enter in the yellow goal field</strong> to commit your goal, or refresh when ledger marks are present.');
+                    } else {
+                        addChatLog('system', '⚠️ <strong>Add a goal, or mark buttons on the workspace.</strong>');
+                    }
                 }
                 isIterating = false;
                 updateWorkflowUI();
@@ -2898,6 +3205,8 @@
         document.addEventListener('DOMContentLoaded', () => {
             switchMainTab(mainTab, { skipLog: true });
             refreshLlmStatus();
+            loadLlmTraces();
+            pingCinemaServer(true).catch(() => {});
             updateWorkflowUI();
             const goalInput = document.getElementById('goal-input');
             if (goalInput) {

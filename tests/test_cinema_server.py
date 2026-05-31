@@ -3,6 +3,9 @@ from pathlib import Path
 
 from nexu.cinema import _cinema_template_text, _render_cinema_template, write_cinema_nexu_hooks
 from nexu.cinema_server import _render_server_script, start_cinema_player_server
+from nexu.config import CinemaConfig, LLMConfig
+
+CINEMA_LLM_MODEL = "openrouter/deepseek/deepseek-v4-pro"
 
 
 @dataclass
@@ -17,6 +20,7 @@ def test_render_server_script_embeds_runtime_context() -> None:
         Path("/tmp/workspace"),
         "demo",
         _LLMConfig(),
+        CinemaConfig(),
         "/usr/bin/python3",
     )
 
@@ -34,6 +38,19 @@ def test_render_server_script_embeds_runtime_context() -> None:
     assert "Markpact context pack" in script
     assert "_mp_payload = nexu_hooks.export_markpact_readme" in script
     assert "has_terminal_artifacts" in script
+    assert "_compact_html_for_llm" in script
+    assert "_compact_markpact_for_llm" in script
+    assert "omitted from Markpact context" in script
+    assert "DEFAULT_MARKPACT_CONTEXT_MODE" in script
+    assert "DEFAULT_MARKPACT_CONTEXT_CHARS" in script
+    assert "DEFAULT_HTML_CONTEXT_CHARS" in script
+    assert "DEFAULT_LLM_TRACE_KEEP" in script
+    assert "OPTION_GENERATION_MODE" in script
+    assert "_call_llm_batch_options" in script
+    assert "_generate_parallel_options" in script
+    assert 'OPTION_GENERATION_MODE in {"batch", "single", "1"}' in script
+    assert "parse_batch_alt_options" in script
+    assert "from nexu.cinema_traces import write_llm_trace" in script
     assert "ThreadPoolExecutor" in script
     assert '"llx"' not in script
     assert "proposed_options_offline" not in script
@@ -42,9 +59,31 @@ def test_render_server_script_embeds_runtime_context() -> None:
     assert "def _llm_network_allowed()" in script
     assert "def _llm_status_payload()" in script
     assert '"/llm/status"' in script
+    assert '"/llm/traces"' in script
+    assert '"/llm/trace"' in script
+    assert "LLM_TRACE_DIR" in script
+    assert '"cinema": {' in script
     assert "_cached_config(ROOT_PATH).llm.allow_network_calls" in script
     assert "API_KEY_ENV = 'OPENROUTER_API_KEY'" in script
     assert "DEFAULT_MODEL = 'test-model'" in script
+
+
+def test_render_server_script_embeds_openrouter_model() -> None:
+    llm = LLMConfig(
+        provider="openrouter",
+        model=CINEMA_LLM_MODEL,
+        allow_network_calls=True,
+    )
+    script = _render_server_script(
+        Path("/tmp/workspace"),
+        "demo",
+        llm,
+        CinemaConfig(),
+        "/usr/bin/python3",
+    )
+
+    assert f"DEFAULT_MODEL = '{CINEMA_LLM_MODEL}'" in script
+    assert 'os.environ.get("LLM_MODEL")' in script
 
 
 def test_write_cinema_nexu_hooks_uses_template(tmp_path: Path) -> None:
@@ -83,9 +122,18 @@ def test_cinema_player_template_is_externalized() -> None:
     assert "offline templates" not in html
     assert 'id="llm-status-badge"' in html
     assert "refreshLlmStatus" in html
+    assert 'id="tab-llm"' in html
+    assert 'id="llm-shell"' in html
+    assert "loadLlmTraces" in html
+    assert "renderTraceMarkdown" in html
     assert "user_goal" in html
     assert "active_example_project" in html
     assert "goal_bootstrap" in html
+    assert "hasIterationContext" in html
+    assert "ledgerGoalFromPolicy" in html
+    assert "syncGoalFromLedger" in html
+    assert "server-offline-banner" in html
+    assert "updateServerOfflineBanner" in html
 
 
 def test_start_cinema_player_server_returns_url_without_opening(

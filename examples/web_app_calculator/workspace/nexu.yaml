@@ -19,6 +19,14 @@ llm:
   api_key_env: OPENROUTER_API_KEY
   temperature: 0.1
   allow_network_calls: true
+cinema:
+  # Live Cinema /iterate tuning (overridable via CINEMA_* env vars)
+  markpact_context_chars: 4000   # max Markpact markdown in LLM prompt (summary mode)
+  markpact_context_mode: summary # summary | full | off
+  html_context_chars: 8000       # max current stage HTML in prompt
+  max_tokens: 4096               # per-call output cap (batch uses max(..., 8192))
+  option_generation_mode: batch  # batch (1 call for A-C) | parallel (3 calls)
+  llm_trace_keep: 80             # retained exchanges in LLM debug tab
 orchestration:
   default_steps: 10
   llm_mode: offline

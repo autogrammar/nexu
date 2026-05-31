@@ -73,7 +73,7 @@ result = activate_example_project(
 )
 assert result["status"] == "project_activated"
 assert result.get("ledger_reset") is True
-assert result["goal_bootstrap"]["status"] == "goal_options_seeded"
+assert result["goal_bootstrap"]["status"] == "requires_llm"
 assert option_previews_are_distinct(cinema)
 html = (cinema / "alt_a.html").read_text(encoding="utf-8").lower()
 assert "calc-body" not in html

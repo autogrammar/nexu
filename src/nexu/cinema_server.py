@@ -16,7 +16,13 @@ def _template_text() -> str:
     return files("nexu").joinpath(_SERVER_TEMPLATE).read_text(encoding="utf-8")
 
 
-def _render_server_script(root: Path, name: str, llm_config: object, python_executable: str) -> str:
+def _render_server_script(
+    root: Path,
+    name: str,
+    llm_config: object,
+    cinema_config: object,
+    python_executable: str,
+) -> str:
     return Template(_template_text()).substitute(
         WORKSPACE_PATH=repr(str(root.absolute())),
         CAPSULE_NAME=repr(name),
@@ -25,6 +31,12 @@ def _render_server_script(root: Path, name: str, llm_config: object, python_exec
         ALLOW_NETWORK_CALLS=repr(llm_config.allow_network_calls),
         API_KEY_ENV=repr(llm_config.api_key_env),
         DEFAULT_MODEL=repr(llm_config.model),
+        CINEMA_MARKPACT_CONTEXT_CHARS=repr(int(cinema_config.markpact_context_chars)),
+        CINEMA_MARKPACT_CONTEXT_MODE=repr(str(cinema_config.markpact_context_mode)),
+        CINEMA_HTML_CONTEXT_CHARS=repr(int(cinema_config.html_context_chars)),
+        CINEMA_MAX_TOKENS=repr(int(cinema_config.max_tokens)),
+        CINEMA_OPTION_GENERATION_MODE=repr(str(cinema_config.option_generation_mode)),
+        CINEMA_LLM_TRACE_KEEP=repr(int(cinema_config.llm_trace_keep)),
     )
 
 
@@ -72,14 +84,20 @@ def _available_port(directory: Path, python_executable: str) -> int:
 def start_persistent_http_server(directory: Path, root: Path, name: str) -> int:
     """Start a persistent custom background HTTP server for Cinema."""
     load_env_files(root)
-    llm_config = load_config(root).llm
+    config = load_config(root)
 
     if not _litellm_available(sys.executable):
         raise RuntimeError(
             "Cinema live iteration requires litellm. From the nexu repo run: uv sync"
         )
 
-    server_script = _render_server_script(root, name, llm_config, sys.executable)
+    server_script = _render_server_script(
+        root,
+        name,
+        config.llm,
+        config.cinema,
+        sys.executable,
+    )
     (directory / "server.py").write_text(server_script, encoding="utf-8")
     return _available_port(directory, sys.executable)
 

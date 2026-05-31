@@ -84,9 +84,12 @@ Open the URL printed in logs (`Live HTTP Server started for Nexu: http://127.0.0
 
 Live workflow:
 
-1. Add a goal and generate **Options A-C**.
+1. Add a goal, then run iteration to generate **Options A-C**.
 2. Compare options while the workspace stays unchanged.
 3. Promote one option to workspace, then mark buttons (left drag = keep, right drag = remove) and apply marks.
+
+When activating catalog projects, `goal_bootstrap.status` is `requires_llm`: goal contracts are
+seeded immediately, while option generation happens in the next LLM iteration.
 
 Bottom row panels:
 

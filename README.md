@@ -8,11 +8,11 @@ Evolution in scope: functions
 
 ## AI Cost Tracking
 
-![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.5.19-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
-![AI Cost](https://img.shields.io/badge/AI%20Cost-$4.01-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-11.1h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
+![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.5.20-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
+![AI Cost](https://img.shields.io/badge/AI%20Cost-$4.33-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-11.6h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
 
-- 🤖 **LLM usage:** $4.0098 (26 commits)
-- 👤 **Human dev:** ~$1110 (11.1h @ $100/h, 30min dedup)
+- 🤖 **LLM usage:** $4.3303 (27 commits)
+- 👤 **Human dev:** ~$1160 (11.6h @ $100/h, 30min dedup)
 
 Generated on 2026-05-31 using [openrouter/qwen/qwen3-coder-next](https://openrouter.ai/qwen/qwen3-coder-next)
 
@@ -238,6 +238,8 @@ without restarting the server:
    `http://127.0.0.1:<port>/cinema_player.html?project=backend_service`
 2. Activation resets the policy ledger for the previous example, seeds goal contracts from the
    project subtitle, and rebuilds **distinct** Options A–C from that project's stages.
+   In the activation response, `goal_bootstrap.status` is `requires_llm` (goal contracts are ready,
+   option generation is deferred to the LLM iteration step).
 3. Mark elements on the **workspace** frame (drag or review mode), then iterate or promote.
 
 The Intract panel shows **Active example (Cinema UI)** separately from the frozen capsule

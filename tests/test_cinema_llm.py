@@ -1,10 +1,15 @@
 from pathlib import Path
 
 from nexu.cinema_llm import (
+    _extract_content,
     call_cinema_html_llm,
+    call_cinema_text_llm,
     compact_llm_error,
     extract_html_document,
     has_terminal_artifacts,
+    looks_like_html_document,
+    normalize_html_document,
+    parse_batch_alt_options,
 )
 
 
@@ -25,9 +30,74 @@ def test_extract_html_document_strips_rich_terminal_frame() -> None:
     assert "ok" in html
 
 
+def test_normalize_html_document_without_doctype() -> None:
+    raw = "Here is the UI:\n<html><head><title>x</title></head><body>ok</body></html>"
+    html = normalize_html_document(raw)
+    assert html.startswith("<!DOCTYPE html>")
+    assert "ok" in html
+
+
+def test_normalize_html_document_closes_partial_html() -> None:
+    raw = "<html><body><div>partial</div>"
+    html = normalize_html_document(raw)
+    assert looks_like_html_document(html)
+    assert html.lower().endswith("</html>")
+
+
+def test_parse_batch_alt_options_flexible_markers() -> None:
+    batch = (
+        "<!-- NEXU_ALT_A -->\n"
+        "<html><body>A</body></html>\n"
+        "<!-- NEXU_ALT_B -->\n"
+        "```html\n<html><body>B</body></html>\n```\n"
+        "<!-- NEXU_ALT_C -->\n"
+        "<!DOCTYPE html><html><body>C</body></html>"
+    )
+    parsed = parse_batch_alt_options(batch)
+    assert set(parsed.keys()) == {"alt_a.html", "alt_b.html", "alt_c.html"}
+    assert "A" in parsed["alt_a.html"]
+    assert "B" in parsed["alt_b.html"]
+    assert "C" in parsed["alt_c.html"]
+
+
+def test_call_cinema_html_llm_accepts_html_without_doctype(monkeypatch, tmp_path: Path) -> None:
+    (tmp_path / "nexu.yaml").write_text(
+        "version: nexu.v1\nllm:\n  allow_network_calls: true\n  provider: openrouter\n"
+        "  model: test/model\n  api_key_env: TEST_CINEMA_KEY\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("TEST_CINEMA_KEY", "secret")
+
+    def fake_completion(**kwargs):
+        return {"choices": [{"message": {"content": "<html><body>no doctype</body></html>"}}]}
+
+    monkeypatch.setattr("nexu.cinema_llm._litellm_completion", lambda: fake_completion)
+    html, err = call_cinema_html_llm("evolve this", tmp_path)
+    assert err is None
+    assert html and "no doctype" in html
+    assert html.startswith("<!DOCTYPE html>")
+
+
 def test_has_terminal_artifacts_detects_box_drawing() -> None:
     assert has_terminal_artifacts("│ <!DOCTYPE html>")
     assert not has_terminal_artifacts("<!DOCTYPE html><html></html>")
+
+
+def test_extract_content_supports_choice_text_fallback() -> None:
+    response = {"choices": [{"text": "<!DOCTYPE html><html></html>"}]}
+    assert _extract_content(response).startswith("<!DOCTYPE")
+
+
+def test_extract_content_error_includes_response_shape() -> None:
+    response = {"choices": [{"finish_reason": "length", "message": {"content": None}}]}
+    try:
+        _extract_content(response)
+    except RuntimeError as exc:
+        msg = str(exc)
+    else:
+        raise AssertionError("expected RuntimeError")
+    assert "finish_reason=length" in msg
+    assert "shape=" in msg
 
 
 def test_compact_llm_error_openrouter_payload() -> None:
@@ -85,3 +155,67 @@ def test_call_cinema_html_llm_uses_litellm(monkeypatch, tmp_path: Path) -> None:
     assert captured["model"] == "test/model"
     assert captured["api_key"] == "secret"
     assert captured["api_base"] == "https://openrouter.ai/api/v1"
+
+
+def test_call_cinema_html_llm_uses_nexu_yaml_default_model(monkeypatch, tmp_path: Path) -> None:
+    (tmp_path / "nexu.yaml").write_text(
+        "version: nexu.v1\nllm:\n  allow_network_calls: true\n  provider: openrouter\n"
+        "  model: openrouter/deepseek/deepseek-v4-pro\n  api_key_env: TEST_CINEMA_KEY\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("TEST_CINEMA_KEY", "secret")
+
+    captured: dict = {}
+
+    def fake_completion(**kwargs):
+        captured.update(kwargs)
+        return {
+            "choices": [
+                {
+                    "message": {
+                        "content": "<!DOCTYPE html><html><body>done</body></html>",
+                    }
+                }
+            ]
+        }
+
+    monkeypatch.setattr("nexu.cinema_llm._litellm_completion", lambda: fake_completion)
+    html, err = call_cinema_html_llm("evolve this", tmp_path)
+    assert err is None
+    assert html and "done" in html
+    assert captured["model"] == "openrouter/deepseek/deepseek-v4-pro"
+
+
+def test_call_cinema_text_llm_returns_raw_content(monkeypatch, tmp_path: Path) -> None:
+    (tmp_path / "nexu.yaml").write_text(
+        "version: nexu.v1\nllm:\n  allow_network_calls: true\n  provider: openrouter\n"
+        "  model: test/model\n  api_key_env: TEST_CINEMA_KEY\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("TEST_CINEMA_KEY", "secret")
+
+    def fake_completion(**kwargs):
+        return {"choices": [{"message": {"content": "raw response"}}]}
+
+    monkeypatch.setattr("nexu.cinema_llm._litellm_completion", lambda: fake_completion)
+    text, err = call_cinema_text_llm("prompt", tmp_path)
+    assert err is None
+    assert text == "raw response"
+
+
+def test_call_cinema_html_llm_error_includes_non_html_preview(monkeypatch, tmp_path: Path) -> None:
+    (tmp_path / "nexu.yaml").write_text(
+        "version: nexu.v1\nllm:\n  allow_network_calls: true\n  provider: openrouter\n"
+        "  model: test/model\n  api_key_env: TEST_CINEMA_KEY\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("TEST_CINEMA_KEY", "secret")
+
+    def fake_completion(**kwargs):
+        return {"choices": [{"message": {"content": "I cannot produce HTML today."}}]}
+
+    monkeypatch.setattr("nexu.cinema_llm._litellm_completion", lambda: fake_completion)
+    html, err = call_cinema_html_llm("evolve this", tmp_path)
+    assert html is None
+    assert err
+    assert "response_preview=I cannot produce HTML today." in err

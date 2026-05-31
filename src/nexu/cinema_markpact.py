@@ -54,7 +54,15 @@ def _project_context_block(workspace_root: Path | None, *, max_chars: int = 3000
             continue
         rel = path.relative_to(root)
         parts = set(rel.parts)
-        if parts & {".git", ".venv", "venv", "__pycache__", ".pytest_cache", "node_modules"}:
+        if parts & {
+            ".git",
+            ".venv",
+            "venv",
+            "__pycache__",
+            ".pytest_cache",
+            "node_modules",
+            ".nexu",
+        }:
             continue
         if path.name in _CONTEXT_INCLUDE_NAMES or path.suffix.lower() in _CONTEXT_SUFFIXES:
             files.append(path)

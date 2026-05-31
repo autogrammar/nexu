@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 import re
 from pathlib import Path
@@ -33,7 +34,10 @@ def _litellm_completion():
 
 
 def _strip_markdown_fences(text: str) -> str:
-    raw = text.strip()
+    raw = str(text or "").strip()
+    fence_match = re.search(r"```(?:html|HTML)?\s*\n([\s\S]*?)```", raw)
+    if fence_match:
+        return fence_match.group(1).strip()
     if raw.startswith("```"):
         lines = raw.splitlines()
         if lines and lines[0].startswith("```"):
@@ -72,7 +76,25 @@ def has_terminal_artifacts(text: str) -> bool:
     return any(ch in sample for ch in _RICH_BORDER_CHARS)
 
 
-def extract_html_document(text: str) -> str:
+def looks_like_html_document(text: str) -> bool:
+    sample = str(text or "").lstrip()[:4000].lower()
+    return "<html" in sample or "<!doctype" in sample
+
+
+def _ensure_html_document_closure(html: str) -> str:
+    out = str(html or "").strip()
+    lower = out.lower()
+    if "<html" not in lower:
+        return out
+    if "</body>" not in lower:
+        out += "\n</body>"
+    if "</html>" not in lower:
+        out += "\n</html>"
+    return out
+
+
+def normalize_html_document(text: str) -> str:
+    """Extract and normalize one HTML document from LLM output."""
     cleaned = _strip_rich_console_artifacts(_strip_markdown_fences(text))
     match = re.search(r"<!DOCTYPE\s+html[\s\S]*?</html>", cleaned, flags=re.I)
     if match:
@@ -80,21 +102,93 @@ def extract_html_document(text: str) -> str:
     match = re.search(r"<html[\s\S]*?</html>", cleaned, flags=re.I)
     if match:
         return "<!DOCTYPE html>\n" + match.group(0).strip()
+    match = re.search(r"(?:<!DOCTYPE\s+html\s*>)?\s*<html[\s\S]*", cleaned, flags=re.I)
+    if match:
+        partial = _ensure_html_document_closure(match.group(0).strip())
+        if partial.lstrip().upper().startswith("<!DOCTYPE"):
+            return partial
+        return "<!DOCTYPE html>\n" + partial
     return cleaned
 
 
-def _extract_content(response: Any) -> str:
+def extract_html_document(text: str) -> str:
+    return normalize_html_document(text)
+
+
+_BATCH_ALT_FILES = {"A": "alt_a.html", "B": "alt_b.html", "C": "alt_c.html"}
+
+
+def parse_batch_alt_options(text: str) -> dict[str, str]:
+    """Parse NEXU_ALT_A/B/C marked batch LLM output into option filenames."""
+    cleaned = _strip_rich_console_artifacts(text or "")
+    out: dict[str, str] = {}
+    for key, filename in _BATCH_ALT_FILES.items():
+        segment_pattern = (
+            rf"<!--\s*NEXU_ALT_{key}\s*-->\s*"
+            rf"(?P<body>[\s\S]*?)(?=<!--\s*NEXU_ALT_[ABC]\s*-->|$)"
+        )
+        segment_match = re.search(segment_pattern, cleaned, flags=re.I)
+        if not segment_match:
+            strict = re.search(
+                rf"<!--\s*NEXU_ALT_{key}\s*-->\s*"
+                rf"(?P<html><!DOCTYPE\s+html[\s\S]*?</html>)",
+                cleaned,
+                flags=re.I,
+            )
+            if strict:
+                out[filename] = strict.group("html").strip()
+            continue
+        html = normalize_html_document(segment_match.group("body"))
+        if looks_like_html_document(html):
+            if not html.lstrip().upper().startswith("<!DOCTYPE"):
+                html = "<!DOCTYPE html>\n" + html.lstrip()
+            out[filename] = html
+    return out
+
+
+def _as_plain_data(value: Any) -> Any:
+    if isinstance(value, dict):
+        return value
+    for attr in ("model_dump", "dict"):
+        fn = getattr(value, attr, None)
+        if callable(fn):
+            try:
+                return fn()
+            except Exception:
+                pass
+    return value
+
+
+def _lookup(obj: Any, key: str, default: Any = None) -> Any:
+    obj = _as_plain_data(obj)
+    if isinstance(obj, dict):
+        return obj.get(key, default)
+    return getattr(obj, key, default)
+
+
+def _response_shape(response: Any) -> str:
+    data = _as_plain_data(response)
     try:
-        content = response["choices"][0]["message"]["content"]
-        if content is not None:
-            return str(content)
+        text = json.dumps(data, ensure_ascii=False, default=str)
     except Exception:
-        pass
-    choices = getattr(response, "choices", None)
+        text = repr(response)
+    return text[:1200]
+
+
+def _extract_content(response: Any) -> str:
+    data = _as_plain_data(response)
+    choices = _lookup(data, "choices")
     if not choices:
-        raise RuntimeError("LLM response did not contain choices")
-    message = getattr(choices[0], "message", None)
-    content = getattr(message, "content", None) if message is not None else None
+        output_text = _lookup(data, "output_text")
+        if isinstance(output_text, str) and output_text.strip():
+            return output_text
+        raise RuntimeError(
+            "LLM response did not contain choices; shape=" + _response_shape(response)
+        )
+
+    first = _as_plain_data(choices[0])
+    message = _lookup(first, "message", {})
+    content = _lookup(message, "content")
     if isinstance(content, list):
         parts: list[str] = []
         for item in content:
@@ -104,9 +198,22 @@ def _extract_content(response: Any) -> str:
                     parts.append(text)
             elif isinstance(item, str):
                 parts.append(item)
-        return "".join(parts)
-    if content is None:
-        raise RuntimeError("LLM response did not contain message content")
+        joined = "".join(parts)
+        if joined.strip():
+            return joined
+    if isinstance(content, str) and content.strip():
+        return content
+
+    for key in ("text", "reasoning_content", "reasoning", "output_text"):
+        candidate = _lookup(first, key) if key == "text" else _lookup(message, key)
+        if isinstance(candidate, str) and candidate.strip():
+            return candidate
+
+    finish = _lookup(first, "finish_reason", "unknown")
+    raise RuntimeError(
+        "LLM response did not contain message content"
+        f" (finish_reason={finish}); shape={_response_shape(response)}"
+    )
     return str(content)
 
 
@@ -126,18 +233,20 @@ def compact_llm_error(err_text: str) -> str:
     return compact[:260]
 
 
-def call_cinema_html_llm(
+def _compact_response_preview(text: str, *, limit: int = 800) -> str:
+    compact = " ".join(str(text or "").split())
+    return compact[:limit]
+
+
+def call_cinema_text_llm(
     prompt: str,
     root: Path,
     *,
     model: str | None = None,
     max_tokens: int = 4096,
+    system_prompt: str | None = None,
 ) -> tuple[str | None, str | None]:
-    """
-    Generate one complete HTML document via LiteLLM/OpenRouter.
-
-    Returns (html, error). Uses nexu.yaml llm settings; no llx subprocess.
-    """
+    """Return raw LLM text content via LiteLLM/OpenRouter."""
     try:
         config = _cached_config(root)
         llm = config.llm
@@ -152,7 +261,7 @@ def call_cinema_html_llm(
         return None, f"{llm.api_key_env} not set"
 
     resolved_model = model or llm.model
-    system = (
+    system = system_prompt or (
         "You are a UI evolution engine. Return only one complete HTML "
         "document. No markdown fences, no explanation."
     )
@@ -178,11 +287,38 @@ def call_cinema_html_llm(
 
     try:
         response = completion(**kwargs)
-        raw = extract_html_document(_extract_content(response))
-        if raw and "<!DOCTYPE" in raw.upper()[:80]:
-            if has_terminal_artifacts(raw):
-                return None, "LLM output contained terminal box-drawing artifacts, not clean HTML"
-            return raw, None
-        return None, "LLM did not return a complete HTML document"
+        return _extract_content(response), None
     except Exception as exc:
         return None, compact_llm_error(str(exc))
+
+
+def call_cinema_html_llm(
+    prompt: str,
+    root: Path,
+    *,
+    model: str | None = None,
+    max_tokens: int = 4096,
+) -> tuple[str | None, str | None]:
+    """
+    Generate one complete HTML document via LiteLLM/OpenRouter.
+
+    Returns (html, error). Uses nexu.yaml llm settings; no llx subprocess.
+    """
+    content, err = call_cinema_text_llm(
+        prompt,
+        root,
+        model=model,
+        max_tokens=max_tokens,
+    )
+    if err:
+        return None, err
+    raw = normalize_html_document(content or "")
+    if raw and looks_like_html_document(raw):
+        if not raw.lstrip().upper().startswith("<!DOCTYPE"):
+            raw = "<!DOCTYPE html>\n" + raw.lstrip()
+        if has_terminal_artifacts(raw):
+            return None, "LLM output contained terminal box-drawing artifacts, not clean HTML"
+        return raw, None
+    preview = _compact_response_preview(content or "")
+    detail = f"; response_preview={preview}" if preview else ""
+    return None, "LLM did not return a complete HTML document" + detail

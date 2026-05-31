@@ -28,11 +28,24 @@ class ReviewConfig:
 
 
 @dataclass
+class CinemaConfig:
+    """Cinema live iteration tuning (also overridable via CINEMA_* env vars)."""
+
+    markpact_context_chars: int = 4000
+    markpact_context_mode: str = "summary"  # summary | full | off
+    html_context_chars: int = 8000
+    max_tokens: int = 4096
+    option_generation_mode: str = "batch"  # batch | parallel
+    llm_trace_keep: int = 80
+
+
+@dataclass
 class nexuConfig:
     version: str = "nexu.v1"
     project_name: str = "project"
     llm: LLMConfig = field(default_factory=LLMConfig)
     review: ReviewConfig = field(default_factory=ReviewConfig)
+    cinema: CinemaConfig = field(default_factory=CinemaConfig)
 
 
 def _as_list(value: Any, default: list[str]) -> list[str]:
@@ -85,6 +98,14 @@ def _resolved_model_from_env(yaml_model: str | None) -> str:
     )
 
 
+def _cinema_mode(value: Any, default: str) -> str:
+    if value is None:
+        return default
+    if isinstance(value, bool):
+        return "off" if not value else "full"
+    return str(value)
+
+
 def load_config(root: Path) -> nexuConfig:
     load_env_files(root)
 
@@ -96,6 +117,7 @@ def load_config(root: Path) -> nexuConfig:
     project = data.get("project", {}) or {}
     llm_data = data.get("llm", {}) or {}
     review_data = data.get("review", {}) or {}
+    cinema_data = data.get("cinema", {}) or {}
     verification_data = data.get("verification", {}) or {}
 
     llm = LLMConfig(
@@ -113,9 +135,18 @@ def load_config(root: Path) -> nexuConfig:
         warn_on=_as_list(review_data.get("warn_on"), _as_list(verification_data.get("warn_on"), ["partial", "warn"])),
         evidence_required=bool(review_data.get("evidence_required", True)),
     )
+    cinema = CinemaConfig(
+        markpact_context_chars=int(cinema_data.get("markpact_context_chars", 4000)),
+        markpact_context_mode=_cinema_mode(cinema_data.get("markpact_context_mode"), "summary"),
+        html_context_chars=int(cinema_data.get("html_context_chars", 8000)),
+        max_tokens=int(cinema_data.get("max_tokens", 4096)),
+        option_generation_mode=str(cinema_data.get("option_generation_mode", "batch")),
+        llm_trace_keep=int(cinema_data.get("llm_trace_keep", 80)),
+    )
     return nexuConfig(
         version=str(data.get("version", "nexu.v1")),
         project_name=str(project.get("name", root.name)),
         llm=llm,
         review=review,
+        cinema=cinema,
     )
