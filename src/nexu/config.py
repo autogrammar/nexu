@@ -43,7 +43,51 @@ def _as_list(value: Any, default: list[str]) -> list[str]:
     return [str(value)]
 
 
+_MODEL_ENV_KEYS = frozenset({"LLM_MODEL", "NEXU_MODEL", "nexu_MODEL"})
+
+
+def _load_env_file(path: Path, *, override_keys: frozenset[str] = frozenset()) -> None:
+    if not path.exists():
+        return
+    try:
+        for raw_line in path.read_text(encoding="utf-8").splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            key = key.strip()
+            value = value.strip().strip('"').strip("'")
+            if key and (key not in os.environ or key in override_keys):
+                os.environ[key] = value
+    except Exception:
+        return
+
+
+def load_env_files(root: Path) -> None:
+    """Load .env from repo root toward workspace; later files override model env vars."""
+    candidates = [
+        root.parent.parent.parent / ".env",
+        root.parent.parent / ".env",
+        root.parent / ".env",
+        root / ".env",
+    ]
+    for index, candidate in enumerate(candidates):
+        _load_env_file(candidate, override_keys=_MODEL_ENV_KEYS if index else frozenset())
+
+
+def _resolved_model_from_env(yaml_model: str | None) -> str:
+    return (
+        os.getenv("LLM_MODEL")
+        or os.getenv("NEXU_MODEL")
+        or os.getenv("nexu_MODEL")
+        or yaml_model
+        or "openrouter/deepseek/deepseek-v4-pro"
+    )
+
+
 def load_config(root: Path) -> nexuConfig:
+    load_env_files(root)
+
     path = root / "nexu.yaml"
     if not path.exists():
         return nexuConfig(project_name=root.name)
@@ -56,12 +100,7 @@ def load_config(root: Path) -> nexuConfig:
 
     llm = LLMConfig(
         provider=str(llm_data.get("provider", "offline")),
-        model=str(
-            llm_data.get(
-                "model",
-                os.getenv("LLM_MODEL") or os.getenv("NEXU_MODEL") or os.getenv("nexu_MODEL") or "openrouter/deepseek/deepseek-v4-pro"
-            )
-        ),
+        model=str(_resolved_model_from_env(llm_data.get("model"))),
         base_url=str(llm_data.get("base_url", "https://openrouter.ai/api/v1")),
         api_key_env=str(llm_data.get("api_key_env", "OPENROUTER_API_KEY")),
         temperature=float(llm_data.get("temperature", 0.1)),

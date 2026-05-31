@@ -3,11 +3,11 @@
 
 ## AI Cost Tracking
 
-![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.5.8-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
-![AI Cost](https://img.shields.io/badge/AI%20Cost-$1.93-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-6.4h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
+![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.5.9-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
+![AI Cost](https://img.shields.io/badge/AI%20Cost-$1.95-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-6.5h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
 
-- 🤖 **LLM usage:** $1.9307 (14 commits)
-- 👤 **Human dev:** ~$638 (6.4h @ $100/h, 30min dedup)
+- 🤖 **LLM usage:** $1.9492 (15 commits)
+- 👤 **Human dev:** ~$649 (6.5h @ $100/h, 30min dedup)
 
 Generated on 2026-05-31 using [openrouter/qwen/qwen3-coder-next](https://openrouter.ai/qwen/qwen3-coder-next)
 
@@ -148,6 +148,42 @@ nexu capsule bundle my-slice
 nexu capsule promote my-slice --dry-run
 nexu mcp tools
 nexu mcp serve --path .
+```
+
+## Cinema (LLM live mode)
+
+To run Cinema with real LLM evolution:
+
+1. Add API key to `.env` in repo root:
+
+```bash
+OPENROUTER_API_KEY=...
+```
+
+1. Enable network calls in workspace config (`examples/web_app_calculator/workspace/nexu.yaml`):
+
+```yaml
+llm:
+  allow_network_calls: true
+  api_key_env: OPENROUTER_API_KEY
+```
+
+1. Run Cinema iteration:
+
+```bash
+make cinema
+```
+
+1. Run tests:
+
+```bash
+make test
+```
+
+You can override defaults from `Makefile` inline:
+
+```bash
+make cinema CINEMA_CAPSULE=scientific_calc CINEMA_PATH=examples/web_app_calculator/workspace
 ```
 
 ## License

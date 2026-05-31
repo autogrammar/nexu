@@ -9,10 +9,23 @@
 - Refactor CLI path/YAML output duplication via shared helpers.
 - Use package `__version__` in MCP `serverInfo` to avoid version drift.
 
+### Fix
+- Respect `llm.allow_network_calls` in `cinema` iteration flow to prevent unintended LLM network calls in offline mode.
+- Read API key env and model defaults for `cinema` from `nexu.yaml` (`llm.api_key_env`, `llm.model`) instead of hardcoded values.
+
 ### Test
 - Run targeted MCP tests: `tests/test_orchestration_mcp.py` (pass).
 - Run targeted flow tests: `tests/test_capsule_next_stage.py`, `tests/test_capsule_runtime_report.py`, `tests/test_nexu.py`, `tests/test_capsule_flow.py` (pass).
-- Run full suite: `pytest -q` (11 passed).
+- Run full suite: `pytest -q` (12 passed).
+
+## [0.5.9] - 2026-05-31
+
+### Docs
+- Update CHANGELOG.md
+- Update README.md
+
+### Other
+- Update Makefile
 
 ## [0.5.8] - 2026-05-31
 

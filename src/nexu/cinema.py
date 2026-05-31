@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from .config import load_config, load_env_files
 from .paths import capsule_dir
 
 def start_persistent_http_server(directory: Path, root: Path, name: str) -> int:
@@ -9,10 +10,16 @@ def start_persistent_http_server(directory: Path, root: Path, name: str) -> int:
     import socket
     import subprocess
     import sys
+
+    load_env_files(root)
+    config = load_config(root)
+    llm_config = config.llm
     
     server_script = f"""import http.server
 import socketserver
 import sys
+import os
+import re
 import json
 import csv
 import mimetypes
@@ -30,8 +37,114 @@ DIRECTORY = Path(__file__).parent.absolute()
 LOG_CSV = DIRECTORY / "log.csv"
 
 WORKSPACE_PATH = {repr(str(root.absolute()))}
+ROOT_PATH = Path(WORKSPACE_PATH).absolute()
 CAPSULE_NAME = {repr(name)}
 SYS_EXE = {repr(sys.executable)}
+ALLOW_NETWORK_CALLS = {repr(llm_config.allow_network_calls)}
+API_KEY_ENV = {repr(llm_config.api_key_env)}
+DEFAULT_MODEL = {repr(llm_config.model)}
+MAX_TOKENS = int(os.environ.get("CINEMA_MAX_TOKENS", "2048"))
+
+ENV_PATH_CANDIDATES = [
+    ROOT_PATH / ".env",
+    ROOT_PATH.parent / ".env",
+    ROOT_PATH.parent.parent / ".env",
+    ROOT_PATH.parent.parent.parent / ".env",
+    DIRECTORY / ".env",
+]
+
+
+_MODEL_ENV_KEYS = frozenset({{"LLM_MODEL", "NEXU_MODEL", "nexu_MODEL"}})
+
+
+def _load_env_file(path: Path, override_keys=None) -> None:
+    override_keys = override_keys or frozenset()
+    if not path.exists():
+        return
+    try:
+        for raw_line in path.read_text(encoding="utf-8").splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            key = key.strip()
+            value = value.strip().strip('"').strip("'")
+            if key and (key not in os.environ or key in override_keys):
+                os.environ[key] = value
+    except Exception:
+        return
+
+
+def _load_all_env() -> None:
+    for index, env_path in enumerate(ENV_PATH_CANDIDATES):
+        _load_env_file(env_path, _MODEL_ENV_KEYS if index else frozenset())
+
+
+def _resolve_model() -> str:
+    _load_all_env()
+    return (
+        os.environ.get("LLM_MODEL")
+        or os.environ.get("NEXU_MODEL")
+        or os.environ.get("nexu_MODEL")
+        or DEFAULT_MODEL
+    )
+
+
+def _ensure_api_key_env() -> None:
+    if os.environ.get(API_KEY_ENV):
+        return
+    _load_all_env()
+    if os.environ.get(API_KEY_ENV):
+        return
+
+
+def _strip_markdown_fences(text: str) -> str:
+    raw = text.strip()
+    if raw.startswith("```"):
+        lines = raw.splitlines()
+        if lines and lines[0].startswith("```"):
+            lines = lines[1:]
+        if lines and lines[-1].strip() == "```":
+            lines = lines[:-1]
+        return chr(10).join(lines).strip()
+    return raw
+
+
+def _extract_llm_content(response: object) -> str | None:
+    choices = getattr(response, "choices", None)
+    if not choices:
+        return None
+    message = getattr(choices[0], "message", None)
+    if message is None:
+        return None
+    content = getattr(message, "content", None)
+    if isinstance(content, list):
+        parts: list[str] = []
+        for item in content:
+            if isinstance(item, dict):
+                text = item.get("text")
+                if isinstance(text, str):
+                    parts.append(text)
+            elif isinstance(item, str):
+                parts.append(item)
+        return "".join(parts)
+    if content is None:
+        return None
+    return str(content)
+
+
+def _compact_llm_error(err_text: str) -> str:
+    if "OpenrouterException - " in err_text:
+        payload = err_text.split("OpenrouterException - ", 1)[1].strip()
+        try:
+            data = json.loads(payload)
+            msg = data.get("error", {{}}).get("message")
+            if isinstance(msg, str) and msg.strip():
+                return msg.strip()
+        except Exception:
+            pass
+    compact = " ".join(err_text.split())
+    return compact[:260]
 
 class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
@@ -72,44 +185,108 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             post_data = self.rfile.read(content_length)
             try:
                 data = json.loads(post_data.decode('utf-8', errors='replace'))
-                prompt = data.get('prompt', '')
+                spatial_feedback = data.get('prompt', '')
                 current_stage = int(data.get('current_stage', 0))
+                annotations = data.get('annotations', [])
                 
-                # Formulate spatial evolution goal
-                goal = f"Evolution step. Spatial feedback: {{prompt}}"
+                # Read current active stage HTML
+                stage_file = DIRECTORY / f'stage{{current_stage}}.html'
+                current_html = stage_file.read_text(encoding='utf-8') if stage_file.exists() else '<p>No stage found</p>'
                 
-                # Execute nexu capsule iterate command using same executable
-                cmd = [
-                    SYS_EXE, "-m", "nexu.cli", "capsule", "iterate", CAPSULE_NAME,
-                    "--steps", "1",
-                    "--goal", goal,
-                    "--cinema",
-                    "--path", WORKSPACE_PATH
-                ]
+                # Build structured LLM prompt from spatial annotations
+                keep_els = [a['id'] for a in annotations if a.get('type') == 'KEEP']
+                delete_els = [a['id'] for a in annotations if a.get('type') == 'DELETE']
                 
-                process = subprocess.run(cmd, capture_output=True, text=True)
+                llm_prompt = (
+                    "You are evolving a calculator web UI. Below is the current HTML.\\n\\n"
+                    "Current HTML:\\n```html\\n" + current_html + "\\n```\\n\\n"
+                    "User spatial feedback:\\n"
+                    "- KEEP these elements (user likes them): " + (', '.join(keep_els) if keep_els else 'none specified') + "\\n"
+                    "- REDESIGN/DELETE these elements (user wants them changed or removed): " + (', '.join(delete_els) if delete_els else 'none specified') + "\\n\\n"
+                    "Additional context: " + spatial_feedback + "\\n\\n"
+                    "Rules:\\n"
+                    "1. Return ONLY the complete evolved HTML document, nothing else.\\n"
+                    "2. Keep the same overall structure (full <!DOCTYPE html> page).\\n"
+                    "3. Preserve elements marked KEEP - do not change their function.\\n"
+                    "4. For DELETE elements: remove them or redesign them into something better.\\n"
+                    "5. Improve the visual design, add new scientific functions if elements were removed.\\n"
+                    "6. Keep the same CSS class names (.btn, .btn-sci, .btn-sci-excess, .screen) so the annotation system works.\\n"
+                    "7. Keep the <script> tag at the end of <body> exactly as-is.\\n"
+                    "8. Make the calculator more scientifically capable with each iteration.\\n\\n"
+                    "Return the full HTML:"
+                )
                 
-                # Append iteration trigger to CSV log
+                # Call LiteLLM via the same Python environment
+                _ensure_api_key_env()
+                api_key = os.environ.get(API_KEY_ENV, '')
+                model = _resolve_model()
+                
+                evolved_html = None
+                llm_error = None
+                
+                if not ALLOW_NETWORK_CALLS:
+                    llm_error = 'llm.allow_network_calls disabled in nexu.yaml'
+                elif api_key:
+                    try:
+                        from litellm import completion as llm_completion
+                        response = llm_completion(
+                            model=model,
+                            messages=[
+                                {{"role": "system", "content": "You are a UI evolution engine. Return only complete HTML documents. No markdown fences, no explanation."}},
+                                {{"role": "user", "content": llm_prompt}}
+                            ],
+                            temperature=0.3,
+                            max_tokens=MAX_TOKENS,
+                            timeout=90,
+                            api_key=api_key,
+                            api_base='https://openrouter.ai/api/v1'
+                        )
+                        content = _extract_llm_content(response)
+
+                        if content is None:
+                            llm_error = 'LLM returned empty content'
+                        else:
+                            raw = _strip_markdown_fences(str(content))
+                            evolved_html = raw
+                    except Exception as llm_exc:
+                        llm_error = _compact_llm_error(str(llm_exc))
+                else:
+                    llm_error = f'{{API_KEY_ENV}} not set'
+                
+                # Write evolved HTML back to stage file
+                if evolved_html and '<!DOCTYPE' in evolved_html.upper()[:50]:
+                    stage_file.write_text(evolved_html, encoding='utf-8')
+                    for candidate_name in ('alt_a.html', 'alt_b.html', 'alt_c.html', 'stage1.html', 'stage2.html'):
+                        (DIRECTORY / candidate_name).write_text(evolved_html, encoding='utf-8')
+                    status_msg = 'evolved_by_llm'
+                else:
+                    status_msg = f'llm_skipped: {{llm_error or "Invalid HTML returned"}}'
+                
+                # Log iteration
                 file_exists = LOG_CSV.exists()
                 with open(LOG_CSV, mode='a', newline='', encoding='utf-8') as f:
                     writer = csv.writer(f)
                     if not file_exists:
                         writer.writerow(['timestamp', 'action', 'details'])
-                    writer.writerow([datetime.now().isoformat(), 'ITERATION_TRIGGERED', f"Stage: {{current_stage}} | Result: {{process.returncode}}"])
+                    writer.writerow([datetime.now().isoformat(), 'ITERATION_LLM', f"Stage: {{current_stage}} | Status: {{status_msg}} | Keep: {{len(keep_els)}} | Delete: {{len(delete_els)}}" ])
                 
                 self.send_response(200)
                 self.send_header('Content-type', 'application/json; charset=utf-8')
                 self.send_header('Access-Control-Allow-Origin', '*')
                 self.end_headers()
                 self.wfile.write(json.dumps({{
-                    "status": "success",
-                    "new_stage": current_stage + 1,
-                    "stdout": process.stdout,
-                    "stderr": process.stderr
+                    "status": status_msg,
+                    "new_stage": current_stage,
+                    "keep_count": len(keep_els),
+                    "delete_count": len(delete_els),
+                    "error": llm_error
                 }}).encode('utf-8'))
                 return
             except Exception as e:
+                import traceback
+                traceback.print_exc()
                 self.send_response(500)
+                self.send_header('Access-Control-Allow-Origin', '*')
                 self.end_headers()
                 self.wfile.write(str(e).encode('utf-8'))
                 return
@@ -129,22 +306,35 @@ with socketserver.TCPServer(('127.0.0.1', PORT), CustomHTTPRequestHandler) as ht
 """
     (directory / "server.py").write_text(server_script, encoding="utf-8")
 
-    # Find a free port in the range 8080-8095
-    for port in range(8080, 8095):
+    def _try_spawn_on_port(port: int) -> bool:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             try:
-                s.bind(('127.0.0.1', port))
-                s.close()
-                
-                cmd = [
-                    sys.executable, str(directory / "server.py"), str(port)
-                ]
-                # Spawn a completely detached process
-                subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
-                return port
+                s.bind(("127.0.0.1", port))
             except OSError:
-                continue
-    return 8080
+                return False
+
+        cmd = [
+            sys.executable,
+            str(directory / "server.py"),
+            str(port),
+        ]
+        subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+        return True
+
+    # Prefer stable local range first.
+    for port in range(8080, 8095):
+        if _try_spawn_on_port(port):
+            return port
+
+    # Fallback: ask OS for an ephemeral free port.
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(("127.0.0.1", 0))
+        fallback_port = int(s.getsockname()[1])
+
+    if _try_spawn_on_port(fallback_port):
+        return fallback_port
+
+    raise RuntimeError("Unable to start cinema HTTP server: no free local port available")
 
 def generate_cinema_player(root: Path, name: str) -> Path:
     """
@@ -278,6 +468,12 @@ def generate_cinema_player(root: Path, name: str) -> Path:
                     }, '*');
                 }
             });
+
+            // Signal parent that the selection gesture is complete
+            // so it can auto-trigger the next LLM iteration
+            setTimeout(() => {
+                window.parent.postMessage({ type: 'selection_done' }, '*');
+            }, 100);
         });
 
         // Handle iframe communication for promoting options
@@ -871,15 +1067,51 @@ def generate_cinema_player(root: Path, name: str) -> Path:
             border-radius: 4px;
             font-weight: normal;
         }
+        .btn-copy {
+            background: #818cf8;
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            margin-left: 12px;
+        }
+        .btn-copy:hover { background: #6366f1; transform: scale(1.05); }
+        .btn-copy.copied { background: #2ed573; }
+        .toast-notification {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            background: #2ed573;
+            color: #0f172a;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            z-index: 99999;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+        .toast-notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body>
+    <div id="toast" class="toast-notification">📋 JSON copied to clipboard!</div>
     <div class="header">
         <h1>🎬 Nexu Multi-Option Cinema Dashboard</h1>
         <div class="controls">
             <button class="btn btn-stage active" onclick="switchStage(0)">S0: Simple Baseline</button>
             <button class="btn btn-stage" onclick="switchStage(1)">S1: Mid scientific</button>
             <button class="btn btn-stage" onclick="switchStage(2)">S2: Evolved</button>
+            <button class="btn btn-copy" id="copy-btn" onclick="copyStateToClipboard()">📋 Copy JSON State</button>
         </div>
     </div>
     
@@ -987,6 +1219,10 @@ Click anywhere on Options A-C to instantly promote them to Active Workspace!
             e.stopPropagation();
         }, true);
 
+        // Debounce timer for auto-triggering iteration after selection
+        let selectionDoneTimer = null;
+        let isIterating = false;
+
         // Ultimate cross-origin postMessage listener
         window.addEventListener('message', (e) => {
             if (!e.data) return;
@@ -999,6 +1235,16 @@ Click anywhere on Options A-C to instantly promote them to Active Workspace!
                 const label = e.data.altSrc.includes('alt_a') ? 'Option A (Minimalist)' :
                               e.data.altSrc.includes('alt_b') ? 'Option B (Standard)' : 'Option C (Expanded)';
                 promoteAlt(e.data.altSrc, label);
+            }
+
+            // Auto-trigger LLM iteration after selection completes
+            if (e.data.type === 'selection_done' && annotations.length > 0 && !isIterating) {
+                // Clear previous timer to debounce rapid successive selections
+                if (selectionDoneTimer) clearTimeout(selectionDoneTimer);
+                selectionDoneTimer = setTimeout(() => {
+                    addChatLog('system', '⚡ <strong>Selection complete! Auto-triggering LLM evolution...</strong>');
+                    runLiveIteration();
+                }, 800);
             }
         });
 
@@ -1115,14 +1361,17 @@ Click anywhere on Options A-C to instantly promote them to Active Workspace!
         }
 
         function runLiveIteration() {
+            if (isIterating) return; // Prevent concurrent iterations
+            isIterating = true;
+
             const promptBox = document.getElementById('prompt-box');
             const actionBtn = document.getElementById('action-btn');
             
-            addChatLog('system', '🤖 <strong>LLM is evolving the code... Running next capsule iteration in background!</strong>');
-            logEvent('ITERATION_STARTED', 'Ecosystem feedback iteration submitted to server.');
+            addChatLog('system', '🤖 <strong>LLM is evolving the code based on your spatial feedback...</strong>');
+            logEvent('ITERATION_STARTED', `Annotations: ${annotations.length} (KEEP: ${annotations.filter(a=>a.type==='KEEP').length}, DELETE: ${annotations.filter(a=>a.type==='DELETE').length})`);
             
             actionBtn.disabled = true;
-            actionBtn.innerText = '⏳ Evolving Code (DeepSeek)...';
+            actionBtn.innerText = '⏳ LLM Evolving...';
 
             fetch('/iterate', {
                 method: 'POST',
@@ -1131,29 +1380,92 @@ Click anywhere on Options A-C to instantly promote them to Active Workspace!
                 },
                 body: JSON.stringify({
                     prompt: promptBox.innerText,
-                    current_stage: activeStage
+                    current_stage: activeStage,
+                    annotations: annotations
                 })
             })
             .then(res => {
-                if (!res.ok) throw new Error("Iteration failed");
+                if (!res.ok) throw new Error('Iteration request failed: ' + res.status);
                 return res.json();
             })
             .then(data => {
+                isIterating = false;
                 actionBtn.disabled = false;
                 actionBtn.innerText = '🚀 Run Live Iteration (DeepSeek)';
                 
-                addChatLog('system', '🎯 <strong>Iteration successful! Evolved stage S' + data.new_stage + ' loaded live in Window 1!</strong>');
-                logEvent('ITERATION_COMPLETED_LIVE', 'New evolution stage: S' + data.new_stage);
-                
-                // Live hot-reload Window 1 frame on the fly to show evolved calculator!
-                const activeFrame = document.getElementById('active-frame');
-                activeFrame.src = activeFrame.src; // Force fresh iframe reload!
+                if (data.status === 'evolved_by_llm') {
+                    addChatLog('system', `🎯 <strong>LLM evolved stage S${data.new_stage}! Keep: ${data.keep_count}, Redesigned: ${data.delete_count}. Reloading Window 1...</strong>`);
+                    logEvent('ITERATION_COMPLETED_LLM', `Stage: S${data.new_stage} | Keep: ${data.keep_count} | Delete: ${data.delete_count}`);
+
+                    // Clear annotations only on successful evolution
+                    annotations = [];
+                    updateFeedbackList();
+
+                    // Live hot-reload Window 1 with cache-busting
+                    const activeFrame = document.getElementById('active-frame');
+                    activeFrame.src = 'stage' + activeStage + '.html?active=true&t=' + Date.now();
+
+                    // Reload option windows (2-4) to reflect newly generated proposals
+                    document.getElementById('alt-a-frame').src = 'alt_a.html?t=' + Date.now();
+                    document.getElementById('alt-b-frame').src = 'alt_b.html?t=' + Date.now();
+                    document.getElementById('alt-c-frame').src = 'alt_c.html?t=' + Date.now();
+                } else {
+                    addChatLog('system', `⚠️ <strong>LLM skipped: ${data.error || data.status}</strong>`);
+                    logEvent('ITERATION_SKIPPED', data.error || data.status);
+                    addChatLog('system', '📝 <strong>Your annotations were preserved. Adjust feedback and retry.</strong>');
+                }
             })
             .catch(err => {
+                isIterating = false;
                 actionBtn.disabled = false;
                 actionBtn.innerText = '🚀 Run Live Iteration (DeepSeek)';
-                addChatLog('system', '❌ <strong>Error: Failed to process next live iteration on backend!</strong>');
-                console.error(err);
+                addChatLog('system', '❌ <strong>Error: ' + err.message + '</strong>');
+                console.error('[NEXU SYSTEM] Iteration error:', err);
+            });
+        }
+
+        function copyStateToClipboard() {
+            const chatMsgs = [];
+            document.querySelectorAll('#chat-logs .chat-msg').forEach(msg => {
+                chatMsgs.push(msg.innerText);
+            });
+
+            const state = {
+                timestamp: new Date().toISOString(),
+                dashboard: 'Nexu Cinema Player',
+                activeStage: activeStage,
+                annotations: annotations,
+                prompt: document.getElementById('prompt-box').innerText,
+                chatLog: chatMsgs,
+                iterating: isIterating,
+                stageUrls: {
+                    stage0: 'stage0.html',
+                    stage1: 'stage1.html',
+                    stage2: 'stage2.html'
+                },
+                stats: {
+                    totalAnnotations: annotations.length,
+                    keepCount: annotations.filter(a => a.type === 'KEEP').length,
+                    deleteCount: annotations.filter(a => a.type === 'DELETE').length
+                }
+            };
+
+            const json = JSON.stringify(state, null, 2);
+            navigator.clipboard.writeText(json).then(() => {
+                const btn = document.getElementById('copy-btn');
+                btn.classList.add('copied');
+                btn.innerText = '✅ Copied!';
+                const toast = document.getElementById('toast');
+                toast.classList.add('show');
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    btn.innerText = '📋 Copy JSON State';
+                    toast.classList.remove('show');
+                }, 2000);
+                logEvent('COPY_STATE', `Copied ${json.length} chars to clipboard`);
+                addChatLog('system', '📋 <strong>Full JSON state copied to clipboard!</strong>');
+            }).catch(err => {
+                addChatLog('system', '❌ <strong>Clipboard copy failed: ' + err.message + '</strong>');
             });
         }
     </script>
@@ -1184,7 +1496,7 @@ Click anywhere on Options A-C to instantly promote them to Active Workspace!
         if not opened_via_system:
             import webbrowser
             webbrowser.open(url)
-    except Exception:
-        pass
+    except Exception as exc:
+        print(f"⚠️ Cinema HTTP server could not start: {exc}")
         
     return player_path
