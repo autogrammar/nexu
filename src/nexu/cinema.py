@@ -84,10 +84,10 @@ def list_history():
     cinema = Path(__file__).resolve().parent
     from nexu.cinema_history import ledger_archive_for_display, list_history_checkpoints
 
-    return {
+    return {{
         "checkpoints": list_history_checkpoints(cinema),
         "ledger_archive": ledger_archive_for_display(cinema),
-    }
+    }}
 
 
 def restore_history(checkpoint_id: str, *, apply_manifest: bool = True, target: str = "both"):
@@ -582,6 +582,14 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(str(e).encode("utf-8"))
                 return
+        if self.path in ("/health", "/health/"):
+            body = json.dumps({{"ok": True, "cinema": CAPSULE_NAME}}).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-type", "application/json; charset=utf-8")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            self.wfile.write(body)
+            return
         if self.path in ("/history", "/history/"):
             try:
                 payload = _list_history()
@@ -2062,9 +2070,28 @@ def generate_cinema_player(root: Path, name: str) -> Path:
         }
 
         // Log page initialization
+        let cinemaServerOnline = false;
+
         logEvent('PAGE_LOAD', 'Cinema Player dashboard initialized');
         refreshIntractPolicy();
         refreshHistory();
+        pingCinemaServer();
+
+        function pingCinemaServer(silent) {
+            return fetch('/health', { method: 'GET' })
+                .then(res => {
+                    if (!res.ok) throw new Error('health ' + res.status);
+                    cinemaServerOnline = true;
+                    return res.json();
+                })
+                .catch(() => {
+                    cinemaServerOnline = false;
+                    if (!silent) {
+                        addChatLog('system', '⚠️ <strong>Cinema server offline.</strong> In terminal: <code>make cinema-stop && make cinema</code>, then reload this page.');
+                    }
+                    throw new Error('server offline');
+                });
+        }
 
         function refreshHistory() {
             fetch('/history')
@@ -2642,7 +2669,7 @@ def generate_cinema_player(root: Path, name: str) -> Path:
             actionBtn.innerText = '⏳ Working…';
             updateWorkflowUI();
 
-            fetch('/iterate', {
+            const runIterate = () => fetch('/iterate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -2711,8 +2738,19 @@ def generate_cinema_player(root: Path, name: str) -> Path:
             .catch(err => {
                 isIterating = false;
                 updateWorkflowUI();
-                addChatLog('system', '❌ <strong>Error: ' + err.message + '</strong>');
+                const msg = String(err.message || err);
+                if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) {
+                    cinemaServerOnline = false;
+                    addChatLog('system', '❌ <strong>Cannot reach Cinema server</strong> (connection refused). Run <code>make cinema-stop && make cinema</code>, open the new URL from the log, then click Apply again — your ✓/✗ marks are still in this session.');
+                } else {
+                    addChatLog('system', '❌ <strong>Error: ' + msg + '</strong>');
+                }
                 console.error('[NEXU SYSTEM] Iteration error:', err);
+            });
+
+            pingCinemaServer(true).then(() => runIterate()).catch(() => {
+                isIterating = false;
+                updateWorkflowUI();
             });
         }
 

@@ -52,6 +52,7 @@ Folder: `examples/web_app_dashboard/`
 This example demonstrates how to safely evolve a Web Application Dashboard (Baseline) into a target version featuring a live notification feed ($S_2$), automatically compiling visual mock sandboxes (`index.html`) using `nexu capsule runtime`.
 
 Run the automated simulation:
+
 ```bash
 cd examples/web_app_dashboard
 uv run python run.py
@@ -62,13 +63,43 @@ uv run python run.py
 Folder: `examples/web_app_calculator/`
 
 This example showcases how `nexu` handles visual comparison of two web application mocks side-by-side:
+
 - **Simple Calculator (S0)**: Basic arithmetic interface.
 - **Scientific Calculator (S2)**: High-fidelity visual mock layout including advanced trigonometry operations (`sin`, `cos`, `tan`, `log`).
 
 Run the automated simulation:
+
 ```bash
 cd examples/web_app_calculator
 uv run python run.py
+```
+
+Run live Cinema from the repository root:
+
+```bash
+make cinema
+```
+
+Open the URL printed in logs (`Live HTTP Server started for Cinema Player: http://127.0.0.1:...`).
+
+Live workflow:
+
+1. Add a goal and generate **Options A-C**.
+2. Compare options while the workspace stays unchanged.
+3. Promote one option to workspace, then mark buttons (left drag = keep, right drag = remove) and apply marks.
+
+Bottom row panels:
+
+- **Change history**: checkpoint list with `Restore UI + policy`.
+- **Policy contracts**: baseline/active ledger lines and manifest actions.
+
+Useful helpers:
+
+```bash
+make cinema-open
+make cinema-stop
+make cinema-repair
+NEXU_CINEMA_NO_OPEN=1 make cinema
 ```
 
 ## Run all examples
@@ -76,7 +107,6 @@ uv run python run.py
 ```bash
 python examples/run_examples.py
 ```
-
 
 ## MCP service
 
