@@ -183,7 +183,7 @@ SHIELD_SCRIPT = """
             'li',
             'blockquote',
             'figure',
-            'img[alt]',
+            'img[alt]:not([alt=""])',
             '.menu-item',
             '.wp-block-button',
             '.wp-block-button__link',
@@ -227,14 +227,44 @@ SHIELD_SCRIPT = """
             return node && node.closest ? node.closest(markingSelector()) : null;
         }
 
+        function isLazyPlaceholderImg(el) {
+            if (!el || (el.tagName || '').toUpperCase() !== 'IMG') return false;
+            const src = (el.getAttribute('src') || '').trim().toLowerCase();
+            const cls = typeof el.className === 'string' ? el.className : '';
+            const lazyAttr = el.hasAttribute('data-lazyloaded')
+                || el.hasAttribute('data-lazy-src')
+                || el.hasAttribute('data-src')
+                || /\\blazy(?:load)?\\b/i.test(cls);
+            const dataSvg = src.startsWith('data:image/svg+xml');
+            const blank = !src || src === '#' || dataSvg;
+            return lazyAttr && blank;
+        }
+
         function elementIdFromEl(el) {
             const rawId = (el.id || '').trim();
             if (rawId) return rawId.replace(/^btn-/, '');
             const target = (el.dataset && el.dataset.nexuTarget || '').trim();
             if (target) return target;
+            const tag = (el.tagName || '').toLowerCase();
+            if (tag === 'img') {
+                const alt = (el.getAttribute('alt') || '').trim();
+                if (alt) return 'img-' + alt.slice(0, 48);
+                return '';
+            }
             const text = (el.innerText || '').trim();
             if (el.tagName === 'BUTTON' && text) return text;
             return text;
+        }
+
+        function isMarkableTarget(el) {
+            if (!el || !el.getBoundingClientRect) return false;
+            if (isLazyPlaceholderImg(el)) return false;
+            const rect = el.getBoundingClientRect();
+            if (rect.width < 6 || rect.height < 6) return false;
+            const id = elementIdFromEl(el);
+            if (id) return true;
+            const text = (el.innerText || el.textContent || '').replace(/\\s+/g, ' ').trim();
+            return !!text;
         }
 
         function compactFragment(el) {
@@ -259,9 +289,10 @@ SHIELD_SCRIPT = """
 
         function allTargets() {
             const nodes = Array.from(document.querySelectorAll(markingSelector()));
-            if (!isHttpImportPreview()) return nodes;
-            return nodes.filter(
-                (el) => !nodes.some((other) => other !== el && el.contains(other))
+            const filtered = nodes.filter(isMarkableTarget);
+            if (!isHttpImportPreview()) return filtered;
+            return filtered.filter(
+                (el) => !filtered.some((other) => other !== el && el.contains(other))
             );
         }
 
@@ -413,6 +444,7 @@ SHIELD_SCRIPT = """
                 const hit = calcButtonTarget(e.target);
                 if (intersects || (isSingleClick && hit === el)) {
                     const eid = elementIdFromEl(el);
+                    if (!eid || !isMarkableTarget(el)) return;
                     nexuLog('annotate', { elementId: eid, action: selectionType, mode: 'drag' });
                     window.parent.postMessage({
                         type: 'annotation',

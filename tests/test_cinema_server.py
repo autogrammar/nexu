@@ -213,6 +213,8 @@ def test_cinema_player_template_is_externalized() -> None:
     )
     assert "if (needsGoal && tab === 'editor')" in html
     assert "if (mainTab !== 'editor') {" in html
+    assert "if (tab !== 'editor')" in html
+    assert "closeGoalPromptModal();" in html
     assert "iterationAllowedWithoutGoal" in html
     assert "FRAGMENT_ITERATE_MS" in html
     assert "skipEditorSwitch: !httpImport" in html

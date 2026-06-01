@@ -17,7 +17,7 @@ SUMD - Structured Unified Markdown Descriptor for AI-aware project refactorizati
 ## Metadata
 
 - **name**: `nexu`
-- **version**: `0.5.28`
+- **version**: `0.5.29`
 - **python_requires**: `>=3.10`
 - **license**: Apache-2.0
 - **ai_model**: `openrouter/qwen/qwen3-coder-next`
@@ -37,7 +37,7 @@ SUMD (description) → DOQL/source (code) → taskfile (automation) → testql (
 
 app {
   name: nexu;
-  version: 0.5.28;
+  version: 0.5.29;
 }
 
 dependencies {
@@ -244,7 +244,7 @@ pfix>=0.1.60
 
 ## Call Graph
 
-*386 nodes · 500 edges · 60 modules · CC̄=4.5*
+*392 nodes · 500 edges · 60 modules · CC̄=4.5*
 
 ### Hubs (by degree)
 
@@ -261,8 +261,8 @@ pfix>=0.1.60
 
 ```toon markpact:analysis path=project/calls.toon.yaml
 # code2llm call graph | /home/tom/github/semcod/nexu
-# generated in 0.22s
-# nodes: 386 | edges: 500 | modules: 60
+# generated in 0.25s
+# nodes: 392 | edges: 500 | modules: 60
 # CC̄=4.5
 
 HUBS[20]:
@@ -378,11 +378,9 @@ MODULES:
     sync_cinema_templates  CC=1  out:4
     write_cinema_nexu_hooks  CC=1  out:8
     write_intract_policy_files  CC=2  out:5
-  src.nexu.cinema_baseline_contracts  [5 funcs]
+  src.nexu.cinema_baseline_contracts  [3 funcs]
     _contract  CC=3  out:2
-    calculator_baseline_contracts  CC=1  out:7
     ensure_capsule_intract_yaml  CC=9  out:25
-    is_calculator_capsule  CC=5  out:5
     merge_calculator_baselines  CC=5  out:5
   src.nexu.cinema_goal_contracts  [14 funcs]
     _build_detail_text  CC=5  out:5
@@ -434,23 +432,20 @@ MODULES:
     call_cinema_html_llm  CC=12  out:8
   src.nexu.cinema_llm_contracts  [1 funcs]
     build_llm_contract_block  CC=2  out:2
-  src.nexu.cinema_markpact  [5 funcs]
-    _escape_markdown_fence  CC=2  out:1
-    _get_app_title  CC=3  out:3
-    _get_baseline_block  CC=6  out:4
+  src.nexu.cinema_markpact  [2 funcs]
     build_markpact_readme  CC=11  out:21
     markpact_download_filename  CC=2  out:2
-  src.nexu.cinema_policy  [22 funcs]
-    append_goal_ledger_entry  CC=7  out:13
-    append_iteration_ledger_entry  CC=3  out:7
-    apply_ledger_from_cinema  CC=6  out:15
-    cinema_dir_for  CC=1  out:2
-    effective_ui_constraints_from_ledger  CC=4  out:4
-    enforce_deletes_on_option_previews  CC=3  out:5
-    ensure_http_option_previews_from_stage0  CC=3  out:5
-    ensure_option_previews_from_stages  CC=3  out:5
-    load_effective_ui_constraints  CC=14  out:15
-    load_goal_contract_lines  CC=12  out:14
+  src.nexu.cinema_policy  [37 funcs]
+    _build_constraint_result  CC=5  out:4
+    _html_files_distinct  CC=1  out:1
+    _intract_manifest_path  CC=4  out:4
+    _ledger_entry_matches_project  CC=8  out:10
+    _ledger_entry_matches_scope  CC=5  out:7
+    _process_keep_delete_entries  CC=7  out:6
+    _process_ledger_entry  CC=6  out:6
+    _process_proposed_contracts  CC=8  out:3
+    _proposal_kind_and_element  CC=12  out:8
+    _replace_html_title  CC=1  out:1
   src.nexu.cinema_project_imports  [54 funcs]
     _activate_delete_fallback  CC=3  out:5
     _activate_imported  CC=11  out:32
@@ -517,8 +512,7 @@ MODULES:
     _load_env_file  CC=10  out:11
     load_config  CC=14  out:76
     load_env_files  CC=3  out:3
-  src.nexu.export_prompt  [2 funcs]
-    _cinema_policy_ledger_block  CC=12  out:13
+  src.nexu.export_prompt  [1 funcs]
     export_iteration_prompt  CC=3  out:18
   src.nexu.fast_delivery.context  [3 funcs]
     compact_html_for_llm  CC=3  out:6
@@ -556,18 +550,15 @@ MODULES:
     run_mcp_stdio  CC=6  out:7
   src.nexu.orchestrate  [1 funcs]
     build_capsule_orchestration  CC=2  out:28
-  src.nexu.paths  [6 funcs]
+  src.nexu.paths  [4 funcs]
     capsule_dir  CC=1  out:1
-    capsules_dir  CC=1  out:1
     ensure_project_dirs  CC=2  out:7
-    nexu_dir  CC=1  out:0
     project_root  CC=1  out:3
     snapshots_dir  CC=1  out:1
   src.nexu.plan  [2 funcs]
     _contract_summary  CC=9  out:3
     build_iteration_plan  CC=7  out:15
-  src.nexu.promote  [3 funcs]
-    _promotion_map  CC=2  out:4
+  src.nexu.promote  [2 funcs]
     apply_promotion_plan  CC=4  out:8
     build_promotion_plan  CC=6  out:16
   src.nexu.report  [1 funcs]
@@ -665,8 +656,8 @@ EDGES:
 
 ```toon markpact:analysis path=project/calls.toon.yaml
 # code2llm call graph | /home/tom/github/semcod/nexu
-# generated in 0.22s
-# nodes: 386 | edges: 500 | modules: 60
+# generated in 0.25s
+# nodes: 392 | edges: 500 | modules: 60
 # CC̄=4.5
 
 HUBS[20]:
@@ -782,11 +773,9 @@ MODULES:
     sync_cinema_templates  CC=1  out:4
     write_cinema_nexu_hooks  CC=1  out:8
     write_intract_policy_files  CC=2  out:5
-  src.nexu.cinema_baseline_contracts  [5 funcs]
+  src.nexu.cinema_baseline_contracts  [3 funcs]
     _contract  CC=3  out:2
-    calculator_baseline_contracts  CC=1  out:7
     ensure_capsule_intract_yaml  CC=9  out:25
-    is_calculator_capsule  CC=5  out:5
     merge_calculator_baselines  CC=5  out:5
   src.nexu.cinema_goal_contracts  [14 funcs]
     _build_detail_text  CC=5  out:5
@@ -838,23 +827,20 @@ MODULES:
     call_cinema_html_llm  CC=12  out:8
   src.nexu.cinema_llm_contracts  [1 funcs]
     build_llm_contract_block  CC=2  out:2
-  src.nexu.cinema_markpact  [5 funcs]
-    _escape_markdown_fence  CC=2  out:1
-    _get_app_title  CC=3  out:3
-    _get_baseline_block  CC=6  out:4
+  src.nexu.cinema_markpact  [2 funcs]
     build_markpact_readme  CC=11  out:21
     markpact_download_filename  CC=2  out:2
-  src.nexu.cinema_policy  [22 funcs]
-    append_goal_ledger_entry  CC=7  out:13
-    append_iteration_ledger_entry  CC=3  out:7
-    apply_ledger_from_cinema  CC=6  out:15
-    cinema_dir_for  CC=1  out:2
-    effective_ui_constraints_from_ledger  CC=4  out:4
-    enforce_deletes_on_option_previews  CC=3  out:5
-    ensure_http_option_previews_from_stage0  CC=3  out:5
-    ensure_option_previews_from_stages  CC=3  out:5
-    load_effective_ui_constraints  CC=14  out:15
-    load_goal_contract_lines  CC=12  out:14
+  src.nexu.cinema_policy  [37 funcs]
+    _build_constraint_result  CC=5  out:4
+    _html_files_distinct  CC=1  out:1
+    _intract_manifest_path  CC=4  out:4
+    _ledger_entry_matches_project  CC=8  out:10
+    _ledger_entry_matches_scope  CC=5  out:7
+    _process_keep_delete_entries  CC=7  out:6
+    _process_ledger_entry  CC=6  out:6
+    _process_proposed_contracts  CC=8  out:3
+    _proposal_kind_and_element  CC=12  out:8
+    _replace_html_title  CC=1  out:1
   src.nexu.cinema_project_imports  [54 funcs]
     _activate_delete_fallback  CC=3  out:5
     _activate_imported  CC=11  out:32
@@ -921,8 +907,7 @@ MODULES:
     _load_env_file  CC=10  out:11
     load_config  CC=14  out:76
     load_env_files  CC=3  out:3
-  src.nexu.export_prompt  [2 funcs]
-    _cinema_policy_ledger_block  CC=12  out:13
+  src.nexu.export_prompt  [1 funcs]
     export_iteration_prompt  CC=3  out:18
   src.nexu.fast_delivery.context  [3 funcs]
     compact_html_for_llm  CC=3  out:6
@@ -960,18 +945,15 @@ MODULES:
     run_mcp_stdio  CC=6  out:7
   src.nexu.orchestrate  [1 funcs]
     build_capsule_orchestration  CC=2  out:28
-  src.nexu.paths  [6 funcs]
+  src.nexu.paths  [4 funcs]
     capsule_dir  CC=1  out:1
-    capsules_dir  CC=1  out:1
     ensure_project_dirs  CC=2  out:7
-    nexu_dir  CC=1  out:0
     project_root  CC=1  out:3
     snapshots_dir  CC=1  out:1
   src.nexu.plan  [2 funcs]
     _contract_summary  CC=9  out:3
     build_iteration_plan  CC=7  out:15
-  src.nexu.promote  [3 funcs]
-    _promotion_map  CC=2  out:4
+  src.nexu.promote  [2 funcs]
     apply_promotion_plan  CC=4  out:8
     build_promotion_plan  CC=6  out:16
   src.nexu.report  [1 funcs]
@@ -1056,7 +1038,7 @@ EDGES:
 ### Code Analysis (`project/analysis.toon.yaml`)
 
 ```toon markpact:analysis path=project/analysis.toon.yaml
-# code2llm | 99f 17742L | python:77,yaml:9,json:3,txt:2,shell:2,javascript:2,yml:1,toml:1 | 2026-06-01
+# code2llm | 99f 17754L | python:77,yaml:9,json:3,txt:2,shell:2,javascript:2,toml:1,yml:1 | 2026-06-01
 # generated in 0.03s
 # CC̅=4.5 | critical:5/633 | dups:0 | cycles:0
 
@@ -1212,7 +1194,7 @@ LAYERS:
   │ !! cinema_policy              906L  0C   44m  CC=14     ←6
   │ !! cinema_offline_options     901L  0C   32m  CC=13     ←1
   │ !! cinema_projects            720L  1C   25m  CC=14     ←4
-  │ !! cinema_scripts             672L  0C    4m  CC=6      ←5
+  │ !! cinema_scripts             680L  0C    4m  CC=6      ←5
   │ !! cinema_http_preprocess     606L  1C   29m  CC=16     ←4
   │ !! cinema_publish             469L  0C   23m  CC=15     ←1
   │ mcp_server                 393L  0C   13m  CC=6      ←1
@@ -1224,7 +1206,7 @@ LAYERS:
   │ cinema_history             244L  0C   13m  CC=8      ←2
   │ orchestrate                232L  0C    6m  CC=13     ←2
   │ cinema_markpact            215L  0C    7m  CC=14     ←2
-  │ cinema_html_validate       201L  0C   13m  CC=12     ←3
+  │ cinema_html_validate       205L  0C   13m  CC=12     ←3
   │ cinema_llm_contracts       196L  0C    7m  CC=9      ←1
   │ cinema                     194L  0C    9m  CC=11     ←5
   │ config                     191L  4C    6m  CC=14     ←5
@@ -1305,16 +1287,16 @@ COUPLING:
           examples.web_app_dashboard                                   9                                                                      10                                   1                                                                                                          ──                                      !! fan-out
       examples.web_app_event_monitor                                                                                                          19                                                                                                                                                                                  ──  !! fan-out
   CYCLES: none
-  HUB: src.nexu/ (fan-in=133)
-  HUB: examples.web_app_calculator/ (fan-in=7)
   HUB: src.vico/ (fan-in=60)
+  HUB: examples.web_app_calculator/ (fan-in=7)
+  HUB: src.nexu/ (fan-in=133)
   HUB: scripts/ (fan-in=91)
-  SMELL: examples/ fan-out=60 → split needed
-  SMELL: src.nexu/ fan-out=61 → split needed
-  SMELL: examples.web_app_calculator/ fan-out=97 → split needed
   SMELL: src.vico/ fan-out=12 → split needed
-  SMELL: examples.web_app_event_monitor/ fan-out=19 → split needed
+  SMELL: examples.web_app_calculator/ fan-out=97 → split needed
   SMELL: examples.web_app_dashboard/ fan-out=20 → split needed
+  SMELL: src.nexu/ fan-out=61 → split needed
+  SMELL: examples/ fan-out=60 → split needed
+  SMELL: examples.web_app_event_monitor/ fan-out=19 → split needed
   SMELL: examples.web_app_pactown_ecosystem/ fan-out=22 → split needed
 
 EXTERNAL:
@@ -1325,15 +1307,15 @@ EXTERNAL:
 ### Duplication (`project/duplication.toon.yaml`)
 
 ```toon markpact:analysis path=project/duplication.toon.yaml
-# redup/duplication | 9 groups | 78f 16383L | 2026-06-01
+# redup/duplication | 9 groups | 78f 16434L | 2026-06-01
 
 SUMMARY:
   files_scanned: 78
-  total_lines:   16383
+  total_lines:   16434
   dup_groups:    9
   dup_fragments: 25
   saved_lines:   157
-  scan_ms:       2613
+  scan_ms:       3816
 
 HOTSPOTS[7] (files with most duplication):
   examples/web_app_calculator/cinema/server.py  dup=46L  groups=2  frags=8  (0.3%)

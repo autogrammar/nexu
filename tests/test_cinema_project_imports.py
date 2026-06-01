@@ -180,14 +180,14 @@ def test_import_http_project_fetches_and_migrates(tmp_path: Path):
     assert meta["import_kind"] == "http"
     assert meta["fetch_meta"]["final_url"] == "https://example.com/demo"
     stage0 = (cinema / "stage0.html").read_text(encoding="utf-8")
-    assert "<h1>Site</h1>" in stage0
+    assert ">Site</h1>" in stage0
     assert '<base href="https://example.com/demo/">' in stage0
     assert f'imported_projects/{project_id}/source/assets/asset-0.css' in stage0
     assert "nexu preview: block cross-origin fetch" in stage0
     assert "Markpact migration" not in stage0
     assert (project_dir / "source" / "assets" / "asset-0.css").exists()
     alt_a = (cinema / "alt_a.html").read_text(encoding="utf-8")
-    assert "<h1>Site</h1>" in alt_a
+    assert ">Site</h1>" in alt_a
     assert "calc-body" not in alt_a
     policy = json.loads((cinema / "intract_policy.json").read_text(encoding="utf-8"))
     assert policy["capsule"]["is_calculator"] is False
@@ -197,8 +197,10 @@ def test_import_http_project_fetches_and_migrates(tmp_path: Path):
     assert (project_dir / "source" / "nexu-outline.html").is_file()
     assert meta["visual_css_bytes"] > 0
     assert meta["outline_node_count"] >= 1
+    assert meta.get("organize", {}).get("targets_added", 0) >= 1
     outline = (project_dir / "source" / "nexu-outline.html").read_text(encoding="utf-8")
-    assert len(outline) < len(body.decode("utf-8"))
+    index_html = (project_dir / "source" / "index.html").read_text(encoding="utf-8")
+    assert len(outline) < len(index_html)
     assert any(a.get("kind") == "visual_css" for a in meta.get("artifacts") or [])
 
 
@@ -244,7 +246,7 @@ def test_activate_http_import_regenerates_preview_stage0(tmp_path: Path):
     assert "Markpact migration workspace" not in json.dumps(result)
     assert "Chemical" not in json.dumps(result)
     stage0 = (cinema / "stage0.html").read_text(encoding="utf-8")
-    assert "<h1>Live preview</h1>" in stage0
+    assert ">Live preview</h1>" in stage0
     assert "Markpact migration" not in stage0
     assert "const NEXU_PARAMS = new URLSearchParams" in stage0
     assert "nexu preview: block cross-origin fetch" in stage0
@@ -323,7 +325,7 @@ def test_activate_http_import_regenerates_preprocess_when_missing(tmp_path: Path
     assert profile.get("visual_css")
 
     stage0 = (cinema / "stage0.html").read_text(encoding="utf-8")
-    assert "<h1>Legacy site</h1>" in stage0
+    assert ">Legacy site</h1>" in stage0
     assert "const NEXU_PARAMS = new URLSearchParams" in stage0
     assert "nexu preview: block cross-origin fetch" in stage0
 

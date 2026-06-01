@@ -80,6 +80,16 @@ After template changes: `make cinema-restart`.
 |------------|--------|
 | **`repatch` path dependency** | Marked-context and UI patch primitives live in sibling repo `repatch`; CI and local tests need `uv sync` and import path (see `scripts/ci-cinema-smoke.sh`). |
 
+### Pre-edit HTML organization (repatch)
+
+| Status | Detail |
+|--------|--------|
+| **`organize_html_project` in repatch** | `repatch.organize_html` / `organize_html_project_dir` extract substantial inline `<style>`/`<script>` to `nexu-extracted.css` / `nexu-extracted.js`, strip preview scripts (same rules as `sanitize_http_preview_html`), remove lazy placeholder `<img>` tags, and add `data-nexu-target` on markable nodes without `id`. |
+| **HTTP import wiring** | `_finish_import` calls `organize_html_project_dir` on `source/` **before** `preprocess_http_import` so visual CSS extraction and outline build see organized HTML. Metadata is stored under `project.json` → `organize`. |
+| **Still in nexu** | Preview shim, shield injection, stage0 assembly, and `nexu-visual.css` / `nexu-outline.html` artifact paths remain in `cinema_http_preprocess.py` / `cinema_project_imports.py`. |
+| **Empty-id marks vs ledger** | Shield iframe may still emit session marks with `id: ""` for unlabelled nodes; policy ledger drops empty keys (`cinema_policy._process_keep_delete_entries`), so `effectiveAnnotations` in session export excludes them while raw `annotations` may not. Shield now filters lazy placeholders and zero-size nodes; player ignores empty `elementId`. |
+| **Follow-up** | ZIP/git import could call organize when index HTML is present; patch-routing manifest beyond `organize` meta is not implemented yet. |
+
 ---
 
 ## Fixed recently (not open P0/P1)

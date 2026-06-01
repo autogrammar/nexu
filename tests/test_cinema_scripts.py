@@ -42,3 +42,25 @@ def test_inject_cinema_shield_posts_compact_marked_fragment():
     assert "function compactFragment" in out
     assert "fragment: compactFragment" in out
     assert "outerHTML" in out
+
+
+def test_inject_cinema_shield_skips_lazy_placeholder_imgs():
+    html = """<!DOCTYPE html><html><body data-nexu-import-preview="http">
+    <img class="wp-image-12" data-lazyloaded="1"
+         src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMSIgaGVpZ2h0PSIxIi8+"
+         alt="" width="622" height="603" />
+    <img class="wp-image-99" alt="Hero photo" src="/photo.jpg" />
+    </body></html>"""
+    out = inject_cinema_shield(html)
+    assert "function isLazyPlaceholderImg" in out
+    assert "function isMarkableTarget" in out
+    assert "isMarkableTarget" in out
+    assert 'img[alt]:not([alt=""])' in out
+
+
+def test_inject_cinema_shield_requires_meaningful_image_alt():
+    out = inject_cinema_shield(
+        "<html><body><img class='wp-image-42' src='/real.jpg' alt='' /></body></html>"
+    )
+    assert 'img[alt]:not([alt=""])' in out
+    assert "return '';" in out

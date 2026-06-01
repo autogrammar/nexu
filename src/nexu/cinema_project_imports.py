@@ -16,6 +16,8 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urljoin, urlparse
 from urllib.request import Request, urlopen
 
+from repatch import organize_html_project_dir
+
 from .cinema_http_preprocess import (
     ensure_http_preprocess_artifacts,
     prepare_http_preview_html,
@@ -778,7 +780,11 @@ def _finish_import(
     title = _project_title_from_id(project_id)
     resolved_kind = import_kind or _import_kind_from_id(project_id)
     preprocess_fields: dict[str, Any] = {}
+    organize_meta: dict[str, Any] = {}
     if resolved_kind == "http":
+        organized = organize_html_project_dir(source_dir)
+        if organized is not None:
+            organize_meta = dict(organized.meta)
         preprocess_fields = preprocess_http_import(source_dir, fetch_meta=fetch_meta)
     files = _iter_project_files(source_dir)
     _, total_bytes = _source_stats(source_dir)
@@ -816,6 +822,13 @@ def _finish_import(
             {"kind": "visual_css", "path": preprocess_fields.get("visual_css_path", "source/nexu-visual.css")},
             {"kind": "html_outline", "path": preprocess_fields.get("html_outline_path", "source/nexu-outline.html")},
         ]
+    if organize_meta:
+        meta["organize"] = organize_meta
+        css_path = organize_meta.get("extracted_css_path")
+        if css_path:
+            meta["artifacts"] = list(meta["artifacts"]) + [
+                {"kind": "extracted_css", "path": f"source/{css_path}"},
+            ]
     if fetch_meta:
         meta["fetch_meta"] = fetch_meta
     (_project_dir(cinema_dir, project_id) / "project.json").write_text(

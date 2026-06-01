@@ -9,6 +9,16 @@ from pathlib import Path
 from typing import Any
 
 from repatch.css import split_css_rules as _split_css_rules
+from repatch.web_preprocess import (
+    HTTP_PREVIEW_NETWORK_SHIM as _REPATCH_HTTP_PREVIEW_NETWORK_SHIM,
+    build_html_outline as _repatch_build_html_outline,
+    build_http_llm_context as _repatch_build_http_llm_context,
+    extract_visual_css as _repatch_extract_visual_css,
+    http_patch_llm_rules as _repatch_http_patch_llm_rules,
+    inject_http_preview_shim as _repatch_inject_http_preview_shim,
+    prepare_http_preview_html as _repatch_prepare_http_preview_html,
+    sanitize_http_preview_html as _repatch_sanitize_http_preview_html,
+)
 
 MAX_VISUAL_CSS_BYTES = 65_536
 OUTLINE_TEXT_PLACEHOLDER = "…"
@@ -604,3 +614,15 @@ def http_patch_llm_rules() -> str:
             "Do NOT include <script> tags — runtime is injected by Nexu after generation.",
         ]
     )
+
+
+# Core web preprocessing now belongs to repatch.  Keep Nexu's module as the
+# workspace/project-file adapter so old imports continue to work.
+HTTP_PREVIEW_NETWORK_SHIM = _REPATCH_HTTP_PREVIEW_NETWORK_SHIM
+extract_visual_css = _repatch_extract_visual_css
+build_html_outline = _repatch_build_html_outline
+sanitize_http_preview_html = _repatch_sanitize_http_preview_html
+inject_http_preview_shim = _repatch_inject_http_preview_shim
+prepare_http_preview_html = _repatch_prepare_http_preview_html
+build_http_llm_context = _repatch_build_http_llm_context
+http_patch_llm_rules = _repatch_http_patch_llm_rules

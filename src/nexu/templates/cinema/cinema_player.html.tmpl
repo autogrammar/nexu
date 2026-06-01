@@ -2293,6 +2293,9 @@
             if (llmShell) llmShell.hidden = tab !== 'llm';
             if (servicesShell) servicesShell.hidden = tab !== 'services';
             if (editorControls) editorControls.hidden = tab !== 'editor';
+            if (tab !== 'editor') {
+                closeGoalPromptModal();
+            }
             if (tab === 'projects') updateProjectActiveBar();
             if (tab === 'editor') {
                 refreshIntractPolicy();
@@ -2382,6 +2385,7 @@
             updatePromptBox();
             const openModal = () => showGoalPromptModal();
             if (mainTab !== 'editor') {
+                closeGoalPromptModal();
                 return;
             } else {
                 openModal();
@@ -3780,6 +3784,7 @@
         }
 
         function handleAnnotation(elementId, type, fragment) {
+            if (!String(elementId || '').trim()) return;
             if (pendingGoalOptions && !workspaceEngaged) {
                 logEvent('ANNOTATE_PRE_OPTIONS', { elementId: elementId, type: type });
             }
