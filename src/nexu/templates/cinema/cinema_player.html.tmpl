@@ -3712,8 +3712,25 @@
             renderBaseline('project', baseline.project);
             renderBaseline('capsule (frozen model)', baseline.capsule);
 
-            const goalEntries = ledger.filter(e => e && e.status === 'goal_defined');
-            const evolveEntries = ledger.filter(e => e && e.status !== 'goal_defined');
+            const activeScope = String(currentFocusScope || '').trim().toLowerCase();
+            const entryMatchesVisibleContractScope = (entry) => {
+                if (!entry || typeof entry !== 'object') return false;
+                if (!ledgerEntryMatchesActiveProject(entry, data)) return false;
+                const entryScope = String(entry.focus_scope || '').trim().toLowerCase();
+                if (!activeScope) return true;
+                if (!entryScope) return entry.status === 'goal_defined';
+                return entryScope === activeScope;
+            };
+            const visibleLedger = ledger.filter(entryMatchesVisibleContractScope);
+            const goalEntries = visibleLedger.filter(e => e && e.status === 'goal_defined');
+            const evolveEntries = visibleLedger.filter(e => e && e.status !== 'goal_defined');
+            const seenPolicyLines = new Set();
+            const renderPolicyLine = (line) => {
+                const key = String(line || '').trim();
+                if (!key || seenPolicyLines.has(key)) return;
+                seenPolicyLines.add(key);
+                html += `<code class="policy-contract-line">${key}</code>`;
+            };
 
             html += '<div class="policy-section-title">Goal extensions (from project goal)</div>';
             if (!goalEntries.length) {
@@ -3725,7 +3742,7 @@
                     }
                     (entry.proposed_contracts || []).forEach(p => {
                         const line = p.line || p.delta_text || `@intract.v1 id:${p.id || 'unknown'}`;
-                        html += `<code class="policy-contract-line">${line}</code>`;
+                        renderPolicyLine(line);
                     });
                 });
             }
@@ -3737,7 +3754,7 @@
                 evolveEntries.forEach(entry => {
                     (entry.proposed_contracts || []).forEach(p => {
                         const line = p.line || p.delta_text || `@intract.v1 id:${p.id || 'unknown'}`;
-                        html += `<code class="policy-contract-line">${line}</code>`;
+                        renderPolicyLine(line);
                     });
                 });
             }
@@ -3746,7 +3763,7 @@
             if (meta) {
                 const pCount = (baseline.project || []).length;
                 const cCount = (baseline.capsule || []).length;
-                meta.textContent = `baseline ${pCount}+${cCount} · goal ${goalEntries.length} · deltas ${evolveEntries.length}`;
+                meta.textContent = `scope ${activeScope || 'all'} · baseline ${pCount}+${cCount} · goal ${goalEntries.length} · deltas ${evolveEntries.length}`;
             }
         }
 

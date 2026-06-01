@@ -3,6 +3,7 @@ from pathlib import Path
 
 from nexu.cinema_policy import (
     apply_ledger_from_cinema,
+    append_iteration_ledger_entry,
     ensure_option_previews_from_stages,
     option_previews_are_distinct,
     effective_ui_constraints_from_ledger,
@@ -287,3 +288,26 @@ def test_propose_ui_delta_and_validate(tmp_path: Path):
     report = validate_intract_artifact(html, normalized, filename="stage0.html", root=tmp_path)
     assert report is not None
     assert report.get("status") in {"pass", "partial", "warn", "unavailable", "error"}
+
+
+def test_iteration_ledger_contracts_use_active_project_and_scope(tmp_path: Path):
+    entry = append_iteration_ledger_entry(
+        tmp_path,
+        "scientific_calc",
+        stage=0,
+        keep=["hero-title"],
+        delete=["cta-primary"],
+        status="evolved_by_llm",
+        model="test-model",
+        domain="web",
+        project_id="http-sss.net.pl",
+        focus_scope="colors",
+        cinema_dir=tmp_path,
+    )
+
+    lines = [p["line"] for p in entry["proposed_contracts"]]
+    assert any("id:cinema.http-sss.net.pl.S0.colors.remove.cta-primary" in line for line in lines)
+    assert any("id:cinema.http-sss.net.pl.S0.colors.keep.hero-title" in line for line in lines)
+    assert all("scope:colors" in line for line in lines)
+    assert all("project:http-sss.net.pl" in line for line in lines)
+    assert all("cinema.scientific_calc.S0.ui" not in line for line in lines)

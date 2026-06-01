@@ -572,8 +572,12 @@ def propose_ui_delta_contract_dicts(
     delete: list[str],
     capsule_name: str,
     domain: str = "calculator",
+    project_id: str = "",
+    focus_scope: str = "",
 ) -> list[dict[str, Any]]:
-    if ensure_intract_on_path(Path(".")):
+    contract_subject = (project_id or capsule_name).strip()
+    contract_scope = (focus_scope or "ui").strip().lower()
+    if not project_id and not focus_scope and ensure_intract_on_path(Path(".")):
         try:
             from intract.proposals import propose_ui_delta_contract_dicts as _propose
 
@@ -589,32 +593,34 @@ def propose_ui_delta_contract_dicts(
 
     proposals: list[dict[str, Any]] = []
     for element_id in delete:
-        contract_id = f"cinema.{capsule_name}.S{stage}.ui.remove.{element_id}"
+        contract_id = f"cinema.{contract_subject}.S{stage}.{contract_scope}.remove.{element_id}"
         proposals.append(
             {
                 "id": contract_id,
                 "kind": "delete",
                 "element": element_id,
                 "line": (
-                    f"@intract.v1 id:{contract_id} scope:ui intent:ui:remove:{element_id} "
+                    f"@intract.v1 id:{contract_id} scope:{contract_scope} "
+                    f"intent:ui:{contract_scope}:remove:{element_id} "
                     f"priority:3 domain:{domain} effect:ui_change "
                     f"forbid:destructive_write,secret_leak "
                     f"require:human_review validate:no_forbidden_effect "
-                    f'meaning:"Cinema S{stage} removed #{element_id}"'
+                    f'project:{contract_subject} meaning:"Cinema S{stage} removed #{element_id} in #{contract_scope}"'
                 ),
             }
         )
     for element_id in keep:
-        contract_id = f"cinema.{capsule_name}.S{stage}.ui.keep.{element_id}"
+        contract_id = f"cinema.{contract_subject}.S{stage}.{contract_scope}.keep.{element_id}"
         proposals.append(
             {
                 "id": contract_id,
                 "kind": "keep",
                 "element": element_id,
                 "line": (
-                    f"@intract.v1 id:{contract_id} scope:ui intent:ui:keep:{element_id} "
+                    f"@intract.v1 id:{contract_id} scope:{contract_scope} "
+                    f"intent:ui:{contract_scope}:keep:{element_id} "
                     f"priority:2 domain:{domain} effect:ui_change validate:input_presence "
-                    f'meaning:"Cinema S{stage} kept #{element_id}"'
+                    f'project:{contract_subject} meaning:"Cinema S{stage} kept #{element_id} in #{contract_scope}"'
                 ),
             }
         )
@@ -793,6 +799,8 @@ def append_iteration_ledger_entry(
             delete=delete,
             capsule_name=capsule_name,
             domain=domain,
+            project_id=project_id,
+            focus_scope=focus_scope,
         ),
     )
     entry = {

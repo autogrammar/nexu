@@ -689,7 +689,13 @@ def _ensure_intract_on_path() -> bool:
 
 
 def _propose_cinema_contracts(stage: int, keep_els: list, delete_els: list) -> list:
-    if _ensure_intract_on_path():
+    active = _active_project().get("project") or {}
+    active_project_id = str(active.get("id") or "").strip()
+    active_kind = str(active.get("kind") or "").strip().lower()
+    domain = "calculator" if active_kind == "calculator" else "web"
+    contract_scope = "ui"
+    contract_subject = active_project_id or CAPSULE_NAME
+    if _ensure_intract_on_path() and not active_project_id:
         try:
             from intract.proposals import propose_ui_delta_contract_dicts
 
@@ -698,36 +704,38 @@ def _propose_cinema_contracts(stage: int, keep_els: list, delete_els: list) -> l
                 keep=keep_els,
                 delete=delete_els,
                 capsule=CAPSULE_NAME,
-                domain="calculator",
+                domain=domain,
             )
         except Exception:
             pass
 
     proposals = []
     for element_id in delete_els:
-        contract_id = f"cinema.{CAPSULE_NAME}.S{stage}.ui.remove.{element_id}"
+        contract_id = f"cinema.{contract_subject}.S{stage}.{contract_scope}.remove.{element_id}"
         proposals.append({
             "id": contract_id,
             "kind": "delete",
             "element": element_id,
             "line": (
-                f"@intract.v1 id:{contract_id} scope:ui intent:ui:remove:{element_id} "
-                f"priority:3 domain:calculator effect:ui_change forbid:destructive_write,secret_leak "
+                f"@intract.v1 id:{contract_id} scope:{contract_scope} "
+                f"intent:ui:{contract_scope}:remove:{element_id} "
+                f"priority:3 domain:{domain} effect:ui_change forbid:destructive_write,secret_leak "
                 f"require:human_review validate:no_forbidden_effect "
-                f'meaning:"Cinema S{stage} removed #{element_id}"'
+                f'project:{contract_subject} meaning:"Cinema S{stage} removed #{element_id} in #{contract_scope}"'
             ),
         })
     for element_id in keep_els:
-        contract_id = f"cinema.{CAPSULE_NAME}.S{stage}.ui.keep.{element_id}"
+        contract_id = f"cinema.{contract_subject}.S{stage}.{contract_scope}.keep.{element_id}"
         proposals.append({
             "id": contract_id,
             "kind": "keep",
             "element": element_id,
             "line": (
-                f"@intract.v1 id:{contract_id} scope:ui intent:ui:keep:{element_id} "
-                f"priority:3 domain:calculator effect:read forbid:destructive_write,secret_leak "
+                f"@intract.v1 id:{contract_id} scope:{contract_scope} "
+                f"intent:ui:{contract_scope}:keep:{element_id} "
+                f"priority:3 domain:{domain} effect:read forbid:destructive_write,secret_leak "
                 f"require:human_review validate:no_forbidden_effect "
-                f'meaning:"Cinema S{stage} preserved #{element_id}"'
+                f'project:{contract_subject} meaning:"Cinema S{stage} preserved #{element_id} in #{contract_scope}"'
             ),
         })
     return proposals
