@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import re
 
+from repatch.css import validate_css_safety as _repatch_validate_css_safety
+
 from .cinema_html import ensure_html_document_closure
 
 _ALT_FILES = frozenset({"alt_a.html", "alt_b.html", "alt_c.html"})
@@ -23,38 +25,8 @@ def _selector_is_runtime_only(selector: str) -> bool:
 
 
 def validate_css_safety(css: str, *, source: str = "css") -> tuple[bool, list[str]]:
-    """Reject CSS patterns that commonly break Cinema previews.
-
-    Runtime Nexu overlay selectors are allowed to use fixed positioning; generated
-    app CSS should stay in normal flow and use flex/grid for layout changes.
-    """
-    errors: list[str] = []
-    text = _strip_css_comments(css)
-    if not text.strip():
-        return True, []
-    if re.search(r"@import\b|url\s*\(|expression\s*\(|javascript\s*:", text, re.I):
-        errors.append(f"{source}: external or executable CSS is not allowed")
-
-    for match in _RULE_RE.finditer(text):
-        selectors = " ".join(match.group("selectors").split())
-        body = match.group("body")
-        if _selector_is_runtime_only(selectors):
-            continue
-        declarations = {
-            decl.group("name").strip().lower(): decl.group("value").strip().lower()
-            for decl in _DECL_RE.finditer(body)
-        }
-        position = declarations.get("position", "")
-        if position in {"absolute", "fixed"}:
-            errors.append(f"{source}: {selectors} uses position:{position}")
-        for name, value in declarations.items():
-            if name.startswith("margin") and re.match(r"-\d", value):
-                errors.append(f"{source}: {selectors} uses negative {name}")
-            if name == "transform" and ":hover" not in selectors:
-                errors.append(f"{source}: {selectors} uses transform outside hover state")
-            if name in {"top", "left", "right", "bottom"} and position in {"absolute", "fixed"}:
-                errors.append(f"{source}: {selectors} uses manual {name} offset")
-    return len(errors) == 0, errors
+    """Reject CSS patterns that commonly break Cinema previews."""
+    return _repatch_validate_css_safety(css, source=source)
 
 
 def _looks_like_html_document(text: str) -> bool:

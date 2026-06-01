@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 import pytest
-
-from nexu.cinema_ui_patch import (
+from repatch.ui_patch import (
     apply_ui_patch_options,
     build_ui_patch_prompt,
     parse_ui_patch_response,

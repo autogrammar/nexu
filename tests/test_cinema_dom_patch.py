@@ -37,10 +37,10 @@ def test_build_function_option_patches_returns_valid_abc() -> None:
     assert "<script" not in files["alt_c.html"].lower()
 
 
-def test_build_function_option_patches_applies_delete_marks() -> None:
+def test_build_function_option_patches_xpatches_delete_marks() -> None:
     html_with_control = HTML.replace(
         "</header>",
-        '<div class="btn" id="btn-old">Old</div></header>',
+        '<a class="btn" id="btn-old" href="#old">Old</a></header>',
     )
     files, labels, meta = build_function_option_patches(
         html_with_control,
@@ -51,7 +51,10 @@ def test_build_function_option_patches_applies_delete_marks() -> None:
 
     assert meta["status"] == "ok"
     assert labels
-    assert "btn-old" not in files["alt_a.html"].lower()
+    assert "btn-old" in files["alt_a.html"].lower()
+    assert 'data-nexu-function-xpatch="a"' in files["alt_a.html"]
+    assert "Sprawdź: audience" in files["alt_a.html"]
+    assert "Umów krok: audience" in files["alt_b.html"]
     assert "nexu-function-evolution" in files["alt_a.html"]
 
 

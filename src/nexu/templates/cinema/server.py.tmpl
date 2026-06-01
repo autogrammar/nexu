@@ -1776,7 +1776,7 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 marked_llm_context = None
                 if session_keep or session_delete or keep_els or delete_els:
                     try:
-                        from nexu.cinema_marked_context import resolve_marked_llm_context
+                        from repatch import resolve_marked_llm_context
 
                         marked_llm_context = resolve_marked_llm_context(
                             current_html,
@@ -2274,7 +2274,7 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                     project_kind = str(ui_profile.get("kind") or "").lower()
                     try:
                         from nexu.cinema_scope import cinema_has_offline_baseline
-                        from nexu.cinema_ui_patch import (
+                        from repatch.ui_patch import (
                             apply_ui_patch_options,
                             build_ui_patch_prompt,
                             parse_ui_patch_response,
@@ -2750,7 +2750,7 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                                 source="offline",
                             )
                         elif not options_written:
-                            from nexu.cinema_scope import should_block_full_html_iterate
+                            from repatch import should_block_full_html_iterate
 
                             block_full_html = should_block_full_html_iterate(
                                 project_kind_for_route,

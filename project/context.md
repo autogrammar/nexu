@@ -85,14 +85,14 @@
 - **Functions**: 13
 - **File**: `mcp_server.py`
 
+### src.nexu.cinema_ui_patch
+- **Functions**: 10
+- **File**: `cinema_ui_patch.py`
+
 ### src.vico.models
 - **Functions**: 10
 - **Classes**: 9
 - **File**: `models.py`
-
-### src.nexu.cinema_ui_patch
-- **Functions**: 10
-- **File**: `cinema_ui_patch.py`
 
 ### src.nexu.cinema
 - **Functions**: 9
@@ -421,6 +421,25 @@ Key functions that process and transform data:
 > Load compact HTTP import artifacts for LLM prompts when the active project is http-*.
 - **Output to**: str, src.nexu.cinema_http_preprocess._project_meta_path, src.nexu.cinema_http_preprocess._load_project_meta, str, str
 
+### src.nexu.cinema_llm.parse_batch_alt_options
+> Parse NEXU_ALT_A/B/C marked batch LLM output into option filenames.
+- **Output to**: src.nexu.cinema_llm._strip_rich_console_artifacts, _BATCH_ALT_FILES.items, re.search, src.nexu.cinema_html_validate.prepare_cinema_html_document, set
+
+### src.nexu.cinema_project_imports._validate_http_url
+- **Output to**: urlparse, url.strip
+
+### src.nexu.cinema_project_imports._validate_git_url
+- **Output to**: url.strip, source.lower, lowered.startswith, lowered.startswith, re.match
+
+### src.nexu.cinema_project_imports._decode_http_bytes
+- **Output to**: src.nexu.cinema_project_imports._charset_from_content_type, body.decode, body.decode
+
+### src.nexu.cinema_project_imports._apply_http_preprocess_fields
+- **Output to**: list, None.strip, updated.get, any, artifacts.append
+
+### src.nexu.cinema_project_imports._refresh_http_preprocess_if_needed
+- **Output to**: str, Path, src.nexu.cinema_project_imports._load_http_fetch_meta, src.nexu.cinema_http_preprocess.ensure_http_preprocess_artifacts, src.nexu.cinema_project_imports._apply_http_preprocess_fields
+
 ### src.nexu.cinema_projects._apply_preprocess_meta
 - **Output to**: None.isoformat, src.nexu.cinema_http_preprocess.preprocess_cinema_seed, str, meta.update, datetime.now
 
@@ -439,31 +458,9 @@ Key functions that process and transform data:
 ### src.nexu.cinema_policy.validate_intract_artifact
 - **Output to**: validate_artifact_with_proposals, src.nexu.cinema_policy.ensure_intract_on_path, src.nexu.cinema_policy.ensure_intract_on_path, Path, str
 
-### src.nexu.cinema_options_cache.invalidate_options_cache
-- **Output to**: cache_root.is_dir, shutil.rmtree
-
-### src.nexu.cinema_llm_contracts._format_contract_params
-- **Output to**: src.nexu.cinema_llm_contracts._compact, src.nexu.cinema_llm_contracts._compact, src.nexu.cinema_llm_contracts._compact, None.join, None.join
-
-### src.nexu.cinema_html_validate.validate_css_safety
-> Reject CSS patterns that commonly break Cinema previews.
-
-Runtime Nexu overlay selectors are allowed
-- **Output to**: src.nexu.cinema_html_validate._strip_css_comments, re.search, _RULE_RE.finditer, text.strip, errors.append
-
-### src.nexu.cinema_html_validate._validate_basic_tags
-- **Output to**: text.lower, src.nexu.cinema_html_validate._looks_like_html_document, errors.append, errors.append, src.nexu.cinema_html_validate._has_open_tag
-
-### src.nexu.cinema_html_validate._validate_calculator_elements
-- **Output to**: re.search, errors.append, re.search, errors.append
-
-### src.nexu.cinema_html_validate.validate_cinema_html_document
-> Return whether HTML has the minimum structure expected in Cinema previews.
-- **Output to**: None.strip, src.nexu.cinema_html_validate._validate_basic_tags, text.lower, lower.find, re.search
-
-### src.nexu.cinema_llm.parse_batch_alt_options
-> Parse NEXU_ALT_A/B/C marked batch LLM output into option filenames.
-- **Output to**: src.nexu.cinema_llm._strip_rich_console_artifacts, _BATCH_ALT_FILES.items, re.search, src.nexu.cinema_html_validate.prepare_cinema_html_document, set
+### src.nexu.cinema_ui_patch.parse_ui_patch_response
+> Parse JSON object from an LLM patch response.
+- **Output to**: src.nexu.cinema_ui_patch._strip_json_fence, data.get, json.loads, isinstance, ValueError
 
 ## Public API Surface
 
@@ -497,9 +494,9 @@ Functions exposed as public API (no underscore prefix):
 - `src.nexu.intract.parse_intract_line` - 22 calls
 - `src.nexu.orchestrate.offline_orchestration_from_context` - 22 calls
 - `src.nexu.cinema_project_ir.summarize_project_ir` - 21 calls
+- `src.nexu.cinema_project_imports.import_http_project` - 21 calls
 - `src.nexu.cinema_markpact.build_markpact_readme` - 21 calls
 - `scripts.check-doc-links.check_links` - 21 calls
-- `src.nexu.cinema_project_imports.import_http_project` - 21 calls
 - `src.nexu.cinema_publish.start_published_service` - 20 calls
 - `src.nexu.cinema_html_validate.relocate_style_tags_to_head` - 20 calls
 - `src.nexu.cinema_html_validate.repair_html_structure` - 20 calls

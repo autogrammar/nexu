@@ -8,6 +8,8 @@ from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any
 
+from repatch.css import split_css_rules as _split_css_rules
+
 MAX_VISUAL_CSS_BYTES = 65_536
 OUTLINE_TEXT_PLACEHOLDER = "…"
 
@@ -168,26 +170,7 @@ def _normalize_linked_paths(linked_css_paths: list[str] | None, html: str) -> li
     return paths
 
 
-def _split_css_rules(css: str) -> list[str]:
-    """Split CSS into top-level rule blocks (best-effort, no full parser)."""
-    text = str(css or "")
-    rules: list[str] = []
-    depth = 0
-    start = 0
-    for index, char in enumerate(text):
-        if char == "{":
-            depth += 1
-        elif char == "}":
-            depth -= 1
-            if depth == 0:
-                chunk = text[start : index + 1].strip()
-                if chunk:
-                    rules.append(chunk)
-                start = index + 1
-    tail = text[start:].strip()
-    if tail and depth == 0:
-        rules.append(tail)
-    return rules
+
 
 
 def _rule_is_visual(rule: str) -> bool:

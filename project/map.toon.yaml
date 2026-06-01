@@ -1,10 +1,10 @@
-# nexu | 122f 23058L | python:118,shell:3,less:1 | 2026-06-01
-# stats: 865 func | 21 cls | 122 mod | CC̄=4.8 | critical:91 | cycles:0
-# alerts[5]: CC test_render_server_script_embeds_runtime_context=74; CC test_cinema_player_template_is_externalized=68; CC _bind_annotations_to_html=29; CC apply_ui_patch_options=25; CC test_import_http_project_fetches_and_migrates=23
+# nexu | 120f 21510L | python:116,shell:3,less:1 | 2026-06-01
+# stats: 800 func | 21 cls | 120 mod | CC̄=4.7 | critical:79 | cycles:0
+# alerts[5]: CC test_render_server_script_embeds_runtime_context=74; CC test_cinema_player_template_is_externalized=68; CC test_import_http_project_fetches_and_migrates=23; CC test_import_zip_project_creates_markpact_migration_and_options=22; CC test_projects_import_zip_endpoint=19
 # hotspots[5]: test_projects_import_zip_endpoint fan=33; test_iterate_dashboard_kinds_colors_prefers_offline_before_llm fan=32; test_iterate_colors_scope_uses_offline_path fan=31; test_iterate_colors_scope_uses_llm_patch_when_available fan=30; test_iterate_functions_scope_skips_offline_fast_path fan=29
 # evolution: baseline
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[122]:
+M[120]:
   app.doql.less,155
   examples/backend_service/app/users.py,9
   examples/frontend_view/src/menu_icons.py,25
@@ -36,16 +36,15 @@ M[122]:
   src/nexu/capsule.py,125
   src/nexu/cinema.py,195
   src/nexu/cinema_baseline_contracts.py,174
-  src/nexu/cinema_dom_patch.py,203
+  src/nexu/cinema_dom_patch.py,28
   src/nexu/cinema_goal_contracts.py,346
   src/nexu/cinema_history.py,245
   src/nexu/cinema_html.py,17
-  src/nexu/cinema_html_validate.py,230
-  src/nexu/cinema_http_preprocess.py,624
+  src/nexu/cinema_html_validate.py,202
+  src/nexu/cinema_http_preprocess.py,605
   src/nexu/cinema_iterate.py,67
   src/nexu/cinema_llm.py,333
   src/nexu/cinema_llm_contracts.py,197
-  src/nexu/cinema_marked_context.py,503
   src/nexu/cinema_markpact.py,216
   src/nexu/cinema_offline_options.py,898
   src/nexu/cinema_options_cache.py,129
@@ -54,11 +53,10 @@ M[122]:
   src/nexu/cinema_project_ir.py,133
   src/nexu/cinema_projects.py,721
   src/nexu/cinema_publish.py,470
-  src/nexu/cinema_scope.py,687
-  src/nexu/cinema_scripts.py,773
+  src/nexu/cinema_scope.py,235
+  src/nexu/cinema_scripts.py,673
   src/nexu/cinema_server.py,145
   src/nexu/cinema_traces.py,167
-  src/nexu/cinema_ui_patch.py,269
   src/nexu/cli.py,380
   src/nexu/config.py,192
   src/nexu/diff.py,36
@@ -102,7 +100,7 @@ M[122]:
   tests/test_cinema_iterate.py,89
   tests/test_cinema_llm.py,279
   tests/test_cinema_llm_contracts.py,61
-  tests/test_cinema_marked_context.py,210
+  tests/test_cinema_marked_context.py,208
   tests/test_cinema_markpact.py,45
   tests/test_cinema_offline_options.py,318
   tests/test_cinema_options_cache.py,65
@@ -326,15 +324,7 @@ D:
     merge_calculator_baselines(capsule_contracts;root;name)
     ensure_capsule_intract_yaml(root;name)
   src/nexu/cinema_dom_patch.py:
-    e: supports_function_patch,build_function_patch_context,_strip_existing_patch,_goal_label,_variant_section,_patch_style,_inject_into_head,_inject_into_body,build_function_option_patches
-    supports_function_patch(scope;project_kind)
-    build_function_patch_context(html_text)
-    _strip_existing_patch(text)
-    _goal_label(user_goal)
-    _variant_section(variant;user_goal;ir)
-    _patch_style()
-    _inject_into_head(text;style)
-    _inject_into_body(text;section)
+    e: build_function_option_patches
     build_function_option_patches(html_text)
   src/nexu/cinema_goal_contracts.py:
     e: _hints_text,is_chemical_goal,_slug,_goal_contract_dict,_resolve_baseline_anchor,_build_detail_text,_detect_chemical_trait,_detect_minimal_trait,_detect_expanded_trait,_detect_api_trait,_detect_dashboard_trait,_detect_engineering_trait,_collect_trait_proposals,propose_goal_extension_contracts,goal_traits_from_contract_lines
@@ -387,13 +377,12 @@ D:
     prepare_cinema_html_document(html)
     filter_valid_option_batch(batch)
   src/nexu/cinema_http_preprocess.py:
-    e: _safe_read_under,_extract_inline_css,_extract_stylesheet_hrefs,_normalize_linked_paths,_split_css_rules,_rule_is_visual,_filter_visual_css,extract_visual_css,_script_src_allowed_for_preview,_should_remove_preview_script,sanitize_http_preview_html,inject_http_preview_shim,prepare_http_preview_html,build_html_outline,_write_preprocess_artifacts,preprocess_cinema_seed,http_preprocess_artifacts_present,ensure_http_preprocess_artifacts,preprocess_http_import,_project_meta_path,load_cinema_seed_preprocess_artifacts,_load_project_meta,load_http_preprocess_artifacts,build_http_llm_context,http_patch_llm_rules,_OutlineParser
+    e: _safe_read_under,_extract_inline_css,_extract_stylesheet_hrefs,_normalize_linked_paths,_rule_is_visual,_filter_visual_css,extract_visual_css,_script_src_allowed_for_preview,_should_remove_preview_script,sanitize_http_preview_html,inject_http_preview_shim,prepare_http_preview_html,build_html_outline,_write_preprocess_artifacts,preprocess_cinema_seed,http_preprocess_artifacts_present,ensure_http_preprocess_artifacts,preprocess_http_import,_project_meta_path,load_cinema_seed_preprocess_artifacts,_load_project_meta,load_http_preprocess_artifacts,build_http_llm_context,http_patch_llm_rules,_OutlineParser
     _OutlineParser: __init__(0),_keep_attr(1),handle_starttag(2),handle_endtag(1),handle_data(1)
     _safe_read_under(base_dir;rel_path)
     _extract_inline_css(html)
     _extract_stylesheet_hrefs(html)
     _normalize_linked_paths(linked_css_paths;html)
-    _split_css_rules(css)
     _rule_is_visual(rule)
     _filter_visual_css(css)
     extract_visual_css(html;linked_css_paths;source_dir)
@@ -446,33 +435,6 @@ D:
     _format_contract_params(keep_els;delete_els;project_goal;current_state;expected_version;element_hints)
     build_llm_communication_contract_lines()
     build_llm_contract_block()
-  src/nexu/cinema_marked_context.py:
-    e: has_ui_marks,_css_id_selector,marked_css_selectors,resolve_marked_selectors,marked_scope_colors_css,restrict_scope_css_to_marks,_id_candidates,_parse_attrs,_logical_id,_extract_balanced_html,_collect_match_candidates,_collect_button_candidates,_extract_and_format_fragment,_find_marked_subtrees,_selector_tokens,_filter_css_for_tokens,_collect_css_sources,_scope_semantics,_cap_text,_client_fragment_html,_assemble_marked_subtrees,_get_relevant_css,_format_context_body,build_marked_element_context,resolve_marked_llm_context
-    has_ui_marks(keep_els;delete_els)
-    _css_id_selector(token)
-    marked_css_selectors(element_ids)
-    resolve_marked_selectors(html;element_ids)
-    marked_scope_colors_css(selectors;variant)
-    restrict_scope_css_to_marks(css;delete_ids)
-    _id_candidates(element_id)
-    _parse_attrs(attr_text)
-    _logical_id(tag;attrs)
-    _extract_balanced_html(html;start)
-    _collect_match_candidates(tag;attrs)
-    _collect_button_candidates(tag;attrs;match;raw_html)
-    _extract_and_format_fragment(text;start)
-    _find_marked_subtrees(html;marked_ids)
-    _selector_tokens(subtrees)
-    _filter_css_for_tokens(css;tokens)
-    _collect_css_sources(html;ui_profile)
-    _scope_semantics(scope)
-    _cap_text(text;limit)
-    _client_fragment_html(client_fragments;element_id)
-    _assemble_marked_subtrees(html;marked_ids;client_fragments)
-    _get_relevant_css(html;subtrees;ui_profile)
-    _format_context_body(keep;delete;marked_ids;subtrees;css;scope;ui_profile)
-    build_marked_element_context(html)
-    resolve_marked_llm_context(html)
   src/nexu/cinema_markpact.py:
     e: _escape_markdown_fence,_language_for,_project_context_block,_get_app_title,_get_baseline_block,build_markpact_readme,markpact_download_filename
     _escape_markdown_fence(text;fence)
@@ -681,35 +643,14 @@ D:
     start_published_service(cinema_dir;service_id)
     stop_published_service(cinema_dir;service_id)
   src/nexu/cinema_scope.py:
-    e: ui_type_for_kind,allowed_scope_ids,default_scope_for_kind,normalize_focus_scope,offline_fast_scopes_for_kind,scope_supports_offline_fast_path,cinema_has_offline_baseline,scope_option_variants,strip_scope_style,_scope_css,_calc_scope_css,_web_scope_css,_resolve_scope_kind,should_block_full_html_iterate,_bind_annotations_to_html,_get_scope_css,_inject_css_block,inject_scope_style,scoped_html_fragment,scope_meta_for_project,load_cinema_ui_profile,can_use_offline_fast_iterate
-    ui_type_for_kind(kind)
-    allowed_scope_ids(project_kind)
-    default_scope_for_kind(project_kind)
-    normalize_focus_scope(scope;project_kind)
-    offline_fast_scopes_for_kind(project_kind)
-    scope_supports_offline_fast_path(scope;project_kind)
+    e: cinema_has_offline_baseline,scope_option_variants,scope_meta_for_project,load_cinema_ui_profile,can_use_offline_fast_iterate
     cinema_has_offline_baseline(cinema_dir)
     scope_option_variants(scope;ui_type;focus_text)
-    strip_scope_style(html)
-    _scope_css(scope;variant)
-    _calc_scope_css(scope;variant)
-    _web_scope_css(scope;variant)
-    _resolve_scope_kind(project_kind;html)
-    should_block_full_html_iterate(project_kind;keep_els;delete_els)
-    _bind_annotations_to_html(html;keep_ids;delete_ids)
-    _get_scope_css(inferred;html;scope;variant)
-    _inject_css_block(html;css)
-    inject_scope_style(html;scope;variant)
-    scoped_html_fragment(html;focus_scope;project_kind)
     scope_meta_for_project(project_kind)
     load_cinema_ui_profile(active;cinema_dir)
     can_use_offline_fast_iterate(focus_scope;project_kind;cinema_dir)
   src/nexu/cinema_scripts.py:
-    e: _delete_match_keys,_selectable_block_attrs,_element_delete_candidates,apply_spatial_deletes_to_html,inject_cinema_shield,finalize_cinema_html,write_cinema_inject_files,repair_cinema_html_files
-    _delete_match_keys(element_id)
-    _selectable_block_attrs(attrs)
-    _element_delete_candidates(attrs;inner_text)
-    apply_spatial_deletes_to_html(html;delete_ids)
+    e: inject_cinema_shield,finalize_cinema_html,write_cinema_inject_files,repair_cinema_html_files
     inject_cinema_shield(html)
     finalize_cinema_html(html)
     write_cinema_inject_files(cinema_dir)
@@ -733,18 +674,6 @@ D:
     write_llm_trace(trace_dir;index_path;lock)
     list_llm_traces(trace_dir)
     read_llm_trace(trace_dir;trace_id)
-  src/nexu/cinema_ui_patch.py:
-    e: supports_llm_patch_scope,_compact_html,_patch_scope_rules,build_ui_patch_prompt,_strip_json_fence,parse_ui_patch_response,_safe_css,_label_for,_css_for,apply_ui_patch_options
-    supports_llm_patch_scope(scope;project_kind)
-    _compact_html(html)
-    _patch_scope_rules(scope)
-    build_ui_patch_prompt(html)
-    _strip_json_fence(text)
-    parse_ui_patch_response(text)
-    _safe_css(css)
-    _label_for(filename;item;fallback)
-    _css_for(item)
-    apply_ui_patch_options(html;patch)
   src/nexu/cli.py:
     e: _print_yaml,_relative_to_root,init,freeze,capsule_create,capsule_list,capsule_status_command,capsule_iterate,capsule_blueprint,capsule_export_prompt,capsule_diff,capsule_drift,capsule_verify,capsule_plan,capsule_runtime,capsule_report,capsule_journal,capsule_orchestrate,capsule_review,capsule_bundle,capsule_promote,mcp_tools,mcp_serve
     _print_yaml(data)

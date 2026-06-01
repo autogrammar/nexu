@@ -6,7 +6,7 @@ SUMMARY:
   dup_groups:    8
   dup_fragments: 22
   saved_lines:   193
-  scan_ms:       2633
+  scan_ms:       2677
 
 HOTSPOTS[7] (files with most duplication):
   src/nexu/cinema_scope.py  dup=103L  groups=1  frags=2  (0.6%)

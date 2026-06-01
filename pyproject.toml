@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "nexu"
-version = "0.5.23"
+version = "0.5.24"
 description = "Visual Intent Contract Orchestrator: freeze project slices, evolve capsules, verify intent contracts."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -26,6 +26,7 @@ dependencies = [
   "typer>=0.12.0",
   "rich>=13.0",
   "litellm>=1.0",
+  "repatch @ file:///home/tom/github/semcod/repatch",
 ]
 
 [project.optional-dependencies]
@@ -42,6 +43,9 @@ nexu = "nexu.cli:app"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/nexu"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

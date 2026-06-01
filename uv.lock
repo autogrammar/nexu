@@ -1819,11 +1819,12 @@ wheels = [
 
 [[package]]
 name = "nexu"
-version = "0.5.23"
+version = "0.5.24"
 source = { editable = "." }
 dependencies = [
     { name = "litellm" },
     { name = "pyyaml" },
+    { name = "repatch" },
     { name = "rich" },
     { name = "typer" },
 ]
@@ -1854,6 +1855,7 @@ requires-dist = [
     { name = "pfix", marker = "extra == 'dev'", specifier = ">=0.1.60" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0" },
     { name = "pyyaml", specifier = ">=6.0" },
+    { name = "repatch", directory = "/home/tom/github/semcod/repatch" },
     { name = "rich", specifier = ">=13.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.4" },
     { name = "typer", specifier = ">=0.12.0" },
@@ -2965,6 +2967,24 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/92/73/93d42045302636c91f2e5ef588b65b84b01428f28ec77de256b1dfdfbe5c/regex-2026.5.9-cp314-cp314t-win_amd64.whl", hash = "sha256:ca518ed29c46eecba6010b15f1b9a479314d2de409536e71b6a13aa04e3b8a77", size = 285685, upload-time = "2026-05-09T23:15:15.086Z" },
     { url = "https://files.pythonhosted.org/packages/da/80/35b4c33c804a165a7f55289afda3ea9e3eb6d15800341a2d66455c0f1f30/regex-2026.5.9-cp314-cp314t-win_arm64.whl", hash = "sha256:5e41809d2683fcde7d5a8c87a6567ba1fb1ce0de9f31bff578de00a4b2d76daa", size = 275713, upload-time = "2026-05-09T23:15:16.98Z" },
 ]
+
+[[package]]
+name = "repatch"
+version = "0.2.1"
+source = { directory = "/home/tom/github/semcod/repatch" }
+dependencies = [
+    { name = "litellm" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "costs", marker = "extra == 'dev'", specifier = ">=0.1.20" },
+    { name = "goal", marker = "extra == 'dev'", specifier = ">=2.1.0" },
+    { name = "litellm", specifier = ">=1.40.0" },
+    { name = "pfix", marker = "extra == 'dev'", specifier = ">=0.1.60" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0" },
+]
+provides-extras = ["dev"]
 
 [[package]]
 name = "requests"

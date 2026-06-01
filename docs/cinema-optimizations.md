@@ -65,6 +65,8 @@ flowchart TD
 
 ## Marked-element fragment iteration (2026-06)
 
+Patch primitives (`marked_context`, `scope`, `ui_patch`, `spatial`, `dom_patch`) live in the standalone [`repatch`](../../repatch) package; Nexu imports them via a path dependency.
+
 When the player sends KEEP/DELETE marks (`annotations` + optional `selected_fragments` from the shield iframe):
 
 1. **Player:** left-click/drag = KEEP (green), right-click/drag = DELETE (red). Each mark triggers `scheduleAutoIteration('mark')` with a shorter debounce (`FRAGMENT_ITERATE_MS`). Marks can start iteration even when a project goal is still pending.

@@ -2,20 +2,18 @@
 
 from __future__ import annotations
 
-from nexu.cinema_marked_context import (
+from repatch import (
     build_marked_element_context,
     has_ui_marks,
+    inject_scope_style,
     marked_css_selectors,
     marked_scope_colors_css,
     resolve_marked_llm_context,
     resolve_marked_selectors,
     restrict_scope_css_to_marks,
-)
-from nexu.cinema_scope import (
-    inject_scope_style,
     should_block_full_html_iterate,
 )
-from nexu.cinema_ui_patch import build_ui_patch_prompt
+from repatch.ui_patch import build_ui_patch_prompt
 
 CALC_HTML = """<!DOCTYPE html>
 <html>

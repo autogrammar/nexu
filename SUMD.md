@@ -23,7 +23,7 @@ Visual Intent Contract Orchestrator: freeze project slices, evolve capsules, ver
 ## Metadata
 
 - **name**: `nexu`
-- **version**: `0.5.22`
+- **version**: `0.5.23`
 - **python_requires**: `>=3.10`
 - **license**: Apache-2.0
 - **ai_model**: `openrouter/qwen/qwen3-coder-next`
@@ -43,7 +43,7 @@ SUMD (description) → DOQL/source (code) → taskfile (automation) → testql (
 
 app {
   name: nexu;
-  version: 0.5.22;
+  version: 0.5.23;
 }
 
 dependencies {
@@ -265,7 +265,7 @@ pipeline:
 ```yaml
 project:
   name: nexu
-  version: 0.5.22
+  version: 0.5.23
   env: local
 ```
 
@@ -1601,7 +1601,7 @@ D:
 
 ```prolog markpact:analysis path=project/logic.pl
 % ── Project Metadata ─────────────────────────────────────
-project_metadata('nexu', '0.5.22', 'python').
+project_metadata('nexu', '0.5.23', 'python').
 
 % ── Project Files ────────────────────────────────────────
 project_file('app.doql.less', 155, 'less').
@@ -1869,15 +1869,7 @@ python_function('src/nexu/cinema_baseline_contracts.py', 'calculator_baseline_co
 python_function('src/nexu/cinema_baseline_contracts.py', 'is_calculator_capsule', 2, 5, 5).
 python_function('src/nexu/cinema_baseline_contracts.py', 'merge_calculator_baselines', 3, 5, 5).
 python_function('src/nexu/cinema_baseline_contracts.py', 'ensure_capsule_intract_yaml', 2, 9, 9).
-python_function('src/nexu/cinema_dom_patch.py', 'supports_function_patch', 2, 4, 2).
-python_function('src/nexu/cinema_dom_patch.py', 'build_function_patch_context', 1, 2, 3).
-python_function('src/nexu/cinema_dom_patch.py', '_strip_existing_patch', 1, 2, 2).
-python_function('src/nexu/cinema_dom_patch.py', '_goal_label', 1, 3, 2).
-python_function('src/nexu/cinema_dom_patch.py', '_variant_section', 3, 3, 5).
-python_function('src/nexu/cinema_dom_patch.py', '_patch_style', 0, 1, 0).
-python_function('src/nexu/cinema_dom_patch.py', '_inject_into_head', 2, 4, 4).
-python_function('src/nexu/cinema_dom_patch.py', '_inject_into_body', 2, 2, 2).
-python_function('src/nexu/cinema_dom_patch.py', 'build_function_option_patches', 1, 8, 13).
+python_function('src/nexu/cinema_dom_patch.py', 'build_function_option_patches', 1, 1, 1).
 python_function('src/nexu/cinema_goal_contracts.py', '_hints_text', 1, 3, 4).
 python_function('src/nexu/cinema_goal_contracts.py', 'is_chemical_goal', 1, 2, 2).
 python_function('src/nexu/cinema_goal_contracts.py', '_slug', 1, 2, 3).
@@ -1909,7 +1901,7 @@ python_function('src/nexu/cinema_history.py', 'ledger_archive_for_display', 1, 5
 python_function('src/nexu/cinema_html.py', 'ensure_html_document_closure', 1, 5, 3).
 python_function('src/nexu/cinema_html_validate.py', '_strip_css_comments', 1, 2, 2).
 python_function('src/nexu/cinema_html_validate.py', '_selector_is_runtime_only', 1, 2, 2).
-python_function('src/nexu/cinema_html_validate.py', 'validate_css_safety', 1, 14, 15).
+python_function('src/nexu/cinema_html_validate.py', 'validate_css_safety', 1, 1, 1).
 python_function('src/nexu/cinema_html_validate.py', '_looks_like_html_document', 1, 3, 3).
 python_function('src/nexu/cinema_html_validate.py', '_has_open_tag', 2, 1, 1).
 python_function('src/nexu/cinema_html_validate.py', '_has_close_tag', 2, 1, 1).
@@ -1920,31 +1912,6 @@ python_function('src/nexu/cinema_html_validate.py', '_validate_calculator_elemen
 python_function('src/nexu/cinema_html_validate.py', 'validate_cinema_html_document', 1, 8, 14).
 python_function('src/nexu/cinema_html_validate.py', 'prepare_cinema_html_document', 1, 2, 2).
 python_function('src/nexu/cinema_html_validate.py', 'filter_valid_option_batch', 1, 9, 6).
-python_function('src/nexu/cinema_http_preprocess.py', '_safe_read_under', 2, 5, 5).
-python_function('src/nexu/cinema_http_preprocess.py', '_extract_inline_css', 1, 4, 3).
-python_function('src/nexu/cinema_http_preprocess.py', '_extract_stylesheet_hrefs', 1, 7, 4).
-python_function('src/nexu/cinema_http_preprocess.py', '_normalize_linked_paths', 2, 9, 6).
-python_function('src/nexu/cinema_http_preprocess.py', '_split_css_rules', 1, 9, 4).
-python_function('src/nexu/cinema_http_preprocess.py', '_rule_is_visual', 1, 7, 4).
-python_function('src/nexu/cinema_http_preprocess.py', '_filter_visual_css', 1, 3, 4).
-python_function('src/nexu/cinema_http_preprocess.py', 'extract_visual_css', 3, 8, 12).
-python_function('src/nexu/cinema_http_preprocess.py', '_script_src_allowed_for_preview', 1, 4, 4).
-python_function('src/nexu/cinema_http_preprocess.py', '_should_remove_preview_script', 1, 2, 3).
-python_function('src/nexu/cinema_http_preprocess.py', 'sanitize_http_preview_html', 1, 2, 4).
-python_function('src/nexu/cinema_http_preprocess.py', 'inject_http_preview_shim', 1, 4, 2).
-python_function('src/nexu/cinema_http_preprocess.py', 'prepare_http_preview_html', 1, 1, 2).
-python_function('src/nexu/cinema_http_preprocess.py', 'build_html_outline', 1, 3, 11).
-python_function('src/nexu/cinema_http_preprocess.py', '_write_preprocess_artifacts', 1, 4, 6).
-python_function('src/nexu/cinema_http_preprocess.py', 'preprocess_cinema_seed', 1, 3, 3).
-python_function('src/nexu/cinema_http_preprocess.py', 'http_preprocess_artifacts_present', 2, 9, 6).
-python_function('src/nexu/cinema_http_preprocess.py', 'ensure_http_preprocess_artifacts', 1, 4, 3).
-python_function('src/nexu/cinema_http_preprocess.py', 'preprocess_http_import', 1, 12, 8).
-python_function('src/nexu/cinema_http_preprocess.py', '_project_meta_path', 2, 1, 0).
-python_function('src/nexu/cinema_http_preprocess.py', 'load_cinema_seed_preprocess_artifacts', 2, 12, 9).
-python_function('src/nexu/cinema_http_preprocess.py', '_load_project_meta', 1, 4, 4).
-python_function('src/nexu/cinema_http_preprocess.py', 'load_http_preprocess_artifacts', 2, 16, 12).
-python_function('src/nexu/cinema_http_preprocess.py', 'build_http_llm_context', 1, 7, 5).
-python_function('src/nexu/cinema_http_preprocess.py', 'http_patch_llm_rules', 0, 1, 1).
 python_function('src/nexu/cinema_iterate.py', 'build_iterate_response_payload', 0, 11, 6).
 python_function('src/nexu/cinema_llm.py', '_cached_config', 1, 4, 4).
 python_function('src/nexu/cinema_llm.py', '_litellm_completion', 0, 2, 0).
@@ -1971,31 +1938,6 @@ python_function('src/nexu/cinema_llm_contracts.py', 'build_llm_option_variants',
 python_function('src/nexu/cinema_llm_contracts.py', '_format_contract_params', 6, 7, 3).
 python_function('src/nexu/cinema_llm_contracts.py', 'build_llm_communication_contract_lines', 0, 9, 4).
 python_function('src/nexu/cinema_llm_contracts.py', 'build_llm_contract_block', 0, 2, 2).
-python_function('src/nexu/cinema_marked_context.py', 'has_ui_marks', 2, 8, 3).
-python_function('src/nexu/cinema_marked_context.py', '_css_id_selector', 1, 4, 3).
-python_function('src/nexu/cinema_marked_context.py', 'marked_css_selectors', 1, 6, 5).
-python_function('src/nexu/cinema_marked_context.py', 'resolve_marked_selectors', 2, 14, 13).
-python_function('src/nexu/cinema_marked_context.py', 'marked_scope_colors_css', 2, 4, 2).
-python_function('src/nexu/cinema_marked_context.py', 'restrict_scope_css_to_marks', 2, 14, 11).
-python_function('src/nexu/cinema_marked_context.py', '_id_candidates', 1, 4, 6).
-python_function('src/nexu/cinema_marked_context.py', '_parse_attrs', 1, 3, 5).
-python_function('src/nexu/cinema_marked_context.py', '_logical_id', 2, 8, 6).
-python_function('src/nexu/cinema_marked_context.py', '_extract_balanced_html', 2, 10, 11).
-python_function('src/nexu/cinema_marked_context.py', '_collect_match_candidates', 2, 6, 6).
-python_function('src/nexu/cinema_marked_context.py', '_collect_button_candidates', 4, 3, 8).
-python_function('src/nexu/cinema_marked_context.py', '_extract_and_format_fragment', 2, 3, 6).
-python_function('src/nexu/cinema_marked_context.py', '_find_marked_subtrees', 2, 17, 13).
-python_function('src/nexu/cinema_marked_context.py', '_selector_tokens', 1, 9, 9).
-python_function('src/nexu/cinema_marked_context.py', '_filter_css_for_tokens', 2, 6, 6).
-python_function('src/nexu/cinema_marked_context.py', '_collect_css_sources', 2, 7, 8).
-python_function('src/nexu/cinema_marked_context.py', '_scope_semantics', 1, 4, 2).
-python_function('src/nexu/cinema_marked_context.py', '_cap_text', 2, 2, 4).
-python_function('src/nexu/cinema_marked_context.py', '_client_fragment_html', 2, 9, 5).
-python_function('src/nexu/cinema_marked_context.py', '_assemble_marked_subtrees', 3, 4, 3).
-python_function('src/nexu/cinema_marked_context.py', '_get_relevant_css', 3, 2, 6).
-python_function('src/nexu/cinema_marked_context.py', '_format_context_body', 7, 14, 7).
-python_function('src/nexu/cinema_marked_context.py', 'build_marked_element_context', 1, 11, 7).
-python_function('src/nexu/cinema_marked_context.py', 'resolve_marked_llm_context', 1, 5, 2).
 python_function('src/nexu/cinema_markpact.py', '_escape_markdown_fence', 2, 2, 1).
 python_function('src/nexu/cinema_markpact.py', '_language_for', 1, 1, 2).
 python_function('src/nexu/cinema_markpact.py', '_project_context_block', 1, 14, 15).
@@ -2185,25 +2127,8 @@ python_function('src/nexu/cinema_publish.py', '_spawn_http_server', 2, 1, 4).
 python_function('src/nexu/cinema_publish.py', '_wait_for_service_running', 2, 3, 5).
 python_function('src/nexu/cinema_publish.py', 'start_published_service', 2, 15, 14).
 python_function('src/nexu/cinema_publish.py', 'stop_published_service', 2, 9, 8).
-python_function('src/nexu/cinema_scope.py', 'ui_type_for_kind', 1, 11, 3).
-python_function('src/nexu/cinema_scope.py', 'allowed_scope_ids', 1, 2, 3).
-python_function('src/nexu/cinema_scope.py', 'default_scope_for_kind', 1, 3, 4).
-python_function('src/nexu/cinema_scope.py', 'normalize_focus_scope', 2, 3, 5).
-python_function('src/nexu/cinema_scope.py', 'offline_fast_scopes_for_kind', 1, 5, 2).
-python_function('src/nexu/cinema_scope.py', 'scope_supports_offline_fast_path', 2, 1, 2).
 python_function('src/nexu/cinema_scope.py', 'cinema_has_offline_baseline', 1, 4, 6).
 python_function('src/nexu/cinema_scope.py', 'scope_option_variants', 3, 11, 1).
-python_function('src/nexu/cinema_scope.py', 'strip_scope_style', 1, 2, 1).
-python_function('src/nexu/cinema_scope.py', '_scope_css', 2, 6, 0).
-python_function('src/nexu/cinema_scope.py', '_calc_scope_css', 2, 7, 0).
-python_function('src/nexu/cinema_scope.py', '_web_scope_css', 2, 6, 0).
-python_function('src/nexu/cinema_scope.py', '_resolve_scope_kind', 2, 10, 2).
-python_function('src/nexu/cinema_scope.py', 'should_block_full_html_iterate', 3, 3, 3).
-python_function('src/nexu/cinema_scope.py', '_bind_annotations_to_html', 3, 29, 18).
-python_function('src/nexu/cinema_scope.py', '_get_scope_css', 4, 7, 5).
-python_function('src/nexu/cinema_scope.py', '_inject_css_block', 2, 5, 4).
-python_function('src/nexu/cinema_scope.py', 'inject_scope_style', 3, 14, 11).
-python_function('src/nexu/cinema_scope.py', 'scoped_html_fragment', 3, 6, 6).
 python_function('src/nexu/cinema_scope.py', 'scope_meta_for_project', 1, 1, 3).
 python_function('src/nexu/cinema_scope.py', 'load_cinema_ui_profile', 2, 10, 12).
 python_function('src/nexu/cinema_scope.py', 'can_use_offline_fast_iterate', 3, 4, 2).
@@ -2230,16 +2155,6 @@ python_function('src/nexu/cinema_traces.py', 'read_trace_index', 1, 3, 3).
 python_function('src/nexu/cinema_traces.py', 'write_llm_trace', 3, 8, 13).
 python_function('src/nexu/cinema_traces.py', 'list_llm_traces', 1, 1, 2).
 python_function('src/nexu/cinema_traces.py', 'read_llm_trace', 2, 2, 5).
-python_function('src/nexu/cinema_ui_patch.py', 'supports_llm_patch_scope', 2, 3, 1).
-python_function('src/nexu/cinema_ui_patch.py', '_compact_html', 1, 3, 4).
-python_function('src/nexu/cinema_ui_patch.py', '_patch_scope_rules', 1, 7, 4).
-python_function('src/nexu/cinema_ui_patch.py', 'build_ui_patch_prompt', 1, 9, 5).
-python_function('src/nexu/cinema_ui_patch.py', '_strip_json_fence', 1, 3, 4).
-python_function('src/nexu/cinema_ui_patch.py', 'parse_ui_patch_response', 1, 6, 7).
-python_function('src/nexu/cinema_ui_patch.py', '_safe_css', 1, 9, 7).
-python_function('src/nexu/cinema_ui_patch.py', '_label_for', 3, 4, 4).
-python_function('src/nexu/cinema_ui_patch.py', '_css_for', 1, 2, 3).
-python_function('src/nexu/cinema_ui_patch.py', 'apply_ui_patch_options', 2, 25, 19).
 python_function('src/nexu/cli.py', '_print_yaml', 1, 1, 3).
 python_function('src/nexu/cli.py', '_relative_to_root', 2, 1, 2).
 python_function('src/nexu/cli.py', 'init', 1, 3, 6).
@@ -2602,12 +2517,6 @@ python_method('CustomHTTPRequestHandler', 'do_POST', 0, 211, 120).
 python_method('CustomHTTPRequestHandler', 'do_DELETE', 0, 9, 12).
 python_method('CustomHTTPRequestHandler', 'do_OPTIONS', 0, 1, 3).
 python_class('examples/web_app_calculator/cinema/server.py', 'ThreadingHTTPServer').
-python_class('src/nexu/cinema_http_preprocess.py', '_OutlineParser').
-python_method('_OutlineParser', '__init__', 0, 1, 2).
-python_method('_OutlineParser', '_keep_attr', 1, 2, 2).
-python_method('_OutlineParser', 'handle_starttag', 2, 8, 3).
-python_method('_OutlineParser', 'handle_endtag', 1, 4, 2).
-python_method('_OutlineParser', 'handle_data', 1, 4, 3).
 python_class('src/nexu/cinema_project_ir.py', '_ProjectIRParser').
 python_method('_ProjectIRParser', '__init__', 0, 1, 2).
 python_method('_ProjectIRParser', 'handle_starttag', 2, 5, 2).
@@ -2770,7 +2679,7 @@ sumd_workflow_step('ci-cinema-smoke', 1, './scripts/ci-cinema-smoke.sh').
 
 ## Call Graph
 
-*381 nodes · 500 edges · 63 modules · CC̄=4.8*
+*391 nodes · 500 edges · 61 modules · CC̄=4.8*
 
 ### Hubs (by degree)
 
@@ -2787,8 +2696,8 @@ sumd_workflow_step('ci-cinema-smoke', 1, './scripts/ci-cinema-smoke.sh').
 
 ```toon markpact:analysis path=project/calls.toon.yaml
 # code2llm call graph | /home/tom/github/semcod/nexu
-# generated in 0.43s
-# nodes: 381 | edges: 500 | modules: 63
+# generated in 0.18s
+# nodes: 391 | edges: 500 | modules: 61
 # CC̄=4.8
 
 HUBS[20]:
@@ -2810,28 +2719,28 @@ HUBS[20]:
     CC=4  in:7  out:29  total:36
   examples.web_app_dashboard.run.main
     CC=2  in:0  out:35  total:35
+  src.nexu.cinema_project_imports._activate_imported
+    CC=11  in:2  out:32  total:34
   src.nexu.report.build_capsule_report
     CC=1  in:2  out:32  total:34
-  src.nexu.cinema_server._render_server_script
-    CC=1  in:1  out:31  total:32
   src.nexu.paths.project_root
     CC=1  in:29  out:3  total:32
+  src.nexu.cinema_server._render_server_script
+    CC=1  in:1  out:31  total:32
   src.nexu.capsule.create_capsule
     CC=8  in:7  out:24  total:31
   src.nexu.orchestrate.build_capsule_orchestration
     CC=2  in:2  out:28  total:30
+  src.nexu.cinema_project_imports._finish_import
+    CC=8  in:3  out:26  total:29
   src.nexu.cinema_http_preprocess.load_http_preprocess_artifacts
     CC=16  in:1  out:27  total:28
   examples.run_examples.run_example
     CC=2  in:1  out:26  total:27
-  src.nexu.paths.capsule_dir
-    CC=1  in:25  out:1  total:26
-  examples.web_app_calculator.cinema.server._llm_status_payload
-    CC=3  in:1  out:25  total:26
   src.nexu.cinema_baseline_contracts.ensure_capsule_intract_yaml
     CC=9  in:1  out:25  total:26
-  src.nexu.review.build_review_packet
-    CC=5  in:2  out:24  total:26
+  examples.web_app_calculator.cinema.server._llm_status_payload
+    CC=3  in:1  out:25  total:26
 
 MODULES:
   examples.nexu_markpact_exporter  [1 funcs]
@@ -2898,21 +2807,10 @@ MODULES:
     sync_cinema_templates  CC=1  out:4
     write_cinema_nexu_hooks  CC=1  out:8
     write_intract_policy_files  CC=2  out:5
-  src.nexu.cinema_baseline_contracts  [5 funcs]
+  src.nexu.cinema_baseline_contracts  [3 funcs]
     _contract  CC=3  out:2
-    calculator_baseline_contracts  CC=1  out:7
     ensure_capsule_intract_yaml  CC=9  out:25
-    is_calculator_capsule  CC=5  out:5
     merge_calculator_baselines  CC=5  out:5
-  src.nexu.cinema_dom_patch  [8 funcs]
-    _goal_label  CC=3  out:2
-    _inject_into_body  CC=2  out:3
-    _inject_into_head  CC=4  out:5
-    _strip_existing_patch  CC=2  out:3
-    _variant_section  CC=3  out:11
-    build_function_option_patches  CC=8  out:14
-    build_function_patch_context  CC=2  out:3
-    supports_function_patch  CC=4  out:4
   src.nexu.cinema_goal_contracts  [14 funcs]
     _build_detail_text  CC=5  out:5
     _collect_trait_proposals  CC=3  out:6
@@ -2935,6 +2833,8 @@ MODULES:
     history_dir  CC=1  out:0
     history_index_path  CC=1  out:1
     ledger_archive_for_display  CC=5  out:16
+  src.nexu.cinema_html  [1 funcs]
+    ensure_html_document_closure  CC=5  out:3
   src.nexu.cinema_html_validate  [1 funcs]
     prepare_cinema_html_document  CC=2  out:2
   src.nexu.cinema_http_preprocess  [24 funcs]
@@ -2948,26 +2848,23 @@ MODULES:
     _safe_read_under  CC=5  out:7
     _script_src_allowed_for_preview  CC=4  out:5
     _should_remove_preview_script  CC=2  out:3
-  src.nexu.cinema_llm  [3 funcs]
+  src.nexu.cinema_llm  [17 funcs]
+    _as_plain_data  CC=5  out:4
     _cached_config  CC=4  out:4
+    _compact_response_preview  CC=2  out:3
+    _extract_content  CC=12  out:21
     _litellm_completion  CC=2  out:0
-    compact_llm_error  CC=5  out:11
+    _lookup  CC=2  out:4
+    _response_shape  CC=2  out:3
+    _strip_markdown_fences  CC=8  out:11
+    _strip_rich_console_artifacts  CC=7  out:14
+    call_cinema_html_llm  CC=12  out:8
   src.nexu.cinema_llm_contracts  [1 funcs]
     build_llm_contract_block  CC=2  out:2
-  src.nexu.cinema_markpact  [5 funcs]
-    _escape_markdown_fence  CC=2  out:1
-    _get_app_title  CC=3  out:3
-    _get_baseline_block  CC=6  out:4
+  src.nexu.cinema_markpact  [2 funcs]
     build_markpact_readme  CC=11  out:21
     markpact_download_filename  CC=2  out:2
-  src.nexu.cinema_offline_options  [1 funcs]
-    _delete_without_keeps  CC=3  out:2
-  src.nexu.cinema_options_cache  [4 funcs]
-    _digest  CC=2  out:4
-    goal_slug  CC=4  out:5
-    options_cache_key  CC=7  out:16
-    write_options_cache  CC=5  out:14
-  src.nexu.cinema_policy  [38 funcs]
+  src.nexu.cinema_policy  [37 funcs]
     _build_constraint_result  CC=5  out:4
     _html_files_distinct  CC=3  out:6
     _normalize_html_body  CC=1  out:2
@@ -2978,22 +2875,22 @@ MODULES:
     _replace_html_title  CC=2  out:2
     _resolve_ledger_path  CC=2  out:2
     append_goal_ledger_entry  CC=7  out:13
-  src.nexu.cinema_project_imports  [8 funcs]
-    activate_imported_project  CC=4  out:6
-    delete_imported_project  CC=7  out:12
-    import_git_project  CC=11  out:16
-    import_http_project  CC=7  out:21
-    import_zip_project  CC=5  out:13
-    imported_project_llm_log  CC=8  out:14
-    merged_projects_catalog  CC=10  out:13
-    read_imported_markpact  CC=9  out:17
-  src.nexu.cinema_project_ir  [6 funcs]
+  src.nexu.cinema_project_imports  [49 funcs]
+    _activate_delete_fallback  CC=3  out:5
+    _activate_imported  CC=11  out:32
+    _apply_http_preprocess_fields  CC=9  out:9
+    _build_http_preview_stage0  CC=14  out:23
+    _build_markpact_migration  CC=8  out:14
+    _catalog_entry_from_meta  CC=7  out:22
+    _charset_from_content_type  CC=3  out:4
+    _clear_active_project  CC=2  out:2
+    _compile_meta_fields  CC=17  out:22
+    _decode_http_bytes  CC=4  out:3
+  src.nexu.cinema_project_ir  [4 funcs]
     _classify_node  CC=12  out:10
     handle_data  CC=4  out:2
     handle_endtag  CC=8  out:11
     _clean_text  CC=2  out:3
-    build_project_ir  CC=2  out:8
-    summarize_project_ir  CC=12  out:21
   src.nexu.cinema_projects  [24 funcs]
     _active_project_meta  CC=1  out:2
     _apply_preprocess_meta  CC=3  out:5
@@ -3005,23 +2902,18 @@ MODULES:
     _init_project_activation  CC=3  out:4
     _project_catalog_entry  CC=2  out:2
     _project_widgets  CC=1  out:1
-  src.nexu.cinema_publish  [20 funcs]
-    _allocate_service_port  CC=11  out:11
-    _generate_markpact_export  CC=1  out:5
-    _handle_existing_service  CC=7  out:8
-    _http_ok  CC=2  out:1
-    _load_registry  CC=3  out:6
-    _pick_port  CC=4  out:2
-    _port_open  CC=2  out:1
-    _prepare_service_directory  CC=1  out:4
-    _refresh_service_status  CC=3  out:1
-    _register_service  CC=4  out:6
+  src.nexu.cinema_publish  [4 funcs]
+    list_published_services  CC=3  out:6
+    publish_project_service  CC=6  out:16
+    start_published_service  CC=15  out:20
+    stop_published_service  CC=9  out:11
   src.nexu.cinema_scope  [2 funcs]
     load_cinema_ui_profile  CC=10  out:15
     scope_meta_for_project  CC=1  out:3
-  src.nexu.cinema_scripts  [4 funcs]
+  src.nexu.cinema_scripts  [5 funcs]
     apply_spatial_deletes_to_html  CC=4  out:29
     finalize_cinema_html  CC=6  out:6
+    inject_cinema_shield  CC=6  out:4
     repair_cinema_html_files  CC=5  out:8
     write_cinema_inject_files  CC=1  out:3
   src.nexu.cinema_server  [7 funcs]
@@ -3055,8 +2947,7 @@ MODULES:
     _load_env_file  CC=10  out:11
     load_config  CC=14  out:76
     load_env_files  CC=3  out:3
-  src.nexu.export_prompt  [2 funcs]
-    _cinema_policy_ledger_block  CC=12  out:13
+  src.nexu.export_prompt  [1 funcs]
     export_iteration_prompt  CC=3  out:18
   src.nexu.fast_delivery.context  [3 funcs]
     compact_html_for_llm  CC=3  out:6
@@ -3100,25 +2991,17 @@ MODULES:
     offline_review_from_status  CC=4  out:0
   src.nexu.mcp_server  [1 funcs]
     run_mcp_stdio  CC=6  out:7
-  src.nexu.orchestrate  [6 funcs]
-    _contract_dicts  CC=2  out:0
-    _render_orchestration_markdown  CC=9  out:22
+  src.nexu.orchestrate  [1 funcs]
     build_capsule_orchestration  CC=2  out:28
-    build_orchestration_context  CC=2  out:11
-    build_orchestration_prompt  CC=1  out:2
-    offline_orchestration_from_context  CC=13  out:22
-  src.nexu.paths  [6 funcs]
+  src.nexu.paths  [4 funcs]
     capsule_dir  CC=1  out:1
-    capsules_dir  CC=1  out:1
     ensure_project_dirs  CC=2  out:7
-    nexu_dir  CC=1  out:0
     project_root  CC=1  out:3
     snapshots_dir  CC=1  out:1
   src.nexu.plan  [2 funcs]
     _contract_summary  CC=9  out:3
     build_iteration_plan  CC=7  out:15
-  src.nexu.promote  [3 funcs]
-    _promotion_map  CC=2  out:4
+  src.nexu.promote  [2 funcs]
     apply_promotion_plan  CC=4  out:8
     build_promotion_plan  CC=6  out:16
   src.nexu.report  [1 funcs]
@@ -3140,8 +3023,7 @@ MODULES:
     current_git_sha  CC=4  out:3
   src.vico.hashing  [1 funcs]
     sha256_file  CC=2  out:6
-  src.vico.models  [4 funcs]
-    from_dict  CC=2  out:6
+  src.vico.models  [3 funcs]
     read_yaml  CC=3  out:4
     utc_now  CC=1  out:2
     write_yaml  CC=1  out:3

@@ -1,5 +1,5 @@
-# code2llm | 99f 18710L | python:80,yaml:9,txt:2,shell:2,json:2,yml:1,toml:1 | 2026-06-01
-# generated in 0.05s
+# code2llm | 99f 18710L | python:80,yaml:9,txt:2,shell:2,json:2,toml:1,yml:1 | 2026-06-01
+# generated in 0.03s
 # CC̅=4.8 | critical:11/668 | dups:0 | cycles:0
 
 HEALTH[11]:
@@ -8,10 +8,10 @@ HEALTH[11]:
   🟡 CC    do_GET CC=34 (limit:15)
   🟡 CC    do_POST CC=211 (limit:15)
   🟡 CC    load_http_preprocess_artifacts CC=16 (limit:15)
-  🟡 CC    propose_goal_extension_contracts CC=15 (limit:15)
-  🟡 CC    start_published_service CC=15 (limit:15)
   🟡 CC    _compile_meta_fields CC=17 (limit:15)
+  🟡 CC    propose_goal_extension_contracts CC=15 (limit:15)
   🟡 CC    apply_ui_patch_options CC=25 (limit:15)
+  🟡 CC    start_published_service CC=15 (limit:15)
   🟡 CC    _bind_annotations_to_html CC=29 (limit:15)
   🟡 CC    _find_marked_subtrees CC=17 (limit:15)
 
@@ -251,17 +251,17 @@ COUPLING:
           examples.web_app_dashboard                                   9                                                                      10                                   1                                                                                                          ──                                      !! fan-out
       examples.web_app_event_monitor                                                                                                          19                                                                                                                                                                                  ──  !! fan-out
   CYCLES: none
-  HUB: examples.web_app_calculator/ (fan-in=7)
   HUB: src.nexu/ (fan-in=128)
-  HUB: scripts/ (fan-in=91)
+  HUB: examples.web_app_calculator/ (fan-in=7)
   HUB: src.vico/ (fan-in=60)
-  SMELL: examples.web_app_dashboard/ fan-out=20 → split needed
-  SMELL: examples.web_app_calculator/ fan-out=92 → split needed
-  SMELL: src.nexu/ fan-out=61 → split needed
+  HUB: scripts/ (fan-in=91)
   SMELL: examples/ fan-out=60 → split needed
-  SMELL: examples.web_app_event_monitor/ fan-out=19 → split needed
   SMELL: examples.web_app_pactown_ecosystem/ fan-out=22 → split needed
+  SMELL: src.nexu/ fan-out=61 → split needed
+  SMELL: examples.web_app_calculator/ fan-out=92 → split needed
   SMELL: src.vico/ fan-out=12 → split needed
+  SMELL: examples.web_app_event_monitor/ fan-out=19 → split needed
+  SMELL: examples.web_app_dashboard/ fan-out=20 → split needed
 
 EXTERNAL:
   validation: run `vallm batch .` → validation.toon
