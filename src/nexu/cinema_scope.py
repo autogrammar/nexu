@@ -13,6 +13,7 @@ from repatch import (
     VISUAL_REDESIGN_SCOPES,
     allowed_scope_ids,
     default_scope_for_kind,
+    goal_requests_column_layout,
     inject_scope_style,
     normalize_focus_scope,
     offline_fast_scopes_for_kind,
@@ -122,6 +123,24 @@ def scope_option_variants(
             "button ids/classes. Change layout direction and panel ordering only via CSS. "
             "Return a complete HTML5 document with head/body structure intact. "
         )
+        if goal_requests_column_layout(focus):
+            return [
+                (
+                    "alt_a.html",
+                    "Option A (orientation: single column)",
+                    base + "Single-column stacked content flow." + focus,
+                ),
+                (
+                    "alt_b.html",
+                    "Option B (orientation: two columns)",
+                    base + "Explicit two-column content layout." + focus,
+                ),
+                (
+                    "alt_c.html",
+                    "Option C (orientation: responsive columns)",
+                    base + "Responsive asymmetric column layout." + focus,
+                ),
+            ]
         return [
             (
                 "alt_a.html",

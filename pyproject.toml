@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "nexu"
-version = "0.5.27"
+version = "0.5.28"
 description = "Visual Intent Contract Orchestrator: freeze project slices, evolve capsules, verify intent contracts."
 readme = "README.md"
 requires-python = ">=3.10"

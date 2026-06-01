@@ -373,7 +373,7 @@ def _write_project_options_from_stages(
         except OSError:
             html_hint = ""
     ui_type = ui_type_for_kind(kind, html_hint=html_hint)
-    variant_specs = scope_option_variants(scope, ui_type)
+    variant_specs = scope_option_variants(scope, ui_type, focus_text=user_goal)
     project_id = str(meta.get("id") or "")
     is_http = project_id.startswith("http-") or str(meta.get("import_kind") or "") == "http"
     if is_http:
@@ -407,6 +407,7 @@ def _write_project_options_from_stages(
             project_kind=kind,
             delete_ids=delete_els,
             keep_ids=keep_els,
+            user_goal=user_goal,
         )
         if scope == "functions" and effective_delete:
             out, _ = apply_spatial_deletes_to_html(out, effective_delete)
@@ -455,6 +456,7 @@ def _write_scoped_calculator_options(
             project_kind="calculator",
             delete_ids=delete_els,
             keep_ids=keep_els,
+            user_goal=user_goal,
         )
         out = _inject_goal_banner(out, user_goal, variant)
         if scope == "functions" and effective_delete:

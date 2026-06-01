@@ -1,4 +1,4 @@
-#!/home/tom/github/semcod/nexu/.venv/bin/python3
+#!/usr/bin/python3.13
 import http.server
 import socketserver
 import sys
@@ -31,7 +31,7 @@ LLM_TRACE_LOCK = Lock()
 WORKSPACE_PATH = '/home/tom/github/semcod/nexu/examples/web_app_calculator/workspace'
 ROOT_PATH = Path(WORKSPACE_PATH).absolute()
 CAPSULE_NAME = 'scientific_calc'
-SYS_EXE = '/home/tom/github/semcod/nexu/.venv/bin/python3'
+SYS_EXE = '/usr/bin/python3.13'
 ALLOW_NETWORK_CALLS = True
 API_KEY_ENV = 'OPENROUTER_API_KEY'
 DEFAULT_MODEL = 'openrouter/x-ai/grok-4.3'
@@ -1071,9 +1071,14 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         super().__init__(*args, directory=str(DIRECTORY), **kwargs)
 
     def do_GET(self):
-        if self.path in ("/policy", "/policy/"):
+        if self.path.startswith("/policy"):
             try:
-                payload = _load_policy_payload()
+                from urllib.parse import parse_qs, urlparse
+
+                parsed = urlparse(self.path)
+                qs = parse_qs(parsed.query or "")
+                focus_scope = str((qs.get("focus_scope") or [""])[0] or "").strip()
+                payload = _load_policy_payload(focus_scope=focus_scope)
                 body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
                 self.send_response(200)
                 self.send_header("Content-type", "application/json; charset=utf-8")
@@ -1653,6 +1658,7 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
                 alt_name = str(data.get('alt', 'alt_a.html')).split('?')[0]
                 stage = int(data.get('stage', 0))
+                focus_scope = str(data.get('focus_scope', '') or '').strip()
                 allowed_alts = {'alt_a.html', 'alt_b.html', 'alt_c.html'}
                 if alt_name not in allowed_alts:
                     payload = {"error": f"unsupported option file: {alt_name}"}
@@ -1665,7 +1671,9 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                         payload = {"error": f"option file not found: {alt_name}"}
                     else:
                         stage_path.write_text(alt_path.read_text(encoding='utf-8'), encoding='utf-8')
-                        options_sync = _patch_option_previews(stage)
+                        options_sync = _patch_option_previews(
+                            stage, focus_scope=focus_scope
+                        )
                         history_entry = _save_history_checkpoint(
                             action='promote',
                             stage=stage,

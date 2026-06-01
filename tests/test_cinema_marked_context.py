@@ -214,6 +214,27 @@ def test_marked_scope_colors_css_differs_by_variant() -> None:
     assert "background-color:#38bdf8" in a
     assert "background-color:#facc15" in b
     assert a != b
+    assert ".kb-btn2_237106-a1 *" in a
+
+
+def test_inject_scope_style_colors_kadence_heading_inline_strong() -> None:
+    mark = "Pracownia Malort Gdynia – przestrzeń dla kreatywności Twojego dziecka"
+    html = (
+        "<html><head></head><body>"
+        '<h2 class="kt-adv-heading2_289857-94 wp-block-kadence-advancedheading">'
+        '<strong style="color: #007D13;">Pracownia Malort Gdynia – </strong>'
+        "przestrzeń dla kreatywności Twojego dziecka"
+        "</h2></body></html>"
+    )
+    patched = inject_scope_style(
+        html,
+        "colors",
+        "a",
+        project_kind="imported",
+        delete_ids=[mark],
+    )
+    assert ".kt-adv-heading2_289857-94 *" in patched
+    assert "color:#0f172a!important" in patched
 
 
 def test_should_block_full_html_for_imported_marks() -> None:

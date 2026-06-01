@@ -171,7 +171,15 @@ def patch_option_previews(
         merge_ui_constraint_lists,
     )
 
+    from nexu.cinema_policy import promote_applies_spatial_deletes
+
     cinema = Path(__file__).resolve().parent
+    if not promote_applies_spatial_deletes(focus_scope):
+        return {
+            "status": "options_unchanged",
+            "files": [],
+            "skip_reason": "visual_scope_no_spatial_delete",
+        }
     effective = load_effective_ui_constraints(
         ROOT,
         CAPSULE,

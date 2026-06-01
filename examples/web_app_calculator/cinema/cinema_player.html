@@ -328,6 +328,40 @@
         }
         .import-status.error { color: #f87171; }
         .import-status.ok { color: #4ade80; }
+        .import-status code {
+            color: #bae6fd;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            word-break: break-all;
+        }
+        .projects-workflow {
+            display: grid;
+            grid-column: 1 / -1;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .projects-workflow-step {
+            border: 1px solid rgba(56, 189, 248, 0.22);
+            border-radius: 8px;
+            padding: 9px 10px;
+            background: rgba(14, 165, 233, 0.06);
+            color: #cbd5e1;
+            font-size: 0.74rem;
+            line-height: 1.35;
+        }
+        .projects-workflow-step strong {
+            display: block;
+            color: #38bdf8;
+            font-size: 0.78rem;
+            margin-bottom: 2px;
+        }
+        @media (max-width: 1100px) {
+            .projects-workflow { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 640px) {
+            .projects-workflow { grid-template-columns: 1fr; }
+        }
         .project-active-bar {
             display: flex;
             flex-wrap: wrap;
@@ -1267,6 +1301,12 @@
             </div>
         </div>
         <section class="projects-import" aria-label="Import project">
+            <div class="projects-workflow" aria-label="Import workflow">
+                <div class="projects-workflow-step"><strong>1. Import</strong>ZIP, Git URL albo HTTP website.</div>
+                <div class="projects-workflow-step"><strong>2. Markpact</strong>Nexu zapisuje lokalny README.markpact.md.</div>
+                <div class="projects-workflow-step"><strong>3. Editor</strong>Projekt działa lokalnie w pętli ABC.</div>
+                <div class="projects-workflow-step"><strong>4. Publish</strong>Aktualny stage można opublikować do Services.</div>
+            </div>
             <article class="import-card">
                 <h3>📦 Upload ZIP</h3>
                 <p>Spakuj projekt lokalnie i zaimportuj do Nexu. Najpierw konwersja do Markpact.</p>
@@ -1496,6 +1536,7 @@
     <script>
         let activeStage = 0;
         let annotations = [];
+        let scopedAnnotations = {};
         let annotationHistory = [];
         let lastIteration = null;
         let projectGoal = '';
@@ -1525,6 +1566,88 @@
             { id: 'orientation', label: '#orientation', help: 'Layout direction, responsive framing, and screen organization.' },
         ];
         let currentFocusScope = 'functions';
+
+        function scopeAnnotationKey(scopeId) {
+            return String(scopeId || currentFocusScope || 'functions').toLowerCase();
+        }
+
+        function persistActiveScopeAnnotations() {
+            scopedAnnotations[scopeAnnotationKey(currentFocusScope)] = annotations.slice();
+        }
+
+        function ledgerEntryMatchesActiveProject(entry, policyData) {
+            const snap = (policyData && policyData.snapshot) || {};
+            const activeEx = snap.active_example_project || {};
+            const activeId = String(activeProjectId || activeEx.id || '').trim();
+            const proj = activeProjectRecord();
+            const activeKind = String((proj && proj.kind) || activeEx.kind || '').toLowerCase();
+            const entryPid = String(entry.project_id || '').trim();
+            if (entryPid) {
+                return entryPid === activeId;
+            }
+            if (activeKind === 'imported' || activeId.startsWith('http-')) {
+                return false;
+            }
+            return true;
+        }
+
+        function annotationsFromLedgerForScope(scopeId, policyData) {
+            if (!policyData) return [];
+            const ledger = Array.isArray(policyData.ledger) ? policyData.ledger : [];
+            const scope = String(scopeId || '').trim().toLowerCase();
+            if (!scope) return [];
+            const byEl = {};
+            ledger.forEach(entry => {
+                if (!entry || typeof entry !== 'object') return;
+                if (entry.status === 'goal_defined') return;
+                if (!ledgerEntryMatchesActiveProject(entry, policyData)) return;
+                if (entry.stage != null && Number(entry.stage) !== activeStage) return;
+                const entryScope = String(entry.focus_scope || '').trim().toLowerCase();
+                if (!entryScope || entryScope !== scope) return;
+                (entry.keep || []).forEach(id => {
+                    const key = String(id).trim();
+                    if (key) byEl[key] = 'KEEP';
+                });
+                (entry.delete || []).forEach(id => {
+                    const key = String(id).trim();
+                    if (key) byEl[key] = 'DELETE';
+                });
+            });
+            return Object.keys(byEl).map(id => ({
+                id: id,
+                type: byEl[id],
+                scope: scopeId,
+                source: 'policy_ledger'
+            }));
+        }
+
+        function loadActiveScopeAnnotations(scopeId, opts) {
+            const options = opts || {};
+            const key = scopeAnnotationKey(scopeId);
+            if (scopedAnnotations[key] && scopedAnnotations[key].length) {
+                annotations = scopedAnnotations[key].map(a => ({ ...a }));
+                return;
+            }
+            if (options.preferLedger && intractPolicyData) {
+                annotations = annotationsFromLedgerForScope(scopeId, intractPolicyData);
+                scopedAnnotations[key] = annotations.slice();
+                return;
+            }
+            if (intractPolicyData) {
+                annotations = annotationsFromLedgerForScope(scopeId, intractPolicyData);
+                if (annotations.length) {
+                    scopedAnnotations[key] = annotations.slice();
+                }
+                return;
+            }
+            annotations = [];
+        }
+
+        function resetScopedAnnotations() {
+            annotations = [];
+            scopedAnnotations = {};
+            lastTouchedElementIds = [];
+        }
 
         function allowedScopeIdsForKind(kind) {
             const k = String(kind || 'web').toLowerCase();
@@ -2112,10 +2235,14 @@
                 const tabEditor = document.getElementById('tab-editor');
                 if (tabEditor) tabEditor.disabled = false;
                 updateProjectActiveBar();
-                const tab = bootTab === 'projects' || bootTab === 'services' ? bootTab : 'editor';
+                const needsGoal = activeProjectRequiresGoal();
+                const requestedTab = ['projects', 'editor', 'llm', 'services'].includes(bootTab)
+                    ? bootTab
+                    : '';
+                const tab = requestedTab || 'editor';
                 switchMainTab(tab, { skipLog: true });
-                if (activeProjectRequiresGoal()) {
-                    maybePromptForImportedGoal();
+                if (needsGoal && tab === 'editor') {
+                    promptForRequiredGoalOnEditor({ quiet: true });
                 }
             };
             const activateBootProject = () => {
@@ -2217,6 +2344,7 @@
         }
 
         function showGoalPromptModal() {
+            if (mainTab !== 'editor') return;
             const backdrop = document.getElementById('goal-prompt-modal-backdrop');
             const input = document.getElementById('goal-prompt-input');
             if (input) input.value = '';
@@ -2241,7 +2369,8 @@
             setProjectGoal();
         }
 
-        function maybePromptForImportedGoal() {
+        function promptForRequiredGoalOnEditor(opts) {
+            const options = opts || {};
             if (!activeProjectRequiresGoal()) {
                 requireGoalPrompt = false;
                 return;
@@ -2251,7 +2380,12 @@
             pendingGoalOptions = false;
             updateWorkflowUI();
             updatePromptBox();
-            showGoalPromptModal();
+            const openModal = () => showGoalPromptModal();
+            if (mainTab !== 'editor') {
+                return;
+            } else {
+                openModal();
+            }
         }
 
         function currentUserGoal() {
@@ -2353,11 +2487,21 @@
             const options = opts || {};
             if (!visibleScopeOptions().some(opt => opt.id === scopeId)) return;
             const changed = currentFocusScope !== scopeId;
+            if (changed) {
+                persistActiveScopeAnnotations();
+            }
             currentFocusScope = scopeId;
+            if (changed) {
+                loadActiveScopeAnnotations(scopeId);
+                lastTouchedElementIds = annotations.map(a => a.id).slice(-24);
+                syncAllIframeVisuals(true);
+            }
             if (changed && !options.quiet) {
                 pendingGoalOptions = true;
             }
             renderScopeOptions();
+            updateFeedbackList();
+            updateElementHintButton();
             updatePromptBox();
             updateWorkflowUI();
             updatePlayerUrl();
@@ -2444,7 +2588,13 @@
             bar.hidden = false;
             if (titleEl) titleEl.textContent = proj ? proj.title : activeProjectId;
             if (metaEl) {
-                metaEl.textContent = (proj ? proj.subtitle + ' · ' : '') + 'Stage S' + activeStage + ' — open Editor or deploy to Services (Markpact).';
+                if (proj && proj.imported) {
+                    const source = proj.import_kind ? proj.import_kind.toUpperCase() : 'IMPORT';
+                    const path = proj.path_hint ? ' · ' + proj.path_hint : '';
+                    metaEl.textContent = source + path + ' · README.markpact.md ready · Stage S' + activeStage + ' — local Editor or Publish.';
+                } else {
+                    metaEl.textContent = (proj ? proj.subtitle + ' · ' : '') + 'Stage S' + activeStage + ' — open Editor or deploy to Services (Markpact).';
+                }
             }
         }
 
@@ -2618,11 +2768,29 @@
                 return null;
             }
             const project = data.project || {};
-            setImportStatus(kind, 'Zaimportowano: ' + (project.title || project.id || 'project'), false);
+            const markpactPath = project.markpact_path || '';
+            const localPath = project.path_hint || (project.id ? 'imported_projects/' + project.id : '');
+            let statusHtml = 'Zaimportowano: <strong>' + escapeHtml(project.title || project.id || 'project') + '</strong>';
+            if (localPath) statusHtml += '<br>Lokalnie: <code>' + escapeHtml(localPath) + '</code>';
+            if (markpactPath) statusHtml += '<br>Markpact: <code>' + escapeHtml(markpactPath.split('/').slice(-3).join('/')) + '</code>';
+            statusHtml += '<br>Gotowe do edycji i publikacji.';
+            const statusEl = document.getElementById('import-' + kind + '-status');
+            if (statusEl) {
+                statusEl.innerHTML = statusHtml;
+                statusEl.classList.remove('error');
+                statusEl.classList.add('ok');
+            } else {
+                setImportStatus(kind, 'Zaimportowano: ' + (project.title || project.id || 'project'), false);
+            }
             activeProjectId = project.id || activeProjectId;
             loadProjectsCatalog().then(() => {
                 if (project.id) {
-                    activateProject(project.id, { skipEditorSwitch: true, quiet: true });
+                    const rec = projectCatalog.find(p => p.id === project.id) || project;
+                    const httpImport = !!(rec.imported && rec.import_kind === 'http');
+                    activateProject(project.id, {
+                        skipEditorSwitch: !httpImport,
+                        quiet: true,
+                    });
                 }
             });
             addChatLog('system', `📦 <strong>Imported:</strong> ${project.title || project.id} — Markpact migration ready. Use ⬇ Markpact or 🚀 Publish.`);
@@ -2759,15 +2927,27 @@
         }
 
         function renderImportedProjectActions(project) {
-            if (!project.imported || !project.deletable) return '';
+            if (!project.deletable) return '';
             const idJson = JSON.stringify(project.id);
-            return `
-                <div class="project-card-actions">
+            const importedButtons = project.imported ? `
                     <button type="button" class="btn-project-action" onclick='event.stopPropagation(); previewImportedMarkpact(${idJson})'>Kontrakt</button>
                     <button type="button" class="btn-project-action" onclick='event.stopPropagation(); openProjectLlmHistory(${idJson})'>Historia LLM</button>
-                    <button type="button" class="btn-project-action danger" onclick='event.stopPropagation(); deleteImportedProject(${idJson})'>Usuń</button>
+            ` : '';
+            return `
+                <div class="project-card-actions">
+                    <button type="button" class="btn-project-action" onclick='event.stopPropagation(); activateProject(${idJson})'>Editor</button>
+                    <button type="button" class="btn-project-action" onclick='event.stopPropagation(); publishImportedProject(${idJson})'>Publish</button>
+                    ${importedButtons}
+                    <button type="button" class="btn-project-action danger" onclick='event.stopPropagation(); deleteProject(${idJson})'>Usuń</button>
                 </div>
             `;
+        }
+
+        function publishImportedProject(projectId) {
+            activeProjectId = projectId;
+            activateProject(projectId, { skipEditorSwitch: true, quiet: true })
+                .then(() => publishCurrentProject())
+                .catch(err => addChatLog('system', '❌ <strong>Publish failed: ' + err.message + '</strong>'));
         }
 
         function closeMarkpactModal() {
@@ -2802,9 +2982,13 @@
         }
 
         function deleteImportedProject(projectId) {
+            return deleteProject(projectId);
+        }
+
+        function deleteProject(projectId) {
             const project = projectCatalog.find(p => p.id === projectId);
             const label = (project && project.title) ? project.title : projectId;
-            const requestUrl = '/projects/imported/' + encodeURIComponent(projectId);
+            const requestUrl = '/projects/delete';
             sessionDiagnostics.delete_flow = {
                 phase: 'clicked',
                 project_id: projectId,
@@ -2816,17 +3000,21 @@
                 method: 'UI',
                 requestUrl: requestUrl,
             });
-            if (!confirm('Usunąć zaimportowany projekt „' + label + '”? Tej operacji nie można cofnąć.')) {
+            if (!confirm('Usunąć projekt „' + label + '” z tego workspace?')) {
                 sessionDiagnostics.delete_flow.phase = 'cancelled';
                 recordProjectsAction('delete_cancelled', projectId, { method: 'UI', requestUrl: requestUrl });
                 return;
             }
             sessionDiagnostics.delete_flow.phase = 'confirmed';
             recordProjectsAction('delete_confirmed', projectId, {
-                method: 'DELETE',
+                method: 'POST',
                 requestUrl: requestUrl,
             });
-            fetch(requestUrl, { method: 'DELETE' })
+            fetch(requestUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: projectId })
+            })
                 .then(async res => {
                     const text = await res.text();
                     let data = {};
@@ -2836,7 +3024,7 @@
                         data = { raw: text.slice(0, 500) };
                     }
                     recordProjectsAction('delete_response', projectId, {
-                        method: 'DELETE',
+                        method: 'POST',
                         requestUrl: requestUrl,
                         status: res.status,
                         responseBody: JSON.stringify(data),
@@ -2846,11 +3034,6 @@
                         res.ok && !data.error ? 'success' : 'failed';
                     if (data.error) throw new Error(data.error);
                     if (!res.ok) {
-                        if (res.status === 405) {
-                            throw new Error(
-                                'Serwer nie obsługuje usuwania (HTTP 405). Uruchom ponownie kinę (make cinema-restart).'
-                            );
-                        }
                         throw new Error('HTTP ' + res.status);
                     }
                     if (activeProjectId === projectId) {
@@ -2932,7 +3115,7 @@
                 requireGoalPrompt = projectNeedsGoalPrompt(data);
                 pendingGoalOptions = !requireGoalPrompt;
                 workspaceEngaged = false;
-                annotations = [];
+                resetScopedAnnotations();
                 elementHints = [];
                 lastTouchedElementIds = [];
                 updateFeedbackList();
@@ -2971,7 +3154,9 @@
                 updateProjectActiveBar();
                 refreshIntractPolicy();
                 if (requireGoalPrompt) {
-                    showGoalPromptModal();
+                    if (!options.skipEditorSwitch) {
+                        promptForRequiredGoalOnEditor({ quiet: options.quiet });
+                    }
                 } else if (boot.status !== 'goal_options_seeded') {
                     scheduleAutoIteration('project_activate');
                 }
@@ -3102,6 +3287,8 @@
             document.getElementById('alt-c-frame').src = frameUrl('alt_c.html', { role: 'option', pane: 'c', mark: 0, calc: calc, review: 0, t: t });
             logEvent('FRAMES_RELOAD', ws);
             updatePlayerUrl();
+            lastIframeSyncKey = '';
+            setTimeout(() => syncAllIframeVisuals(true), 120);
         }
 
         function restoreHistoryCheckpoint(checkpointId) {
@@ -3141,7 +3328,10 @@
         }
 
         function refreshIntractPolicy() {
-            fetch('/policy')
+            const scopeQs = currentFocusScope
+                ? '?focus_scope=' + encodeURIComponent(currentFocusScope)
+                : '';
+            fetch('/policy' + scopeQs)
                 .then(res => {
                     if (!res.ok) throw new Error('policy HTTP ' + res.status);
                     return res.json();
@@ -3150,6 +3340,7 @@
                     intractPolicyData = data;
                     syncGoalFromLedger(data);
                     renderIntractPolicy(data);
+                    loadActiveScopeAnnotations(currentFocusScope, { preferLedger: true });
                     updateWorkflowUI();
                     updatePromptBox();
                 })
@@ -3349,14 +3540,21 @@
         let pendingAutoIterate = false;
         let autoIterateTimer = null;
         const AUTO_ITERATE_MS = 420;
+        const FRAGMENT_ITERATE_MS = 280;
+
+        function iterationAllowedWithoutGoal() {
+            return annotations.length > 0 || elementHints.length > 0;
+        }
 
         function scheduleAutoIteration(reason) {
+            if (requireGoalPrompt && !projectGoal && !iterationAllowedWithoutGoal()) return;
             if (autoIterateTimer) clearTimeout(autoIterateTimer);
+            const delay = reason === 'mark' ? FRAGMENT_ITERATE_MS : AUTO_ITERATE_MS;
             autoIterateTimer = setTimeout(() => {
                 autoIterateTimer = null;
                 if (resolveIterationMode() === 'none') return;
                 runLiveIteration({ auto: true, reason: reason || 'activity' });
-            }, AUTO_ITERATE_MS);
+            }, delay);
         }
 
         // Ultimate cross-origin postMessage listener
@@ -3378,7 +3576,7 @@
             }
 
             if (e.data.type === 'annotation') {
-                handleAnnotation(e.data.elementId, e.data.action);
+                handleAnnotation(e.data.elementId, e.data.action, e.data.fragment);
             }
             
             if (e.data.type === 'promote') {
@@ -3538,17 +3736,70 @@
             updatePlayerUrl();
         }
 
-        function handleAnnotation(elementId, type) {
+        function sanitizeAnnotationFragment(fragment) {
+            if (!fragment || typeof fragment !== 'object') return null;
+            const limit = (value, max) => String(value || '').replace(/\s+/g, ' ').trim().slice(0, max);
+            const rect = fragment.rect && typeof fragment.rect === 'object' ? fragment.rect : {};
+            return {
+                id: limit(fragment.id, 120),
+                tag: limit(fragment.tag, 40),
+                className: limit(fragment.className, 240),
+                text: limit(fragment.text, 700),
+                html: limit(fragment.html, 3000),
+                rect: {
+                    x: Math.round(Number(rect.x) || 0),
+                    y: Math.round(Number(rect.y) || 0),
+                    width: Math.round(Number(rect.width) || 0),
+                    height: Math.round(Number(rect.height) || 0),
+                },
+            };
+        }
+
+        function scopeMarkLabel(type) {
+            if (type === 'KEEP') return 'keep / preserve';
+            const scope = (currentFocusScope || 'functions').toLowerCase();
+            if (scope === 'colors') return 'recolor / change palette';
+            if (scope === 'shapes') return 'reshape / change form';
+            if (scope === 'display') return 'change display / hierarchy';
+            if (scope === 'orientation') return 'move / change layout';
+            if (scope === 'keypad') return 'change key/control';
+            return 'remove / change function';
+        }
+
+        function selectedFragmentsPayload() {
+            return annotations
+                .filter(a => a.fragment)
+                .slice(-16)
+                .map(a => ({
+                    id: a.id,
+                    type: a.type,
+                    scope: a.scope || currentFocusScope,
+                    action: scopeMarkLabel(a.type),
+                    fragment: sanitizeAnnotationFragment(a.fragment),
+                }));
+        }
+
+        function handleAnnotation(elementId, type, fragment) {
             if (pendingGoalOptions && !workspaceEngaged) {
                 logEvent('ANNOTATE_PRE_OPTIONS', { elementId: elementId, type: type });
             }
-            const existingIdx = annotations.findIndex(a => a.id === elementId);
+            const existingIdx = annotations.findIndex(
+                a => a.id === elementId && (a.scope || currentFocusScope) === currentFocusScope
+            );
             if (existingIdx >= 0) {
                 annotations.splice(existingIdx, 1);
             }
 
-            const entry = { id: elementId, type: type, at: new Date().toISOString(), stage: activeStage };
+            const entry = {
+                id: elementId,
+                type: type,
+                at: new Date().toISOString(),
+                stage: activeStage,
+                scope: currentFocusScope,
+                fragment: sanitizeAnnotationFragment(fragment),
+            };
             annotations.push(entry);
+            persistActiveScopeAnnotations();
             annotationHistory.push(entry);
 
             lastTouchedElementIds.push(elementId);
@@ -3558,7 +3809,7 @@
             if (type === 'KEEP') {
                 addChatLog('hint', `✓ <strong>#${elementId}</strong> — keep`);
             } else {
-                addChatLog('hint', `✗ <strong>#${elementId}</strong> — remove / redesign`);
+                addChatLog('hint', `✗ <strong>#${elementId}</strong> — ${scopeMarkLabel(type)}`);
             }
 
             logEvent('ANNOTATE', { elementId: elementId, type: type, total: annotations.length });
@@ -3608,13 +3859,14 @@
 
         let lastIframeSyncKey = '';
 
-        function syncAllIframeVisuals() {
+        function syncAllIframeVisuals(force) {
             const syncKey = JSON.stringify({
+                scope: currentFocusScope,
                 n: annotations.length,
                 a: annotations.map(x => x.id + ':' + x.type).join(','),
                 r: elementReviewMode ? 1 : 0
             });
-            if (syncKey === lastIframeSyncKey) return;
+            if (!force && syncKey === lastIframeSyncKey) return;
             lastIframeSyncKey = syncKey;
             document.querySelectorAll('iframe').forEach(iframe => {
                 if (iframe.contentWindow) {
@@ -3630,12 +3882,23 @@
             });
         }
 
+        function attachIframeSyncHandlers() {
+            document.querySelectorAll('iframe').forEach(iframe => {
+                if (iframe.dataset.nexuSyncAttached === '1') return;
+                iframe.dataset.nexuSyncAttached = '1';
+                iframe.addEventListener('load', () => {
+                    setTimeout(() => syncAllIframeVisuals(true), 60);
+                    setTimeout(() => syncAllIframeVisuals(true), 260);
+                });
+            });
+        }
+
         function updateFeedbackList() {
             const list = document.getElementById('feedback-list');
             list.innerHTML = '';
             
             if (annotations.length === 0) {
-                list.innerHTML = `<div style="color: #64748b; font-size: 0.85rem; text-align: center; margin-top: 40px;">No elements marked yet. Drag on the workspace: left = keep, right = remove.</div>`;
+                list.innerHTML = `<div style="color: #64748b; font-size: 0.85rem; text-align: center; margin-top: 40px;">No elements marked yet. Drag on the workspace: left = keep, right = ${scopeMarkLabel('DELETE')}.</div>`;
                 updatePromptBox();
                 updateElementHintButton();
                 return;
@@ -3651,7 +3914,7 @@
                 
                 const tag = document.createElement('span');
                 tag.className = 'feedback-tag ' + (a.type === 'KEEP' ? 'keep' : 'redesign');
-                tag.innerText = a.type;
+                tag.innerText = a.type === 'KEEP' ? 'KEEP' : scopeMarkLabel('DELETE').toUpperCase();
 
                 item.appendChild(label);
                 item.appendChild(tag);
@@ -3693,7 +3956,7 @@
                     promptText += `  ✓ RETAIN: ${keeps.map(k => '#' + k).join(', ')}\n`;
                 }
                 if (deletes.length > 0) {
-                    promptText += `  ✗ DELETE / REDESIGN: ${deletes.map(d => '#' + d).join(', ')}\n`;
+                    promptText += `  ✗ ${scopeMarkLabel('DELETE').toUpperCase()}: ${deletes.map(d => '#' + d).join(', ')}\n`;
                 }
                 elementHints.forEach(h => {
                     const tags = (h.elementIds || []).map(id => '#' + id).join(', ');
@@ -3711,7 +3974,11 @@
             fetch('/promote', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ alt: altFile, stage: activeStage })
+                body: JSON.stringify({
+                    alt: altFile,
+                    stage: activeStage,
+                    focus_scope: currentFocusScope || '',
+                })
             })
             .then(res => res.json())
             .then(data => {
@@ -3735,9 +4002,9 @@
 
         function runLiveIteration(opts) {
             opts = opts || {};
-            if (requireGoalPrompt && !projectGoal) {
+            if (requireGoalPrompt && !projectGoal && !iterationAllowedWithoutGoal()) {
                 if (!opts.auto) {
-                    showGoalPromptModal();
+                    promptForRequiredGoalOnEditor();
                 }
                 return;
             }
@@ -3790,6 +4057,7 @@
                         prompt: promptBox.innerText,
                         current_stage: activeStage,
                         annotations: annotations,
+                        selected_fragments: selectedFragmentsPayload(),
                         user_goal: goalForIterate,
                         element_hints: elementHints.map(h => h.text),
                         user_hints: buildLegacyHintsPayload(),
@@ -3861,14 +4129,17 @@
                             batch: 'applied_to_workspace',
                             at: new Date().toISOString(),
                             stage: activeStage,
+                            scope: currentFocusScope,
                             marks: annotations.slice()
                         });
                     }
                     annotations = [];
+                    scopedAnnotations[scopeAnnotationKey(currentFocusScope)] = [];
                     updateFeedbackList();
 
                     reloadCinemaFrames();
                     refreshHistory();
+                    refreshIntractPolicy();
                 } else {
                     const scopeId = data.focus_scope || scopePayload.focus_scope || currentFocusScope;
                     const isLlmFailed = /^llm_failed:/i.test(String(data.status || ''));
@@ -3921,11 +4192,15 @@
 
         const HTML_PREVIEW_MAX_CHARS = 5000;
 
-        function effectiveAnnotationsFromPolicy(policyData) {
+        function effectiveAnnotationsFromPolicy(policyData, scopeId) {
+            const scope = scopeId || currentFocusScope;
+            const fromLedger = annotationsFromLedgerForScope(scope, policyData);
+            if (fromLedger.length) return fromLedger;
             const byEl = policyData?.effective_ui?.by_element || {};
             return Object.keys(byEl).map(id => ({
                 id: id,
                 type: byEl[id] === 'delete' ? 'DELETE' : 'KEEP',
+                scope: scope,
                 source: 'policy_ledger'
             }));
         }
@@ -4046,11 +4321,14 @@
             let policyForExport = intractPolicyData;
             if (!policyForExport) {
                 try {
-                    const polRes = await fetch('/policy');
+                    const scopeQs = currentFocusScope
+                        ? '?focus_scope=' + encodeURIComponent(currentFocusScope)
+                        : '';
+                    const polRes = await fetch('/policy' + scopeQs);
                     if (polRes.ok) policyForExport = await polRes.json();
                 } catch (_) {}
             }
-            const ledgerMarks = effectiveAnnotationsFromPolicy(policyForExport);
+            const ledgerMarks = effectiveAnnotationsFromPolicy(policyForExport, currentFocusScope);
             const allMarks = annotations.length ? annotations : ledgerMarks;
             let htmlPreviews = {};
             try {
@@ -4087,8 +4365,11 @@
                 dashboard: 'Nexu',
                 activeStage: activeStage,
                 activeProjectId: activeProjectId,
+                activeScope: currentFocusScope,
                 playerUrl: location.href,
                 annotations: annotations,
+                scopedAnnotations: scopedAnnotations,
+                selectedFragments: selectedFragmentsPayload(),
                 annotationHistory: annotationHistory,
                 effectiveAnnotations: ledgerMarks,
                 allAnnotations: allMarks,
@@ -4161,6 +4442,8 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             switchMainTab(mainTab, { skipLog: true });
+            attachIframeSyncHandlers();
+            syncAllIframeVisuals(true);
             refreshLlmStatus();
             loadLlmTraces();
             pingCinemaServer(true).catch(() => {});

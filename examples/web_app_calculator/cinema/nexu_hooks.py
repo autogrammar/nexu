@@ -26,6 +26,7 @@ from nexu.cinema_projects import (
 )
 from nexu.cinema_project_imports import (
     activate_imported_project,
+    delete_project,
     delete_imported_project,
     import_git_project,
     import_http_project,
@@ -40,7 +41,8 @@ from nexu.cinema_publish import (
     start_published_service,
     stop_published_service,
 )
-from nexu.cinema_scripts import apply_spatial_deletes_to_html, finalize_cinema_html
+from nexu.cinema_scripts import finalize_cinema_html
+from repatch import apply_spatial_deletes_to_html
 
 ROOT = Path('/home/tom/github/semcod/nexu/examples/web_app_calculator/workspace')
 CAPSULE = 'scientific_calc'
@@ -65,9 +67,24 @@ def propose_llm(stage: int, goal: str, model: str):
     return propose_llm_for_stage(ROOT, CAPSULE, stage, goal, model=model)
 
 
-def append_policy_entry(stage: int, keep, delete, status: str, model: str):
+def append_policy_entry(stage: int, keep, delete, status: str, model: str, **kwargs):
+    cinema = Path(__file__).resolve().parent
+    active = load_active_project(cinema) or {}
+    project_id = str(active.get("id") or "").strip()
+    project_kind = str(active.get("kind") or "").strip().lower()
+    domain = "calculator" if project_kind == "calculator" else "web"
     return append_iteration_ledger_entry(
-        ROOT, CAPSULE, stage=stage, keep=keep, delete=delete, status=status, model=model
+        ROOT,
+        CAPSULE,
+        stage=stage,
+        keep=keep,
+        delete=delete,
+        status=status,
+        model=model,
+        domain=domain,
+        project_id=project_id,
+        focus_scope=str(kwargs.get("focus_scope") or "").strip(),
+        cinema_dir=cinema,
     )
 
 
@@ -119,8 +136,15 @@ def restore_history(checkpoint_id: str, *, apply_manifest: bool = True, target: 
     )
 
 
-def effective_ui_constraints(stage: int = 0):
-    return load_effective_ui_constraints(ROOT, CAPSULE, stage=stage)
+def effective_ui_constraints(stage: int = 0, focus_scope: str = ""):
+    cinema = Path(__file__).resolve().parent
+    return load_effective_ui_constraints(
+        ROOT,
+        CAPSULE,
+        stage=stage,
+        focus_scope=focus_scope or None,
+        cinema_dir=cinema,
+    )
 
 
 def sync_option_previews(stage: int = 0, delete_ids=None):
@@ -138,6 +162,7 @@ def patch_option_previews(
     stage: int = 0,
     session_keep=None,
     session_delete=None,
+    focus_scope: str = "",
 ):
     """Apply DELETE policy to alt_a/b/c without copying workspace."""
     from nexu.cinema_policy import (
@@ -146,16 +171,30 @@ def patch_option_previews(
         merge_ui_constraint_lists,
     )
 
+    from nexu.cinema_policy import promote_applies_spatial_deletes
+
     cinema = Path(__file__).resolve().parent
-    effective = load_effective_ui_constraints(ROOT, CAPSULE, stage=stage)
+    if not promote_applies_spatial_deletes(focus_scope):
+        return {
+            "status": "options_unchanged",
+            "files": [],
+            "skip_reason": "visual_scope_no_spatial_delete",
+        }
+    effective = load_effective_ui_constraints(
+        ROOT,
+        CAPSULE,
+        stage=stage,
+        focus_scope=focus_scope or None,
+        cinema_dir=cinema,
+    )
     if session_keep is not None or session_delete is not None:
         merged = merge_ui_constraint_lists(
-            list(effective.get("keep") or []),
-            list(effective.get("delete") or []),
-            list(session_keep or []),
-            list(session_delete or []),
+            ledger_keep=list(effective.get("keep") or []),
+            ledger_delete=list(effective.get("delete") or []),
+            session_keep=list(session_keep or []),
+            session_delete=list(session_delete or []),
         )
-        to_delete = list(merged.get("delete") or [])
+        _keep, to_delete = merged
     else:
         to_delete = list(effective.get("delete") or [])
     if not to_delete:
@@ -211,6 +250,18 @@ def delete_imported(project_id: str):
     cinema = Path(__file__).resolve().parent
     repo_root = find_nexu_repo_root(ROOT)
     return delete_imported_project(
+        cinema,
+        project_id,
+        workspace_root=ROOT,
+        capsule_name=CAPSULE,
+        repo_root=repo_root,
+    )
+
+
+def delete_workspace_project(project_id: str):
+    cinema = Path(__file__).resolve().parent
+    repo_root = find_nexu_repo_root(ROOT)
+    return delete_project(
         cinema,
         project_id,
         workspace_root=ROOT,

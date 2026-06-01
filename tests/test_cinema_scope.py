@@ -309,3 +309,236 @@ def test_http_import_offline_colors_respects_keep_marks(tmp_path: Path) -> None:
         assert ".kb-btn2_237106-a1" not in scope_css
         assert ".kb-btn2_487f06-54" not in scope_css
         assert "html,body" not in scope_css
+
+
+def test_http_import_offline_orientation_marks_create_two_column_patch(
+    tmp_path: Path,
+) -> None:
+    """#orientation marks should change layout containers, not only marked leaves."""
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    (cinema / "active_project.json").write_text(
+        json.dumps(
+            {
+                "id": "http-malortgdynia.pl",
+                "kind": "imported",
+                "import_kind": "http",
+                "title": "Malort",
+            }
+        ),
+        encoding="utf-8",
+    )
+    stage = """<!DOCTYPE html><html><head></head><body data-nexu-import-preview="http">
+<main class="site-content"><div class="entry-content">
+<h2>Pracownia Malort Gdynia</h2>
+<p>Zapraszamy do wyjątkowego miejsca</p>
+<a class="kb-btn2_237106-a1" href="#">Zapisz dziecko</a>
+<a class="kb-btn2_487f06-54" href="#">Nasza lokalizacja</a>
+</div></main>
+</body></html>"""
+    (cinema / "stage0.html").write_text(stage, encoding="utf-8")
+
+    labels = write_goal_options_offline(
+        cinema,
+        delete_els=[
+            "Pracownia Malort Gdynia",
+            "Zapraszamy do wyjątkowego miejsca",
+            "Zapisz dziecko",
+            "Nasza lokalizacja",
+        ],
+        user_goal="podziel na dwie kolumny",
+        focus_scope="orientation",
+    )
+
+    assert any("orientation:" in label for label in labels)
+    html = (cinema / "alt_b.html").read_text(encoding="utf-8")
+    style_match = re.search(
+        r'<style id="nexu-scope-variant">\s*(.*?)\s*</style>',
+        html,
+        flags=re.I | re.S,
+    )
+    assert style_match is not None
+    scope_css = style_match.group(1)
+    assert ":has(" in scope_css
+    assert "grid-template-columns:1fr 1fr" in scope_css
+    assert '[data-nexu-target="Zapisz dziecko"]' in scope_css
+    assert "Zapisz dziecko" in html
+
+
+def test_http_import_offline_colors_recolors_kadence_heading_inline(tmp_path: Path) -> None:
+    """DELETE on Kadence h2: offline colors beat inline color on nested strong."""
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    (cinema / "active_project.json").write_text(
+        json.dumps(
+            {
+                "id": "http-malortgdynia.pl",
+                "kind": "imported",
+                "import_kind": "http",
+                "title": "Malort",
+            }
+        ),
+        encoding="utf-8",
+    )
+    mark = "Pracownia Malort Gdynia – przestrzeń dla kreatywności Twojego dziecka"
+    stage = f"""<!DOCTYPE html><html><head></head><body data-nexu-import-preview="http">
+<h2 class="kt-adv-heading2_289857-94 wp-block-kadence-advancedheading" data-kb-block="kb-adv-heading289857-94">
+<strong style="color: #007D13;">Pracownia Malort Gdynia – </strong>przestrzeń dla kreatywności Twojego dziecka
+</h2>
+</body></html>"""
+    (cinema / "stage0.html").write_text(stage, encoding="utf-8")
+
+    labels = write_goal_options_offline(
+        cinema,
+        keep_els=[],
+        delete_els=[mark],
+        focus_scope="colors",
+    )
+
+    assert any("colors:" in label for label in labels)
+    alts = {
+        name: (cinema / name).read_text(encoding="utf-8")
+        for name in ("alt_a.html", "alt_b.html", "alt_c.html")
+    }
+    for html in alts.values():
+        assert "nexu-scope-variant" in html
+        assert ".kt-adv-heading2_289857-94" in html
+        assert ".kt-adv-heading2_289857-94 *" in html
+        assert "color:" in html and "!important" in html
+    assert "color:#0f172a!important" in alts["alt_a.html"]
+    assert "color:#000!important" in alts["alt_b.html"]
+    assert "color:#1e1b4b!important" in alts["alt_c.html"]
+
+
+def test_http_import_offline_orientation_two_columns_with_delete_marks(
+    tmp_path: Path,
+) -> None:
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    (cinema / "active_project.json").write_text(
+        json.dumps(
+            {
+                "id": "http-malortgdynia.pl",
+                "kind": "imported",
+                "import_kind": "http",
+                "title": "Malort",
+            }
+        ),
+        encoding="utf-8",
+    )
+    stage = """<!DOCTYPE html><html><head></head><body data-nexu-import-preview="http">
+<main class="site-content"><div class="entry-content">
+<section>Left</section><section>Right</section>
+</div></main>
+<a class="kb-btn2_237106-a1" href="#">Zapisz dziecko</a>
+<button class="kb-btn2_999">Nasza lokalizacja</button>
+</body></html>"""
+    (cinema / "stage0.html").write_text(stage, encoding="utf-8")
+
+    labels = write_goal_options_offline(
+        cinema,
+        keep_els=[],
+        delete_els=["Zapisz dziecko", "Nasza lokalizacja"],
+        user_goal="podziel na dwie kolumny",
+        focus_scope="orientation",
+    )
+
+    assert any("two columns" in label for label in labels)
+    alt_b = (cinema / "alt_b.html").read_text(encoding="utf-8")
+    style_match = re.search(
+        r'<style id="nexu-scope-variant">\s*(.*?)\s*</style>',
+        alt_b,
+        flags=re.I | re.S,
+    )
+    assert style_match is not None
+    scope_css = style_match.group(1)
+    assert "grid-template-columns" in scope_css
+    assert "1fr 1fr" in scope_css
+    assert "body{" in scope_css or ".entry-content{" in scope_css
+
+
+def test_http_import_offline_display_keeps_entry_content_headings(
+    tmp_path: Path,
+) -> None:
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    (cinema / "active_project.json").write_text(
+        json.dumps(
+            {
+                "id": "http-malortgdynia.pl",
+                "kind": "imported",
+                "import_kind": "http",
+                "title": "Malort",
+            }
+        ),
+        encoding="utf-8",
+    )
+    stage = """<!DOCTYPE html><html><head></head><body data-nexu-import-preview="http">
+<main class="site-content"><div class="entry-content">
+<h1>Hero</h1><p>Intro</p>
+</div></main>
+<button class="kb-btn2_237106-a1">Zapisz dziecko</button>
+</body></html>"""
+    (cinema / "stage0.html").write_text(stage, encoding="utf-8")
+
+    labels = write_goal_options_offline(
+        cinema,
+        keep_els=[],
+        delete_els=["Zapisz dziecko"],
+        focus_scope="display",
+    )
+
+    assert any("display:" in label for label in labels)
+    alt_b = (cinema / "alt_b.html").read_text(encoding="utf-8")
+    style_match = re.search(
+        r'<style id="nexu-scope-variant">\s*(.*?)\s*</style>',
+        alt_b,
+        flags=re.I | re.S,
+    )
+    assert style_match is not None
+    scope_css = style_match.group(1)
+    assert ".entry-content h1" in scope_css
+    assert "font-size:1.65rem" in scope_css
+    assert '[data-nexu-target="Zapisz dziecko"]' in scope_css
+
+
+def test_http_import_offline_shapes_keeps_content_button_radii(
+    tmp_path: Path,
+) -> None:
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    (cinema / "active_project.json").write_text(
+        json.dumps(
+            {
+                "id": "http-malortgdynia.pl",
+                "kind": "imported",
+                "import_kind": "http",
+                "title": "Malort",
+            }
+        ),
+        encoding="utf-8",
+    )
+    stage = """<!DOCTYPE html><html><head></head><body data-nexu-import-preview="http">
+<div class="entry-content">
+<button class="kb-btn2_237106-a1">Zapisz dziecko</button>
+</div></body></html>"""
+    (cinema / "stage0.html").write_text(stage, encoding="utf-8")
+
+    labels = write_goal_options_offline(
+        cinema,
+        keep_els=[],
+        delete_els=["Zapisz dziecko"],
+        focus_scope="shapes",
+    )
+
+    assert any("shapes:" in label for label in labels)
+    alt_c = (cinema / "alt_c.html").read_text(encoding="utf-8")
+    style_match = re.search(
+        r'<style id="nexu-scope-variant">\s*(.*?)\s*</style>',
+        alt_c,
+        flags=re.I | re.S,
+    )
+    assert style_match is not None
+    scope_css = style_match.group(1)
+    assert ".entry-content button" in scope_css
+    assert "border-radius:999px" in scope_css

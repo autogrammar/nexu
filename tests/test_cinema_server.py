@@ -207,7 +207,10 @@ def test_cinema_player_template_is_externalized() -> None:
     assert "function deleteImportedProject(projectId)" in html
     assert "/projects/delete" in html
     assert "function promptForRequiredGoalOnEditor" in html
-    assert "const requestedTab = ['projects', 'editor', 'llm', 'services'].includes(bootTab)" in html
+    assert (
+        "const requestedTab = ['projects', 'editor', 'llm', 'services'].includes(bootTab)"
+        in html
+    )
     assert "if (needsGoal && tab === 'editor')" in html
     assert "if (mainTab !== 'editor') {" in html
     assert "iterationAllowedWithoutGoal" in html
@@ -216,6 +219,10 @@ def test_cinema_player_template_is_externalized() -> None:
     assert "const needsGoal = activeProjectRequiresGoal()" in html
     assert "selected_fragments: selectedFragmentsPayload()" in html
     assert "function selectedFragmentsPayload()" in html
+    assert "let scopedAnnotations = {}" in html
+    assert "function annotationsFromLedgerForScope" in html
+    assert "function loadActiveScopeAnnotations" in html
+    assert "persistActiveScopeAnnotations()" in html
     assert "function scopeMarkLabel" in html
     assert "attachIframeSyncHandlers" in html
     assert "syncAllIframeVisuals(true)" in html

@@ -121,6 +121,16 @@ def test_effective_ui_constraints_filters_project_and_scope():
     assert calc["keep"] == ["sin"]
 
 
+def test_promote_applies_spatial_deletes_only_for_functions_scope():
+    from nexu.cinema_policy import promote_applies_spatial_deletes
+
+    assert promote_applies_spatial_deletes("functions")
+    assert promote_applies_spatial_deletes("")
+    assert not promote_applies_spatial_deletes("colors")
+    assert not promote_applies_spatial_deletes("display")
+    assert not promote_applies_spatial_deletes("orientation")
+
+
 def test_effective_ui_constraints_ignores_unscoped_when_focus_scope_set():
     ledger = [
         {"stage": 0, "keep": ["legacy_btn"], "delete": []},

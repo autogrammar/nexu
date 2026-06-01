@@ -1624,18 +1624,20 @@
         function loadActiveScopeAnnotations(scopeId, opts) {
             const options = opts || {};
             const key = scopeAnnotationKey(scopeId);
+            if (scopedAnnotations[key] && scopedAnnotations[key].length) {
+                annotations = scopedAnnotations[key].map(a => ({ ...a }));
+                return;
+            }
             if (options.preferLedger && intractPolicyData) {
                 annotations = annotationsFromLedgerForScope(scopeId, intractPolicyData);
                 scopedAnnotations[key] = annotations.slice();
                 return;
             }
-            if (scopedAnnotations[key] && scopedAnnotations[key].length) {
-                annotations = scopedAnnotations[key].map(a => ({ ...a }));
-                return;
-            }
             if (intractPolicyData) {
                 annotations = annotationsFromLedgerForScope(scopeId, intractPolicyData);
-                scopedAnnotations[key] = annotations.slice();
+                if (annotations.length) {
+                    scopedAnnotations[key] = annotations.slice();
+                }
                 return;
             }
             annotations = [];
@@ -3972,7 +3974,11 @@
             fetch('/promote', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ alt: altFile, stage: activeStage })
+                body: JSON.stringify({
+                    alt: altFile,
+                    stage: activeStage,
+                    focus_scope: currentFocusScope || '',
+                })
             })
             .then(res => res.json())
             .then(data => {
@@ -4315,7 +4321,10 @@
             let policyForExport = intractPolicyData;
             if (!policyForExport) {
                 try {
-                    const polRes = await fetch('/policy');
+                    const scopeQs = currentFocusScope
+                        ? '?focus_scope=' + encodeURIComponent(currentFocusScope)
+                        : '';
+                    const polRes = await fetch('/policy' + scopeQs);
                     if (polRes.ok) policyForExport = await polRes.json();
                 } catch (_) {}
             }

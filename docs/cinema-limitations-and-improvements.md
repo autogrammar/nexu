@@ -92,7 +92,11 @@ These issues **were** production problems; fixes are in tree but may still need 
 | Policy ledger bleed across projects | Ledger entries filtered by `project_id` + `focus_scope`; new entries tagged |
 | Shield false positive (`btn-sci` in injected JS) | Import validation regex matches CSS class tokens, not JS string literals |
 | All buttons recolored on `#colors` | Narrow selector resolution in `repatch` marked context (KEEP/DELETE semantics) |
+| Kadence heading inline `style="color: …"` ignored on `#colors` | `marked_scope_colors_css` adds `!important` text-color on marked node + descendants (`*`, `[style*='color']`); Kadence class resolved via text-label matching |
 | Full-page LLM overwriting import snapshot | `should_block_full_html_iterate` + import stage guards on `/iterate` |
+| `#orientation` DELETE stripped page layout on HTTP import | `inject_scope_style` uses `marked_scope_orientation_css` + column-goal page rules (not `restrict_scope_css_to_marks`) |
+| `#display` / `#shapes` DELETE dropped h1/h2 and wrapper radii on HTTP import | Page-level `_web_display_scope_css` / `_web_shapes_scope_css` with marked-element extras |
+| Promote applied all-scope DELETE spatial removes to alt previews | `/promote` passes `focus_scope`; ledger filtered per scope; visual scopes skip spatial delete on options |
 
 Functional **P0/P1/P2** items in [cinema-optimizations.md](cinema-optimizations.md) tracking table are marked **done**. Remaining work is engineering debt, P3, operations, or repo-wide roadmap — not missing core Cinema features.
 

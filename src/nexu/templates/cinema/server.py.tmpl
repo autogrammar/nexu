@@ -1658,6 +1658,7 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
                 alt_name = str(data.get('alt', 'alt_a.html')).split('?')[0]
                 stage = int(data.get('stage', 0))
+                focus_scope = str(data.get('focus_scope', '') or '').strip()
                 allowed_alts = {'alt_a.html', 'alt_b.html', 'alt_c.html'}
                 if alt_name not in allowed_alts:
                     payload = {"error": f"unsupported option file: {alt_name}"}
@@ -1670,7 +1671,9 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                         payload = {"error": f"option file not found: {alt_name}"}
                     else:
                         stage_path.write_text(alt_path.read_text(encoding='utf-8'), encoding='utf-8')
-                        options_sync = _patch_option_previews(stage)
+                        options_sync = _patch_option_previews(
+                            stage, focus_scope=focus_scope
+                        )
                         history_entry = _save_history_checkpoint(
                             action='promote',
                             stage=stage,

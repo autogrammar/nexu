@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 from repatch import (
+    VISUAL_REDESIGN_SCOPES,
     OPTION_PREVIEW_FILES as _REPATCH_OPTION_PREVIEW_FILES,
     enforce_deletes_on_option_previews as _repatch_enforce_deletes_on_option_previews,
     html_files_distinct as _repatch_html_files_distinct,
@@ -42,6 +43,12 @@ def _ledger_entry_matches_project(
     if kind == "imported" or active_id.startswith("http-"):
         return False
     return True
+
+
+def promote_applies_spatial_deletes(focus_scope: str | None) -> bool:
+    """Promote may spatial-delete option previews only outside visual redesign scopes."""
+    active = str(focus_scope or "").strip().lower()
+    return active not in VISUAL_REDESIGN_SCOPES
 
 
 def _ledger_entry_matches_scope(entry: dict[str, Any], *, focus_scope: str | None) -> bool:
