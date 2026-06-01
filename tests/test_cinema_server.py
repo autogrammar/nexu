@@ -99,6 +99,9 @@ def test_render_server_script_embeds_runtime_context() -> None:
     assert "ALLOW_NETWORK_CALLS = False" in script
     assert "def _llm_network_allowed()" in script
     assert "def _llm_status_payload()" in script
+    assert "import shutil" in script
+    assert 'prefix = "/services/view/"' in script
+    assert "shutil.copyfileobj(fh, self.wfile)" in script
     assert '"/llm/status"' in script
     assert '"/llm/traces"' in script
     assert '"/llm/trace"' in script
