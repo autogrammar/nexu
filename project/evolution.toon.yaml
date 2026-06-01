@@ -1,18 +1,18 @@
-# code2llm/evolution | 471 func | 54f | 2026-06-01
+# code2llm/evolution | 491 func | 54f | 2026-06-01
 # generated in 0.00s
 
 NEXT[5] (ranked by impact):
   [1] !! SPLIT           src/nexu/cinema_project_imports.py
-      WHY: 1134L, 0 classes, max CC=17
-      EFFORT: ~4h  IMPACT: 19278
+      WHY: 1219L, 0 classes, max CC=14
+      EFFORT: ~4h  IMPACT: 17066
 
-  [2] !! SPLIT           src/nexu/cinema_offline_options.py
-      WHY: 897L, 0 classes, max CC=13
-      EFFORT: ~4h  IMPACT: 11661
+  [2] !! SPLIT           src/nexu/cinema_policy.py
+      WHY: 906L, 0 classes, max CC=14
+      EFFORT: ~4h  IMPACT: 12684
 
-  [3] !! SPLIT           src/nexu/cinema_policy.py
-      WHY: 861L, 0 classes, max CC=13
-      EFFORT: ~4h  IMPACT: 11193
+  [3] !! SPLIT           src/nexu/cinema_offline_options.py
+      WHY: 901L, 0 classes, max CC=13
+      EFFORT: ~4h  IMPACT: 11713
 
   [4] !  SPLIT-FUNC      start_published_service  CC=15  fan=17
       WHY: CC=15 exceeds 15
@@ -24,15 +24,15 @@ NEXT[5] (ranked by impact):
 
 
 RISKS[3]:
-  ⚠ Splitting src/nexu/cinema_project_imports.py may break 52 import paths
+  ⚠ Splitting src/nexu/cinema_project_imports.py may break 57 import paths
+  ⚠ Splitting src/nexu/cinema_policy.py may break 44 import paths
   ⚠ Splitting src/nexu/cinema_offline_options.py may break 32 import paths
-  ⚠ Splitting src/nexu/cinema_policy.py may break 40 import paths
 
 METRICS-TARGET:
   CC̄:          4.4 → ≤3.1
-  max-CC:      17 → ≤8
+  max-CC:      16 → ≤8
   god-modules: 7 → 0
-  high-CC(≥15): 4 → ≤2
+  high-CC(≥15): 3 → ≤1
   hub-types:   0 → ≤0
 
 PATTERNS (language parser shared logic):
@@ -60,4 +60,4 @@ PATTERNS (language parser shared logic):
     - Standardized FunctionInfo/ClassInfo models
 
 HISTORY:
-  prev CC̄=4.6 → now CC̄=4.4
+  prev CC̄=4.4 → now CC̄=4.4

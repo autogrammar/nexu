@@ -1,17 +1,15 @@
 # code2llm call graph | /home/tom/github/semcod/nexu
-# generated in 0.22s
-# nodes: 387 | edges: 500 | modules: 60
-# CC̄=4.6
+# generated in 0.25s
+# nodes: 392 | edges: 500 | modules: 60
+# CC̄=4.5
 
 HUBS[20]:
   examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler.do_GET
-    CC=34  in:0  out:183  total:183
+    CC=37  in:0  out:189  total:189
   scripts.ci-cinema-smoke.print
     CC=0  in:94  out:0  total:94
   src.nexu.config.load_config
     CC=14  in:5  out:76  total:81
-  src.nexu.intract.read_manifest_contracts
-    CC=12  in:8  out:32  total:40
   examples.web_app_pactown_ecosystem.run.main
     CC=8  in:0  out:39  total:39
   examples.web_app_event_monitor.run.main
@@ -20,14 +18,14 @@ HUBS[20]:
     CC=11  in:4  out:32  total:36
   examples.web_app_dashboard.run.main
     CC=2  in:0  out:35  total:35
-  src.nexu.cinema_project_imports._activate_imported
-    CC=11  in:2  out:32  total:34
   src.nexu.report.build_capsule_report
     CC=1  in:2  out:32  total:34
-  src.nexu.cinema_server._render_server_script
-    CC=1  in:1  out:31  total:32
+  src.nexu.cinema_project_imports._activate_imported
+    CC=11  in:2  out:32  total:34
   src.nexu.paths.project_root
     CC=1  in:29  out:3  total:32
+  src.nexu.cinema_server._render_server_script
+    CC=1  in:1  out:31  total:32
   src.nexu.capsule.create_capsule
     CC=8  in:7  out:24  total:31
   src.nexu.orchestrate.build_capsule_orchestration
@@ -36,16 +34,24 @@ HUBS[20]:
     CC=8  in:3  out:26  total:29
   src.nexu.cinema_http_preprocess.load_http_preprocess_artifacts
     CC=16  in:1  out:27  total:28
+  examples.web_app_calculator.cinema.server._write_llm_trace
+    CC=3  in:22  out:6  total:28
   examples.run_examples.run_example
     CC=2  in:1  out:26  total:27
-  src.nexu.cinema_baseline_contracts.ensure_capsule_intract_yaml
-    CC=9  in:1  out:25  total:26
+  examples.web_app_calculator.cinema.server._llm_status_payload
+    CC=3  in:1  out:25  total:26
   src.nexu.review.build_review_packet
     CC=5  in:2  out:24  total:26
   src.nexu.paths.capsule_dir
     CC=1  in:25  out:1  total:26
 
 MODULES:
+  examples.mcp_patch_demo.server  [5 funcs]
+    broadcast  CC=2  out:3
+    data  CC=4  out:6
+    dslCommand  CC=4  out:6
+    presetDsl  CC=2  out:3
+    presetName  CC=2  out:3
   examples.nexu_markpact_exporter  [1 funcs]
     main  CC=3  out:22
   examples.realtime_lane_nexu_sync  [1 funcs]
@@ -58,28 +64,28 @@ MODULES:
   examples.scientific_calculator_demo2  [2 funcs]
     main  CC=2  out:17
     print_code  CC=1  out:6
-  examples.web_app_calculator.cinema.nexu_hooks  [28 funcs]
+  examples.web_app_calculator.cinema.nexu_hooks  [29 funcs]
     activate_project  CC=2  out:6
     active_project  CC=1  out:3
     append_goal_policy_entry  CC=11  out:19
-    append_policy_entry  CC=1  out:1
+    append_policy_entry  CC=6  out:14
     apply_manifest_from_ledger  CC=1  out:1
     apply_spatial_patch  CC=2  out:2
     delete_imported  CC=1  out:4
-    effective_ui_constraints  CC=1  out:1
+    delete_workspace_project  CC=1  out:4
+    effective_ui_constraints  CC=2  out:3
     export_markpact_readme  CC=2  out:5
-    goal_contract_lines  CC=1  out:1
-  examples.web_app_calculator.cinema.server  [38 funcs]
+  examples.web_app_calculator.cinema.server  [41 funcs]
     do_DELETE  CC=9  out:23
-    do_GET  CC=34  out:183
+    do_GET  CC=37  out:189
     _append_policy_entry  CC=2  out:2
     _append_policy_entry_legacy  CC=3  out:12
+    _apply_entry_constraints  CC=7  out:6
     _compact_html_for_llm  CC=1  out:4
     _compact_llm_error  CC=2  out:4
     _compact_markpact_for_llm  CC=3  out:10
     _delete_imported_project  CC=2  out:1
     _effective_markpact_mode  CC=1  out:7
-    _effective_ui_constraints_from_ledger  CC=17  out:16
   examples.web_app_calculator.run  [1 funcs]
     main  CC=2  out:23
   examples.web_app_dashboard.run  [1 funcs]
@@ -167,18 +173,18 @@ MODULES:
   src.nexu.cinema_markpact  [2 funcs]
     build_markpact_readme  CC=11  out:21
     markpact_download_filename  CC=2  out:2
-  src.nexu.cinema_policy  [39 funcs]
+  src.nexu.cinema_policy  [37 funcs]
     _build_constraint_result  CC=5  out:4
-    _html_files_distinct  CC=3  out:6
-    _normalize_html_body  CC=1  out:2
+    _html_files_distinct  CC=1  out:1
+    _intract_manifest_path  CC=4  out:4
+    _ledger_entry_matches_project  CC=8  out:10
+    _ledger_entry_matches_scope  CC=5  out:7
     _process_keep_delete_entries  CC=7  out:6
-    _process_ledger_entry  CC=4  out:4
+    _process_ledger_entry  CC=6  out:6
     _process_proposed_contracts  CC=8  out:3
     _proposal_kind_and_element  CC=12  out:8
-    _replace_html_title  CC=2  out:2
-    _resolve_ledger_path  CC=2  out:2
-    append_goal_ledger_entry  CC=7  out:13
-  src.nexu.cinema_project_imports  [49 funcs]
+    _replace_html_title  CC=1  out:1
+  src.nexu.cinema_project_imports  [54 funcs]
     _activate_delete_fallback  CC=3  out:5
     _activate_imported  CC=11  out:32
     _apply_http_preprocess_fields  CC=9  out:9
@@ -187,7 +193,7 @@ MODULES:
     _catalog_entry_from_meta  CC=7  out:22
     _charset_from_content_type  CC=3  out:4
     _clear_active_project  CC=2  out:2
-    _compile_meta_fields  CC=17  out:22
+    _compile_meta_fields  CC=8  out:17
     _decode_http_bytes  CC=4  out:3
   src.nexu.cinema_projects  [24 funcs]
     _active_project_meta  CC=1  out:2
@@ -260,14 +266,6 @@ MODULES:
     rel  CC=1  out:2
   src.nexu.init_project  [1 funcs]
     init_project  CC=3  out:7
-  src.nexu.intract  [7 funcs]
-    _split_csv  CC=4  out:4
-    _tokenize_contract  CC=5  out:10
-    format_intract_v1_line  CC=3  out:1
-    parse_intract_line  CC=3  out:22
-    read_manifest_contracts  CC=12  out:32
-    scan_contracts_in_file  CC=3  out:5
-    scan_contracts_in_text  CC=3  out:4
   src.nexu.intract_adapter  [6 funcs]
     _ensure_intract_on_path  CC=3  out:4
     _finding_for_result  CC=9  out:16
@@ -350,6 +348,10 @@ EDGES:
   examples.scientific_calculator_demo2.main → src.nexu.capsule.create_capsule
   examples.scientific_calculator_demo2.main → src.nexu.iterate.iterate_capsule
   examples.web_app_event_monitor.run.main → scripts.ci-cinema-smoke.print
+  examples.mcp_patch_demo.server.data → examples.mcp_patch_demo.server.broadcast
+  examples.mcp_patch_demo.server.dslCommand → examples.mcp_patch_demo.server.broadcast
+  examples.mcp_patch_demo.server.presetName → examples.mcp_patch_demo.server.broadcast
+  examples.mcp_patch_demo.server.presetDsl → examples.mcp_patch_demo.server.broadcast
   examples.web_app_calculator.run.main → src.nexu.init_project.init_project
   examples.web_app_calculator.run.main → src.vico.freeze.freeze_project
   examples.web_app_calculator.run.main → scripts.ci-cinema-smoke.print
@@ -359,6 +361,7 @@ EDGES:
   examples.web_app_calculator.cinema.nexu_hooks.apply_spatial_patch → src.nexu.cinema_scripts.finalize_cinema_html
   examples.web_app_calculator.cinema.nexu_hooks.propose_llm → src.nexu.cinema_policy.propose_llm_for_stage
   examples.web_app_calculator.cinema.nexu_hooks.append_policy_entry → src.nexu.cinema_policy.append_iteration_ledger_entry
+  examples.web_app_calculator.cinema.nexu_hooks.append_policy_entry → src.nexu.cinema_projects.load_active_project
   examples.web_app_calculator.cinema.nexu_hooks.append_goal_policy_entry → src.nexu.cinema_policy.append_goal_ledger_entry
   examples.web_app_calculator.cinema.nexu_hooks.append_goal_policy_entry → src.nexu.cinema_projects.load_active_project
   examples.web_app_calculator.cinema.nexu_hooks.goal_contract_lines → src.nexu.cinema_policy.load_goal_contract_lines
@@ -371,10 +374,5 @@ EDGES:
   examples.web_app_calculator.cinema.nexu_hooks.sync_option_previews → src.nexu.cinema_policy.sync_option_previews_from_workspace
   examples.web_app_calculator.cinema.nexu_hooks.patch_option_previews → src.nexu.cinema_policy.load_effective_ui_constraints
   examples.web_app_calculator.cinema.nexu_hooks.patch_option_previews → src.nexu.cinema_policy.enforce_deletes_on_option_previews
+  examples.web_app_calculator.cinema.nexu_hooks.patch_option_previews → src.nexu.cinema_policy.promote_applies_spatial_deletes
   examples.web_app_calculator.cinema.nexu_hooks.patch_option_previews → src.nexu.cinema_policy.merge_ui_constraint_lists
-  examples.web_app_calculator.cinema.nexu_hooks.projects_catalog → src.nexu.cinema_project_imports.merged_projects_catalog
-  examples.web_app_calculator.cinema.nexu_hooks.activate_project → src.nexu.cinema_projects.activate_example_project
-  examples.web_app_calculator.cinema.nexu_hooks.activate_project → src.nexu.cinema_project_imports.activate_imported_project
-  examples.web_app_calculator.cinema.nexu_hooks.activate_project → src.nexu.cinema_projects.find_nexu_repo_root
-  examples.web_app_calculator.cinema.nexu_hooks.import_project_from_zip → src.nexu.cinema_project_imports.import_zip_project
-  examples.web_app_calculator.cinema.nexu_hooks.import_project_from_git → src.nexu.cinema_project_imports.import_git_project

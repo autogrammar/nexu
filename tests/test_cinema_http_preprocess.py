@@ -276,3 +276,5 @@ def test_prepare_http_preview_with_shield_keeps_network_shim() -> None:
     assert "const NEXU_PARAMS = new URLSearchParams" in body
     assert "isHttpImportPreview" in body
     assert "SELECTOR_HTTP" in body
+    assert "'p'" in body
+    assert "'img[alt]'" in body

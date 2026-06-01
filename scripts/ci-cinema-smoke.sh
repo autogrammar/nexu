@@ -5,8 +5,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-echo "== nexu: uv sync =="
-uv sync --quiet
+echo "== nexu: uv sync (dev) =="
+uv sync --extra dev --quiet
 
 echo "== nexu: pytest =="
 uv run pytest -q

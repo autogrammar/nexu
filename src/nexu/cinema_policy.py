@@ -28,6 +28,16 @@ ManifestTarget = Literal["project", "capsule", "both"]
 _VALID_TARGETS = frozenset({"project", "capsule", "both"})
 
 
+def _intract_manifest_path(raw: str | None) -> Path | None:
+    """Return path only when it points at a readable intract YAML manifest."""
+    if not raw:
+        return None
+    path = Path(str(raw))
+    if path.suffix.lower() not in {".yaml", ".yml"}:
+        return None
+    return path if path.is_file() else None
+
+
 def _ledger_entry_matches_project(
     entry: dict[str, Any],
     *,
@@ -256,8 +266,9 @@ def refresh_imported_policy_snapshot(
         "project": {
             "root": str(cinema_dir),
             "name": project_id,
-            "has_intract_yaml": bool(markpact_path),
-            "intract_path": markpact_path or None,
+            "has_intract_yaml": False,
+            "intract_path": None,
+            "markpact_path": markpact_path or None,
         },
         "capsule": {
             "name": project_id,
@@ -485,8 +496,8 @@ def manifest_paths_from_snapshot(
 
     project = snapshot.get("project", {}) if isinstance(snapshot, dict) else {}
     capsule = snapshot.get("capsule", {}) if isinstance(snapshot, dict) else {}
-    project_manifest = Path(project["intract_path"]) if project.get("intract_path") else None
-    capsule_manifest = Path(capsule["intract_path"]) if capsule.get("intract_path") else None
+    project_manifest = _intract_manifest_path(project.get("intract_path"))
+    capsule_manifest = _intract_manifest_path(capsule.get("intract_path"))
     return resolve_manifest_paths(
         workspace_root=project_root(root),
         capsule_name=capsule_name,
@@ -522,10 +533,10 @@ def apply_ledger_from_cinema(
     if snapshot:
         project = snapshot.get("project", {})
         capsule = snapshot.get("capsule", {})
-        if isinstance(project, dict) and project.get("intract_path"):
-            project_manifest = Path(str(project["intract_path"]))
-        if isinstance(capsule, dict) and capsule.get("intract_path"):
-            capsule_manifest = Path(str(capsule["intract_path"]))
+        if isinstance(project, dict):
+            project_manifest = _intract_manifest_path(project.get("intract_path"))
+        if isinstance(capsule, dict):
+            capsule_manifest = _intract_manifest_path(capsule.get("intract_path"))
 
     batch = apply_ledger_to_manifests(
         workspace_root=root,

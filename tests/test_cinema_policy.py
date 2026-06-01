@@ -131,6 +131,44 @@ def test_promote_applies_spatial_deletes_only_for_functions_scope():
     assert not promote_applies_spatial_deletes("orientation")
 
 
+def test_refresh_imported_policy_snapshot_keeps_markpact_separate_from_intract(
+    tmp_path: Path,
+) -> None:
+    from nexu.cinema_policy import refresh_imported_policy_snapshot
+
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    markpact = cinema / "imported_projects" / "http-example.net" / "README.markpact.md"
+    markpact.parent.mkdir(parents=True)
+    markpact.write_text("# Markpact\n", encoding="utf-8")
+    meta = {
+        "id": "http-example.net",
+        "import_kind": "http",
+        "markpact_path": str(markpact),
+    }
+    active = {"id": "http-example.net", "kind": "imported"}
+
+    refresh_imported_policy_snapshot(cinema, meta, active)
+
+    policy = json.loads((cinema / "intract_policy.json").read_text(encoding="utf-8"))
+    project = policy["project"]
+    assert project["has_intract_yaml"] is False
+    assert project["intract_path"] is None
+    assert project["markpact_path"] == str(markpact)
+
+
+def test_intract_manifest_path_rejects_markpact_readme(tmp_path: Path) -> None:
+    from nexu.cinema_policy import _intract_manifest_path
+
+    markpact = tmp_path / "README.markpact.md"
+    markpact.write_text("# Markpact\n", encoding="utf-8")
+    intract = tmp_path / "intract.yaml"
+    intract.write_text("version: intract.v1\n", encoding="utf-8")
+
+    assert _intract_manifest_path(str(markpact)) is None
+    assert _intract_manifest_path(str(intract)) == intract
+
+
 def test_effective_ui_constraints_ignores_unscoped_when_focus_scope_set():
     ledger = [
         {"stage": 0, "keep": ["legacy_btn"], "delete": []},

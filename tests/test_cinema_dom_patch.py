@@ -58,6 +58,28 @@ def test_build_function_option_patches_xpatches_delete_marks() -> None:
     assert "nexu-function-evolution" in files["alt_a.html"]
 
 
+def test_build_function_option_patches_allows_imported_theme_css() -> None:
+    wordpress_html = HTML.replace(
+        "</head>",
+        (
+            "<style>"
+            "@import url('https://fonts.googleapis.com/css?family=Jost');"
+            ".wp-lightbox-overlay{position:fixed;left:0;top:0;}"
+            "</style></head>"
+        ),
+    )
+    files, labels, meta = build_function_option_patches(
+        wordpress_html,
+        user_goal="audience",
+        project_kind="imported",
+        delete_els=["Kontakt"],
+    )
+
+    assert meta["status"] == "ok"
+    assert labels
+    assert set(files) == {"alt_a.html", "alt_b.html", "alt_c.html"}
+
+
 def test_function_patch_context_is_compact_ir() -> None:
     context = build_function_patch_context(HTML, user_goal="audience")
 

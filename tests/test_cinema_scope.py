@@ -410,6 +410,52 @@ def test_http_import_offline_colors_recolors_kadence_heading_inline(tmp_path: Pa
     assert "color:#1e1b4b!important" in alts["alt_c.html"]
 
 
+def test_http_import_offline_colors_recolors_all_marked_kadence_headings(
+    tmp_path: Path,
+) -> None:
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    (cinema / "active_project.json").write_text(
+        json.dumps(
+            {
+                "id": "http-malortgdynia.pl",
+                "kind": "imported",
+                "import_kind": "http",
+                "title": "Malort",
+            }
+        ),
+        encoding="utf-8",
+    )
+    heading = "Pracownia Malort Gdynia – przestrzeń dla kreatywności Twojego dziecka"
+    body = (
+        "Zapraszamy do wyjątkowego miejsca, gdzie dzieci rozwijają wyobraźnię i "
+        "pewność siebie poprzez spontaniczną twórczość artystyczną."
+    )
+    stage = f"""<!DOCTYPE html><html><head></head><body data-nexu-import-preview="http">
+<h2 class="kt-adv-heading2_289857-94 wp-block-kadence-advancedheading">
+<strong style="color: #007D13;">Pracownia Malort Gdynia&nbsp;&#8211; </strong>przestrzeń dla kreatywności Twojego dziecka
+</h2>
+<h2 class="kt-adv-heading2_79aa1a-c6 wp-block-kadence-advancedheading">{body}</h2>
+</body></html>"""
+    (cinema / "stage0.html").write_text(stage, encoding="utf-8")
+
+    labels = write_goal_options_offline(
+        cinema,
+        keep_els=[],
+        delete_els=[body, heading],
+        focus_scope="colors",
+    )
+
+    assert any("colors:" in label for label in labels)
+    html = (cinema / "alt_c.html").read_text(encoding="utf-8")
+    assert ".kt-adv-heading2_289857-94" in html
+    assert ".kt-adv-heading2_79aa1a-c6" in html
+    assert ".kt-adv-heading2_289857-94 *" in html
+    assert ".kt-adv-heading2_79aa1a-c6 *" in html
+    assert "background-color:#e879f9" in html
+    assert "color:#1e1b4b!important" in html
+
+
 def test_http_import_offline_orientation_two_columns_with_delete_marks(
     tmp_path: Path,
 ) -> None:

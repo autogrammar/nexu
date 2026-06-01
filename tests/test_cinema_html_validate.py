@@ -103,3 +103,12 @@ def test_html_validation_rejects_generated_absolute_layout() -> None:
     ok, errors = validate_cinema_html_document(raw, ui_type="calculator")
     assert not ok
     assert any("position:fixed" in err for err in errors)
+
+
+def test_imported_html_validation_allows_original_theme_css() -> None:
+    raw = _CALC_SHELL.replace(
+        "</head>",
+        "<style>.wp-lightbox-overlay{position:fixed;left:0;top:0;}</style></head>",
+    )
+    ok, errors = validate_cinema_html_document(raw, ui_type="imported")
+    assert ok, errors

@@ -6,6 +6,22 @@ flowchart TD
     subgraph examples__frontend_view
         examples__frontend_view__src__menu_icons__preview_menu_icons["preview_menu_icons"]
     end
+    subgraph examples__mcp_patch_demo
+        examples__mcp_patch_demo__server__express["express"]
+        examples__mcp_patch_demo__server__http["http"]
+        examples__mcp_patch_demo__server__WebSocket["WebSocket"]
+        examples__mcp_patch_demo__server__path["path"]
+        examples__mcp_patch_demo__server__app["app"]
+        examples__mcp_patch_demo__server__port["port"]
+        examples__mcp_patch_demo__server__server["server"]
+        examples__mcp_patch_demo__server__wss["wss"]
+        examples__mcp_patch_demo__server__data["data"]
+        examples__mcp_patch_demo__server__dslCommand["dslCommand"]
+        examples__mcp_patch_demo__server__presetName["presetName"]
+        examples__mcp_patch_demo__server__presetDsl["presetDsl"]
+        examples__mcp_patch_demo__server__broadcast["broadcast"]
+        examples__mcp_patch_demo__server__serialized["serialized"]
+    end
     subgraph examples__mcp_service
         examples__mcp_service__src__demo__plan_demo["plan_demo"]
     end
@@ -46,13 +62,14 @@ flowchart TD
         examples__web_app_calculator__cinema__nexu_hooks__restore_history["restore_history"]
         examples__web_app_calculator__cinema__nexu_hooks__effective_ui_constraints["effective_ui_constraints"]
         examples__web_app_calculator__cinema__nexu_hooks__sync_option_previews["sync_option_previews"]
-        examples__web_app_calculator__cinema__nexu_hooks__patch_option_previews("patch_option_previews CC=10")
+        examples__web_app_calculator__cinema__nexu_hooks__patch_option_previews("patch_option_previews CC=11")
         examples__web_app_calculator__cinema__nexu_hooks__projects_catalog["projects_catalog"]
         examples__web_app_calculator__cinema__nexu_hooks__activate_project["activate_project"]
         examples__web_app_calculator__cinema__nexu_hooks__import_project_from_zip["import_project_from_zip"]
         examples__web_app_calculator__cinema__nexu_hooks__import_project_from_git["import_project_from_git"]
         examples__web_app_calculator__cinema__nexu_hooks__import_project_from_http["import_project_from_http"]
         examples__web_app_calculator__cinema__nexu_hooks__delete_imported["delete_imported"]
+        examples__web_app_calculator__cinema__nexu_hooks__delete_workspace_project["delete_workspace_project"]
         examples__web_app_calculator__cinema__nexu_hooks__imported_markpact["imported_markpact"]
         examples__web_app_calculator__cinema__nexu_hooks__imported_llm_log["imported_llm_log"]
         examples__web_app_calculator__cinema__nexu_hooks__active_project["active_project"]
@@ -79,6 +96,7 @@ flowchart TD
         examples__web_app_calculator__cinema__server___path_segments["_path_segments"]
         examples__web_app_calculator__cinema__server___parse_imported_project_route["_parse_imported_project_route"]
         examples__web_app_calculator__cinema__server___delete_imported_project["_delete_imported_project"]
+        examples__web_app_calculator__cinema__server___delete_project["_delete_project"]
         examples__web_app_calculator__cinema__server___imported_markpact["_imported_markpact"]
         examples__web_app_calculator__cinema__server___imported_llm_log["_imported_llm_log"]
         examples__web_app_calculator__cinema__server___read_llm_trace["_read_llm_trace"]
@@ -88,8 +106,6 @@ flowchart TD
         examples__web_app_calculator__cinema__server___compact_html_for_llm["_compact_html_for_llm"]
         examples__web_app_calculator__cinema__server___effective_markpact_mode["_effective_markpact_mode"]
         examples__web_app_calculator__cinema__server___compact_markpact_for_llm["_compact_markpact_for_llm"]
-        examples__web_app_calculator__cinema__server___try_read_options_cache["_try_read_options_cache"]
-        examples__web_app_calculator__cinema__server___store_options_cache["_store_options_cache"]
     end
     subgraph examples__web_app_dashboard
         examples__web_app_dashboard__run__main["main"]
@@ -115,6 +131,26 @@ flowchart TD
     subgraph scripts__ci_cinema_smoke
         scripts__ci_cinema_smoke__print["print"]
     end
+    subgraph sdk__js
+        sdk__js__repatch_sdk__RepatchSDK__connect["connect"]
+        sdk__js__repatch_sdk__RepatchSDK___connectWS["_connectWS"]
+        sdk__js__repatch_sdk__RepatchSDK__payload["payload"]
+        sdk__js__repatch_sdk__RepatchSDK__setTimeout["setTimeout"]
+        sdk__js__repatch_sdk__RepatchSDK___connectSSE["_connectSSE"]
+        sdk__js__repatch_sdk__RepatchSDK__onPatch["onPatch"]
+        sdk__js__repatch_sdk__RepatchSDK__apply("apply CC=12")
+        sdk__js__repatch_sdk__RepatchSDK__dslClean["dslClean"]
+        sdk__js__repatch_sdk__RepatchSDK__addMatch["addMatch"]
+        sdk__js__repatch_sdk__RepatchSDK__replaceMatch["replaceMatch"]
+        sdk__js__repatch_sdk__RepatchSDK__styleMatch["styleMatch"]
+        sdk__js__repatch_sdk__RepatchSDK__removeMatch("removeMatch CC=12")
+        sdk__js__repatch_sdk__RepatchSDK__html["html"]
+        sdk__js__repatch_sdk__RepatchSDK__target["target"]
+        sdk__js__repatch_sdk__RepatchSDK__css["css"]
+        sdk__js__repatch_sdk__RepatchSDK__styleEl["styleEl"]
+        sdk__js__repatch_sdk__RepatchSDK__cb["cb"]
+        sdk__js__repatch_sdk__RepatchSDK__sendPatchRequest["sendPatchRequest"]
+    end
     subgraph src__nexu
         src__nexu__runtime___read_fixture["_read_fixture"]
         src__nexu__runtime___collect_fixtures["_collect_fixtures"]
@@ -127,13 +163,6 @@ flowchart TD
         src__nexu__config___resolved_model_from_env["_resolved_model_from_env"]
         src__nexu__config___cinema_mode["_cinema_mode"]
         src__nexu__config__load_config("load_config CC=14")
-        src__nexu__intract__format_intract_v1_line["format_intract_v1_line"]
-        src__nexu__intract___split_csv["_split_csv"]
-        src__nexu__intract___tokenize_contract["_tokenize_contract"]
-        src__nexu__intract__parse_intract_line["parse_intract_line"]
-        src__nexu__intract__scan_contracts_in_text["scan_contracts_in_text"]
-        src__nexu__intract__scan_contracts_in_file["scan_contracts_in_file"]
-        src__nexu__intract__read_manifest_contracts("read_manifest_contracts CC=12")
         src__nexu__cli___print_yaml["_print_yaml"]
         src__nexu__cli___relative_to_root["_relative_to_root"]
         src__nexu__cli__init["init"]
@@ -176,6 +205,13 @@ flowchart TD
         src__nexu__cinema__write_cinema_nexu_hooks["write_cinema_nexu_hooks"]
         src__nexu__cinema___contract_to_public_dict["_contract_to_public_dict"]
         src__nexu__cinema__build_intract_policy_snapshot("build_intract_policy_snapshot CC=11")
+        src__nexu__cinema__sync_cinema_templates["sync_cinema_templates"]
+        src__nexu__cinema__write_intract_policy_files["write_intract_policy_files"]
+        src__nexu__cinema__generate_cinema_player["generate_cinema_player"]
+        src__nexu__cinema___start_cinema_server["_start_cinema_server"]
+        src__nexu__bundle___should_include["_should_include"]
+        src__nexu__bundle__build_capsule_bundle["build_capsule_bundle"]
+        src__nexu__intract_adapter___sibling_intract_src["_sibling_intract_src"]
     end
     subgraph src__vico
         src__vico__freeze__freeze_project["freeze_project"]
@@ -225,6 +261,10 @@ flowchart TD
     examples__scientific_calculator_demo2__main --> src__nexu__capsule__create_capsule
     examples__scientific_calculator_demo2__main --> src__nexu__iterate__iterate_capsule
     examples__web_app_event_monitor__run__main --> scripts__ci_cinema_smoke__print
+    examples__mcp_patch_demo__server__data --> examples__mcp_patch_demo__server__broadcast
+    examples__mcp_patch_demo__server__dslCommand --> examples__mcp_patch_demo__server__broadcast
+    examples__mcp_patch_demo__server__presetName --> examples__mcp_patch_demo__server__broadcast
+    examples__mcp_patch_demo__server__presetDsl --> examples__mcp_patch_demo__server__broadcast
     examples__web_app_calculator__run__main --> src__nexu__init_project__init_project
     examples__web_app_calculator__run__main --> src__vico__freeze__freeze_project
     examples__web_app_calculator__run__main --> scripts__ci_cinema_smoke__print
@@ -235,6 +275,7 @@ flowchart TD
     examples__web_app_calculator__cinema__nexu_hooks__apply_spatial_patch --> src__nexu__cinema_scripts__finalize_cinema_html
     examples__web_app_calculator__cinema__nexu_hooks__propose_llm --> src__nexu__cinema_policy__propose_llm_for_stage
     examples__web_app_calculator__cinema__nexu_hooks__append_policy_entry --> src__nexu__cinema_policy__append_iteration_ledger_entry
+    examples__web_app_calculator__cinema__nexu_hooks__append_policy_entry --> src__nexu__cinema_projects__load_active_project
     examples__web_app_calculator__cinema__nexu_hooks__append_goal_policy_entry --> src__nexu__cinema_policy__append_goal_ledger_entry
     examples__web_app_calculator__cinema__nexu_hooks__append_goal_policy_entry --> src__nexu__cinema_projects__load_active_project
     examples__web_app_calculator__cinema__nexu_hooks__goal_contract_lines --> src__nexu__cinema_policy__load_goal_contract_lines
@@ -247,6 +288,7 @@ flowchart TD
     examples__web_app_calculator__cinema__nexu_hooks__sync_option_previews --> src__nexu__cinema_policy__sync_option_previews_from_workspace
     examples__web_app_calculator__cinema__nexu_hooks__patch_option_previews --> src__nexu__cinema_policy__load_effective_ui_constraints
     examples__web_app_calculator__cinema__nexu_hooks__patch_option_previews --> src__nexu__cinema_policy__enforce_deletes_on_option_previews
+    examples__web_app_calculator__cinema__nexu_hooks__patch_option_previews --> src__nexu__cinema_policy__promote_applies_spatial_deletes
     examples__web_app_calculator__cinema__nexu_hooks__patch_option_previews --> src__nexu__cinema_policy__merge_ui_constraint_lists
     examples__web_app_calculator__cinema__nexu_hooks__projects_catalog --> src__nexu__cinema_project_imports__merged_projects_catalog
     examples__web_app_calculator__cinema__nexu_hooks__activate_project --> src__nexu__cinema_projects__activate_example_project
@@ -257,6 +299,8 @@ flowchart TD
     examples__web_app_calculator__cinema__nexu_hooks__import_project_from_http --> src__nexu__cinema_project_imports__import_http_project
     examples__web_app_calculator__cinema__nexu_hooks__delete_imported --> src__nexu__cinema_projects__find_nexu_repo_root
     examples__web_app_calculator__cinema__nexu_hooks__delete_imported --> src__nexu__cinema_project_imports__delete_imported_project
+    examples__web_app_calculator__cinema__nexu_hooks__delete_workspace_project --> src__nexu__cinema_projects__find_nexu_repo_root
+    examples__web_app_calculator__cinema__nexu_hooks__delete_workspace_project --> src__nexu__cinema_project_imports__delete_project
     examples__web_app_calculator__cinema__nexu_hooks__imported_markpact --> src__nexu__cinema_project_imports__read_imported_markpact
     examples__web_app_calculator__cinema__nexu_hooks__imported_llm_log --> src__nexu__cinema_project_imports__imported_project_llm_log
     examples__web_app_calculator__cinema__nexu_hooks__active_project --> src__nexu__cinema_projects__load_active_project
@@ -295,6 +339,9 @@ flowchart TD
     examples__web_app_calculator__cinema__server___store_options_cache --> src__nexu__fast_delivery__options__store_options_cache
     examples__web_app_calculator__cinema__server___compact_llm_error --> src__nexu__cinema_llm__compact_llm_error
     examples__web_app_calculator__cinema__server___load_policy_payload --> examples__web_app_calculator__cinema__server___effective_ui_constraints_from_ledger
+    examples__web_app_calculator__cinema__server___effective_ui_constraints_from_ledger --> src__nexu__cinema_policy__effective_ui_constraints_from_ledger
+    examples__web_app_calculator__cinema__server___effective_ui_constraints_from_ledger --> examples__web_app_calculator__cinema__server___apply_entry_constraints
+    examples__web_app_calculator__cinema__server___merge_ui_constraints --> examples__web_app_calculator__cinema__server___update_constraints
     examples__web_app_calculator__cinema__server___propose_cinema_contracts --> examples__web_app_calculator__cinema__server___ensure_intract_on_path
     examples__web_app_calculator__cinema__server___propose_cinema_contracts --> src__nexu__cinema_policy__propose_ui_delta_contract_dicts
     examples__web_app_calculator__cinema__server___proposal_delta_text --> examples__web_app_calculator__cinema__server___proposal_kind_and_element
@@ -305,7 +352,6 @@ flowchart TD
     examples__web_app_calculator__cinema__server___propose_llm_for_stage --> examples__web_app_calculator__cinema__server___resolve_model
     examples__web_app_calculator__cinema__server___append_policy_entry --> examples__web_app_calculator__cinema__server___append_policy_entry_legacy
     examples__web_app_calculator__cinema__server__CustomHTTPRequestHandler__do_GET --> examples__web_app_calculator__cinema__server___parse_imported_project_route
-    examples__web_app_calculator__cinema__server__CustomHTTPRequestHandler__do_GET --> examples__web_app_calculator__cinema__server___load_policy_payload
     examples__web_app_calculator__cinema__server__CustomHTTPRequestHandler__do_DELETE --> examples__web_app_calculator__cinema__server___path_segments
     examples__web_app_calculator__cinema__server__CustomHTTPRequestHandler__do_DELETE --> examples__web_app_calculator__cinema__server___delete_imported_project
     examples__web_app_dashboard__run__main --> scripts__ci_cinema_smoke__print
@@ -319,7 +365,6 @@ flowchart TD
     src__nexu__runtime__build_capsule_runtime --> src__nexu__capsule__load_capsule
     src__nexu__runtime__build_capsule_runtime --> src__nexu__paths__capsule_dir
     src__nexu__runtime__build_capsule_runtime --> src__nexu__blueprint__build_blueprint
-    src__nexu__runtime__build_capsule_runtime --> src__nexu__intract__read_manifest_contracts
     src__nexu__runtime__build_capsule_runtime --> src__vico__models__write_yaml
     src__nexu__runtime__build_capsule_runtime --> src__nexu__journal__append_journal
     src__nexu__runtime__build_capsule_runtime --> src__vico__models__utc_now
@@ -330,10 +375,6 @@ flowchart TD
     src__nexu__config__load_env_files --> src__nexu__config___load_env_file
     src__nexu__config__load_config --> src__nexu__config__load_env_files
     src__nexu__config__load_config --> src__vico__models__read_yaml
-    src__nexu__intract__parse_intract_line --> src__nexu__intract___tokenize_contract
-    src__nexu__intract__parse_intract_line --> src__nexu__intract___split_csv
-    src__nexu__intract__scan_contracts_in_text --> src__nexu__intract__parse_intract_line
-    src__nexu__intract__scan_contracts_in_file --> src__nexu__intract__scan_contracts_in_text
     src__nexu__cli__init --> src__nexu__paths__project_root
     src__nexu__cli__init --> src__nexu__init_project__init_project
     src__nexu__cli__freeze --> src__nexu__paths__project_root
@@ -401,7 +442,6 @@ flowchart TD
     src__nexu__llm__call_litellm_review --> src__nexu__llm__call_litellm_json
     src__nexu__cinema___render_cinema_template --> src__nexu__cinema___cinema_template_text
     src__nexu__cinema__write_cinema_nexu_hooks --> src__nexu__cinema___cinema_template_text
-    src__nexu__cinema___contract_to_public_dict --> src__nexu__intract__format_intract_v1_line
     src__nexu__cinema__build_intract_policy_snapshot --> src__nexu__paths__capsule_dir
     src__nexu__cinema__build_intract_policy_snapshot --> src__nexu__cinema_baseline_contracts__ensure_capsule_intract_yaml
     src__nexu__cinema__build_intract_policy_snapshot --> src__nexu__cinema_baseline_contracts__merge_calculator_baselines
@@ -452,7 +492,6 @@ flowchart TD
     src__nexu__review__build_review_packet --> src__vico__models__utc_now
     src__nexu__plan__build_iteration_plan --> src__nexu__capsule__load_capsule
     src__nexu__plan__build_iteration_plan --> src__nexu__paths__capsule_dir
-    src__nexu__plan__build_iteration_plan --> src__nexu__intract__read_manifest_contracts
     src__nexu__plan__build_iteration_plan --> src__nexu__blueprint__build_blueprint
     src__nexu__plan__build_iteration_plan --> src__nexu__plan___contract_summary
     src__nexu__plan__build_iteration_plan --> src__vico__models__write_yaml
@@ -460,7 +499,6 @@ flowchart TD
     src__nexu__plan__build_iteration_plan --> src__vico__models__utc_now
     src__nexu__blueprint__build_blueprint --> src__nexu__capsule__load_capsule
     src__nexu__blueprint__build_blueprint --> src__nexu__paths__capsule_dir
-    src__nexu__blueprint__build_blueprint --> src__nexu__intract__read_manifest_contracts
     src__nexu__blueprint__build_blueprint --> src__vico__models__write_yaml
     src__nexu__blueprint__build_blueprint --> src__vico__models__utc_now
     src__nexu__files__collect_files --> src__nexu__files__rel
@@ -532,6 +570,12 @@ flowchart TD
     src__vico__drift__check_source_drift --> src__vico__hashing__sha256_file
     src__vico__drift__check_source_drift --> src__vico__models__utc_now
     src__vico__drift__check_source_drift --> src__nexu__paths__capsule_dir
+    src__nexu__cinema_project_imports__http_stage_matches_import --> src__nexu__cinema_project_imports___source_url_from_meta
+    src__nexu__cinema_project_imports__reject_import_stage_replacement --> src__nexu__cinema_project_imports__http_stage_matches_import
+    src__nexu__cinema_project_imports__reject_import_stage_replacement --> src__nexu__cinema_project_imports___import_kind_from_id
+    src__nexu__cinema_project_imports__restore_http_import_stages_if_needed --> src__nexu__cinema_project_imports___build_http_preview_stage0
+    src__nexu__cinema_project_imports__restore_http_import_stages_if_needed --> src__nexu__cinema_policy__ensure_http_option_previews_from_stage0
+    src__nexu__cinema_project_imports__restore_http_import_stages_if_needed --> src__nexu__cinema_project_imports__http_stage_matches_import
     src__nexu__cinema_project_imports___project_dir --> src__nexu__cinema_project_imports___imports_root
     src__nexu__cinema_project_imports___decode_http_bytes --> src__nexu__cinema_project_imports___charset_from_content_type
     src__nexu__cinema_project_imports___fetch_http_body --> src__nexu__cinema_project_imports___validate_http_url
@@ -585,10 +629,12 @@ flowchart TD
     src__nexu__cinema_project_imports___finish_import --> src__nexu__cinema_project_imports___project_dir
     src__nexu__cinema_project_imports___source_stats --> src__nexu__cinema_project_imports___iter_project_files
     src__nexu__cinema_project_imports__is_deletable_imported_id --> src__nexu__cinema_project_imports__normalize_imported_project_id
+    src__nexu__cinema_project_imports___resolve_markpact_path --> src__nexu__cinema_project_imports___project_dir
     src__nexu__cinema_project_imports___compile_meta_fields --> src__nexu__cinema_project_imports___source_stats
     src__nexu__cinema_project_imports___compile_meta_fields --> src__nexu__cinema_project_imports___infer_workspace_context
+    src__nexu__cinema_project_imports___compile_meta_fields --> src__nexu__cinema_project_imports___resolve_markpact_path
+    src__nexu__cinema_project_imports___compile_meta_fields --> src__nexu__cinema_project_imports___with_workspace_meta_defaults
     src__nexu__cinema_project_imports___compile_meta_fields --> src__nexu__cinema_project_imports___source_url_from_meta
-    src__nexu__cinema_project_imports___compile_meta_fields --> src__nexu__cinema_project_imports___project_dir
     src__nexu__cinema_project_imports___ensure_project_meta_fields --> src__nexu__cinema_project_imports___compile_meta_fields
     src__nexu__cinema_project_imports___ensure_project_meta_fields --> src__nexu__cinema_project_imports___project_dir
     src__nexu__cinema_project_imports___catalog_entry_from_meta --> src__nexu__cinema_project_imports__is_deletable_imported_id
@@ -684,7 +730,6 @@ flowchart TD
     src__nexu__cinema_history__ledger_archive_for_display --> src__nexu__cinema_history___build_label
     src__nexu__cinema_goal_contracts__is_chemical_goal --> src__nexu__cinema_goal_contracts___hints_text
     src__nexu__cinema_goal_contracts___goal_contract_dict --> src__nexu__cinema_baseline_contracts___contract
-    src__nexu__cinema_goal_contracts___goal_contract_dict --> src__nexu__intract__format_intract_v1_line
     src__nexu__cinema_goal_contracts___detect_chemical_trait --> src__nexu__cinema_goal_contracts___goal_contract_dict
     src__nexu__cinema_goal_contracts___detect_chemical_trait --> src__nexu__cinema_goal_contracts__is_chemical_goal
     src__nexu__cinema_goal_contracts___detect_minimal_trait --> src__nexu__cinema_goal_contracts___goal_contract_dict
@@ -705,23 +750,22 @@ flowchart TD
     src__nexu__cinema_goal_contracts__propose_goal_extension_contracts --> src__nexu__cinema_goal_contracts___goal_contract_dict
     src__nexu__cinema_policy___process_ledger_entry --> src__nexu__cinema_policy___process_keep_delete_entries
     src__nexu__cinema_policy___process_ledger_entry --> src__nexu__cinema_policy___process_proposed_contracts
+    src__nexu__cinema_policy___process_ledger_entry --> src__nexu__cinema_policy___ledger_entry_matches_project
+    src__nexu__cinema_policy___process_ledger_entry --> src__nexu__cinema_policy___ledger_entry_matches_scope
     src__nexu__cinema_policy___process_proposed_contracts --> src__nexu__cinema_policy___proposal_kind_and_element
     src__nexu__cinema_policy__effective_ui_constraints_from_ledger --> src__nexu__cinema_policy___build_constraint_result
     src__nexu__cinema_policy__effective_ui_constraints_from_ledger --> src__nexu__cinema_policy___process_ledger_entry
-    src__nexu__cinema_policy___html_files_distinct --> src__nexu__cinema_policy___normalize_html_body
     src__nexu__cinema_policy__option_previews_are_distinct --> src__nexu__cinema_policy___html_files_distinct
     src__nexu__cinema_policy__stage_files_are_distinct --> src__nexu__cinema_policy___html_files_distinct
     src__nexu__cinema_policy__ensure_option_previews_from_stages --> src__nexu__cinema_policy___replace_html_title
     src__nexu__cinema_policy__ensure_http_option_previews_from_stage0 --> src__nexu__cinema_policy___replace_html_title
-    src__nexu__cinema_policy__sync_option_previews_from_workspace --> src__nexu__cinema_scripts__finalize_cinema_html
     src__nexu__cinema_policy__sync_option_previews_from_workspace --> src__nexu__cinema_policy__load_effective_ui_constraints
-    src__nexu__cinema_policy__sync_option_previews_from_workspace --> src__nexu__cinema_policy___replace_html_title
     src__nexu__cinema_policy__enforce_deletes_on_option_previews --> src__nexu__cinema_policy__merge_ui_constraint_lists
-    src__nexu__cinema_policy__enforce_deletes_on_option_previews --> src__nexu__cinema_scripts__finalize_cinema_html
     src__nexu__cinema_policy__refresh_cinema_policy_snapshot --> src__nexu__cinema__build_intract_policy_snapshot
     src__nexu__cinema_policy__refresh_cinema_policy_snapshot --> src__nexu__cinema_projects__load_active_project
-    src__nexu__cinema_policy__load_effective_ui_constraints --> src__nexu__cinema_policy__policy_ledger_path
     src__nexu__cinema_policy__load_effective_ui_constraints --> src__nexu__cinema_policy__effective_ui_constraints_from_ledger
+    src__nexu__cinema_policy__load_effective_ui_constraints --> src__nexu__cinema_policy__policy_ledger_path
+    src__nexu__cinema_policy__load_effective_ui_constraints --> src__nexu__cinema_projects__load_active_project
     src__nexu__cinema_policy__cinema_model_label --> src__nexu__config__load_env_files
     src__nexu__cinema_policy__cinema_model_label --> src__nexu__config__load_config
     src__nexu__cinema_policy__cinema_dir_for --> src__nexu__paths__capsule_dir
@@ -729,11 +773,13 @@ flowchart TD
     src__nexu__cinema_policy__policy_snapshot_path --> src__nexu__cinema_policy__cinema_dir_for
     src__nexu__cinema_policy__policy_ledger_path --> src__nexu__cinema_policy__cinema_dir_for
     src__nexu__cinema_policy__load_policy_snapshot --> src__nexu__cinema_policy__policy_snapshot_path
+    src__nexu__cinema_policy__manifest_paths_from_snapshot --> src__nexu__cinema_policy___intract_manifest_path
     src__nexu__cinema_policy__manifest_paths_from_snapshot --> src__nexu__paths__project_root
     src__nexu__cinema_policy__apply_ledger_from_cinema --> src__nexu__paths__project_root
     src__nexu__cinema_policy__apply_ledger_from_cinema --> src__nexu__cinema_policy__policy_ledger_path
     src__nexu__cinema_policy__apply_ledger_from_cinema --> src__nexu__cinema_policy__normalize_manifest_target
     src__nexu__cinema_policy__apply_ledger_from_cinema --> src__nexu__cinema_policy__load_policy_snapshot
+    src__nexu__cinema_policy__apply_ledger_from_cinema --> src__nexu__cinema_policy___intract_manifest_path
     src__nexu__cinema_policy__ensure_intract_on_path --> src__nexu__paths__project_root
     src__nexu__cinema_policy__propose_ui_delta_contract_dicts --> src__nexu__cinema_policy__ensure_intract_on_path
     src__nexu__cinema_policy___resolve_ledger_path --> src__nexu__cinema_policy__policy_ledger_path
@@ -757,13 +803,11 @@ flowchart TD
     src__nexu__cinema_policy__verify_capsule_workspace --> src__nexu__paths__project_root
     src__nexu__export_prompt__export_iteration_prompt --> src__nexu__capsule__load_capsule
     src__nexu__export_prompt__export_iteration_prompt --> src__nexu__paths__capsule_dir
-    src__nexu__export_prompt__export_iteration_prompt --> src__nexu__intract__read_manifest_contracts
     src__nexu__export_prompt__export_iteration_prompt --> src__nexu__blueprint__build_blueprint
     src__nexu__export_prompt__export_iteration_prompt --> src__vico__diff__diff_capsule
     src__nexu__export_prompt__export_iteration_prompt --> src__nexu__export_prompt___cinema_policy_ledger_block
     src__nexu__export_prompt__export_iteration_prompt --> src__vico__models__write_yaml
     src__nexu__export_prompt__export_iteration_prompt --> src__nexu__export_prompt___latest_iteration
-    src__nexu__cinema_baseline_contracts___contract --> src__nexu__intract__format_intract_v1_line
     src__nexu__cinema_baseline_contracts__calculator_baseline_contracts --> src__nexu__cinema_baseline_contracts___contract
     src__nexu__cinema_baseline_contracts__is_calculator_capsule --> src__nexu__paths__capsule_dir
     src__nexu__cinema_baseline_contracts__merge_calculator_baselines --> src__nexu__cinema_baseline_contracts__calculator_baseline_contracts
@@ -788,16 +832,8 @@ flowchart TD
     src__nexu__promote__build_promotion_plan --> src__vico__drift__check_source_drift
     src__nexu__promote__build_promotion_plan --> src__vico__diff__diff_capsule
     src__nexu__promote__build_promotion_plan --> src__vico__models__write_yaml
-    src__nexu__promote__build_promotion_plan --> src__vico__models__utc_now
-    src__nexu__promote__build_promotion_plan --> src__nexu__promote___promotion_map
-    src__nexu__promote__apply_promotion_plan --> src__nexu__paths__capsule_dir
-    src__nexu__orchestrate__build_orchestration_context --> src__nexu__capsule__load_capsule
-    src__nexu__orchestrate__build_orchestration_context --> src__nexu__paths__capsule_dir
-    src__nexu__orchestrate__build_orchestration_context --> src__nexu__intract__read_manifest_contracts
-    src__nexu__orchestrate__build_orchestration_context --> src__nexu__plan__build_iteration_plan
-    src__nexu__orchestrate__build_orchestration_context --> src__nexu__blueprint__build_blueprint
 
     classDef highCC fill:#ff6b6b,stroke:#c92a2a,color:#fff
     classDef medCC fill:#ffd43b,stroke:#f08c00,color:#000
-    class examples__web_app_calculator__cinema__server___effective_ui_constraints_from_ledger,examples__web_app_calculator__cinema__server___merge_ui_constraints,examples__web_app_calculator__cinema__server__CustomHTTPRequestHandler__do_GET,examples__web_app_calculator__cinema__server__CustomHTTPRequestHandler__do_POST,src__nexu__cinema_http_preprocess__load_http_preprocess_artifacts,src__nexu__cinema_project_imports___compile_meta_fields,src__nexu__cinema_goal_contracts__propose_goal_extension_contracts,src__nexu__cinema_publish__start_published_service highCC
-    class examples__web_app_event_monitor__run__main,examples__web_app_calculator__cinema__nexu_hooks__append_goal_policy_entry,examples__web_app_calculator__cinema__nexu_hooks__patch_option_previews,examples__web_app_calculator__cinema__server___load_env_file,examples__web_app_calculator__cinema__server___extract_llm_content,examples__web_app_calculator__cinema__server___proposal_kind_and_element,examples__web_app_calculator__cinema__server___import_project,examples__web_app_calculator__cinema__server__CustomHTTPRequestHandler__do_DELETE,examples__web_app_pactown_ecosystem__run__main,src__nexu__runtime___html_page,src__nexu__config___load_env_file,src__nexu__config__load_config,src__nexu__intract__read_manifest_contracts,src__nexu__llm__call_litellm_json,src__nexu__cinema__build_intract_policy_snapshot,src__nexu__intract_adapter___finding_for_result,src__nexu__plan___contract_summary,src__nexu__files__collect_files,src__nexu__cinema_http_preprocess___normalize_linked_paths,src__nexu__cinema_http_preprocess__extract_visual_css,src__nexu__cinema_http_preprocess___OutlineParser__handle_starttag,src__nexu__cinema_http_preprocess__http_preprocess_artifacts_present,src__nexu__cinema_http_preprocess__preprocess_http_import,src__nexu__cinema_http_preprocess__load_cinema_seed_preprocess_artifacts,src__nexu__cinema_traces__redact_secrets,src__nexu__cinema_traces__write_llm_trace,src__nexu__cinema_llm___strip_markdown_fences,src__nexu__cinema_llm__parse_batch_alt_options,src__nexu__cinema_llm___extract_content,src__nexu__cinema_llm__call_cinema_text_llm medCC
+    class examples__web_app_calculator__cinema__server__CustomHTTPRequestHandler__do_GET,examples__web_app_calculator__cinema__server__CustomHTTPRequestHandler__do_POST,src__nexu__cinema_http_preprocess__load_http_preprocess_artifacts,src__nexu__cinema_goal_contracts__propose_goal_extension_contracts,src__nexu__cinema_publish__start_published_service highCC
+    class examples__web_app_event_monitor__run__main,examples__web_app_calculator__cinema__nexu_hooks__append_goal_policy_entry,examples__web_app_calculator__cinema__nexu_hooks__patch_option_previews,examples__web_app_calculator__cinema__server___load_env_file,examples__web_app_calculator__cinema__server___extract_llm_content,examples__web_app_calculator__cinema__server___effective_ui_constraints_from_ledger,examples__web_app_calculator__cinema__server___proposal_kind_and_element,examples__web_app_calculator__cinema__server___import_project,examples__web_app_calculator__cinema__server__CustomHTTPRequestHandler__do_DELETE,examples__web_app_pactown_ecosystem__run__main,src__nexu__runtime___html_page,src__nexu__config___load_env_file,src__nexu__config__load_config,src__nexu__llm__call_litellm_json,src__nexu__cinema__build_intract_policy_snapshot,src__nexu__intract_adapter___finding_for_result,src__nexu__plan___contract_summary,src__nexu__files__collect_files,src__nexu__cinema_http_preprocess___normalize_linked_paths,src__nexu__cinema_http_preprocess__extract_visual_css,src__nexu__cinema_http_preprocess___OutlineParser__handle_starttag,src__nexu__cinema_http_preprocess__http_preprocess_artifacts_present,src__nexu__cinema_http_preprocess__preprocess_http_import,src__nexu__cinema_http_preprocess__load_cinema_seed_preprocess_artifacts,src__nexu__cinema_traces__redact_secrets,src__nexu__cinema_traces__write_llm_trace,src__nexu__cinema_llm___strip_markdown_fences,src__nexu__cinema_llm__parse_batch_alt_options,src__nexu__cinema_llm___extract_content,src__nexu__cinema_llm__call_cinema_text_llm medCC

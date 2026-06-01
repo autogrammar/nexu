@@ -1,21 +1,18 @@
-# code2llm | 96f 17035L | python:77,yaml:9,txt:2,shell:2,json:2,yml:1,toml:1 | 2026-06-01
+# code2llm | 99f 17754L | python:77,yaml:9,json:3,txt:2,shell:2,javascript:2,toml:1,yml:1 | 2026-06-01
 # generated in 0.03s
-# CC̅=4.6 | critical:8/595 | dups:0 | cycles:0
+# CC̅=4.5 | critical:5/633 | dups:0 | cycles:0
 
-HEALTH[8]:
-  🟡 CC    _effective_ui_constraints_from_ledger CC=17 (limit:15)
-  🟡 CC    _merge_ui_constraints CC=17 (limit:15)
-  🟡 CC    do_GET CC=34 (limit:15)
-  🟡 CC    do_POST CC=211 (limit:15)
+HEALTH[5]:
+  🟡 CC    do_GET CC=37 (limit:15)
+  🟡 CC    do_POST CC=258 (limit:15)
   🟡 CC    load_http_preprocess_artifacts CC=16 (limit:15)
-  🟡 CC    _compile_meta_fields CC=17 (limit:15)
   🟡 CC    propose_goal_extension_contracts CC=15 (limit:15)
   🟡 CC    start_published_service CC=15 (limit:15)
 
 REFACTOR[1]:
-  1. split 8 high-CC methods  (CC>15)
+  1. split 5 high-CC methods  (CC>15)
 
-PIPELINES[101]:
+PIPELINES[127]:
   [1] Src [main]: main → print
       PURITY: 100% pure
   [2] Src [main]: main → print
@@ -28,104 +25,105 @@ PIPELINES[101]:
       PURITY: 100% pure
   [6] Src [main]: main → print
       PURITY: 100% pure
-  [7] Src [main]: main → init_project → ensure_project_dirs → nexu_dir
+  [7] Src [express]: express
       PURITY: 100% pure
-  [8] Src [apply_manifest_from_ledger]: apply_manifest_from_ledger → apply_ledger_from_cinema → project_root
+  [8] Src [http]: http
       PURITY: 100% pure
-  [9] Src [apply_spatial_patch]: apply_spatial_patch → finalize_cinema_html
+  [9] Src [WebSocket]: WebSocket
       PURITY: 100% pure
-  [10] Src [propose_llm]: propose_llm → propose_llm_for_stage → cinema_dir_for → capsule_dir → ...(2 more)
+  [10] Src [path]: path
       PURITY: 100% pure
-  [11] Src [append_policy_entry]: append_policy_entry → append_iteration_ledger_entry → normalize_proposals_for_ledger → _proposal_kind_and_element
+  [11] Src [app]: app
       PURITY: 100% pure
-  [12] Src [append_goal_policy_entry]: append_goal_policy_entry → append_goal_ledger_entry → normalize_proposals_for_ledger → _proposal_kind_and_element
+  [12] Src [port]: port
       PURITY: 100% pure
-  [13] Src [goal_contract_lines]: goal_contract_lines → load_goal_contract_lines → _resolve_ledger_path → policy_ledger_path → ...(4 more)
+  [13] Src [server]: server
       PURITY: 100% pure
-  [14] Src [validate_artifact]: validate_artifact → validate_intract_artifact → ensure_intract_on_path → project_root
+  [14] Src [wss]: wss
       PURITY: 100% pure
-  [15] Src [save_history]: save_history → save_history_checkpoint → _load_index → history_index_path → ...(1 more)
+  [15] Src [data]: data → broadcast
       PURITY: 100% pure
-  [16] Src [list_history]: list_history → list_history_checkpoints → _load_index → history_index_path → ...(1 more)
+  [16] Src [dslCommand]: dslCommand → broadcast
       PURITY: 100% pure
-  [17] Src [restore_history]: restore_history → restore_history_checkpoint → project_root
+  [17] Src [presetName]: presetName → broadcast
       PURITY: 100% pure
-  [18] Src [effective_ui_constraints]: effective_ui_constraints → load_effective_ui_constraints → policy_ledger_path → cinema_dir_for → ...(3 more)
+  [18] Src [presetDsl]: presetDsl → broadcast
       PURITY: 100% pure
-  [19] Src [sync_option_previews]: sync_option_previews → sync_option_previews_from_workspace → finalize_cinema_html
+  [19] Src [serialized]: serialized
       PURITY: 100% pure
-  [20] Src [patch_option_previews]: patch_option_previews → load_effective_ui_constraints → policy_ledger_path → cinema_dir_for → ...(3 more)
+  [20] Src [main]: main → init_project → ensure_project_dirs → nexu_dir
       PURITY: 100% pure
-  [21] Src [projects_catalog]: projects_catalog → merged_projects_catalog → list_project_catalog → deleted_project_ids
+  [21] Src [apply_manifest_from_ledger]: apply_manifest_from_ledger → apply_ledger_from_cinema → project_root
       PURITY: 100% pure
-  [22] Src [activate_project]: activate_project → activate_example_project → _find_example_project
+  [22] Src [apply_spatial_patch]: apply_spatial_patch → finalize_cinema_html
       PURITY: 100% pure
-  [23] Src [import_project_from_zip]: import_project_from_zip → import_zip_project → _project_dir → _imports_root
+  [23] Src [propose_llm]: propose_llm → propose_llm_for_stage → cinema_dir_for → capsule_dir → ...(2 more)
       PURITY: 100% pure
-  [24] Src [import_project_from_git]: import_project_from_git → import_git_project → _validate_git_url
+  [24] Src [append_policy_entry]: append_policy_entry → append_iteration_ledger_entry → normalize_proposals_for_ledger → _proposal_kind_and_element
       PURITY: 100% pure
-  [25] Src [import_project_from_http]: import_project_from_http → import_http_project → _project_dir → _imports_root
+  [25] Src [append_goal_policy_entry]: append_goal_policy_entry → append_goal_ledger_entry → normalize_proposals_for_ledger → _proposal_kind_and_element
       PURITY: 100% pure
-  [26] Src [delete_imported]: delete_imported → find_nexu_repo_root
+  [26] Src [goal_contract_lines]: goal_contract_lines → load_goal_contract_lines → _resolve_ledger_path → policy_ledger_path → ...(4 more)
       PURITY: 100% pure
-  [27] Src [imported_markpact]: imported_markpact → read_imported_markpact → normalize_imported_project_id
+  [27] Src [validate_artifact]: validate_artifact → validate_intract_artifact → ensure_intract_on_path → project_root
       PURITY: 100% pure
-  [28] Src [imported_llm_log]: imported_llm_log → imported_project_llm_log → normalize_imported_project_id
+  [28] Src [save_history]: save_history → save_history_checkpoint → _load_index → history_index_path → ...(1 more)
       PURITY: 100% pure
-  [29] Src [active_project]: active_project → load_active_project
+  [29] Src [list_history]: list_history → list_history_checkpoints → _load_index → history_index_path → ...(1 more)
       PURITY: 100% pure
-  [30] Src [export_markpact_readme]: export_markpact_readme → load_effective_ui_constraints → policy_ledger_path → cinema_dir_for → ...(3 more)
+  [30] Src [restore_history]: restore_history → restore_history_checkpoint → project_root
       PURITY: 100% pure
-  [31] Src [services_catalog]: services_catalog → list_published_services → _load_registry → _registry_path → ...(1 more)
+  [31] Src [effective_ui_constraints]: effective_ui_constraints → load_effective_ui_constraints → effective_ui_constraints_from_ledger → _build_constraint_result
       PURITY: 100% pure
-  [32] Src [publish_service]: publish_service → publish_project_service → _slug_service_id
+  [32] Src [sync_option_previews]: sync_option_previews → sync_option_previews_from_workspace → load_effective_ui_constraints → effective_ui_constraints_from_ledger → ...(1 more)
       PURITY: 100% pure
-  [33] Src [start_service]: start_service → start_published_service → _load_registry → _registry_path → ...(1 more)
+  [33] Src [patch_option_previews]: patch_option_previews → load_effective_ui_constraints → effective_ui_constraints_from_ledger → _build_constraint_result
       PURITY: 100% pure
-  [34] Src [stop_service]: stop_service → stop_published_service → _load_registry → _registry_path → ...(1 more)
+  [34] Src [projects_catalog]: projects_catalog → merged_projects_catalog → list_project_catalog → deleted_project_ids
       PURITY: 100% pure
-  [35] Src [_trace_slug]: _trace_slug → trace_slug
+  [35] Src [activate_project]: activate_project → activate_example_project → _find_example_project
       PURITY: 100% pure
-  [36] Src [_read_trace_index]: _read_trace_index → read_trace_index
+  [36] Src [import_project_from_zip]: import_project_from_zip → import_zip_project → _project_dir → _imports_root
       PURITY: 100% pure
-  [37] Src [_extract_html_document]: _extract_html_document → _strip_markdown_fences
+  [37] Src [import_project_from_git]: import_project_from_git → import_git_project → _validate_git_url
       PURITY: 100% pure
-  [38] Src [_extract_llm_content]: _extract_llm_content
+  [38] Src [import_project_from_http]: import_project_from_http → import_http_project → _project_dir → _imports_root
       PURITY: 100% pure
-  [39] Src [_sync_option_previews]: _sync_option_previews
+  [39] Src [delete_imported]: delete_imported → find_nexu_repo_root
       PURITY: 100% pure
-  [40] Src [__init__]: __init__
+  [40] Src [delete_workspace_project]: delete_workspace_project → find_nexu_repo_root
       PURITY: 100% pure
-  [41] Src [do_GET]: do_GET → _parse_imported_project_route → _path_segments
+  [41] Src [imported_markpact]: imported_markpact → read_imported_markpact → normalize_imported_project_id
       PURITY: 100% pure
-  [42] Src [do_POST]: do_POST → _nexu_hooks_apply
+  [42] Src [imported_llm_log]: imported_llm_log → imported_project_llm_log → normalize_imported_project_id
       PURITY: 100% pure
-  [43] Src [do_DELETE]: do_DELETE → _path_segments
+  [43] Src [active_project]: active_project → load_active_project
       PURITY: 100% pure
-  [44] Src [do_OPTIONS]: do_OPTIONS
+  [44] Src [export_markpact_readme]: export_markpact_readme → load_effective_ui_constraints → effective_ui_constraints_from_ledger → _build_constraint_result
       PURITY: 100% pure
-  [45] Src [list_users]: list_users
+  [45] Src [services_catalog]: services_catalog → list_published_services → _load_registry → _registry_path → ...(1 more)
       PURITY: 100% pure
-  [46] Src [preview_menu_icons]: preview_menu_icons
+  [46] Src [publish_service]: publish_service → publish_project_service → _slug_service_id
       PURITY: 100% pure
-  [47] Src [main]: main → print
+  [47] Src [start_service]: start_service → start_published_service → _load_registry → _registry_path → ...(1 more)
       PURITY: 100% pure
-  [48] Src [render_dashboard]: render_dashboard
+  [48] Src [stop_service]: stop_service → stop_published_service → _load_registry → _registry_path → ...(1 more)
       PURITY: 100% pure
-  [49] Src [render_dashboard]: render_dashboard
+  [49] Src [_trace_slug]: _trace_slug → trace_slug
       PURITY: 100% pure
-  [50] Src [main]: main → print
+  [50] Src [_read_trace_index]: _read_trace_index → read_trace_index
       PURITY: 100% pure
 
 LAYERS:
-  examples/                       CC̄=5.3    ←in:0  →out:60  !! split
-  │ !! server                    2746L  2C   68m  CC=211    ←0
-  │ nexu_hooks                 280L  0C   28m  CC=11     ←7
+  examples/                       CC̄=5.1    ←in:0  →out:60  !! split
+  │ !! server                    3039L  2C   71m  CC=258    ←0
+  │ nexu_hooks                 331L  0C   29m  CC=11     ←7
   │ run                        118L  0C    1m  CC=2      ←0
   │ run                        110L  0C    1m  CC=2      ←0
   │ run                         97L  0C    1m  CC=8      ←0
   │ nexu_markpact_exporter      95L  0C    1m  CC=3      ←0
   │ run                         90L  0C    1m  CC=13     ←0
+  │ server.js                   87L  0C   14m  CC=4      ←0
   │ scientific_calculator_demo2    86L  0C    2m  CC=2      ←0
   │ run_examples                79L  0C    2m  CC=2      ←0
   │ docker-compose.yml          70L  0C    0m  CC=0.0    ←0
@@ -141,6 +139,7 @@ LAYERS:
   │ menu_icons                  24L  0C    1m  CC=3      ←0
   │ dashboard                   24L  0C    1m  CC=2      ←0
   │ pactown.yaml                19L  0C    0m  CC=0.0    ←0
+  │ package.json                14L  0C    0m  CC=0.0    ←0
   │ dashboard                   10L  0C    1m  CC=1      ←0
   │ demo                        10L  0C    1m  CC=1      ←0
   │ flow                         9L  0C    1m  CC=1      ←0
@@ -151,23 +150,23 @@ LAYERS:
   │ requirements.txt             1L  0C    0m  CC=0.0    ←0
   │
   src/                            CC̄=4.4    ←in:0  →out:0
-  │ !! cinema_project_imports    1134L  0C   52m  CC=17     ←1
-  │ !! cinema_offline_options     897L  0C   32m  CC=13     ←1
-  │ !! cinema_policy              861L  0C   40m  CC=13     ←6
+  │ !! cinema_project_imports    1219L  0C   57m  CC=14     ←2
+  │ !! cinema_policy              906L  0C   44m  CC=14     ←6
+  │ !! cinema_offline_options     901L  0C   32m  CC=13     ←1
   │ !! cinema_projects            720L  1C   25m  CC=14     ←4
-  │ !! cinema_scripts             672L  0C    4m  CC=6      ←6
+  │ !! cinema_scripts             680L  0C    4m  CC=6      ←5
   │ !! cinema_http_preprocess     606L  1C   29m  CC=16     ←4
   │ !! cinema_publish             469L  0C   23m  CC=15     ←1
   │ mcp_server                 393L  0C   13m  CC=6      ←1
   │ cli                        379L  0C   23m  CC=4      ←0
   │ !! cinema_goal_contracts      345L  0C   15m  CC=15     ←2
   │ cinema_llm                 332L  0C   18m  CC=12     ←1
-  │ verify                     317L  0C   14m  CC=12     ←0
+  │ verify                     325L  0C   14m  CC=12     ←0
+  │ cinema_scope               253L  0C    5m  CC=12     ←4
   │ cinema_history             244L  0C   13m  CC=8      ←2
-  │ cinema_scope               234L  0C    5m  CC=11     ←4
   │ orchestrate                232L  0C    6m  CC=13     ←2
   │ cinema_markpact            215L  0C    7m  CC=14     ←2
-  │ cinema_html_validate       201L  0C   13m  CC=12     ←3
+  │ cinema_html_validate       205L  0C   13m  CC=12     ←3
   │ cinema_llm_contracts       196L  0C    7m  CC=9      ←1
   │ cinema                     194L  0C    9m  CC=11     ←5
   │ config                     191L  4C    6m  CC=14     ←5
@@ -177,7 +176,6 @@ LAYERS:
   │ export_prompt              160L  0C    3m  CC=12     ←4
   │ review                     157L  0C    2m  CC=5      ←2
   │ cinema_server              144L  0C    8m  CC=4      ←1
-  │ intract                    140L  1C    7m  CC=12     ←9
   │ intract_adapter            133L  0C    6m  CC=9      ←1
   │ runtime                    131L  0C    4m  CC=9      ←4
   │ cinema_options_cache       128L  0C    8m  CC=9      ←1
@@ -193,10 +191,11 @@ LAYERS:
   │ context                     66L  0C    3m  CC=9      ←1
   │ bundle                      55L  0C    2m  CC=5      ←2
   │ files                       51L  0C    4m  CC=8      ←7
+  │ intract                     46L  0C    0m  CC=0.0    ←0
   │ iterate                     44L  0C    1m  CC=7      ←5
   │ journal                     43L  0C    3m  CC=5      ←8
   │ paths                       35L  0C    6m  CC=2      ←23
-  │ cinema_dom_patch            27L  0C    1m  CC=1      ←0
+  │ cinema_dom_patch            27L  0C    1m  CC=1      ←1
   │ __init__                    24L  0C    0m  CC=0.0    ←0
   │ cinema_html                 16L  0C    1m  CC=5      ←2
   │ __init__                     5L  0C    0m  CC=0.0    ←0
@@ -213,9 +212,12 @@ LAYERS:
   │ check-doc-links            114L  0C    8m  CC=12     ←0
   │ ci-cinema-smoke.sh          85L  0C    1m  CC=0.0    ←12
   │
+  sdk/                            CC̄=2.8    ←in:0  →out:0
+  │ repatch-sdk.js             186L  1C   18m  CC=12     ←0
+  │
   ./                              CC̄=0.0    ←in:0  →out:0
   │ !! goal.yaml                  512L  0C    0m  CC=0.0    ←0
-  │ tree.txt                   259L  0C    0m  CC=0.0    ←0
+  │ tree.txt                   268L  0C    0m  CC=0.0    ←0
   │ Makefile                    98L  0C    0m  CC=0.0    ←0
   │ pyproject.toml              89L  0C    0m  CC=0.0    ←0
   │ project.sh                  50L  0C    0m  CC=0.0    ←0
@@ -237,7 +239,7 @@ LAYERS:
 COUPLING:
                                                                 src.nexu         examples.web_app_calculator                             scripts                            src.vico                            examples  examples.web_app_pactown_ecosystem          examples.web_app_dashboard      examples.web_app_event_monitor
                             src.nexu                                  ──                                   6                                   2                                  53                                 ←20                                                                      ←9                                      hub
-         examples.web_app_calculator                                  81                                  ──                                   4                                   1                                  ←1                                                                                                              hub
+         examples.web_app_calculator                                  92                                  ──                                   4                                   1                                  ←1                                                                                                              hub
                              scripts                                  ←2                                  ←4                                  ──                                                                     ←34                                 ←22                                 ←10                                 ←19  hub
                             src.vico                                  12                                  ←1                                                                      ──                                  ←5                                                                      ←1                                      hub
                             examples                                  20                                   1                                  34                                   5                                  ──                                                                                                              !! fan-out
@@ -245,17 +247,17 @@ COUPLING:
           examples.web_app_dashboard                                   9                                                                      10                                   1                                                                                                          ──                                      !! fan-out
       examples.web_app_event_monitor                                                                                                          19                                                                                                                                                                                  ──  !! fan-out
   CYCLES: none
-  HUB: examples.web_app_calculator/ (fan-in=7)
-  HUB: scripts/ (fan-in=91)
-  HUB: src.nexu/ (fan-in=122)
   HUB: src.vico/ (fan-in=60)
-  SMELL: examples.web_app_pactown_ecosystem/ fan-out=22 → split needed
-  SMELL: examples.web_app_event_monitor/ fan-out=19 → split needed
-  SMELL: examples/ fan-out=60 → split needed
-  SMELL: examples.web_app_calculator/ fan-out=86 → split needed
+  HUB: examples.web_app_calculator/ (fan-in=7)
+  HUB: src.nexu/ (fan-in=133)
+  HUB: scripts/ (fan-in=91)
+  SMELL: src.vico/ fan-out=12 → split needed
+  SMELL: examples.web_app_calculator/ fan-out=97 → split needed
   SMELL: examples.web_app_dashboard/ fan-out=20 → split needed
   SMELL: src.nexu/ fan-out=61 → split needed
-  SMELL: src.vico/ fan-out=12 → split needed
+  SMELL: examples/ fan-out=60 → split needed
+  SMELL: examples.web_app_event_monitor/ fan-out=19 → split needed
+  SMELL: examples.web_app_pactown_ecosystem/ fan-out=22 → split needed
 
 EXTERNAL:
   validation: run `vallm batch .` → validation.toon
