@@ -74,7 +74,7 @@ def test_render_server_script_embeds_runtime_context() -> None:
     assert "parse_batch_alt_options" in script
     assert "from nexu.cinema_traces import write_llm_trace" in script
     assert "class ThreadingHTTPServer" in script
-    assert 'self.send_header("Location", "/cinema_player.html" + suffix)' in script
+    assert 'self.send_header("Location", "cinema_player.html" + suffix)' in script
     assert "if not batch_html" not in script
     assert "ThreadPoolExecutor" in script
     assert '"llx"' not in script
