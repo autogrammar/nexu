@@ -53,6 +53,18 @@ OFFLINE_FAST_SCOPES_DASHBOARD = frozenset(
     {"colors", "shapes", "display", "orientation"}
 )
 
+# Visual scopes where DELETE marks mean restyle (not DOM removal).
+VISUAL_REDESIGN_SCOPES = frozenset(
+    {"colors", "shapes", "display", "orientation", "keypad"}
+)
+
+# Project kinds that must not receive full-page LLM regeneration when marks exist.
+MARKED_PATCH_KINDS = frozenset(
+    IMPORTED_KINDS
+    | DASHBOARD_KINDS
+    | frozenset({"web", "frontend"})
+)
+
 
 def ui_type_for_kind(kind: str, *, html_hint: str = "") -> str:
     k = (kind or "").strip().lower()
@@ -437,9 +449,37 @@ def _resolve_scope_kind(project_kind: str, html: str) -> str:
     return "web"
 
 
-def inject_scope_style(html: str, scope: str, variant: str, *, project_kind: str = "") -> str:
+def should_block_full_html_iterate(
+    project_kind: str,
+    keep_els: list[str] | None,
+    delete_els: list[str] | None,
+    *,
+    focus_scope: str = "",
+) -> bool:
+    """True when marks exist on imported/web/dashboard projects — force patch paths only."""
+    from .cinema_marked_context import has_ui_marks
+
+    if not has_ui_marks(keep_els, delete_els):
+        return False
+    kind = (project_kind or "").strip().lower()
+    return kind in MARKED_PATCH_KINDS
+
+
+def inject_scope_style(
+    html: str,
+    scope: str,
+    variant: str,
+    *,
+    project_kind: str = "",
+    delete_ids: list[str] | None = None,
+    keep_ids: list[str] | None = None,
+) -> str:
     inferred = _resolve_scope_kind(project_kind, html)
     scope = normalize_focus_scope(scope, inferred)
+    delete_list = [str(x).strip() for x in (delete_ids or []) if str(x).strip()]
+    keep_list = [str(x).strip() for x in (keep_ids or []) if str(x).strip()]
+    if scope in VISUAL_REDESIGN_SCOPES and keep_list and not delete_list:
+        return strip_scope_style(html)
     if inferred == "calculator" or (
         inferred not in IMPORTED_KINDS.union(DASHBOARD_KINDS) and "calc-body" in html.lower()
     ):
@@ -449,6 +489,10 @@ def inject_scope_style(html: str, scope: str, variant: str, *, project_kind: str
     else:
         css = _web_scope_css(scope, variant) or _scope_css(scope, variant)
     cleaned = strip_scope_style(html)
+    if scope in VISUAL_REDESIGN_SCOPES and delete_list:
+        from .cinema_marked_context import restrict_scope_css_to_marks
+
+        css = restrict_scope_css_to_marks(css, delete_list)
     if not css:
         return cleaned
     block = f'<style id="{SCOPE_STYLE_ID}">\n{css}\n</style>'
@@ -513,11 +557,16 @@ def load_cinema_ui_profile(
         "active": project,
     }
     try:
-        from .cinema_http_preprocess import load_http_preprocess_artifacts
+        from .cinema_http_preprocess import (
+            load_cinema_seed_preprocess_artifacts,
+            load_http_preprocess_artifacts,
+        )
 
-        http_ctx = load_http_preprocess_artifacts(cinema_dir, project)
-        if http_ctx:
-            profile.update(http_ctx)
+        preprocess_ctx = load_http_preprocess_artifacts(cinema_dir, project)
+        if not preprocess_ctx:
+            preprocess_ctx = load_cinema_seed_preprocess_artifacts(cinema_dir, project)
+        if preprocess_ctx:
+            profile.update(preprocess_ctx)
     except Exception:
         pass
     return profile

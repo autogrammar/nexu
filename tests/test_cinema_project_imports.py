@@ -243,7 +243,86 @@ def test_activate_http_import_regenerates_preview_stage0(tmp_path: Path):
     stage0 = (cinema / "stage0.html").read_text(encoding="utf-8")
     assert "<h1>Live preview</h1>" in stage0
     assert "Markpact migration" not in stage0
+    assert "const NEXU_PARAMS = new URLSearchParams" in stage0
+    assert "nexu preview: block cross-origin fetch" in stage0
+    assert 'data-nexu-import-preview="http"' in stage0
     assert json.loads((cinema / "intract_policy_ledger.json").read_text(encoding="utf-8")) == []
+
+
+def test_activate_http_import_regenerates_preprocess_when_missing(tmp_path: Path):
+    """Re-activate migrates pre-preprocess HTTP imports without re-fetching."""
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    body = b"""<!DOCTYPE html><html><head><style>body{color:#112233}</style></head>
+<body><main class="hero"><h1>Legacy site</h1></main></body></html>"""
+
+    class FakeResp:
+        headers = {"Content-Type": "text/html; charset=utf-8"}
+        url = "https://legacy.example/"
+
+        def __init__(self):
+            self._done = False
+
+        def read(self, n=-1):
+            if self._done:
+                return b""
+            self._done = True
+            return body if n == -1 else body[: max(n, 0)]
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+    with patch("nexu.cinema_project_imports.urlopen", return_value=FakeResp()):
+        imported = import_http_project(cinema, "https://legacy.example/", allow_network=True)
+
+    project_id = imported["project"]["id"]
+    project_dir = cinema / "imported_projects" / project_id
+    source_dir = project_dir / "source"
+    (source_dir / "nexu-visual.css").unlink()
+    (source_dir / "nexu-outline.html").unlink()
+    meta_path = project_dir / "project.json"
+    legacy_meta = json.loads(meta_path.read_text(encoding="utf-8"))
+    for key in (
+        "llm_context_mode",
+        "visual_css_path",
+        "html_outline_path",
+        "visual_css_bytes",
+        "outline_node_count",
+        "visual_css_truncated",
+    ):
+        legacy_meta.pop(key, None)
+    legacy_meta["artifacts"] = [
+        {"kind": "markpact", "path": "README.markpact.md"},
+        {"kind": "source", "path": "source/"},
+    ]
+    meta_path.write_text(json.dumps(legacy_meta, indent=2) + "\n", encoding="utf-8")
+    (cinema / "stage0.html").write_text("<html>stale without shield</html>", encoding="utf-8")
+
+    result = activate_imported_project(cinema, project_id)
+    assert result["status"] == "project_imported"
+
+    meta = json.loads(meta_path.read_text(encoding="utf-8"))
+    assert meta["llm_context_mode"] == "patch"
+    assert (source_dir / "nexu-visual.css").is_file()
+    assert (source_dir / "nexu-outline.html").is_file()
+    assert meta["visual_css_bytes"] > 0
+    assert meta["outline_node_count"] >= 1
+    assert any(a.get("kind") == "visual_css" for a in meta.get("artifacts") or [])
+
+    from nexu.cinema_scope import load_cinema_ui_profile
+
+    active = json.loads((cinema / "active_project.json").read_text(encoding="utf-8"))
+    profile = load_cinema_ui_profile(active, cinema)
+    assert profile.get("llm_context_mode") == "patch"
+    assert profile.get("visual_css")
+
+    stage0 = (cinema / "stage0.html").read_text(encoding="utf-8")
+    assert "<h1>Legacy site</h1>" in stage0
+    assert "const NEXU_PARAMS = new URLSearchParams" in stage0
+    assert "nexu preview: block cross-origin fetch" in stage0
 
 
 def test_activate_http_import_empty_subtitle_not_goal(tmp_path: Path):

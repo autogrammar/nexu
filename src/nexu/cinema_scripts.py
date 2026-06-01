@@ -134,7 +134,7 @@ SHIELD_SCRIPT = """
         `;
         document.head.appendChild(style);
 
-        const SELECTOR = [
+        const SELECTOR_BASE = [
             '.btn',
             '.btn-sci',
             '.btn-sci-excess',
@@ -157,7 +157,39 @@ SHIELD_SCRIPT = """
             '.grid > div',
             '.sci-grid > button',
             '.sci-grid > div',
-        ].join(', ');
+        ];
+        const SELECTOR_HTTP = [
+            'a[href]',
+            'button',
+            'input[type="submit"]',
+            'input[type="button"]',
+            '[role="button"]',
+            '[id]',
+            'section',
+            'article',
+            'header',
+            'footer',
+            'nav',
+            'main',
+            'h1',
+            'h2',
+            'h3',
+            '.menu-item',
+            '.wp-block-button',
+            '.wp-block-button__link',
+        ];
+        function isHttpImportPreview() {
+            return !!(
+                document.body
+                && document.body.getAttribute('data-nexu-import-preview') === 'http'
+            );
+        }
+        function markingSelector() {
+            if (isHttpImportPreview()) {
+                return SELECTOR_BASE.concat(SELECTOR_HTTP).join(', ');
+            }
+            return SELECTOR_BASE.join(', ');
+        }
         let selectionBox = null;
         let isDrawing = false;
         let startX = 0, startY = 0;
@@ -182,7 +214,7 @@ SHIELD_SCRIPT = """
         document.body.appendChild(dock);
 
         function calcButtonTarget(node) {
-            return node && node.closest ? node.closest(SELECTOR) : null;
+            return node && node.closest ? node.closest(markingSelector()) : null;
         }
 
         function elementIdFromEl(el) {
@@ -195,8 +227,32 @@ SHIELD_SCRIPT = """
             return text;
         }
 
+        function compactFragment(el) {
+            if (!el) return null;
+            const rect = el.getBoundingClientRect();
+            const text = (el.innerText || el.textContent || '').replace(/\\s+/g, ' ').trim();
+            const html = (el.outerHTML || '').replace(/\\s+/g, ' ').trim();
+            return {
+                id: elementIdFromEl(el),
+                tag: (el.tagName || '').toLowerCase(),
+                className: typeof el.className === 'string' ? el.className : '',
+                text: text.slice(0, 700),
+                html: html.slice(0, 3000),
+                rect: {
+                    x: Math.round(rect.x),
+                    y: Math.round(rect.y),
+                    width: Math.round(rect.width),
+                    height: Math.round(rect.height),
+                },
+            };
+        }
+
         function allTargets() {
-            return Array.from(document.querySelectorAll(SELECTOR));
+            const nodes = Array.from(document.querySelectorAll(markingSelector()));
+            if (!isHttpImportPreview()) return nodes;
+            return nodes.filter(
+                (el) => !nodes.some((other) => other !== el && el.contains(other))
+            );
         }
 
         nexuLog('iframe_boot', {
@@ -235,6 +291,7 @@ SHIELD_SCRIPT = """
                 type: 'annotation',
                 elementId: focusedId,
                 action: action,
+                fragment: compactFragment(focusedEl),
             }, '*');
             annotatedIds.add(focusedId);
             setTimeout(() => {
@@ -351,6 +408,7 @@ SHIELD_SCRIPT = """
                         type: 'annotation',
                         elementId: eid,
                         action: selectionType,
+                        fragment: compactFragment(el),
                     }, '*');
                 }
             });
@@ -655,6 +713,24 @@ def apply_spatial_deletes_to_html(html: str, delete_ids: list[str]) -> tuple[str
     patched = _BTN_DIV_RE.sub(_btn_replacer, html)
     patched = _SELECTABLE_BLOCK_RE.sub(_block_replacer, patched)
     return patched, removed
+
+
+_NEXU_SHIELD_MARKER = "const NEXU_PARAMS = new URLSearchParams"
+
+
+def inject_cinema_shield(html: str, *, calc: bool = False) -> str:
+    """Append marking shield without stripping existing preview scripts (e.g. HTTP network shim)."""
+    if not html or _NEXU_SHIELD_MARKER in html:
+        return html
+    bundle = SHIELD_SCRIPT + (CALCULATOR_RUNTIME_SCRIPT if calc else "")
+    lower = html.lower()
+    if "</body>" in lower:
+        idx = lower.rfind("</body>")
+        return html[:idx] + bundle + html[idx:]
+    if "</html>" in lower:
+        idx = lower.rfind("</html>")
+        return html[:idx] + bundle + html[idx:]
+    return html.rstrip() + bundle + "\n</body>\n</html>\n"
 
 
 def finalize_cinema_html(html: str, *, inject: str | None = None) -> str:

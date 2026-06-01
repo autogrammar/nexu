@@ -398,6 +398,89 @@ def build_html_outline(html: str) -> tuple[str, dict[str, Any]]:
     return outline, meta
 
 
+def _write_preprocess_artifacts(
+    html: str,
+    *,
+    output_dir: Path,
+    linked_css_paths: list[str] | None = None,
+    css_path_rel: str,
+    outline_path_rel: str,
+) -> dict[str, Any]:
+    linked = list(linked_css_paths or [])
+    visual_css, css_meta = extract_visual_css(html, linked, output_dir)
+    outline, outline_meta = build_html_outline(html)
+    css_path = output_dir / css_path_rel
+    outline_path = output_dir / outline_path_rel
+    try:
+        css_path.write_text(visual_css + ("\n" if visual_css else ""), encoding="utf-8")
+        outline_path.write_text(outline + "\n", encoding="utf-8")
+    except OSError:
+        return {}
+    return {
+        "llm_context_mode": "patch",
+        "visual_css_path": css_path_rel,
+        "visual_css_bytes": css_meta.get("visual_css_bytes", 0),
+        "visual_css_truncated": bool(css_meta.get("visual_css_truncated")),
+        "html_outline_path": outline_path_rel,
+        "outline_node_count": outline_meta.get("outline_node_count", 0),
+        "outline_bytes": outline_meta.get("outline_bytes", 0),
+    }
+
+
+def preprocess_cinema_seed(cinema_dir: Path) -> dict[str, Any]:
+    """Write nexu-visual.css and nexu-outline.html beside stage0.html; return active_project fields."""
+    stage0 = cinema_dir / "stage0.html"
+    if not stage0.is_file():
+        return {}
+    try:
+        html = stage0.read_text(encoding="utf-8")
+    except OSError:
+        return {}
+    return _write_preprocess_artifacts(
+        html,
+        output_dir=cinema_dir,
+        css_path_rel="nexu-visual.css",
+        outline_path_rel="nexu-outline.html",
+    )
+
+
+def http_preprocess_artifacts_present(
+    source_dir: Path,
+    meta: dict[str, Any] | None = None,
+) -> bool:
+    """True when compact LLM patch artifacts exist under source_dir."""
+    project = meta if isinstance(meta, dict) else {}
+    css_rel = str(project.get("visual_css_path") or "source/nexu-visual.css")
+    outline_rel = str(project.get("html_outline_path") or "source/nexu-outline.html")
+    css_local = css_rel[len("source/") :] if css_rel.startswith("source/") else css_rel
+    outline_local = outline_rel[len("source/") :] if outline_rel.startswith("source/") else outline_rel
+    css_ok = (source_dir / css_local).is_file()
+    outline_ok = (source_dir / outline_local).is_file()
+    mode_ok = str(project.get("llm_context_mode") or "") == "patch"
+    return css_ok and outline_ok and mode_ok
+
+
+def ensure_http_preprocess_artifacts(
+    source_dir: Path,
+    *,
+    fetch_meta: dict[str, Any] | None = None,
+    meta: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Regenerate nexu-visual.css + nexu-outline.html when missing (HTTP re-activate migration)."""
+    if not source_dir.is_dir():
+        return {}
+    if http_preprocess_artifacts_present(source_dir, meta):
+        return {}
+    fields = preprocess_http_import(source_dir, fetch_meta=fetch_meta)
+    if not fields:
+        return {}
+    return {
+        **fields,
+        "visual_css_path": "source/nexu-visual.css",
+        "html_outline_path": "source/nexu-outline.html",
+    }
+
+
 def preprocess_http_import(source_dir: Path, *, fetch_meta: dict[str, Any] | None = None) -> dict[str, Any]:
     """Write nexu-visual.css and nexu-outline.html under source_dir; return project.json fields."""
     index_path = source_dir / "index.html"
@@ -424,30 +507,57 @@ def preprocess_http_import(source_dir: Path, *, fetch_meta: dict[str, Any] | Non
                 if local:
                     linked.append(local)
 
-    visual_css, css_meta = extract_visual_css(html, linked, source_dir)
-    outline, outline_meta = build_html_outline(html)
-
-    css_path = source_dir / "nexu-visual.css"
-    outline_path = source_dir / "nexu-outline.html"
-    try:
-        css_path.write_text(visual_css + ("\n" if visual_css else ""), encoding="utf-8")
-        outline_path.write_text(outline + "\n", encoding="utf-8")
-    except OSError:
-        return {}
-
-    return {
-        "llm_context_mode": "patch",
+    return _write_preprocess_artifacts(
+        html,
+        output_dir=source_dir,
+        linked_css_paths=linked,
+        css_path_rel="nexu-visual.css",
+        outline_path_rel="nexu-outline.html",
+    ) | {
         "visual_css_path": "source/nexu-visual.css",
-        "visual_css_bytes": css_meta.get("visual_css_bytes", 0),
-        "visual_css_truncated": bool(css_meta.get("visual_css_truncated")),
         "html_outline_path": "source/nexu-outline.html",
-        "outline_node_count": outline_meta.get("outline_node_count", 0),
-        "outline_bytes": outline_meta.get("outline_bytes", 0),
     }
 
 
 def _project_meta_path(cinema_dir: Path, project_id: str) -> Path:
     return cinema_dir / "imported_projects" / project_id / "project.json"
+
+
+def load_cinema_seed_preprocess_artifacts(
+    cinema_dir: Path | str,
+    active: dict[str, Any] | None,
+) -> dict[str, Any]:
+    """Load compact seed preprocess artifacts from cinema dir when active_project uses patch mode."""
+    project = active if isinstance(active, dict) else {}
+    if str(project.get("llm_context_mode") or "") != "patch":
+        return {}
+    root = Path(cinema_dir)
+    css_rel = str(project.get("visual_css_path") or "nexu-visual.css")
+    outline_rel = str(project.get("html_outline_path") or "nexu-outline.html")
+    visual_css = _safe_read_under(root, css_rel) or ""
+    html_outline = _safe_read_under(root, outline_rel) or ""
+    if not visual_css and not html_outline:
+        return {}
+    return {
+        "llm_context_mode": "patch",
+        "visual_css": visual_css,
+        "html_outline": html_outline,
+        "visual_css_bytes": int(project.get("visual_css_bytes") or len(visual_css.encode("utf-8"))),
+        "outline_node_count": int(project.get("outline_node_count") or 0),
+        "visual_css_truncated": bool(project.get("visual_css_truncated")),
+    }
+
+
+def _load_project_meta(meta_path: Path) -> dict[str, Any] | None:
+    if not meta_path.is_file():
+        return None
+    try:
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        if isinstance(meta, dict):
+            return meta
+    except (OSError, json.JSONDecodeError):
+        pass
+    return None
 
 
 def load_http_preprocess_artifacts(
@@ -460,13 +570,8 @@ def load_http_preprocess_artifacts(
     if not project_id.startswith("http-"):
         return {}
     meta_path = _project_meta_path(Path(cinema_dir), project_id)
-    if not meta_path.is_file():
-        return {}
-    try:
-        meta = json.loads(meta_path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return {}
-    if not isinstance(meta, dict):
+    meta = _load_project_meta(meta_path)
+    if not meta:
         return {}
     project_dir = meta_path.parent
     source_dir = project_dir / "source"

@@ -397,9 +397,16 @@ def _write_project_options_from_stages(
             return []
         out = finalize_cinema_html(source.read_text(encoding="utf-8"))
         out = _inject_goal_banner(out, user_goal, variant)
-        out = inject_scope_style(out, scope, variant, project_kind=kind)
         effective_delete = _delete_without_keeps(delete_els, keep_els)
-        if effective_delete:
+        out = inject_scope_style(
+            out,
+            scope,
+            variant,
+            project_kind=kind,
+            delete_ids=delete_els,
+            keep_ids=keep_els,
+        )
+        if scope == "functions" and effective_delete:
             out, _ = apply_spatial_deletes_to_html(out, effective_delete)
             out = finalize_cinema_html(out)
         (cinema_dir / alt_name).write_text(out, encoding="utf-8")
@@ -438,10 +445,17 @@ def _write_scoped_calculator_options(
                 variant, keep_els, user_goal=user_goal
             )
         out = finalize_cinema_html(html)
-        out = inject_scope_style(out, scope, variant, project_kind="calculator")
-        out = _inject_goal_banner(out, user_goal, variant)
         effective_delete = _delete_without_keeps(delete_els, keep_els)
-        if effective_delete:
+        out = inject_scope_style(
+            out,
+            scope,
+            variant,
+            project_kind="calculator",
+            delete_ids=delete_els,
+            keep_ids=keep_els,
+        )
+        out = _inject_goal_banner(out, user_goal, variant)
+        if scope == "functions" and effective_delete:
             out, _ = apply_spatial_deletes_to_html(out, effective_delete)
             out = finalize_cinema_html(out)
         (cinema_dir / alt_name).write_text(out, encoding="utf-8")
@@ -687,6 +701,128 @@ def _render_packaged_alt(name: str) -> str:
     return Template(raw).substitute(INJECTED_SCRIPTS=SHIELD_SCRIPT + CALCULATOR_RUNTIME_SCRIPT)
 
 
+def _is_dashboard_kind(
+    active_kind: str,
+    use_calculator: bool,
+    use_chemical: bool,
+    traits: dict[str, bool],
+) -> bool:
+    return traits.get("dashboard") or traits.get("api") or (
+        not use_calculator
+        and not use_chemical
+        and active_kind in (
+            "dashboard", "monitor", "ecosystem", "api", "frontend", "slice", "mcp", "imported"
+        )
+    )
+
+
+def _detect_project_types(
+    cinema_dir: Path,
+    keep: list[str],
+    delete: list[str],
+    goal_text: str,
+    hint_list: list[str],
+    traits: dict[str, bool],
+) -> tuple[bool, bool, bool, bool, bool, str]:
+    """Detect project type flags for option generation."""
+    chem_sources = ([goal_text] if goal_text else []) + hint_list
+    use_chemical = traits.get("chemical") or is_chemical_goal(chem_sources)
+    use_policy = _policy_constrained(keep, delete)
+    use_calculator = _cinema_is_calculator(cinema_dir)
+    active_kind = str(_active_project_meta(cinema_dir).get("kind") or "").lower()
+    use_dashboard = _is_dashboard_kind(active_kind, use_calculator, use_chemical, traits)
+    use_project_stages = (
+        (use_dashboard or active_kind == "imported" or (not use_calculator and not use_chemical))
+        and (cinema_dir / "stage0.html").is_file()
+    )
+    use_scientific = (
+        use_calculator or (use_policy and not _active_is_imported(cinema_dir))
+    ) and not use_chemical
+    return (
+        use_chemical,
+        use_policy,
+        use_calculator,
+        use_dashboard,
+        use_project_stages,
+        use_scientific,
+        active_kind,
+    )
+
+
+def _get_option_mapping(use_chemical: bool, use_scientific: bool) -> list[tuple[str, str, str]]:
+    """Get filename/variant/label mapping for option generation."""
+    if use_chemical:
+        return [
+            ("alt_a.html", "a", "Option A (chemical minimal)"),
+            ("alt_b.html", "b", "Option B (chemical balanced)"),
+            ("alt_c.html", "c", "Option C (chemical expanded)"),
+        ]
+    if use_scientific:
+        return [
+            ("alt_a.html", "a", "Option A (minimal)"),
+            ("alt_b.html", "b", "Option B (standard)"),
+            ("alt_c.html", "c", "Option C (expanded)"),
+        ]
+    return [
+        ("alt_a.html", "a", "Option A (minimalist)"),
+        ("alt_b.html", "b", "Option B (standard)"),
+        ("alt_c.html", "c", "Option C (expanded)"),
+    ]
+
+
+def _generate_option_html(
+    variant: str,
+    keep: list[str],
+    goal_text: str,
+    use_chemical: bool,
+    use_scientific: bool,
+) -> str:
+    """Generate HTML for a single option variant."""
+    if use_chemical:
+        return build_chemical_option_html(variant, keep, user_goal=goal_text)
+    if use_scientific:
+        return build_policy_scientific_option_html(variant, keep, user_goal=goal_text)
+    tmpl = f"alt_{variant}.html.tmpl"
+    return _render_packaged_alt(tmpl)
+
+
+def _write_option_files(
+    cinema_dir: Path,
+    mapping: list[tuple[str, str, str]],
+    keep: list[str],
+    delete: list[str],
+    goal_text: str,
+    use_chemical: bool,
+    use_scientific: bool,
+) -> list[str]:
+    """Write option HTML files and return labels."""
+    labels: list[str] = []
+    for filename, variant, label in mapping:
+        html = _generate_option_html(variant, keep, goal_text, use_chemical, use_scientific)
+        out = finalize_cinema_html(html)
+        effective_delete = _delete_without_keeps(delete, keep)
+        if effective_delete:
+            out, _ = apply_spatial_deletes_to_html(out, effective_delete)
+            out = finalize_cinema_html(out)
+        (cinema_dir / filename).write_text(out, encoding="utf-8")
+        labels.append(label)
+    return labels
+
+
+def _sync_stages_from_options(cinema_dir: Path, labels: list[str]) -> None:
+    """Sync stage1/stage2 from alt_b/alt_c options."""
+    alt_b = cinema_dir / "alt_b.html"
+    alt_c = cinema_dir / "alt_c.html"
+    if labels and alt_b.is_file():
+        (cinema_dir / "stage1.html").write_text(
+            alt_b.read_text(encoding="utf-8"), encoding="utf-8"
+        )
+    if labels and alt_c.is_file():
+        (cinema_dir / "stage2.html").write_text(
+            alt_c.read_text(encoding="utf-8"), encoding="utf-8"
+        )
+
+
 def write_goal_options_offline(
     cinema_dir: Path,
     *,
@@ -706,26 +842,20 @@ def write_goal_options_offline(
     hint_list = list(hints or [])
     goal_text = (user_goal or "").strip()
     traits = goal_traits_from_contract_lines(goal_contract_lines)
-    chem_sources = ([goal_text] if goal_text else []) + hint_list
-    use_chemical = traits.get("chemical") or is_chemical_goal(chem_sources)
-    use_policy = _policy_constrained(keep, delete)
-    use_calculator = _cinema_is_calculator(cinema_dir)
-    active_kind = str(_active_project_meta(cinema_dir).get("kind") or "").lower()
-    use_dashboard = traits.get("dashboard") or traits.get("api") or (
-        not use_calculator
-        and not use_chemical
-        and active_kind
-        in ("dashboard", "monitor", "ecosystem", "api", "frontend", "slice", "mcp", "imported")
-    )
-    use_project_stages = (
-        (use_dashboard or active_kind == "imported" or (not use_calculator and not use_chemical))
-        and (cinema_dir / "stage0.html").is_file()
-    )
-    use_scientific = (
-        use_calculator or (use_policy and not _active_is_imported(cinema_dir))
-    ) and not use_chemical
+
+    (
+        use_chemical,
+        _use_policy,
+        use_calculator,
+        _use_dashboard,
+        use_project_stages,
+        use_scientific,
+        active_kind,
+    ) = _detect_project_types(cinema_dir, keep, delete, goal_text, hint_list, traits)
+
     raw_scope = (focus_scope or "").strip().lower()
     labels: list[str] = []
+
     if use_project_stages:
         labels = _write_project_options_from_stages(
             cinema_dir,
@@ -736,6 +866,7 @@ def write_goal_options_offline(
         )
         if labels:
             return labels
+
     if raw_scope and (use_calculator or use_chemical):
         from .cinema_scope import normalize_focus_scope
 
@@ -751,49 +882,16 @@ def write_goal_options_offline(
         )
         if labels:
             return labels
-    if use_chemical:
-        mapping = [
-            ("alt_a.html", "a", "Option A (chemical minimal)"),
-            ("alt_b.html", "b", "Option B (chemical balanced)"),
-            ("alt_c.html", "c", "Option C (chemical expanded)"),
-        ]
-    elif use_scientific:
-        mapping = [
-            ("alt_a.html", "a", "Option A (minimal)"),
-            ("alt_b.html", "b", "Option B (standard)"),
-            ("alt_c.html", "c", "Option C (expanded)"),
-        ]
-    else:
-        mapping = [
-            ("alt_a.html", "a", "Option A (minimalist)"),
-            ("alt_b.html", "b", "Option B (standard)"),
-            ("alt_c.html", "c", "Option C (expanded)"),
-        ]
-    for filename, variant, label in mapping:
-        if use_chemical:
-            html = build_chemical_option_html(variant, keep, user_goal=goal_text)
-        elif use_scientific:
-            html = build_policy_scientific_option_html(
-                variant, keep, user_goal=goal_text
-            )
-        else:
-            tmpl = f"alt_{variant}.html.tmpl"
-            html = _render_packaged_alt(tmpl)
-        out = finalize_cinema_html(html)
-        effective_delete = _delete_without_keeps(delete, keep)
-        if effective_delete:
-            out, _ = apply_spatial_deletes_to_html(out, effective_delete)
-            out = finalize_cinema_html(out)
-        (cinema_dir / filename).write_text(out, encoding="utf-8")
-        labels.append(label)
-    alt_b = cinema_dir / "alt_b.html"
-    alt_c = cinema_dir / "alt_c.html"
-    if labels and alt_b.is_file():
-        (cinema_dir / "stage1.html").write_text(
-            alt_b.read_text(encoding="utf-8"), encoding="utf-8"
-        )
-    if labels and alt_c.is_file():
-        (cinema_dir / "stage2.html").write_text(
-            alt_c.read_text(encoding="utf-8"), encoding="utf-8"
-        )
+
+    mapping = _get_option_mapping(use_chemical, use_scientific)
+    labels = _write_option_files(
+        cinema_dir,
+        mapping,
+        keep,
+        delete,
+        goal_text,
+        use_chemical,
+        use_scientific,
+    )
+    _sync_stages_from_options(cinema_dir, labels)
     return labels

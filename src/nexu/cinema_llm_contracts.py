@@ -82,6 +82,23 @@ def build_llm_option_variants(
     return variants
 
 
+def _format_contract_params(
+    keep_els: list[str] | None,
+    delete_els: list[str] | None,
+    project_goal: str,
+    current_state: str,
+    expected_version: str,
+    element_hints: list[str] | None,
+) -> tuple[str, str, str, str, str, str]:
+    keep = ", ".join(list(keep_els or [])[:16]) or "none"
+    delete = ", ".join(list(delete_els or [])[:16]) or "none"
+    goal = _compact(project_goal)
+    current = _compact(current_state)
+    expected = _compact(expected_version)
+    hints = "; ".join(_compact(h, max_len=80) for h in list(element_hints or [])[:8])
+    return keep, delete, goal, current, expected, hints
+
+
 def build_llm_communication_contract_lines(
     *,
     ui_type: str,
@@ -98,12 +115,9 @@ def build_llm_communication_contract_lines(
     ui = _slug(ui_type or "web")
     scope = _slug(focus_scope or "functions")
     variant = _slug(variant_label or "variant")
-    keep = ", ".join(list(keep_els or [])[:16]) or "none"
-    delete = ", ".join(list(delete_els or [])[:16]) or "none"
-    goal = _compact(project_goal)
-    current = _compact(current_state)
-    expected = _compact(expected_version)
-    hints = "; ".join(_compact(h, max_len=80) for h in list(element_hints or [])[:8])
+    keep, delete, goal, current, expected, hints = _format_contract_params(
+        keep_els, delete_els, project_goal, current_state, expected_version, element_hints
+    )
 
     lines = [
         _line(

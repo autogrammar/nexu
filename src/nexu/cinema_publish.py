@@ -378,6 +378,30 @@ def publish_project_service(
     return result
 
 
+def _spawn_http_server(service_dir: Path, port: int) -> subprocess.Popen:
+    log_path = service_dir / "service.log"
+    log_file = open(log_path, "a", encoding="utf-8")
+    proc = subprocess.Popen(
+        [sys.executable, "-m", "http.server", str(port)],
+        cwd=str(service_dir),
+        stdout=log_file,
+        stderr=subprocess.STDOUT,
+        start_new_session=True,
+    )
+    log_file.close()
+    return proc
+
+
+def _wait_for_service_running(entry: dict[str, Any], deadline: float) -> dict[str, Any]:
+    refreshed = dict(entry)
+    while time.time() < deadline:
+        refreshed = _refresh_service_status(dict(entry))
+        if refreshed.get("status") == "running":
+            break
+        time.sleep(0.1)
+    return refreshed
+
+
 def start_published_service(cinema_dir: Path, service_id: str) -> dict[str, Any]:
     data = _load_registry(cinema_dir)
     services: list[dict[str, Any]] = list(data.get("services") or [])
@@ -400,16 +424,7 @@ def start_published_service(cinema_dir: Path, service_id: str) -> dict[str, Any]
     if not port:
         return {"error": "no free port for service"}
 
-    log_path = service_dir / "service.log"
-    log_file = open(log_path, "a", encoding="utf-8")
-    proc = subprocess.Popen(
-        [sys.executable, "-m", "http.server", str(port)],
-        cwd=str(service_dir),
-        stdout=log_file,
-        stderr=subprocess.STDOUT,
-        start_new_session=True,
-    )
-    log_file.close()
+    proc = _spawn_http_server(service_dir, port)
 
     entry["port"] = port
     entry["pid"] = proc.pid
@@ -422,13 +437,8 @@ def start_published_service(cinema_dir: Path, service_id: str) -> dict[str, Any]
             break
     _save_registry(cinema_dir, {"services": services})
 
-    refreshed = dict(entry)
     deadline = time.time() + 2.0
-    while time.time() < deadline:
-        refreshed = _refresh_service_status(dict(entry))
-        if refreshed.get("status") == "running":
-            break
-        time.sleep(0.1)
+    refreshed = _wait_for_service_running(entry, deadline)
     return {"status": "started", "service": refreshed}
 
 

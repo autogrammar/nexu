@@ -1678,6 +1678,11 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 spatial_feedback = data.get('prompt', '')
                 current_stage = int(data.get('current_stage', 0))
                 annotations = data.get('annotations', [])
+                if not isinstance(annotations, list):
+                    annotations = []
+                selected_fragments = data.get('selected_fragments') or []
+                if not isinstance(selected_fragments, list):
+                    selected_fragments = []
                 user_goal = str(data.get('user_goal', '') or '').strip()
                 focus_scope = str(data.get('focus_scope', '') or '').strip()
                 focus_scope_label = str(data.get('focus_scope_label', '') or '').strip()
@@ -1733,33 +1738,22 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 # Build structured LLM prompt from spatial annotations
                 pending_goal = bool(data.get('pending_goal', False))
                 requested_mode = str(data.get('iteration_mode', '') or '').strip()
-                session_keep = [a['id'] for a in annotations if a.get('type') == 'KEEP']
-                session_delete = [a['id'] for a in annotations if a.get('type') == 'DELETE']
+                session_keep = [
+                    str(a.get('id') or '').strip()
+                    for a in annotations
+                    if isinstance(a, dict) and a.get('type') == 'KEEP' and str(a.get('id') or '').strip()
+                ]
+                session_delete = [
+                    str(a.get('id') or '').strip()
+                    for a in annotations
+                    if isinstance(a, dict) and a.get('type') == 'DELETE' and str(a.get('id') or '').strip()
+                ]
                 if session_delete or session_keep:
                     pending_goal = False
                 policy_payload = _load_policy_payload()
                 goal_contract_lines: list[str] = []
                 ui_profile = _load_cinema_ui_profile()
                 project_kind = str(ui_profile.get("kind") or "").lower()
-                try:
-                    from nexu.cinema_scope import scoped_html_fragment
-
-                    scoped = scoped_html_fragment(current_html, focus_scope, project_kind)
-                    if scoped:
-                        current_html_for_prompt = _compact_html_for_llm(scoped)
-                except Exception:
-                    pass
-                if ui_profile.get("llm_context_mode") == "patch" and (
-                    ui_profile.get("html_outline") or ui_profile.get("visual_css")
-                ):
-                    try:
-                        from nexu.cinema_http_preprocess import build_http_llm_context
-
-                        patch_ctx = build_http_llm_context(ui_profile)
-                        if patch_ctx:
-                            current_html_for_prompt = patch_ctx
-                    except Exception:
-                        pass
                 try:
                     import nexu_hooks
                     if user_goal:
@@ -1777,6 +1771,47 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 keep_els, delete_els = _merge_ui_constraints(
                     ledger_keep, ledger_delete, session_keep, session_delete
                 )
+                visual_redesign_scopes = {"colors", "shapes", "display", "orientation"}
+                active_scope_name = (focus_scope or "").strip().lower()
+                hard_delete_els = [] if active_scope_name in visual_redesign_scopes else delete_els
+                marked_llm_context = None
+                if session_keep or session_delete or keep_els or delete_els:
+                    try:
+                        from nexu.cinema_marked_context import resolve_marked_llm_context
+
+                        marked_llm_context = resolve_marked_llm_context(
+                            current_html,
+                            keep_els=keep_els,
+                            delete_els=delete_els,
+                            focus_scope=focus_scope or "",
+                            project_kind=project_kind,
+                            ui_profile=ui_profile,
+                            client_fragments=selected_fragments,
+                        )
+                    except Exception:
+                        marked_llm_context = None
+                if marked_llm_context:
+                    current_html_for_prompt = marked_llm_context
+                else:
+                    try:
+                        from nexu.cinema_scope import scoped_html_fragment
+
+                        scoped = scoped_html_fragment(current_html, focus_scope, project_kind)
+                        if scoped:
+                            current_html_for_prompt = _compact_html_for_llm(scoped)
+                    except Exception:
+                        pass
+                    if ui_profile.get("llm_context_mode") == "patch" and (
+                        ui_profile.get("html_outline") or ui_profile.get("visual_css")
+                    ):
+                        try:
+                            from nexu.cinema_http_preprocess import build_http_llm_context
+
+                            patch_ctx = build_http_llm_context(ui_profile)
+                            if patch_ctx:
+                                current_html_for_prompt = patch_ctx
+                        except Exception:
+                            pass
                 # goal_options: refresh A–C only; marks/hints constrain variants, workspace unchanged.
                 if requested_mode == 'goal_options':
                     apply_active = False
@@ -1884,7 +1919,11 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                         "- KEEP these elements (user likes them): "
                         + (', '.join(keep_els) if keep_els else 'none specified')
                         + "\n"
-                        "- REDESIGN/DELETE these elements (user wants them changed or removed): "
+                        + (
+                            "- REDESIGN these marked fragments within the selected scope: "
+                            if active_scope_name in visual_redesign_scopes
+                            else "- REDESIGN/DELETE these elements (user wants them changed or removed): "
+                        )
                         + (', '.join(delete_els) if delete_els else 'none specified')
                         + "\n\n"
                         "Project goal (overall target):\n"
@@ -1918,12 +1957,27 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                                 + ". Every other button (sin, cos, tan, log, ln, EXP, pi, digits, operators) must remain."
                             )
                         else:
-                            prompt += (
-                                "\n\nCRITICAL: Remove or redesign ONLY these targets: "
-                                + delete_list
-                                + ". Keep all other dashboard widgets unless listed."
-                            )
-                    prompt += "\n\nReturn the full HTML:"
+                            if active_scope_name in visual_redesign_scopes:
+                                prompt += (
+                                    "\n\nCRITICAL: Modify ONLY these marked targets for the current visual scope: "
+                                    + delete_list
+                                    + ". Do not remove them; change only color/shape/display/orientation as requested."
+                                )
+                            else:
+                                prompt += (
+                                    "\n\nCRITICAL: Remove or redesign ONLY these targets: "
+                                    + delete_list
+                                    + ". Keep all other dashboard widgets unless listed."
+                                )
+                    if marked_llm_context or ui_profile.get("llm_context_mode") == "patch":
+                        prompt += (
+                            "\n\nPATCH FRAGMENTS ONLY: apply scope changes to DELETE-marked "
+                            "targets; KEEP-marked elements must stay unchanged. "
+                            "Return a complete HTML document that preserves unmarked structure "
+                            "(minimal xpatch — do not replace the whole page)."
+                        )
+                    else:
+                        prompt += "\n\nReturn the full HTML:"
                     return prompt
 
                 def _apply_spatial_patch(html: str, delete_els: list) -> tuple[str | None, list]:
@@ -2228,7 +2282,11 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                             supports_llm_patch_scope,
                         )
 
-                        if not supports_llm_patch_scope(active_scope, project_kind):
+                        if not supports_llm_patch_scope(
+                            active_scope,
+                            project_kind,
+                            has_marks=bool(marked_llm_context),
+                        ):
                             return {}, [], None
                         if not cinema_has_offline_baseline(DIRECTORY):
                             return {}, [], None
@@ -2236,7 +2294,9 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                         return {}, [], _compact_llm_error(str(exc))
 
                     patch_source_html = current_html
-                    if ui_profile.get("llm_context_mode") == "patch":
+                    if marked_llm_context:
+                        patch_source_html = marked_llm_context
+                    elif ui_profile.get("llm_context_mode") == "patch":
                         try:
                             from nexu.cinema_http_preprocess import build_http_llm_context
 
@@ -2254,6 +2314,7 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                         user_goal=user_goal,
                         keep_els=keep_els,
                         delete_els=delete_els,
+                        context_fragment=marked_llm_context,
                     )
                     _ensure_api_key_env()
                     started = time.time()
@@ -2367,7 +2428,8 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                                     f"scope: #{active_scope}\n"
                                     f"goal: {user_goal or '(none)'}\n"
                                     f"keep: {', '.join(keep_els) if keep_els else 'none'}\n"
-                                    f"delete: {', '.join(delete_els) if delete_els else 'none'}\n"
+                                    f"change: {', '.join(delete_els) if delete_els else 'none'}\n"
+                                    f"hard_delete: {', '.join(hard_delete_els) if hard_delete_els else 'none'}\n"
                                     "contract: preserve baseline and change only the selected scope."
                                 ),
                                 output="\n".join(labels),
@@ -2381,6 +2443,60 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                             prompt="Local Intract-controlled option generation failed before LLM fallback.",
                             error=_compact_llm_error(str(exc)),
                             model="intract-local-patch",
+                        )
+                        return []
+
+                def _try_function_patch_options() -> list[str]:
+                    """Local #functions route: DOM patches from project IR, no full HTML LLM."""
+                    active_scope = (focus_scope or "").strip().lower()
+                    project_kind = str(ui_profile.get("kind") or "").lower()
+                    try:
+                        from nexu.cinema_dom_patch import (
+                            build_function_option_patches,
+                            build_function_patch_context,
+                            supports_function_patch,
+                        )
+
+                        if not supports_function_patch(active_scope, project_kind):
+                            return []
+                        started = time.time()
+                        files, labels, meta = build_function_option_patches(
+                            current_html,
+                            user_goal=user_goal,
+                            project_kind=project_kind,
+                            keep_els=keep_els,
+                            delete_els=delete_els,
+                        )
+                        if not files:
+                            _write_llm_trace(
+                                label="Intract function patch",
+                                prompt=build_function_patch_context(
+                                    current_html,
+                                    user_goal=user_goal,
+                                ),
+                                error=_compact_llm_error(str(meta)),
+                                model="intract-function-patch",
+                            )
+                            return []
+                        for filename, html in files.items():
+                            (DIRECTORY / filename).write_text(html, encoding="utf-8")
+                        _write_llm_trace(
+                            label="Intract function patch",
+                            prompt=build_function_patch_context(
+                                current_html,
+                                user_goal=user_goal,
+                            ),
+                            output="\n".join(labels),
+                            model="intract-function-patch",
+                            duration_ms=int((time.time() - started) * 1000),
+                        )
+                        return labels
+                    except Exception as exc:
+                        _write_llm_trace(
+                            label="Intract function patch",
+                            prompt="Local function patch generation failed before LLM fallback.",
+                            error=_compact_llm_error(str(exc)),
+                            model="intract-function-patch",
                         )
                         return []
 
@@ -2518,15 +2634,35 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                     else:
                         active_scope_for_route = (focus_scope or "").strip().lower()
                         project_kind_for_route = str(ui_profile.get("kind") or "").lower()
-                        prefer_local_scope = (
-                            project_kind_for_route in {"imported", "web"}
-                            and active_scope_for_route in {
-                                "colors",
-                                "shapes",
-                                "display",
-                                "orientation",
-                            }
-                        )
+                        prefer_local_scope = False
+                        try:
+                            from nexu.cinema_scope import (
+                                DASHBOARD_KINDS,
+                                IMPORTED_KINDS,
+                                can_use_offline_fast_iterate,
+                            )
+
+                            prefer_local_scope = can_use_offline_fast_iterate(
+                                active_scope_for_route,
+                                project_kind_for_route,
+                                DIRECTORY,
+                                force_llm=FORCE_LLM,
+                                fast_scope_options=FAST_SCOPE_OPTIONS,
+                            ) and (
+                                project_kind_for_route in IMPORTED_KINDS
+                                or project_kind_for_route in DASHBOARD_KINDS
+                            )
+                        except Exception:
+                            prefer_local_scope = (
+                                project_kind_for_route
+                                in {"imported", "web", "dashboard", "slice", "monitor", "ecosystem", "api", "mcp", "frontend"}
+                                and active_scope_for_route in {
+                                    "colors",
+                                    "shapes",
+                                    "display",
+                                    "orientation",
+                                }
+                            )
                         fast_labels = _try_intract_fast_options() if prefer_local_scope else []
                         if fast_labels:
                             options_written = fast_labels
@@ -2545,6 +2681,25 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                                 files=batch_files,
                                 labels=options_written,
                                 source="offline",
+                            )
+                        function_labels = [] if options_written else _try_function_patch_options()
+                        if function_labels:
+                            options_written = function_labels
+                            status_msg = 'proposed_options_by_intract_patch'
+                            llm_error = None
+                            from nexu.fast_delivery import read_option_files
+
+                            batch_files = read_option_files(DIRECTORY)
+                            _store_options_cache(
+                                stage_html=current_html,
+                                ledger=ledger_raw,
+                                focus_scope=focus_scope or "functions",
+                                goal=user_goal,
+                                keep_els=keep_els,
+                                delete_els=delete_els,
+                                files=batch_files,
+                                labels=options_written,
+                                source="function_patch",
                             )
                         patch_html, patch_labels, patch_err = (
                             ({}, [], None)
@@ -2591,45 +2746,60 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                                 labels=options_written,
                                 source="offline",
                             )
-                        elif not options_written and OPTION_GENERATION_MODE in {"batch", "single", "1"}:
-                            batch_html, batch_err = _call_llm_batch_options(option_variants)
-                            options_written = _write_option_files(batch_html)
-                            if options_written:
-                                status_msg = 'proposed_options_by_llm'
-                                llm_error = None
-                                _store_options_cache(
-                                    stage_html=current_html,
-                                    ledger=ledger_raw,
-                                    focus_scope=focus_scope or "functions",
-                                    goal=user_goal,
-                                    keep_els=keep_els,
-                                    delete_els=delete_els,
-                                    files=batch_html,
-                                    labels=options_written,
-                                    source="llm",
-                                )
-                            else:
-                                llm_error = batch_err
-                                status_msg = f'llm_failed: {llm_error or "No option HTML generated"}'
                         elif not options_written:
-                            parallel_html, parallel_err = _generate_parallel_options(option_variants)
-                            options_written = _write_option_files(parallel_html)
-                            if options_written:
-                                status_msg = 'proposed_options_by_llm'
-                                llm_error = None
-                                _store_options_cache(
-                                    stage_html=current_html,
-                                    ledger=ledger_raw,
-                                    focus_scope=focus_scope or "functions",
-                                    goal=user_goal,
-                                    keep_els=keep_els,
-                                    delete_els=delete_els,
-                                    files=parallel_html,
-                                    labels=options_written,
-                                    source="llm",
+                            from nexu.cinema_scope import should_block_full_html_iterate
+
+                            block_full_html = should_block_full_html_iterate(
+                                project_kind_for_route,
+                                keep_els,
+                                delete_els,
+                                focus_scope=focus_scope or "",
+                            )
+                            if block_full_html:
+                                status_msg = "llm_blocked_marks_require_patch"
+                                llm_error = (
+                                    "Marked fragments require patch/offline path; "
+                                    "full-page LLM skipped for imported/web projects."
                                 )
+                            elif OPTION_GENERATION_MODE in {"batch", "single", "1"}:
+                                batch_html, batch_err = _call_llm_batch_options(option_variants)
+                                options_written = _write_option_files(batch_html)
+                                if options_written:
+                                    status_msg = 'proposed_options_by_llm'
+                                    llm_error = None
+                                    _store_options_cache(
+                                        stage_html=current_html,
+                                        ledger=ledger_raw,
+                                        focus_scope=focus_scope or "functions",
+                                        goal=user_goal,
+                                        keep_els=keep_els,
+                                        delete_els=delete_els,
+                                        files=batch_html,
+                                        labels=options_written,
+                                        source="llm",
+                                    )
+                                else:
+                                    llm_error = batch_err
+                                    status_msg = f'llm_failed: {llm_error or "No option HTML generated"}'
                             else:
-                                status_msg = f'llm_failed: {parallel_err or "No option HTML generated"}'
+                                parallel_html, parallel_err = _generate_parallel_options(option_variants)
+                                options_written = _write_option_files(parallel_html)
+                                if options_written:
+                                    status_msg = 'proposed_options_by_llm'
+                                    llm_error = None
+                                    _store_options_cache(
+                                        stage_html=current_html,
+                                        ledger=ledger_raw,
+                                        focus_scope=focus_scope or "functions",
+                                        goal=user_goal,
+                                        keep_els=keep_els,
+                                        delete_els=delete_els,
+                                        files=parallel_html,
+                                        labels=options_written,
+                                        source="llm",
+                                    )
+                                else:
+                                    status_msg = f'llm_failed: {parallel_err or "No option HTML generated"}'
                 else:
                     iteration_mode = "active_workspace"
                     if delete_els:

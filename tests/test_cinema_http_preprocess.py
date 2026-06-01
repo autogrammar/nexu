@@ -10,8 +10,12 @@ import pytest
 from nexu.cinema_http_preprocess import (
     build_html_outline,
     build_http_llm_context,
+    ensure_http_preprocess_artifacts,
     extract_visual_css,
+    http_preprocess_artifacts_present,
+    load_cinema_seed_preprocess_artifacts,
     prepare_http_preview_html,
+    preprocess_cinema_seed,
     preprocess_http_import,
     sanitize_http_preview_html,
 )
@@ -69,6 +73,51 @@ def test_build_html_outline_smaller_than_source_and_strips_scripts() -> None:
     assert meta["outline_node_count"] >= 4
 
 
+def test_preprocess_cinema_seed_writes_artifacts_beside_stage0(tmp_path: Path) -> None:
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    (cinema / "stage0.html").write_text(SAMPLE_HTML, encoding="utf-8")
+
+    fields = preprocess_cinema_seed(cinema)
+
+    assert fields["llm_context_mode"] == "patch"
+    assert fields["visual_css_path"] == "nexu-visual.css"
+    assert fields["html_outline_path"] == "nexu-outline.html"
+    assert (cinema / "nexu-visual.css").is_file()
+    assert (cinema / "nexu-outline.html").is_file()
+    assert fields["visual_css_bytes"] > 0
+
+
+def test_load_cinema_ui_profile_includes_seed_preprocess(tmp_path: Path) -> None:
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    (cinema / "stage0.html").write_text(SAMPLE_HTML, encoding="utf-8")
+    preprocess_fields = preprocess_cinema_seed(cinema)
+    active = {"id": "web_app_dashboard", "kind": "dashboard", **preprocess_fields}
+    (cinema / "active_project.json").write_text(json.dumps(active), encoding="utf-8")
+
+    profile = load_cinema_ui_profile(active, cinema)
+
+    assert profile["llm_context_mode"] == "patch"
+    assert profile["visual_css"]
+    assert profile["html_outline"]
+    assert profile["ui_type"] == "dashboard"
+
+
+def test_load_cinema_seed_preprocess_artifacts_reads_active_metadata(tmp_path: Path) -> None:
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    (cinema / "stage0.html").write_text(SAMPLE_HTML, encoding="utf-8")
+    preprocess_fields = preprocess_cinema_seed(cinema)
+    active = {"id": "vertical_slice", "kind": "slice", **preprocess_fields}
+
+    artifacts = load_cinema_seed_preprocess_artifacts(cinema, active)
+
+    assert artifacts["llm_context_mode"] == "patch"
+    assert artifacts["visual_css"]
+    assert artifacts["html_outline"]
+
+
 def test_preprocess_http_import_writes_artifacts(tmp_path: Path) -> None:
     source = tmp_path / "source"
     source.mkdir()
@@ -87,6 +136,42 @@ def test_preprocess_http_import_writes_artifacts(tmp_path: Path) -> None:
     assert fields["outline_node_count"] >= 4
     outline = (source / "nexu-outline.html").read_text(encoding="utf-8")
     assert len(outline) < len(SAMPLE_HTML)
+
+
+def test_http_preprocess_artifacts_present_requires_files_and_patch_mode(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    source.mkdir()
+    (source / "index.html").write_text(SAMPLE_HTML, encoding="utf-8")
+    assert not http_preprocess_artifacts_present(source, {})
+
+    fields = preprocess_http_import(source)
+    meta = {"llm_context_mode": "patch", **fields}
+    assert http_preprocess_artifacts_present(source, meta)
+
+    (source / "nexu-visual.css").unlink()
+    assert not http_preprocess_artifacts_present(source, meta)
+
+
+def test_ensure_http_preprocess_artifacts_skips_when_present(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    source.mkdir()
+    (source / "index.html").write_text(SAMPLE_HTML, encoding="utf-8")
+    meta = preprocess_http_import(source)
+    assert ensure_http_preprocess_artifacts(source, meta=meta) == {}
+
+
+def test_ensure_http_preprocess_artifacts_regenerates_when_missing(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    source.mkdir()
+    (source / "index.html").write_text(SAMPLE_HTML, encoding="utf-8")
+    preprocess_http_import(source)
+    (source / "nexu-visual.css").unlink()
+    (source / "nexu-outline.html").unlink()
+
+    fields = ensure_http_preprocess_artifacts(source, meta={})
+    assert fields["llm_context_mode"] == "patch"
+    assert (source / "nexu-visual.css").is_file()
+    assert (source / "nexu-outline.html").is_file()
 
 
 def test_build_http_llm_context_combines_css_and_outline() -> None:
@@ -174,3 +259,20 @@ def test_prepare_http_preview_injects_network_shim() -> None:
     assert "nexu preview: block cross-origin fetch" in prepared
     assert "window.kadenceConfig" in prepared
     assert prepared.index("nexu preview: block cross-origin fetch") < prepared.lower().index("<link")
+
+
+def test_prepare_http_preview_with_shield_keeps_network_shim() -> None:
+    from nexu.cinema_scripts import inject_cinema_shield
+
+    prepared, _ = prepare_http_preview_html(LITESPEED_FIXTURE)
+    body = inject_cinema_shield(
+        prepared.replace(
+            "<body>",
+            '<body data-nexu-import-preview="http">',
+            1,
+        )
+    )
+    assert "nexu preview: block cross-origin fetch" in body
+    assert "const NEXU_PARAMS = new URLSearchParams" in body
+    assert "isHttpImportPreview" in body
+    assert "SELECTOR_HTTP" in body

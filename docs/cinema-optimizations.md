@@ -21,6 +21,11 @@ Tracking UX, performance, and routing improvements for the Cinema player and ser
 | P1 | Projects tab import (ZIP / Git / HTTP → Markpact) | done | `cinema_project_imports.py`; `/projects/import/*`; local `imported_projects/` |
 | P1 | HTTP import stage0 preview (base href + local CSS) | done | Fetched HTML in workspace iframe; Markpact README stays metadata |
 | P1 | HTTP import preprocess (visual CSS + HTML outline) | done | `cinema_http_preprocess.py`; `source/nexu-visual.css`, `source/nexu-outline.html`; `llm_context_mode: patch` |
+| P1 | Catalog/example seed preprocess on activation | done | `preprocess_cinema_seed`; `nexu-visual.css` + `nexu-outline.html` beside `stage0.html`; `active_project.json` patch mode |
+| P1 | HTTP import preview shield + marking selectors | done | `inject_cinema_shield` + `SELECTOR_HTTP` in `cinema_scripts.py`; preview shim preserved |
+| P1 | Marked-element LLM context (fragment iteration) | done | `cinema_marked_context.py`; `/iterate` prefers marked HTML/CSS over full page or scope block |
+| P0 | Goal modal on Editor activate only | done | Player skips auto-iterate when `goal_options_seeded`; Editor button opens goal flow |
+| P1 | Dashboard/slice offline-first routing | done | `prefer_local_scope` uses `DASHBOARD_KINDS` before LLM patch in `/iterate` |
 | P1 | HTTP import options/policy decoupled from calculator | done | stage0 clones to A–C; ledger reset; `is_calculator: false` in policy snapshot |
 | P0 | `focus_scope` on `lastIteration` + `/iterate` JSON response | done | Player export + server response |
 | P1 | Clearer player message when `llm_failed` on `#functions` | done | Points to nexu.yaml LLM config or visual scopes |
@@ -37,9 +42,40 @@ Tracking UX, performance, and routing improvements for the Cinema player and ser
 
 ## Scope routing (reference)
 
+```mermaid
+flowchart TD
+  iterate["/iterate request"] --> scope{"focus_scope?"}
+  scope -->|"#functions or calculator #keypad layout"| llm["LLM only"]
+  scope -->|"#colors #shapes #display #orientation"| dash{"dashboard / slice / imported?"}
+  dash -->|yes| offline["prefer_local_scope: cache → offline → LLM patch"]
+  dash -->|calculator visual| offline
+  offline --> llm
+  scope -->|force_llm or no baseline| llm
+```
+
+| Route | Scopes | Order |
+|-------|--------|-------|
+| LLM only | `#functions` (all kinds); calculator `#keypad` layout changes | LLM |
+| Offline-first | `#colors`, `#shapes`, `#display`, `#orientation`; dashboard/slice/imported visual scopes | cache → offline (~10–50 ms) → LLM CSS patch → full LLM |
+| Patch context | HTTP imports + catalog seeds with preprocess artifacts | compact `nexu-visual.css` + `nexu-outline.html` instead of full `stage0.html` |
+
 - **LLM only:** `#functions` (all kinds); `#keypad` on calculator when changing control layout.
 - **Cache / LLM patch / offline first:** `#colors`, `#shapes`, `#display`, `#orientation`; calculator `#keypad` for palette/geometry patches.
 - Override: `cinema.force_llm: true` skips offline; `cinema.fast_scope_options: false` disables the local fast path; `cinema.llm_patch_options: false` disables the compact LLM CSS patch path.
+
+## Marked-element fragment iteration (2026-06)
+
+When the player sends KEEP/DELETE marks (`annotations` + optional `selected_fragments` from the shield iframe):
+
+1. **Player:** left-click/drag = KEEP (green), right-click/drag = DELETE (red). Each mark triggers `scheduleAutoIteration('mark')` with a shorter debounce (`FRAGMENT_ITERATE_MS`). Marks can start iteration even when a project goal is still pending.
+2. **Server:** `resolve_marked_llm_context` extracts each marked element's HTML subtree plus CSS rules matching its id/classes. When `llm_context_mode: patch`, visual CSS from `nexu-visual.css` is filtered to marked selectors; client-side fragments fill gaps when HTTP preview selectors miss an element.
+3. **Prompt precedence:** marked context overrides scoped page fragments and full-page patch context for both full LLM and LLM CSS patch paths. When marks exist on imported/web/dashboard projects, full-page LLM generation is blocked (`should_block_full_html_iterate`); routes fall through to offline scope CSS, LLM CSS patch, or local `#functions` DOM patch (`cinema_dom_patch.py`).
+4. **Scope semantics:**
+   - **KEEP (green):** element stays as-is in Options A–C (visual scopes skip global CSS when only KEEP marks are present; offline CSS is scoped to DELETE targets only).
+   - **DELETE (red):** scope-dependent change — `#functions` removes/redesigns DOM; `#colors` / `#shapes` / `#display` / `#orientation` restyle marked fragments only (no spatial delete on visual scopes).
+5. **Scope availability:** `cinema_scope.SCOPE_IDS_BY_KIND` — calculator adds `#keypad`; dashboard/slice/imported/web share `#functions` + visual layers; api/mcp omit `#orientation`. Player `allowedScopeIdsForKind` mirrors this set.
+
+Re-run `make cinema-restart` after template changes so generated `server.py` picks up the routing.
 
 ## semcod/wronai fit check
 
@@ -127,6 +163,16 @@ When you import a website via **HTTP URL**, Nexu:
 **Re-activate** an existing HTTP import from the Projects tab to rebuild stage0 and Options A–C from stored `source/index.html` without re-fetching. If you iterated before this fix, delete stale `alt_*.html` or re-activate to replace calculator pollution. **Re-import** after `make cinema-restart` to generate preprocess artifacts for imports created before this feature.
 
 **Limitations:** cross-origin CDN assets may still fail in the iframe; JavaScript (cookie banners, SPAs) may not run fully; only the initial HTML snapshot is stored (not a full crawl). Re-import after code changes to refresh the snapshot. **Preview network isolation:** stage0/alt HTML strips live-site scripts and injects a head shim that blocks cross-origin `fetch`/XHR so local cinema origin does not hit CORS errors (CSS/images still load via `<base href>`).
+
+## Catalog / example seed preprocess (2026-06)
+
+When you activate a built-in catalog project (dashboard, monitor, vertical slice, …), Nexu now:
+
+1. Writes or copies `stage0.html` (and options) as before.
+2. Extracts **visual CSS** and an **HTML outline** from `stage0.html` into `cinema/nexu-visual.css` and `cinema/nexu-outline.html`.
+3. Records `llm_context_mode: "patch"` and byte counts in `active_project.json`.
+
+`/iterate` and the LLM CSS patch path then use the compact artifacts (same as HTTP imports) instead of sending the full seed HTML on every request. Re-activate a catalog project to regenerate artifacts after seed HTML changes.
 
 ## Workspace layout (`.nexu`)
 

@@ -31,8 +31,10 @@ quality: test docs-links quality-intract quality-redup
 		src/nexu/cinema_html.py \
 		src/nexu/cinema_html_validate.py \
 		src/nexu/cinema_llm_contracts.py \
-		src/nexu/cinema_markpact.py \
-		src/nexu/cinema_project_imports.py \
+	src/nexu/cinema_markpact.py \
+	src/nexu/cinema_dom_patch.py \
+	src/nexu/cinema_project_ir.py \
+	src/nexu/cinema_project_imports.py \
 		src/nexu/cinema_projects.py \
 		src/nexu/cinema_scripts.py \
 		src/nexu/cinema_publish.py \
@@ -49,8 +51,10 @@ quality: test docs-links quality-intract quality-redup
 		tests/test_cinema_server.py \
 		tests/test_cinema_baseline_contracts.py \
 		tests/test_cinema_goal_contracts.py \
-		tests/test_cinema_markpact.py \
-		tests/test_cinema_project_imports.py \
+	tests/test_cinema_markpact.py \
+	tests/test_cinema_dom_patch.py \
+	tests/test_cinema_project_ir.py \
+	tests/test_cinema_project_imports.py \
 		tests/test_cinema_projects.py \
 		tests/test_cinema_scripts.py \
 		tests/test_cinema_publish.py \

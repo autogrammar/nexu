@@ -42,6 +42,10 @@ def test_activate_example_project_seeds_when_no_source(tmp_path: Path):
     assert "app-shell" in html
     assert "calc-body" not in html
     assert "data-nexu-target" in html
+    active = json.loads((cinema / "active_project.json").read_text(encoding="utf-8"))
+    assert active["llm_context_mode"] == "patch"
+    assert (cinema / "nexu-visual.css").is_file()
+    assert (cinema / "nexu-outline.html").is_file()
 
 
 def test_activate_frontend_view_seeds_selectable_web_gui(tmp_path: Path):

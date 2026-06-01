@@ -66,6 +66,8 @@ def test_render_server_script_embeds_runtime_context() -> None:
     assert "LLM_PATCH_OPTIONS" in script
     assert "_try_intract_fast_options" in script
     assert "_try_llm_patch_options" in script
+    assert "_try_function_patch_options" in script
+    assert "build_function_option_patches" in script
     assert "_call_llm_batch_options" in script
     assert "_generate_parallel_options" in script
     assert 'OPTION_GENERATION_MODE in {"batch", "single", "1"}' in script
@@ -76,6 +78,7 @@ def test_render_server_script_embeds_runtime_context() -> None:
     assert "ThreadPoolExecutor" in script
     assert '"llx"' not in script
     assert "proposed_options_offline" in script
+    assert "proposed_options_by_intract_patch" in script
     assert "proposed_options_cached" in script
     assert "proposed_options_by_llm_patch" in script
     assert "supports_llm_patch_scope" in script
@@ -203,6 +206,17 @@ def test_cinema_player_template_is_externalized() -> None:
     assert "onclick='event.stopPropagation(); deleteProject(${idJson})'" in html
     assert "function deleteImportedProject(projectId)" in html
     assert "/projects/delete" in html
+    assert "function promptForRequiredGoalOnEditor" in html
+    assert "if (mainTab !== 'editor') return" in html
+    assert "iterationAllowedWithoutGoal" in html
+    assert "FRAGMENT_ITERATE_MS" in html
+    assert "skipEditorSwitch: !httpImport" in html
+    assert "const needsGoal = activeProjectRequiresGoal()" in html
+    assert "selected_fragments: selectedFragmentsPayload()" in html
+    assert "function selectedFragmentsPayload()" in html
+    assert "function scopeMarkLabel" in html
+    assert "attachIframeSyncHandlers" in html
+    assert "syncAllIframeVisuals(true)" in html
 
 
 def test_render_server_script_embeds_project_import_routes() -> None:
@@ -221,6 +235,13 @@ def test_render_server_script_embeds_project_import_routes() -> None:
     assert "def _import_project_http(" in script
     assert "import_project_from_http" in script
     assert "prefer_local_scope" in script
+    assert "DASHBOARD_KINDS" in script
+    assert "can_use_offline_fast_iterate" in script
+    assert "resolve_marked_llm_context" in script
+    assert "selected_fragments = data.get('selected_fragments')" in script
+    assert "hard_delete_els" in script
+    assert "REDESIGN these marked fragments within the selected scope" in script
+    assert "should_block_full_html_iterate" in script
     assert "delete_workspace_project" in script
 
 
@@ -344,6 +365,126 @@ def test_iterate_colors_scope_uses_offline_path(tmp_path: Path) -> None:
             proc.wait(timeout=3)
         except subprocess.TimeoutExpired:
             proc.kill()
+
+
+def test_iterate_dashboard_kinds_colors_prefers_offline_before_llm(
+    tmp_path: Path,
+) -> None:
+    """Dashboard-family kinds should use offline path before LLM patch (like imported/web)."""
+    for kind, project_id in (
+        ("dashboard", "web_app_dashboard"),
+        ("slice", "web_app_slice"),
+    ):
+        cinema = tmp_path / f"cinema_{kind}"
+        cinema.mkdir()
+        workspace = tmp_path / f"workspace_{kind}"
+        workspace.mkdir()
+        (workspace / "nexu.yaml").write_text(
+            "\n".join(
+                [
+                    "project:",
+                    "  name: demo",
+                    "cinema:",
+                    "  fast_scope_options: true",
+                    "  force_llm: false",
+                    "  llm_patch_options: true",
+                    "",
+                ]
+            ),
+            encoding="utf-8",
+        )
+        cap = workspace / ".nexu" / "capsules" / "demo"
+        (cap / "src").mkdir(parents=True)
+        (cap / "src" / "app.py").write_text("# demo\n", encoding="utf-8")
+        (cap / "policy.json").write_text('{"keep":[],"delete":[]}', encoding="utf-8")
+        (cinema / "active_project.json").write_text(
+            json.dumps({"id": project_id, "kind": kind, "title": kind.title()}),
+            encoding="utf-8",
+        )
+        stage_html = (
+            "<!DOCTYPE html><html><head></head><body>"
+            "<div class='app-shell kpi-grid'><section class='kpi-card'>"
+            "Revenue</section></div></body></html>"
+        )
+        for name in ("stage0.html", "stage1.html", "stage2.html"):
+            (cinema / name).write_text(stage_html, encoding="utf-8")
+        (cinema / "intract_policy_ledger.json").write_text("[]", encoding="utf-8")
+        write_cinema_nexu_hooks(cinema, workspace, "demo")
+        llm = LLMConfig(allow_network_calls=True, model=CINEMA_LLM_MODEL)
+        cinema_cfg = CinemaConfig(
+            force_llm=False,
+            fast_scope_options=True,
+            llm_patch_options=True,
+            options_cache=False,
+        )
+        (cinema / "server.py").write_text(
+            _render_server_script(workspace, "demo", llm, cinema_cfg, sys.executable),
+            encoding="utf-8",
+        )
+
+        port = _free_port()
+        nexu_src = str(Path(nexu.__file__).resolve().parent.parent)
+        proc = subprocess.Popen(
+            [sys.executable, str(cinema / "server.py"), str(port)],
+            cwd=cinema,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            env={**os.environ, "PYTHONPATH": nexu_src},
+        )
+        try:
+            deadline = time.time() + 8.0
+            while time.time() < deadline:
+                try:
+                    conn = HTTPConnection("127.0.0.1", port, timeout=0.5)
+                    conn.request("GET", "/llm/status")
+                    conn.getresponse().read()
+                    conn.close()
+                    break
+                except OSError:
+                    time.sleep(0.05)
+            else:
+                raise AssertionError("cinema server did not start")
+
+            body = json.dumps(
+                {
+                    "iteration_mode": "goal_options",
+                    "focus_scope": "colors",
+                    "focus_scope_label": "#colors",
+                    "current_stage": 0,
+                    "prompt": "",
+                    "annotations": [],
+                    "force_refresh": True,
+                }
+            ).encode("utf-8")
+            conn = HTTPConnection("127.0.0.1", port, timeout=10.0)
+            conn.request(
+                "POST",
+                "/iterate",
+                body=body,
+                headers={
+                    "Content-Type": "application/json",
+                    "Content-Length": str(len(body)),
+                },
+            )
+            resp = conn.getresponse()
+            payload = json.loads(resp.read().decode("utf-8"))
+            conn.close()
+
+            assert resp.status == 200, kind
+            assert payload["status"] == "proposed_options_offline", (
+                f"{kind}: expected offline before LLM patch, got {payload['status']}"
+            )
+            assert payload["focus_scope"] == "colors"
+            assert len(payload.get("options_written") or []) == 3
+            alt_a = (cinema / "alt_a.html").read_text(encoding="utf-8")
+            assert "nexu-scope-variant" in alt_a
+            assert "colors:" in " ".join(payload["options_written"]).lower()
+        finally:
+            proc.terminate()
+            try:
+                proc.wait(timeout=3)
+            except subprocess.TimeoutExpired:
+                proc.kill()
 
 
 def test_iterate_colors_scope_uses_llm_patch_when_available(tmp_path: Path) -> None:

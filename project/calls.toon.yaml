@@ -1,49 +1,49 @@
 # code2llm call graph | /home/tom/github/semcod/nexu
-# generated in 0.16s
-# nodes: 339 | edges: 500 | modules: 60
+# generated in 0.30s
+# nodes: 359 | edges: 500 | modules: 64
 # CC̄=4.8
 
 HUBS[20]:
+  examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler.do_GET
+    CC=34  in:0  out:183  total:183
   scripts.ci-cinema-smoke.print
     CC=0  in:94  out:0  total:94
   src.nexu.config.load_config
     CC=14  in:5  out:76  total:81
   src.nexu.intract.read_manifest_contracts
     CC=12  in:8  out:32  total:40
-  src.nexu.cinema_goal_contracts.propose_goal_extension_contracts
-    CC=37  in:1  out:38  total:39
-  src.nexu.cinema_offline_options.write_goal_options_offline
-    CC=37  in:1  out:38  total:39
   examples.web_app_pactown_ecosystem.run.main
     CC=8  in:0  out:39  total:39
   examples.web_app_event_monitor.run.main
     CC=13  in:0  out:37  total:37
+  src.nexu.cinema_scripts.apply_spatial_deletes_to_html
+    CC=4  in:7  out:29  total:36
   src.nexu.cinema.build_intract_policy_snapshot
     CC=11  in:4  out:32  total:36
-  src.nexu.cinema_scripts.apply_spatial_deletes_to_html
-    CC=4  in:6  out:29  total:35
   examples.web_app_dashboard.run.main
     CC=2  in:0  out:35  total:35
-  src.nexu.cinema_projects.activate_example_project
-    CC=18  in:3  out:32  total:35
   src.nexu.report.build_capsule_report
     CC=1  in:2  out:32  total:34
   src.nexu.paths.project_root
     CC=1  in:29  out:3  total:32
   src.nexu.cinema_server._render_server_script
     CC=1  in:1  out:31  total:32
-  src.nexu.cinema_publish.start_published_service
-    CC=17  in:2  out:29  total:31
   src.nexu.capsule.create_capsule
     CC=8  in:7  out:24  total:31
-  src.nexu.cinema_llm._extract_content
-    CC=16  in:1  out:29  total:30
   src.nexu.orchestrate.build_capsule_orchestration
     CC=2  in:2  out:28  total:30
-  src.nexu.cinema_markpact.build_markpact_readme
-    CC=18  in:2  out:26  total:28
-  src.nexu.cinema_html_validate.validate_css_safety
-    CC=14  in:2  out:26  total:28
+  src.nexu.cinema_llm._extract_content
+    CC=16  in:1  out:29  total:30
+  examples.run_examples.run_example
+    CC=2  in:1  out:26  total:27
+  src.nexu.verify.verify_capsule
+    CC=1  in:0  out:26  total:26
+  src.nexu.cinema_baseline_contracts.ensure_capsule_intract_yaml
+    CC=9  in:1  out:25  total:26
+  src.nexu.paths.capsule_dir
+    CC=1  in:25  out:1  total:26
+  src.nexu.review.build_review_packet
+    CC=5  in:2  out:24  total:26
 
 MODULES:
   examples.nexu_markpact_exporter  [1 funcs]
@@ -69,6 +69,17 @@ MODULES:
     effective_ui_constraints  CC=1  out:1
     export_markpact_readme  CC=2  out:5
     goal_contract_lines  CC=1  out:1
+  examples.web_app_calculator.cinema.server  [38 funcs]
+    do_DELETE  CC=9  out:23
+    do_GET  CC=34  out:183
+    _append_policy_entry  CC=2  out:2
+    _append_policy_entry_legacy  CC=3  out:12
+    _compact_html_for_llm  CC=1  out:4
+    _compact_llm_error  CC=2  out:4
+    _compact_markpact_for_llm  CC=3  out:10
+    _delete_imported_project  CC=2  out:1
+    _effective_markpact_mode  CC=1  out:7
+    _effective_ui_constraints_from_ledger  CC=17  out:16
   examples.web_app_calculator.run  [1 funcs]
     main  CC=2  out:23
   examples.web_app_dashboard.run  [1 funcs]
@@ -77,6 +88,15 @@ MODULES:
     main  CC=13  out:37
   examples.web_app_pactown_ecosystem.run  [1 funcs]
     main  CC=8  out:39
+  scripts.check-doc-links  [8 funcs]
+    _anchors  CC=3  out:6
+    _is_external  CC=3  out:4
+    _markdown_files  CC=4  out:4
+    _resolve  CC=1  out:5
+    _slug  CC=1  out:5
+    _targets  CC=1  out:2
+    check_links  CC=12  out:21
+    main  CC=3  out:7
   scripts.ci-cinema-smoke  [1 funcs]
     print  CC=0  out:0
   src.nexu.blueprint  [1 funcs]
@@ -105,13 +125,8 @@ MODULES:
     ensure_capsule_intract_yaml  CC=9  out:25
     is_calculator_capsule  CC=5  out:5
     merge_calculator_baselines  CC=5  out:5
-  src.nexu.cinema_goal_contracts  [6 funcs]
-    _goal_contract_dict  CC=6  out:15
-    _hints_text  CC=3  out:6
-    _slug  CC=2  out:4
-    goal_traits_from_contract_lines  CC=2  out:2
-    is_chemical_goal  CC=2  out:2
-    propose_goal_extension_contracts  CC=37  out:38
+  src.nexu.cinema_goal_contracts  [1 funcs]
+    propose_goal_extension_contracts  CC=15  out:17
   src.nexu.cinema_history  [13 funcs]
     _build_label  CC=4  out:7
     _copy_checkpoint_files  CC=3  out:3
@@ -126,8 +141,19 @@ MODULES:
   src.nexu.cinema_html  [1 funcs]
     ensure_html_document_closure  CC=5  out:3
   src.nexu.cinema_html_validate  [2 funcs]
+    filter_valid_option_batch  CC=9  out:6
     prepare_cinema_html_document  CC=2  out:2
-    validate_css_safety  CC=14  out:26
+  src.nexu.cinema_http_preprocess  [19 funcs]
+    _extract_inline_css  CC=4  out:4
+    _extract_stylesheet_hrefs  CC=7  out:4
+    _filter_visual_css  CC=3  out:4
+    _normalize_linked_paths  CC=9  out:9
+    _rule_is_visual  CC=7  out:8
+    _safe_read_under  CC=5  out:7
+    _script_src_allowed_for_preview  CC=4  out:5
+    _should_remove_preview_script  CC=2  out:3
+    _split_css_rules  CC=9  out:6
+    _write_preprocess_artifacts  CC=4  out:10
   src.nexu.cinema_llm  [17 funcs]
     _as_plain_data  CC=5  out:4
     _cached_config  CC=4  out:4
@@ -139,32 +165,16 @@ MODULES:
     _strip_markdown_fences  CC=8  out:11
     _strip_rich_console_artifacts  CC=7  out:14
     call_cinema_html_llm  CC=12  out:8
-  src.nexu.cinema_llm_contracts  [6 funcs]
-    _compact  CC=3  out:5
-    _line  CC=4  out:10
-    _slug  CC=2  out:3
-    build_llm_communication_contract_lines  CC=15  out:19
+  src.nexu.cinema_llm_contracts  [1 funcs]
     build_llm_contract_block  CC=2  out:2
-    build_llm_option_variants  CC=4  out:6
-  src.nexu.cinema_markpact  [3 funcs]
-    _escape_markdown_fence  CC=2  out:1
-    build_markpact_readme  CC=18  out:26
+  src.nexu.cinema_markpact  [2 funcs]
+    build_markpact_readme  CC=11  out:21
     markpact_download_filename  CC=2  out:2
-  src.nexu.cinema_offline_options  [24 funcs]
-    _active_is_imported  CC=5  out:7
-    _active_project_meta  CC=4  out:5
-    _btn  CC=3  out:1
-    _chemical_shell  CC=2  out:2
-    _cinema_is_calculator  CC=12  out:12
-    _delete_without_keeps  CC=3  out:2
-    _expanded_excess_row  CC=8  out:6
-    _inject_goal_banner  CC=4  out:5
-    _keep_ids_lower  CC=3  out:2
-    _mandatory_trig  CC=3  out:1
-  src.nexu.cinema_options_cache  [4 funcs]
+  src.nexu.cinema_options_cache  [5 funcs]
     _digest  CC=2  out:4
     goal_slug  CC=4  out:5
     options_cache_key  CC=7  out:16
+    read_options_cache  CC=9  out:12
     write_options_cache  CC=5  out:14
   src.nexu.cinema_policy  [37 funcs]
     _build_constraint_result  CC=5  out:4
@@ -179,41 +189,33 @@ MODULES:
     append_goal_ledger_entry  CC=7  out:13
   src.nexu.cinema_project_imports  [8 funcs]
     activate_imported_project  CC=4  out:6
-    delete_imported_project  CC=16  out:22
+    delete_imported_project  CC=12  out:14
     import_git_project  CC=11  out:16
     import_http_project  CC=7  out:21
     import_zip_project  CC=5  out:13
     imported_project_llm_log  CC=8  out:14
     merged_projects_catalog  CC=10  out:13
     read_imported_markpact  CC=9  out:17
+  src.nexu.cinema_project_ir  [4 funcs]
+    _classify_node  CC=12  out:10
+    handle_data  CC=4  out:2
+    handle_endtag  CC=8  out:11
+    _clean_text  CC=2  out:3
   src.nexu.cinema_projects  [3 funcs]
-    activate_example_project  CC=18  out:32
+    activate_example_project  CC=2  out:13
     find_nexu_repo_root  CC=5  out:4
     load_active_project  CC=4  out:4
-  src.nexu.cinema_publish  [21 funcs]
-    _allocate_service_port  CC=11  out:11
-    _create_service_entry  CC=3  out:2
-    _generate_markpact_export  CC=1  out:5
-    _handle_existing_service  CC=7  out:8
-    _http_ok  CC=2  out:1
-    _load_registry  CC=3  out:6
-    _pick_port  CC=4  out:2
-    _port_open  CC=2  out:1
-    _prepare_service_directory  CC=1  out:4
-    _refresh_service_status  CC=3  out:1
-  src.nexu.cinema_scope  [6 funcs]
-    inject_scope_style  CC=11  out:14
-    normalize_focus_scope  CC=3  out:5
-    scope_option_variants  CC=11  out:1
-    scoped_html_fragment  CC=6  out:7
-    strip_scope_style  CC=2  out:1
-    ui_type_for_kind  CC=11  out:4
-  src.nexu.cinema_scripts  [6 funcs]
-    _delete_match_keys  CC=4  out:11
-    _element_delete_candidates  CC=6  out:8
+  src.nexu.cinema_publish  [4 funcs]
+    list_published_services  CC=3  out:6
+    publish_project_service  CC=6  out:16
+    start_published_service  CC=15  out:20
+    stop_published_service  CC=9  out:11
+  src.nexu.cinema_scope  [2 funcs]
+    load_cinema_ui_profile  CC=10  out:15
+    scope_supports_offline_fast_path  CC=1  out:2
+  src.nexu.cinema_scripts  [3 funcs]
     apply_spatial_deletes_to_html  CC=4  out:29
     finalize_cinema_html  CC=6  out:6
-    repair_cinema_html_files  CC=5  out:8
     write_cinema_inject_files  CC=1  out:3
   src.nexu.cinema_server  [7 funcs]
     _available_port  CC=4  out:8
@@ -231,16 +233,6 @@ MODULES:
     text_metrics  CC=3  out:6
     trace_slug  CC=3  out:3
     write_llm_trace  CC=8  out:18
-  src.nexu.cinema_ui_patch  [9 funcs]
-    _compact_html  CC=3  out:4
-    _css_for  CC=2  out:4
-    _label_for  CC=4  out:5
-    _safe_css  CC=9  out:11
-    _strip_json_fence  CC=3  out:5
-    apply_ui_patch_options  CC=9  out:15
-    build_ui_patch_prompt  CC=8  out:4
-    parse_ui_patch_response  CC=6  out:11
-    supports_llm_patch_scope  CC=1  out:1
   src.nexu.cli  [22 funcs]
     _print_yaml  CC=1  out:3
     _relative_to_root  CC=1  out:2
@@ -259,6 +251,15 @@ MODULES:
   src.nexu.export_prompt  [2 funcs]
     _cinema_policy_ledger_block  CC=12  out:13
     export_iteration_prompt  CC=3  out:18
+  src.nexu.fast_delivery.context  [3 funcs]
+    compact_html_for_llm  CC=3  out:6
+    compact_markpact_for_llm  CC=9  out:12
+    effective_markpact_mode  CC=8  out:7
+  src.nexu.fast_delivery.options  [4 funcs]
+    _compatible_with_stage  CC=5  out:4
+    _looks_like_calculator  CC=4  out:2
+    read_cached_options  CC=11  out:17
+    store_options_cache  CC=3  out:4
   src.nexu.files  [4 funcs]
     collect_files  CC=8  out:8
     is_text_file  CC=2  out:1
@@ -293,8 +294,17 @@ MODULES:
     call_litellm_json  CC=8  out:13
     call_litellm_review  CC=2  out:3
     offline_review_from_status  CC=4  out:0
-  src.nexu.mcp_server  [1 funcs]
-    run_mcp_stdio  CC=6  out:7
+  src.nexu.mcp_server  [12 funcs]
+    _apply_promotion_from_mcp  CC=1  out:2
+    _prompt_get  CC=3  out:3
+    _prompts_list  CC=1  out:0
+    _read_resource  CC=6  out:11
+    _resource_list  CC=2  out:2
+    _result_content  CC=1  out:1
+    _rpc_handlers  CC=3  out:15
+    _rpc_initialize  CC=1  out:1
+    _tool_map  CC=2  out:2
+    call_tool  CC=3  out:2
   src.nexu.orchestrate  [6 funcs]
     _contract_dicts  CC=2  out:0
     _render_orchestration_markdown  CC=9  out:22

@@ -2152,10 +2152,13 @@
                 const tabEditor = document.getElementById('tab-editor');
                 if (tabEditor) tabEditor.disabled = false;
                 updateProjectActiveBar();
-                const tab = bootTab === 'projects' || bootTab === 'services' ? bootTab : 'editor';
+                const needsGoal = activeProjectRequiresGoal();
+                const tab = needsGoal
+                    ? 'editor'
+                    : (bootTab === 'projects' || bootTab === 'services' ? bootTab : 'editor');
                 switchMainTab(tab, { skipLog: true });
-                if (activeProjectRequiresGoal()) {
-                    maybePromptForImportedGoal();
+                if (needsGoal) {
+                    promptForRequiredGoalOnEditor({ quiet: true });
                 }
             };
             const activateBootProject = () => {
@@ -2257,6 +2260,7 @@
         }
 
         function showGoalPromptModal() {
+            if (mainTab !== 'editor') return;
             const backdrop = document.getElementById('goal-prompt-modal-backdrop');
             const input = document.getElementById('goal-prompt-input');
             if (input) input.value = '';
@@ -2281,7 +2285,8 @@
             setProjectGoal();
         }
 
-        function maybePromptForImportedGoal() {
+        function promptForRequiredGoalOnEditor(opts) {
+            const options = opts || {};
             if (!activeProjectRequiresGoal()) {
                 requireGoalPrompt = false;
                 return;
@@ -2291,7 +2296,13 @@
             pendingGoalOptions = false;
             updateWorkflowUI();
             updatePromptBox();
-            showGoalPromptModal();
+            const openModal = () => showGoalPromptModal();
+            if (mainTab !== 'editor') {
+                switchMainTab('editor', { skipLog: !!options.quiet });
+                requestAnimationFrame(() => requestAnimationFrame(openModal));
+            } else {
+                openModal();
+            }
         }
 
         function currentUserGoal() {
@@ -2681,7 +2692,12 @@
             activeProjectId = project.id || activeProjectId;
             loadProjectsCatalog().then(() => {
                 if (project.id) {
-                    activateProject(project.id, { skipEditorSwitch: true, quiet: true });
+                    const rec = projectCatalog.find(p => p.id === project.id) || project;
+                    const httpImport = !!(rec.imported && rec.import_kind === 'http');
+                    activateProject(project.id, {
+                        skipEditorSwitch: !httpImport,
+                        quiet: true,
+                    });
                 }
             });
             addChatLog('system', `📦 <strong>Imported:</strong> ${project.title || project.id} — Markpact migration ready. Use ⬇ Markpact or 🚀 Publish.`);
@@ -3045,7 +3061,9 @@
                 updateProjectActiveBar();
                 refreshIntractPolicy();
                 if (requireGoalPrompt) {
-                    showGoalPromptModal();
+                    if (!options.skipEditorSwitch) {
+                        promptForRequiredGoalOnEditor({ quiet: options.quiet });
+                    }
                 } else if (boot.status !== 'goal_options_seeded') {
                     scheduleAutoIteration('project_activate');
                 }
@@ -3176,6 +3194,8 @@
             document.getElementById('alt-c-frame').src = frameUrl('alt_c.html', { role: 'option', pane: 'c', mark: 0, calc: calc, review: 0, t: t });
             logEvent('FRAMES_RELOAD', ws);
             updatePlayerUrl();
+            lastIframeSyncKey = '';
+            setTimeout(() => syncAllIframeVisuals(true), 120);
         }
 
         function restoreHistoryCheckpoint(checkpointId) {
@@ -3423,14 +3443,21 @@
         let pendingAutoIterate = false;
         let autoIterateTimer = null;
         const AUTO_ITERATE_MS = 420;
+        const FRAGMENT_ITERATE_MS = 280;
+
+        function iterationAllowedWithoutGoal() {
+            return annotations.length > 0 || elementHints.length > 0;
+        }
 
         function scheduleAutoIteration(reason) {
+            if (requireGoalPrompt && !projectGoal && !iterationAllowedWithoutGoal()) return;
             if (autoIterateTimer) clearTimeout(autoIterateTimer);
+            const delay = reason === 'mark' ? FRAGMENT_ITERATE_MS : AUTO_ITERATE_MS;
             autoIterateTimer = setTimeout(() => {
                 autoIterateTimer = null;
                 if (resolveIterationMode() === 'none') return;
                 runLiveIteration({ auto: true, reason: reason || 'activity' });
-            }, AUTO_ITERATE_MS);
+            }, delay);
         }
 
         // Ultimate cross-origin postMessage listener
@@ -3452,7 +3479,7 @@
             }
 
             if (e.data.type === 'annotation') {
-                handleAnnotation(e.data.elementId, e.data.action);
+                handleAnnotation(e.data.elementId, e.data.action, e.data.fragment);
             }
             
             if (e.data.type === 'promote') {
@@ -3612,7 +3639,50 @@
             updatePlayerUrl();
         }
 
-        function handleAnnotation(elementId, type) {
+        function sanitizeAnnotationFragment(fragment) {
+            if (!fragment || typeof fragment !== 'object') return null;
+            const limit = (value, max) => String(value || '').replace(/\s+/g, ' ').trim().slice(0, max);
+            const rect = fragment.rect && typeof fragment.rect === 'object' ? fragment.rect : {};
+            return {
+                id: limit(fragment.id, 120),
+                tag: limit(fragment.tag, 40),
+                className: limit(fragment.className, 240),
+                text: limit(fragment.text, 700),
+                html: limit(fragment.html, 3000),
+                rect: {
+                    x: Math.round(Number(rect.x) || 0),
+                    y: Math.round(Number(rect.y) || 0),
+                    width: Math.round(Number(rect.width) || 0),
+                    height: Math.round(Number(rect.height) || 0),
+                },
+            };
+        }
+
+        function scopeMarkLabel(type) {
+            if (type === 'KEEP') return 'keep / preserve';
+            const scope = (currentFocusScope || 'functions').toLowerCase();
+            if (scope === 'colors') return 'recolor / change palette';
+            if (scope === 'shapes') return 'reshape / change form';
+            if (scope === 'display') return 'change display / hierarchy';
+            if (scope === 'orientation') return 'move / change layout';
+            if (scope === 'keypad') return 'change key/control';
+            return 'remove / change function';
+        }
+
+        function selectedFragmentsPayload() {
+            return annotations
+                .filter(a => a.fragment)
+                .slice(-16)
+                .map(a => ({
+                    id: a.id,
+                    type: a.type,
+                    scope: a.scope || currentFocusScope,
+                    action: scopeMarkLabel(a.type),
+                    fragment: sanitizeAnnotationFragment(a.fragment),
+                }));
+        }
+
+        function handleAnnotation(elementId, type, fragment) {
             if (pendingGoalOptions && !workspaceEngaged) {
                 logEvent('ANNOTATE_PRE_OPTIONS', { elementId: elementId, type: type });
             }
@@ -3621,7 +3691,14 @@
                 annotations.splice(existingIdx, 1);
             }
 
-            const entry = { id: elementId, type: type, at: new Date().toISOString(), stage: activeStage };
+            const entry = {
+                id: elementId,
+                type: type,
+                at: new Date().toISOString(),
+                stage: activeStage,
+                scope: currentFocusScope,
+                fragment: sanitizeAnnotationFragment(fragment),
+            };
             annotations.push(entry);
             annotationHistory.push(entry);
 
@@ -3632,7 +3709,7 @@
             if (type === 'KEEP') {
                 addChatLog('hint', `✓ <strong>#${elementId}</strong> — keep`);
             } else {
-                addChatLog('hint', `✗ <strong>#${elementId}</strong> — remove / redesign`);
+                addChatLog('hint', `✗ <strong>#${elementId}</strong> — ${scopeMarkLabel(type)}`);
             }
 
             logEvent('ANNOTATE', { elementId: elementId, type: type, total: annotations.length });
@@ -3682,13 +3759,13 @@
 
         let lastIframeSyncKey = '';
 
-        function syncAllIframeVisuals() {
+        function syncAllIframeVisuals(force) {
             const syncKey = JSON.stringify({
                 n: annotations.length,
                 a: annotations.map(x => x.id + ':' + x.type).join(','),
                 r: elementReviewMode ? 1 : 0
             });
-            if (syncKey === lastIframeSyncKey) return;
+            if (!force && syncKey === lastIframeSyncKey) return;
             lastIframeSyncKey = syncKey;
             document.querySelectorAll('iframe').forEach(iframe => {
                 if (iframe.contentWindow) {
@@ -3704,12 +3781,23 @@
             });
         }
 
+        function attachIframeSyncHandlers() {
+            document.querySelectorAll('iframe').forEach(iframe => {
+                if (iframe.dataset.nexuSyncAttached === '1') return;
+                iframe.dataset.nexuSyncAttached = '1';
+                iframe.addEventListener('load', () => {
+                    setTimeout(() => syncAllIframeVisuals(true), 60);
+                    setTimeout(() => syncAllIframeVisuals(true), 260);
+                });
+            });
+        }
+
         function updateFeedbackList() {
             const list = document.getElementById('feedback-list');
             list.innerHTML = '';
             
             if (annotations.length === 0) {
-                list.innerHTML = `<div style="color: #64748b; font-size: 0.85rem; text-align: center; margin-top: 40px;">No elements marked yet. Drag on the workspace: left = keep, right = remove.</div>`;
+                list.innerHTML = `<div style="color: #64748b; font-size: 0.85rem; text-align: center; margin-top: 40px;">No elements marked yet. Drag on the workspace: left = keep, right = ${scopeMarkLabel('DELETE')}.</div>`;
                 updatePromptBox();
                 updateElementHintButton();
                 return;
@@ -3725,7 +3813,7 @@
                 
                 const tag = document.createElement('span');
                 tag.className = 'feedback-tag ' + (a.type === 'KEEP' ? 'keep' : 'redesign');
-                tag.innerText = a.type;
+                tag.innerText = a.type === 'KEEP' ? 'KEEP' : scopeMarkLabel('DELETE').toUpperCase();
 
                 item.appendChild(label);
                 item.appendChild(tag);
@@ -3767,7 +3855,7 @@
                     promptText += `  ✓ RETAIN: ${keeps.map(k => '#' + k).join(', ')}\n`;
                 }
                 if (deletes.length > 0) {
-                    promptText += `  ✗ DELETE / REDESIGN: ${deletes.map(d => '#' + d).join(', ')}\n`;
+                    promptText += `  ✗ ${scopeMarkLabel('DELETE').toUpperCase()}: ${deletes.map(d => '#' + d).join(', ')}\n`;
                 }
                 elementHints.forEach(h => {
                     const tags = (h.elementIds || []).map(id => '#' + id).join(', ');
@@ -3809,9 +3897,9 @@
 
         function runLiveIteration(opts) {
             opts = opts || {};
-            if (requireGoalPrompt && !projectGoal) {
+            if (requireGoalPrompt && !projectGoal && !iterationAllowedWithoutGoal()) {
                 if (!opts.auto) {
-                    showGoalPromptModal();
+                    promptForRequiredGoalOnEditor();
                 }
                 return;
             }
@@ -3864,6 +3952,7 @@
                         prompt: promptBox.innerText,
                         current_stage: activeStage,
                         annotations: annotations,
+                        selected_fragments: selectedFragmentsPayload(),
                         user_goal: goalForIterate,
                         element_hints: elementHints.map(h => h.text),
                         user_hints: buildLegacyHintsPayload(),
@@ -4163,6 +4252,7 @@
                 activeProjectId: activeProjectId,
                 playerUrl: location.href,
                 annotations: annotations,
+                selectedFragments: selectedFragmentsPayload(),
                 annotationHistory: annotationHistory,
                 effectiveAnnotations: ledgerMarks,
                 allAnnotations: allMarks,
@@ -4235,6 +4325,8 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             switchMainTab(mainTab, { skipLog: true });
+            attachIframeSyncHandlers();
+            syncAllIframeVisuals(true);
             refreshLlmStatus();
             loadLlmTraces();
             pingCinemaServer(true).catch(() => {});

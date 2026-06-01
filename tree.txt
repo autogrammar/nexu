@@ -144,10 +144,12 @@
 │       ├── bundle.py
 │       ├── capsule.py
 │       ├── cinema_baseline_contracts.py
+│       ├── cinema_dom_patch.py
 │       ├── cinema_goal_contracts.py
 │       ├── cinema_history.py
 │       ├── cinema_html.py
 │       ├── cinema_html_validate.py
+│       ├── cinema_http_preprocess.py
 │       ├── cinema_iterate.py
 │       ├── cinema_llm_contracts.py
 │       ├── cinema_llm.py
@@ -156,6 +158,7 @@
 │       ├── cinema_options_cache.py
 │       ├── cinema_policy.py
 │       ├── cinema_project_imports.py
+│       ├── cinema_project_ir.py
 │       ├── cinema_projects.py
 │       ├── cinema_publish.py
 │       ├── cinema.py
@@ -216,9 +219,11 @@
 │   ├── test_capsule_next_stage.py
 │   ├── test_capsule_runtime_report.py
 │   ├── test_cinema_baseline_contracts.py
+│   ├── test_cinema_dom_patch.py
 │   ├── test_cinema_goal_contracts.py
 │   ├── test_cinema_history.py
 │   ├── test_cinema_html_validate.py
+│   ├── test_cinema_http_preprocess.py
 │   ├── test_cinema_iterate.py
 │   ├── test_cinema_llm_contracts.py
 │   ├── test_cinema_llm.py
@@ -227,6 +232,7 @@
 │   ├── test_cinema_options_cache.py
 │   ├── test_cinema_policy.py
 │   ├── test_cinema_project_imports.py
+│   ├── test_cinema_project_ir.py
 │   ├── test_cinema_projects.py
 │   ├── test_cinema_publish.py
 │   ├── test_cinema_scope.py
@@ -251,4 +257,4 @@
 ├── uv.lock
 └── VERSION
 
-50 directories, 202 files
+50 directories, 208 files

@@ -89,6 +89,178 @@ def _goal_contract_dict(
     return row
 
 
+def _resolve_baseline_anchor(kind: str, template_base: str) -> str:
+    """Determine baseline anchor based on project kind."""
+    if kind in ("imported", "web") or kind in {
+        "dashboard",
+        "monitor",
+        "ecosystem",
+        "api",
+        "mcp",
+        "frontend",
+        "slice",
+    }:
+        return template_base
+    if kind == "calculator" or not kind:
+        return "calc.app.kind"
+    return template_base
+
+
+def _build_detail_text(
+    scope_display: str,
+    context: str,
+    current: str,
+    expected: str,
+) -> str:
+    """Build detail text from optional fields."""
+    details = []
+    if scope_display:
+        details.append(f"focus scope {scope_display}")
+    if context:
+        details.append(f"project {context}")
+    if current:
+        details.append(f"current slice: {current}")
+    if expected:
+        details.append(f"expected/actions: {expected}")
+    return "; ".join(details)
+
+
+def _detect_chemical_trait(text: str, capsule_name: str, stage: int) -> dict[str, Any] | None:
+    """Detect chemical/scientific calculator goal."""
+    if not is_chemical_goal([text]):
+        return None
+    return _goal_contract_dict(
+        f"goal.{capsule_name}.S{stage}.trait.chemical",
+        "evolve:chemical_calculator",
+        "Extend toward chemical/scientific calculator: element keys, formulas, "
+        "molar mass — preserve KEEP trig/sci controls from baseline and policy.",
+        capsule_name=capsule_name,
+        stage=stage,
+        based_on="calc.ui.keypad.sci_row",
+    )
+
+
+def _detect_minimal_trait(
+    text: str, kind: str, capsule_name: str, stage: int
+) -> dict[str, Any] | None:
+    """Detect minimal UI preference for calculators."""
+    if kind != "calculator":
+        return None
+    if not any(w in text.lower() for w in ("minimal", "prosty", "compact", "mniej")):
+        return None
+    return _goal_contract_dict(
+        f"goal.{capsule_name}.S{stage}.trait.minimal",
+        "evolve:minimal_ui",
+        "Prefer fewer controls and cleaner layout (Option A direction) while "
+        "honoring baseline display + KEEP list.",
+        capsule_name=capsule_name,
+        stage=stage,
+        based_on="calc.options.variant_a",
+    )
+
+
+def _detect_expanded_trait(
+    text: str, kind: str, capsule_name: str, stage: int
+) -> dict[str, Any] | None:
+    """Detect expanded/rich UI preference for calculators."""
+    if kind != "calculator":
+        return None
+    if not any(w in text.lower() for w in ("expand", "rich", "więcej", "rozbudow")):
+        return None
+    return _goal_contract_dict(
+        f"goal.{capsule_name}.S{stage}.trait.expanded",
+        "evolve:expanded_ui",
+        "Allow richer feature set (Option C direction) without breaking "
+        "baseline grid classes and KEEP elements.",
+        capsule_name=capsule_name,
+        stage=stage,
+        based_on="calc.options.variant_c",
+    )
+
+
+def _detect_api_trait(
+    lower: str, capsule_name: str, stage: int, template_base: str
+) -> dict[str, Any] | None:
+    """Detect API/backend related goals."""
+    api_keywords = frozenset({
+        "api", "rest", "route", "routes", "endpoint", "openapi",
+        "contract", "backend", "service", "grpc",
+    })
+    if not any(w in lower for w in api_keywords):
+        return None
+    return _goal_contract_dict(
+        f"goal.{capsule_name}.S{stage}.trait.api",
+        "evolve:api_surface",
+        "Evolve API/backend service UI: route surface, health/metrics, "
+        "contract docs — use project stage progression for Options A–C.",
+        capsule_name=capsule_name,
+        stage=stage,
+        based_on=template_base,
+    )
+
+
+def _detect_dashboard_trait(
+    lower: str, capsule_name: str, stage: int, template_base: str
+) -> dict[str, Any] | None:
+    """Detect dashboard/analytics related goals."""
+    dashboard_keywords = frozenset({
+        "dashboard", "analytics", "analityk", "kpi", "wykres", "chart",
+        "panel", "metric", "funnel", "cohort", "experiment", "flag", "workspace",
+    })
+    if not any(w in lower for w in dashboard_keywords):
+        return None
+    return _goal_contract_dict(
+        f"goal.{capsule_name}.S{stage}.trait.dashboard",
+        "evolve:analytics_dashboard",
+        "Evolve dashboard/analytics UI: KPI cards, charts, filters — "
+        "use project stage progression for Options A–C.",
+        capsule_name=capsule_name,
+        stage=stage,
+        based_on=template_base,
+    )
+
+
+def _detect_engineering_trait(
+    lower: str, kind: str, capsule_name: str, stage: int, template_base: str
+) -> dict[str, Any] | None:
+    """Detect engineering/space-agency style goals."""
+    eng_keywords = frozenset({
+        "engineer", "engineers", "engineering", "inżynier", "inzynier",
+        "space", "agency", "nasa", "aerospace",
+    })
+    if not any(w in lower for w in eng_keywords):
+        return None
+    based_on = "calc.ui.display" if kind == "calculator" else template_base
+    return _goal_contract_dict(
+        f"goal.{capsule_name}.S{stage}.trait.engineering",
+        "evolve:engineering_ui",
+        "Target engineering/space-agency style: technical readouts, "
+        "precision metrics, mission-control aesthetic in labels and layout.",
+        capsule_name=capsule_name,
+        stage=stage,
+        based_on=based_on,
+    )
+
+
+def _collect_trait_proposals(
+    text: str,
+    lower: str,
+    kind: str,
+    capsule_name: str,
+    stage: int,
+    template_base: str,
+) -> list[dict[str, Any]]:
+    detectors = [
+        _detect_chemical_trait(text, capsule_name, stage),
+        _detect_minimal_trait(text, kind, capsule_name, stage),
+        _detect_expanded_trait(text, kind, capsule_name, stage),
+        _detect_api_trait(lower, capsule_name, stage, template_base),
+        _detect_dashboard_trait(lower, capsule_name, stage, template_base),
+        _detect_engineering_trait(lower, kind, capsule_name, stage, template_base),
+    ]
+    return [t for t in detectors if t is not None]
+
+
 def propose_goal_extension_contracts(
     goal: str,
     *,
@@ -113,36 +285,17 @@ def propose_goal_extension_contracts(
     scope_display = (
         focus_scope_label or (f"#{focus_scope}" if focus_scope else "#functions")
     ).strip()
-    current = (current_state or "").strip()
-    expected = (expected_version or "").strip()
-    context = (project_context or "").strip()
-    details = []
-    if scope_display:
-        details.append(f"focus scope {scope_display}")
-    if context:
-        details.append(f"project {context}")
-    if current:
-        details.append(f"current slice: {current}")
-    if expected:
-        details.append(f"expected/actions: {expected}")
-    detail_text = "; ".join(details)
-    slug = _slug(expected or text)
     kind = (project_kind or "").strip().lower()
     template_base = f"cinema.{capsule_name}.S{stage}.ui.template"
-    if kind in ("imported", "web") or kind in {
-        "dashboard",
-        "monitor",
-        "ecosystem",
-        "api",
-        "mcp",
-        "frontend",
-        "slice",
-    }:
-        baseline_anchor = template_base
-    elif kind == "calculator" or not kind:
-        baseline_anchor = "calc.app.kind"
-    else:
-        baseline_anchor = template_base
+    baseline_anchor = _resolve_baseline_anchor(kind, template_base)
+    detail_text = _build_detail_text(
+        scope_display,
+        (project_context or "").strip(),
+        (current_state or "").strip(),
+        (expected_version or "").strip(),
+    )
+    slug = _slug(expected_version or text)
+
     proposals: list[dict[str, Any]] = [
         _goal_contract_dict(
             f"goal.{capsule_name}.S{stage}.target.{slug}",
@@ -172,132 +325,9 @@ def propose_goal_extension_contracts(
             ),
         )
 
-    if is_chemical_goal([text]):
-        proposals.append(
-            _goal_contract_dict(
-                f"goal.{capsule_name}.S{stage}.trait.chemical",
-                "evolve:chemical_calculator",
-                "Extend toward chemical/scientific calculator: element keys, formulas, "
-                "molar mass — preserve KEEP trig/sci controls from baseline and policy.",
-                capsule_name=capsule_name,
-                stage=stage,
-                based_on="calc.ui.keypad.sci_row",
-            ),
-        )
-
-    if kind == "calculator" and any(
-        w in text.lower() for w in ("minimal", "prosty", "compact", "mniej")
-    ):
-        proposals.append(
-            _goal_contract_dict(
-                f"goal.{capsule_name}.S{stage}.trait.minimal",
-                "evolve:minimal_ui",
-                "Prefer fewer controls and cleaner layout (Option A direction) while "
-                "honoring baseline display + KEEP list.",
-                capsule_name=capsule_name,
-                stage=stage,
-                based_on="calc.options.variant_a",
-            ),
-        )
-
-    if kind == "calculator" and any(
-        w in text.lower() for w in ("expand", "rich", "więcej", "rozbudow")
-    ):
-        proposals.append(
-            _goal_contract_dict(
-                f"goal.{capsule_name}.S{stage}.trait.expanded",
-                "evolve:expanded_ui",
-                "Allow richer feature set (Option C direction) without breaking "
-                "baseline grid classes and KEEP elements.",
-                capsule_name=capsule_name,
-                stage=stage,
-                based_on="calc.options.variant_c",
-            ),
-        )
-
     lower = text.lower()
-    if any(
-        w in lower
-        for w in (
-            "api",
-            "rest",
-            "route",
-            "routes",
-            "endpoint",
-            "openapi",
-            "contract",
-            "backend",
-            "service",
-            "grpc",
-        )
-    ):
-        proposals.append(
-            _goal_contract_dict(
-                f"goal.{capsule_name}.S{stage}.trait.api",
-                "evolve:api_surface",
-                "Evolve API/backend service UI: route surface, health/metrics, "
-                "contract docs — use project stage progression for Options A–C.",
-                capsule_name=capsule_name,
-                stage=stage,
-                based_on=template_base,
-            ),
-        )
-
-    if any(
-        w in lower
-        for w in (
-            "dashboard",
-            "analytics",
-            "analityk",
-            "kpi",
-            "wykres",
-            "chart",
-            "panel",
-            "metric",
-            "funnel",
-            "cohort",
-            "experiment",
-            "flag",
-            "workspace",
-        )
-    ):
-        proposals.append(
-            _goal_contract_dict(
-                f"goal.{capsule_name}.S{stage}.trait.dashboard",
-                "evolve:analytics_dashboard",
-                "Evolve dashboard/analytics UI: KPI cards, charts, filters — "
-                "use project stage progression for Options A–C.",
-                capsule_name=capsule_name,
-                stage=stage,
-                based_on=f"cinema.{capsule_name}.S{stage}.ui.template",
-            ),
-        )
-
-    if any(
-        w in lower
-        for w in (
-            "engineer",
-            "engineers",
-            "engineering",
-            "inżynier",
-            "inzynier",
-            "space",
-            "agency",
-            "nasa",
-            "aerospace",
-        )
-    ):
-        proposals.append(
-            _goal_contract_dict(
-                f"goal.{capsule_name}.S{stage}.trait.engineering",
-                "evolve:engineering_ui",
-                "Target engineering/space-agency style: technical readouts, "
-                "precision metrics, mission-control aesthetic in labels and layout.",
-                capsule_name=capsule_name,
-                stage=stage,
-                based_on="calc.ui.display" if kind == "calculator" else template_base,
-            ),
-        )
+    traits = _collect_trait_proposals(text, lower, kind, capsule_name, stage, template_base)
+    proposals.extend(traits)
 
     return proposals
 

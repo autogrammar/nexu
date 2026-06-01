@@ -1,29 +1,25 @@
-# code2llm | 96f 17111L | python:77,yaml:9,txt:2,shell:2,json:2,toml:1,yml:1 | 2026-06-01
-# generated in 0.03s
-# CC̅=4.8 | critical:16/573 | dups:0 | cycles:0
+# code2llm | 99f 18428L | python:80,yaml:9,txt:2,shell:2,json:2,toml:1,yml:1 | 2026-06-01
+# generated in 0.04s
+# CC̅=4.8 | critical:12/653 | dups:0 | cycles:0
 
-HEALTH[16]:
-  🟡 CC    _extract_content CC=16 (limit:15)
-  🟡 CC    propose_goal_extension_contracts CC=37 (limit:15)
-  🟡 CC    build_markpact_readme CC=18 (limit:15)
-  🟡 CC    start_published_service CC=17 (limit:15)
-  🟡 CC    write_goal_options_offline CC=37 (limit:15)
-  🟡 CC    build_llm_communication_contract_lines CC=15 (limit:15)
-  🟡 CC    validate_cinema_html_document CC=16 (limit:15)
+HEALTH[12]:
   🟡 CC    _effective_ui_constraints_from_ledger CC=17 (limit:15)
   🟡 CC    _merge_ui_constraints CC=17 (limit:15)
   🟡 CC    do_GET CC=34 (limit:15)
   🟡 CC    do_POST CC=211 (limit:15)
-  🟡 CC    load_http_preprocess_artifacts CC=18 (limit:15)
-  🟡 CC    _ensure_project_meta_fields CC=20 (limit:15)
-  🟡 CC    delete_imported_project CC=16 (limit:15)
-  🟡 CC    list_project_catalog CC=17 (limit:15)
-  🟡 CC    activate_example_project CC=18 (limit:15)
+  🟡 CC    _extract_content CC=16 (limit:15)
+  🟡 CC    load_http_preprocess_artifacts CC=16 (limit:15)
+  🟡 CC    _compile_meta_fields CC=17 (limit:15)
+  🟡 CC    propose_goal_extension_contracts CC=15 (limit:15)
+  🟡 CC    start_published_service CC=15 (limit:15)
+  🟡 CC    inject_scope_style CC=22 (limit:15)
+  🟡 CC    _find_marked_subtrees CC=22 (limit:15)
+  🟡 CC    build_marked_element_context CC=28 (limit:15)
 
 REFACTOR[1]:
-  1. split 16 high-CC methods  (CC>15)
+  1. split 12 high-CC methods  (CC>15)
 
-PIPELINES[98]:
+PIPELINES[107]:
   [1] Src [main]: main → print
       PURITY: 100% pure
   [2] Src [main]: main → print
@@ -66,7 +62,7 @@ PIPELINES[98]:
       PURITY: 100% pure
   [21] Src [projects_catalog]: projects_catalog → merged_projects_catalog → list_project_catalog → deleted_project_ids
       PURITY: 100% pure
-  [22] Src [activate_project]: activate_project → activate_example_project → reset_cinema_policy_ledger
+  [22] Src [activate_project]: activate_project → activate_example_project → _find_example_project
       PURITY: 100% pure
   [23] Src [import_project_from_zip]: import_project_from_zip → import_zip_project → _project_dir → _imports_root
       PURITY: 100% pure
@@ -92,37 +88,37 @@ PIPELINES[98]:
       PURITY: 100% pure
   [34] Src [stop_service]: stop_service → stop_published_service → _load_registry → _registry_path → ...(1 more)
       PURITY: 100% pure
-  [35] Src [list_users]: list_users
+  [35] Src [_trace_slug]: _trace_slug → trace_slug
       PURITY: 100% pure
-  [36] Src [preview_menu_icons]: preview_menu_icons
+  [36] Src [_read_trace_index]: _read_trace_index → read_trace_index
       PURITY: 100% pure
-  [37] Src [main]: main → print
+  [37] Src [_extract_html_document]: _extract_html_document → _strip_markdown_fences
       PURITY: 100% pure
-  [38] Src [render_dashboard]: render_dashboard
+  [38] Src [_extract_llm_content]: _extract_llm_content
       PURITY: 100% pure
-  [39] Src [render_dashboard]: render_dashboard
+  [39] Src [_sync_option_previews]: _sync_option_previews
       PURITY: 100% pure
-  [40] Src [main]: main → print
+  [40] Src [__init__]: __init__
       PURITY: 100% pure
-  [41] Src [init]: init → project_root
+  [41] Src [do_GET]: do_GET → _parse_imported_project_route → _path_segments
       PURITY: 100% pure
-  [42] Src [freeze]: freeze → project_root
+  [42] Src [do_POST]: do_POST → _nexu_hooks_apply
       PURITY: 100% pure
-  [43] Src [capsule_create]: capsule_create → project_root
+  [43] Src [do_DELETE]: do_DELETE → _path_segments
       PURITY: 100% pure
-  [44] Src [capsule_list]: capsule_list → project_root
+  [44] Src [do_OPTIONS]: do_OPTIONS
       PURITY: 100% pure
-  [45] Src [capsule_status_command]: capsule_status_command → project_root
+  [45] Src [list_users]: list_users
       PURITY: 100% pure
-  [46] Src [capsule_iterate]: capsule_iterate → project_root
+  [46] Src [preview_menu_icons]: preview_menu_icons
       PURITY: 100% pure
-  [47] Src [capsule_blueprint]: capsule_blueprint → project_root
+  [47] Src [main]: main → print
       PURITY: 100% pure
-  [48] Src [capsule_export_prompt]: capsule_export_prompt → project_root
+  [48] Src [render_dashboard]: render_dashboard
       PURITY: 100% pure
-  [49] Src [capsule_diff]: capsule_diff → project_root
+  [49] Src [render_dashboard]: render_dashboard
       PURITY: 100% pure
-  [50] Src [capsule_drift]: capsule_drift → project_root
+  [50] Src [main]: main → print
       PURITY: 100% pure
 
 LAYERS:
@@ -158,36 +154,39 @@ LAYERS:
   │ inputs.json                  4L  0C    0m  CC=0.0    ←0
   │ requirements.txt             1L  0C    0m  CC=0.0    ←0
   │
-  src/                            CC̄=4.8    ←in:0  →out:0
-  │ !! cinema_project_imports    1034L  0C   45m  CC=20     ←1
+  src/                            CC̄=4.7    ←in:0  →out:0
+  │ !! cinema_project_imports    1112L  0C   50m  CC=17     ←1
+  │ !! cinema_offline_options     897L  0C   32m  CC=13     ←2
   │ !! cinema_policy              861L  0C   40m  CC=13     ←6
-  │ !! cinema_offline_options     799L  0C   26m  CC=37     ←1
-  │ !! cinema_scripts             696L  0C    7m  CC=6      ←6
-  │ !! cinema_projects            650L  1C   14m  CC=18     ←4
-  │ !! cinema_scope               539L  0C   18m  CC=11     ←6
-  │ !! cinema_http_preprocess     518L  1C   24m  CC=18     ←3
-  │ !! cinema_publish             459L  0C   21m  CC=17     ←1
+  │ !! cinema_scripts             772L  0C    8m  CC=6      ←7
+  │ !! cinema_projects            720L  1C   25m  CC=14     ←4
+  │ !! cinema_http_preprocess     623L  1C   30m  CC=16     ←5
+  │ !! cinema_scope               588L  0C   19m  CC=22     ←7
+  │ !! cinema_publish             469L  0C   23m  CC=15     ←1
   │ mcp_server                 393L  0C   13m  CC=6      ←1
   │ cli                        379L  0C   23m  CC=4      ←0
+  │ !! cinema_marked_context      379L  0C   16m  CC=28     ←1
+  │ !! cinema_goal_contracts      345L  0C   15m  CC=15     ←2
   │ !! cinema_llm                 326L  0C   17m  CC=16     ←1
   │ verify                     317L  0C   14m  CC=12     ←0
-  │ !! cinema_goal_contracts      315L  0C    6m  CC=37     ←2
   │ cinema_history             244L  0C   13m  CC=8      ←2
+  │ cinema_ui_patch            237L  0C   10m  CC=9      ←1
   │ orchestrate                232L  0C    6m  CC=13     ←2
-  │ !! cinema_html_validate       220L  0C   11m  CC=16     ←4
-  │ !! cinema_markpact            207L  0C    5m  CC=18     ←2
+  │ cinema_html_validate       229L  0C   13m  CC=14     ←5
+  │ cinema_markpact            215L  0C    7m  CC=14     ←2
+  │ cinema_dom_patch           202L  0C    9m  CC=8      ←0
+  │ cinema_llm_contracts       196L  0C    7m  CC=9      ←1
   │ cinema                     194L  0C    9m  CC=11     ←5
   │ config                     191L  4C    6m  CC=14     ←5
-  │ cinema_ui_patch            190L  0C    9m  CC=9      ←1
-  │ !! cinema_llm_contracts       182L  0C    6m  CC=15     ←1
   │ cinema_baseline_contracts   173L  0C    5m  CC=9      ←2
   │ cinema_traces              166L  0C    7m  CC=9      ←2
   │ llm                        165L  0C    5m  CC=8      ←2
   │ export_prompt              160L  0C    3m  CC=12     ←4
   │ review                     157L  0C    2m  CC=5      ←2
-  │ cinema_server              144L  0C    8m  CC=4      ←2
+  │ cinema_server              144L  0C    8m  CC=4      ←1
   │ intract                    140L  1C    7m  CC=12     ←9
   │ intract_adapter            133L  0C    6m  CC=9      ←1
+  │ cinema_project_ir          132L  1C    8m  CC=12     ←1
   │ runtime                    131L  0C    4m  CC=9      ←4
   │ cinema_options_cache       128L  0C    8m  CC=9      ←1
   │ options                    128L  0C    5m  CC=11     ←1
@@ -223,8 +222,8 @@ LAYERS:
   │
   ./                              CC̄=0.0    ←in:0  →out:0
   │ !! goal.yaml                  512L  0C    0m  CC=0.0    ←0
-  │ tree.txt                   254L  0C    0m  CC=0.0    ←0
-  │ Makefile                    96L  0C    0m  CC=0.0    ←0
+  │ tree.txt                   260L  0C    0m  CC=0.0    ←0
+  │ Makefile                   100L  0C    0m  CC=0.0    ←0
   │ pyproject.toml              85L  0C    0m  CC=0.0    ←0
   │ project.sh                  50L  0C    0m  CC=0.0    ←0
   │ pyqual.yaml                 25L  0C    0m  CC=0.0    ←0
@@ -245,7 +244,7 @@ LAYERS:
 COUPLING:
                                                                 src.nexu         examples.web_app_calculator                             scripts                            src.vico                            examples  examples.web_app_pactown_ecosystem          examples.web_app_dashboard      examples.web_app_event_monitor
                             src.nexu                                  ──                                   6                                   2                                  53                                 ←20                                                                      ←9                                      hub
-         examples.web_app_calculator                                  85                                  ──                                   4                                   1                                  ←1                                                                                                              hub
+         examples.web_app_calculator                                  87                                  ──                                   4                                   1                                  ←1                                                                                                              hub
                              scripts                                  ←2                                  ←4                                  ──                                                                     ←34                                 ←22                                 ←10                                 ←19  hub
                             src.vico                                  12                                  ←1                                                                      ──                                  ←5                                                                      ←1                                      hub
                             examples                                  20                                   1                                  34                                   5                                  ──                                                                                                              !! fan-out
@@ -253,16 +252,16 @@ COUPLING:
           examples.web_app_dashboard                                   9                                                                      10                                   1                                                                                                          ──                                      !! fan-out
       examples.web_app_event_monitor                                                                                                          19                                                                                                                                                                                  ──  !! fan-out
   CYCLES: none
-  HUB: src.nexu/ (fan-in=126)
+  HUB: src.nexu/ (fan-in=128)
   HUB: examples.web_app_calculator/ (fan-in=7)
   HUB: scripts/ (fan-in=91)
   HUB: src.vico/ (fan-in=60)
-  SMELL: examples.web_app_dashboard/ fan-out=20 → split needed
   SMELL: src.nexu/ fan-out=61 → split needed
-  SMELL: examples.web_app_calculator/ fan-out=90 → split needed
-  SMELL: examples.web_app_pactown_ecosystem/ fan-out=22 → split needed
-  SMELL: examples/ fan-out=60 → split needed
   SMELL: examples.web_app_event_monitor/ fan-out=19 → split needed
+  SMELL: examples.web_app_dashboard/ fan-out=20 → split needed
+  SMELL: examples.web_app_calculator/ fan-out=92 → split needed
+  SMELL: examples/ fan-out=60 → split needed
+  SMELL: examples.web_app_pactown_ecosystem/ fan-out=22 → split needed
   SMELL: src.vico/ fan-out=12 → split needed
 
 EXTERNAL:

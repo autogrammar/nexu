@@ -95,6 +95,21 @@ def _project_context_block(workspace_root: Path | None, *, max_chars: int = 3000
     return "".join(chunks)
 
 
+def _get_app_title(html: str, capsule_name: str, stage: int) -> str:
+    title_match = re.search(r"<title[^>]*>([^<]*)</title>", html, flags=re.I)
+    return (
+        title_match.group(1).strip() if title_match else None
+    ) or f"{capsule_name} S{stage}"
+
+
+def _get_baseline_block(project_contracts: list[Any], capsule_contracts: list[Any]) -> str:
+    baseline_lines = [
+        str(item.get("line") or item.get("id") or item)
+        for item in project_contracts + capsule_contracts
+    ]
+    return "\n".join(f"- `{line}`" for line in baseline_lines) or "- (none)"
+
+
 def build_markpact_readme(
     cinema_dir: Path,
     *,
@@ -116,10 +131,7 @@ def build_markpact_readme(
         raise FileNotFoundError(f"missing {stage_file.name} in {cinema_dir}")
 
     html = stage_file.read_text(encoding="utf-8")
-    title_match = re.search(r"<title[^>]*>([^<]*)</title>", html, flags=re.I)
-    app_title = (
-        title_match.group(1).strip() if title_match else None
-    ) or f"{capsule_name} S{stage}"
+    app_title = _get_app_title(html, capsule_name, stage)
 
     effective = effective_ui or {}
     keep = list(effective.get("keep") or [])
@@ -144,11 +156,7 @@ def build_markpact_readme(
     }
 
     html_body = _escape_markdown_fence(html)
-    baseline_lines = [
-        str(item.get("line") or item.get("id") or item)
-        for item in project_contracts + capsule_contracts
-    ]
-    baseline_block = "\n".join(f"- `{line}`" for line in baseline_lines) or "- (none)"
+    baseline_block = _get_baseline_block(project_contracts, capsule_contracts)
 
     return f"""# {app_title} — Nexu Markpact export
 

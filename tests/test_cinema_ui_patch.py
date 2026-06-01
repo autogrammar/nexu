@@ -39,6 +39,7 @@ def test_build_ui_patch_prompt_is_json_contract() -> None:
     assert "Do not return HTML" in prompt
     assert "#colors" in prompt
     assert "make it clearer" in prompt
+    assert "DELETE ids: tan" in prompt
 
 
 def test_parse_and_apply_ui_patch_response() -> None:
@@ -99,3 +100,5 @@ def test_supports_llm_patch_scope() -> None:
     assert supports_llm_patch_scope("colors", "dashboard")
     assert supports_llm_patch_scope("keypad", "calculator")
     assert not supports_llm_patch_scope("functions", "dashboard")
+    assert not supports_llm_patch_scope("functions", "imported", has_marks=True)
+    assert supports_llm_patch_scope("colors", "imported", has_marks=True)

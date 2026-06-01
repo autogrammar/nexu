@@ -142,12 +142,7 @@ def repair_html_structure(html: str) -> str:
     return relocate_style_tags_to_head(text).strip()
 
 
-def validate_cinema_html_document(html: str, *, ui_type: str = "web") -> tuple[bool, list[str]]:
-    """Return whether HTML has the minimum structure expected in Cinema previews."""
-    text = str(html or "").strip()
-    errors: list[str] = []
-    if not text:
-        return False, ["empty document"]
+def _validate_basic_tags(text: str, errors: list[str]) -> None:
     if not _looks_like_html_document(text):
         errors.append("missing html root")
     lower = text.lower()
@@ -160,6 +155,23 @@ def validate_cinema_html_document(html: str, *, ui_type: str = "web") -> tuple[b
         if not _has_close_tag(text, tag):
             errors.append(f"missing closing {tag} tag")
 
+
+def _validate_calculator_elements(text: str, errors: list[str]) -> None:
+    if not re.search(r'\bid=["\']screen["\']', text, re.I):
+        errors.append("calculator missing #screen")
+    if not re.search(r'class=["\'][^"\']*\bbtn\b', text, re.I):
+        errors.append("calculator missing .btn controls")
+
+
+def validate_cinema_html_document(html: str, *, ui_type: str = "web") -> tuple[bool, list[str]]:
+    """Return whether HTML has the minimum structure expected in Cinema previews."""
+    text = str(html or "").strip()
+    errors: list[str] = []
+    if not text:
+        return False, ["empty document"]
+    _validate_basic_tags(text, errors)
+
+    lower = text.lower()
     head_close = lower.find("</head>")
     body_open = re.search(r"<\s*body\b", text, re.I)
     if head_close >= 0 and body_open:
@@ -168,10 +180,7 @@ def validate_cinema_html_document(html: str, *, ui_type: str = "web") -> tuple[b
             errors.append("style element between head and body")
 
     if ui_type == "calculator":
-        if not re.search(r'\bid=["\']screen["\']', text, re.I):
-            errors.append("calculator missing #screen")
-        if not re.search(r'class=["\'][^"\']*\bbtn\b', text, re.I):
-            errors.append("calculator missing .btn controls")
+        _validate_calculator_elements(text, errors)
 
     for index, style in enumerate(_STYLE_BODY_RE.findall(text), start=1):
         _ok, css_errors = validate_css_safety(style, source=f"style[{index}]")

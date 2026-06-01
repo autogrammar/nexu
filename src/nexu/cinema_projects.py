@@ -177,37 +177,47 @@ def is_example_project_id(project_id: str) -> bool:
     return any(p.id == project_id for p in EXAMPLE_PROJECTS)
 
 
-def list_project_catalog(cinema_dir: Path | None = None) -> dict[str, Any]:
-    deleted = deleted_project_ids(cinema_dir)
-    projects = []
-    for project in EXAMPLE_PROJECTS:
-        if project.id in deleted:
-            continue
-        data = project.to_public_dict()
-        if cinema_dir is not None:
-            data.update(
-                {
-                    "imported": False,
-                    "deletable": True,
-                    "source_kind": "demo",
-                    "path_hint": f"projects/{project.id}",
-                    "workspace_store": ".nexu",
-                }
-            )
-        projects.append(data)
+def _project_catalog_entry(project: ExampleProject, cinema_dir: Path | None) -> dict[str, Any]:
+    data = project.to_public_dict()
+    if cinema_dir is None:
+        return data
+    data.update(
+        {
+            "imported": False,
+            "deletable": True,
+            "source_kind": "demo",
+            "path_hint": f"projects/{project.id}",
+            "workspace_store": ".nexu",
+        }
+    )
+    return data
+
+
+def _catalog_filters(projects: list[dict[str, Any]]) -> dict[str, list[str]]:
     domains = sorted({p.domain for p in EXAMPLE_PROJECTS})
     kinds = sorted({p.kind for p in EXAMPLE_PROJECTS})
+    
+    project_domains = {str(p.get("domain") or "") for p in projects if p.get("domain")}
+    project_kinds = {str(p.get("kind") or "") for p in projects if p.get("kind")}
+    project_tags = {tag for p in projects for tag in (p.get("tags") or [])}
+    
+    return {
+        "domains": sorted(project_domains) or domains,
+        "kinds": sorted(project_kinds) or kinds,
+        "tags": sorted(project_tags),
+    }
+
+
+def list_project_catalog(cinema_dir: Path | None = None) -> dict[str, Any]:
+    deleted = deleted_project_ids(cinema_dir)
+    projects = [
+        _project_catalog_entry(project, cinema_dir)
+        for project in EXAMPLE_PROJECTS
+        if project.id not in deleted
+    ]
     return {
         "projects": projects,
-        "filters": {
-            "domains": sorted(
-                {str(p.get("domain") or "") for p in projects if p.get("domain")}
-            )
-            or domains,
-            "kinds": sorted({str(p.get("kind") or "") for p in projects if p.get("kind")})
-            or kinds,
-            "tags": sorted({tag for p in projects for tag in (p.get("tags") or [])}),
-        },
+        "filters": _catalog_filters(projects),
     }
 
 
@@ -535,6 +545,121 @@ def _write_seed_variants(cinema_dir: Path, project: ExampleProject) -> None:
     )
 
 
+def _find_example_project(project_id: str) -> ExampleProject | None:
+    return next((p for p in EXAMPLE_PROJECTS if p.id == project_id), None)
+
+
+def _active_project_meta(project: ExampleProject) -> dict[str, Any]:
+    return {
+        "id": project.id,
+        "title": project.title,
+        "domain": project.domain,
+        "kind": project.kind,
+        "activated_at": datetime.now(timezone.utc).isoformat(),
+        "source": "pending",
+    }
+
+
+def _write_active_project_meta(cinema_dir: Path, meta: dict[str, Any]) -> None:
+    (cinema_dir / ACTIVE_PROJECT_FILE).write_text(
+        json.dumps(meta, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+
+
+def _resolve_root_for_project_source(
+    cinema_dir: Path,
+    repo_root: Path | None,
+    workspace_root: Path | None,
+) -> Path | None:
+    return repo_root or find_nexu_repo_root(cinema_dir) or find_nexu_repo_root(workspace_root)
+
+
+def _copy_or_seed_project_files(
+    cinema_dir: Path,
+    project: ExampleProject,
+    source: Path | None,
+) -> list[str]:
+    copied: list[str] = []
+    if source is not None:
+        copied = _copy_cinema_files(source, cinema_dir)
+    if "stage0.html" in copied:
+        return copied
+    _write_seed_variants(cinema_dir, project)
+    return [
+        "stage0.html",
+        "alt_a.html",
+        "alt_b.html",
+        "alt_c.html",
+        "stage1.html",
+        "stage2.html",
+    ]
+
+
+def _sync_project_options(cinema_dir: Path, project: ExampleProject) -> dict[str, Any]:
+    if project.kind != "calculator":
+        return ensure_option_previews_from_stages(cinema_dir)
+    if stage_files_are_distinct(cinema_dir) and not option_previews_are_distinct(cinema_dir):
+        return ensure_option_previews_from_stages(cinema_dir)
+    return {
+        "status": "options_preserved"
+        if option_previews_are_distinct(cinema_dir)
+        else "options_unchanged",
+    }
+
+
+def _apply_preprocess_meta(cinema_dir: Path, meta: dict[str, Any], source: Path | None) -> None:
+    from .cinema_http_preprocess import preprocess_cinema_seed
+
+    meta["source"] = str(source) if source else "seed"
+    meta["activated_at"] = datetime.now(timezone.utc).isoformat()
+    preprocess_fields = preprocess_cinema_seed(cinema_dir)
+    if preprocess_fields:
+        meta.update(preprocess_fields)
+
+
+def _bootstrap_goal_from_project(
+    cinema_dir: Path,
+    project: ExampleProject,
+    workspace_root: Path | None,
+    capsule_name: str | None,
+) -> dict[str, Any]:
+    from .cinema_scope import scope_meta_for_project
+
+    if workspace_root is None or not capsule_name or not project.subtitle.strip():
+        return {"status": "skipped"}
+    append_goal_ledger_entry(
+        workspace_root,
+        capsule_name,
+        stage=0,
+        goal=project.subtitle.strip(),
+        project_context=f"{project.title} ({project.kind})",
+        project_kind=project.kind,
+        cinema_dir=cinema_dir,
+    )
+    refresh_cinema_policy_snapshot(cinema_dir, workspace_root, capsule_name)
+    return {
+        "status": "requires_llm",
+        "options_written": [],
+        "user_goal": project.subtitle.strip(),
+        **scope_meta_for_project(project.kind),
+    }
+
+
+def _init_project_activation(
+    cinema_dir: Path,
+    project: ExampleProject,
+    workspace_root: Path | None,
+    capsule_name: str | None,
+) -> dict[str, Any]:
+    meta = _active_project_meta(project)
+    _write_active_project_meta(cinema_dir, meta)
+    reset_cinema_policy_ledger(cinema_dir)
+    if workspace_root is not None and capsule_name:
+        refresh_cinema_policy_snapshot(cinema_dir, workspace_root, capsule_name)
+    return meta
+
+
 def activate_example_project(
     cinema_dir: Path,
     project_id: str,
@@ -544,42 +669,15 @@ def activate_example_project(
     workspace_root: Path | None = None,
 ) -> dict[str, Any]:
     """Load example UI into the live cinema directory (no browser reload)."""
-    project = next((p for p in EXAMPLE_PROJECTS if p.id == project_id), None)
+    project = _find_example_project(project_id)
     if project is None:
         return {"error": f"unknown project: {project_id}"}
 
-    meta = {
-        "id": project.id,
-        "title": project.title,
-        "domain": project.domain,
-        "kind": project.kind,
-        "activated_at": datetime.now(timezone.utc).isoformat(),
-        "source": "pending",
-    }
-    (cinema_dir / ACTIVE_PROJECT_FILE).write_text(
-        json.dumps(meta, indent=2, ensure_ascii=False) + "\n",
-        encoding="utf-8",
-    )
-    reset_cinema_policy_ledger(cinema_dir)
-    if workspace_root is not None and capsule_name:
-        refresh_cinema_policy_snapshot(cinema_dir, workspace_root, capsule_name)
+    meta = _init_project_activation(cinema_dir, project, workspace_root, capsule_name)
 
-    root = repo_root or find_nexu_repo_root(cinema_dir) or find_nexu_repo_root(workspace_root)
+    root = _resolve_root_for_project_source(cinema_dir, repo_root, workspace_root)
     source = _resolve_source_cinema(project, root)
-    copied: list[str] = []
-
-    if source is not None:
-        copied = _copy_cinema_files(source, cinema_dir)
-    if "stage0.html" not in copied:
-        _write_seed_variants(cinema_dir, project)
-        copied = [
-            "stage0.html",
-            "alt_a.html",
-            "alt_b.html",
-            "alt_c.html",
-            "stage1.html",
-            "stage2.html",
-        ]
+    copied = _copy_or_seed_project_files(cinema_dir, project, source)
 
     write_cinema_inject_files(cinema_dir)
 
@@ -587,46 +685,18 @@ def activate_example_project(
 
     repair_cinema_html_files(cinema_dir)
 
-    if project.kind != "calculator":
-        options_sync = ensure_option_previews_from_stages(cinema_dir)
-    elif stage_files_are_distinct(cinema_dir) and not option_previews_are_distinct(
-        cinema_dir
-    ):
-        options_sync = ensure_option_previews_from_stages(cinema_dir)
-    else:
-        options_sync = {
-            "status": "options_preserved"
-            if option_previews_are_distinct(cinema_dir)
-            else "options_unchanged",
-        }
-
-    meta["source"] = str(source) if source else "seed"
-    meta["activated_at"] = datetime.now(timezone.utc).isoformat()
-    (cinema_dir / ACTIVE_PROJECT_FILE).write_text(
-        json.dumps(meta, indent=2, ensure_ascii=False) + "\n",
-        encoding="utf-8",
-    )
+    options_sync = _sync_project_options(cinema_dir, project)
+    _apply_preprocess_meta(cinema_dir, meta, source)
+    _write_active_project_meta(cinema_dir, meta)
 
     from .cinema_scope import scope_meta_for_project
 
-    goal_bootstrap: dict[str, Any] = {"status": "skipped"}
-    if workspace_root is not None and capsule_name and project.subtitle.strip():
-        append_goal_ledger_entry(
-            workspace_root,
-            capsule_name,
-            stage=0,
-            goal=project.subtitle.strip(),
-            project_context=f"{project.title} ({project.kind})",
-            project_kind=project.kind,
-            cinema_dir=cinema_dir,
-        )
-        refresh_cinema_policy_snapshot(cinema_dir, workspace_root, capsule_name)
-        goal_bootstrap = {
-            "status": "requires_llm",
-            "options_written": [],
-            "user_goal": project.subtitle.strip(),
-            **scope_meta_for_project(project.kind),
-        }
+    goal_bootstrap = _bootstrap_goal_from_project(
+        cinema_dir,
+        project,
+        workspace_root,
+        capsule_name,
+    )
 
     return {
         "status": "project_activated",

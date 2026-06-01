@@ -16,7 +16,11 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urljoin, urlparse
 from urllib.request import Request, urlopen
 
-from .cinema_http_preprocess import prepare_http_preview_html, preprocess_http_import
+from .cinema_http_preprocess import (
+    ensure_http_preprocess_artifacts,
+    prepare_http_preview_html,
+    preprocess_http_import,
+)
 from .cinema_policy import (
     ensure_http_option_previews_from_stage0,
     ensure_option_previews_from_stages,
@@ -31,7 +35,7 @@ from .cinema_projects import (
     load_active_project,
 )
 from .cinema_scope import scope_meta_for_project
-from .cinema_scripts import write_cinema_inject_files
+from .cinema_scripts import inject_cinema_shield, write_cinema_inject_files
 from .cinema_traces import list_llm_traces
 
 IMPORTS_DIR = "imported_projects"
@@ -296,6 +300,7 @@ def _build_http_preview_stage0(meta: dict[str, Any]) -> str | None:
         html = _rewrite_local_stylesheets(html, project_id=project_id, saved=saved)
     html = _inject_base_href(html, _document_base_href(page_url))
     html, _preview_meta = prepare_http_preview_html(html)
+    html = inject_cinema_shield(html)
     if 'data-nexu-import-preview="http"' not in html:
         html = re.sub(
             r"(<body\b)([^>]*>)",
@@ -446,13 +451,58 @@ def _stage_html(meta: dict[str, Any], *, variant: str) -> str:
 </html>"""
 
 
+def _apply_http_preprocess_fields(meta: dict[str, Any], preprocess_fields: dict[str, Any]) -> dict[str, Any]:
+    if not preprocess_fields:
+        return meta
+    updated = {**meta, **preprocess_fields}
+    artifacts = list(updated.get("artifacts") or [])
+    for kind, path_key in (
+        ("visual_css", "visual_css_path"),
+        ("html_outline", "html_outline_path"),
+    ):
+        path_val = str(preprocess_fields.get(path_key) or "").strip()
+        if not path_val:
+            continue
+        if not any(str(item.get("kind") or "") == kind for item in artifacts):
+            artifacts.append({"kind": kind, "path": path_val})
+    updated["artifacts"] = artifacts
+    return updated
+
+
+def _refresh_http_preprocess_if_needed(cinema_dir: Path, meta: dict[str, Any]) -> dict[str, Any]:
+    project_id = str(meta.get("id") or "")
+    if not project_id.startswith("http-"):
+        return meta
+    source_dir = Path(str(meta.get("source_dir") or (_project_dir(cinema_dir, project_id) / "source")))
+    fetch_meta = _load_http_fetch_meta(source_dir)
+    preprocess_fields = ensure_http_preprocess_artifacts(
+        source_dir,
+        fetch_meta=fetch_meta,
+        meta=meta,
+    )
+    if not preprocess_fields:
+        return meta
+    updated = _apply_http_preprocess_fields(meta, preprocess_fields)
+    meta_path = _project_dir(cinema_dir, project_id) / "project.json"
+    try:
+        meta_path.write_text(
+            json.dumps(updated, indent=2, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
+    except OSError:
+        pass
+    return updated
+
+
 def _activate_imported(cinema_dir: Path, meta: dict[str, Any]) -> dict[str, Any]:
+    import_kind = str(meta.get("import_kind") or _import_kind_from_id(str(meta.get("id") or "")))
+    if import_kind == "http":
+        meta = _refresh_http_preprocess_if_needed(cinema_dir, meta)
     reset_cinema_policy_ledger(cinema_dir)
     stage0_html = _build_http_preview_stage0(meta) or _stage_html(meta, variant="stage0")
     (cinema_dir / "stage0.html").write_text(stage0_html, encoding="utf-8")
     for name, variant in (("stage1.html", "stage1"), ("stage2.html", "stage2")):
         (cinema_dir / name).write_text(_stage_html(meta, variant=variant), encoding="utf-8")
-    import_kind = str(meta.get("import_kind") or _import_kind_from_id(str(meta.get("id") or "")))
     if import_kind == "http":
         options_sync = ensure_http_option_previews_from_stage0(cinema_dir)
     else:
@@ -760,12 +810,7 @@ def is_deletable_imported_id(project_id: str) -> bool:
     return not suffix.startswith(("zip-", "git-", "http-"))
 
 
-def _ensure_project_meta_fields(
-    cinema_dir: Path,
-    meta: dict[str, Any],
-    *,
-    persist: bool = True,
-) -> dict[str, Any]:
+def _compile_meta_fields(cinema_dir: Path, meta: dict[str, Any]) -> dict[str, Any]:
     project_id = str(meta.get("id") or "")
     source_dir = Path(str(meta.get("source_dir") or (_project_dir(cinema_dir, project_id) / "source")))
     scanned_count, scanned_bytes = _source_stats(source_dir)
@@ -796,7 +841,18 @@ def _ensure_project_meta_fields(
         ]
     if "services" not in meta:
         updated["services"] = []
+    return updated
+
+
+def _ensure_project_meta_fields(
+    cinema_dir: Path,
+    meta: dict[str, Any],
+    *,
+    persist: bool = True,
+) -> dict[str, Any]:
+    updated = _compile_meta_fields(cinema_dir, meta)
     if persist and updated != meta:
+        project_id = str(meta.get("id") or "")
         meta_path = _project_dir(cinema_dir, project_id) / "project.json"
         try:
             meta_path.write_text(
@@ -917,6 +973,40 @@ def imported_project_llm_log(
     }
 
 
+def _verify_delete_paths(project_dir: Path, imports_root: Path) -> str | None:
+    try:
+        resolved = project_dir.resolve()
+    except OSError:
+        return "project not found"
+    if resolved != imports_root and not str(resolved).startswith(str(imports_root) + "/"):
+        return "invalid project path"
+    if not project_dir.is_dir():
+        return "project not found"
+    return None
+
+
+def _activate_delete_fallback(
+    cinema_dir: Path,
+    fallback: str,
+    workspace_root: Path,
+    capsule_name: str,
+    repo_root: Path,
+) -> str | None:
+    activation = activate_example_project(
+        cinema_dir,
+        fallback,
+        repo_root=repo_root,
+        capsule_name=capsule_name,
+        workspace_root=workspace_root,
+    )
+    if activation.get("error"):
+        active_path = cinema_dir / ACTIVE_PROJECT_FILE
+        if active_path.exists():
+            active_path.unlink()
+        return str(activation["error"])
+    return None
+
+
 def delete_imported_project(
     cinema_dir: Path,
     project_id: str,
@@ -930,12 +1020,9 @@ def delete_imported_project(
         return {"error": "only imported projects (zip-/git-/http-) can be deleted"}
     project_dir = _project_dir(cinema_dir, project_id)
     imports_root = _imports_root(cinema_dir).resolve()
-    try:
-        resolved = project_dir.resolve()
-    except OSError:
-        return {"error": "project not found"}
-    if resolved != imports_root and not str(resolved).startswith(str(imports_root) + "/"):
-        return {"error": "invalid project path"}
+    path_err = _verify_delete_paths(project_dir, imports_root)
+    if path_err:
+        return {"error": path_err}
     if not project_dir.is_dir():
         return {"error": f"unknown imported project: {project_id}"}
     active = load_active_project(cinema_dir) or {}
@@ -945,21 +1032,12 @@ def delete_imported_project(
     if was_active:
         fallback = DEFAULT_FALLBACK_PROJECT
         if repo_root and workspace_root and capsule_name:
-            activation = activate_example_project(
-                cinema_dir,
-                fallback,
-                repo_root=repo_root,
-                capsule_name=capsule_name,
-                workspace_root=workspace_root,
-            )
-            if activation.get("error"):
-                active_path = cinema_dir / ACTIVE_PROJECT_FILE
-                if active_path.exists():
-                    active_path.unlink()
+            err = _activate_delete_fallback(cinema_dir, fallback, workspace_root, capsule_name, repo_root)
+            if err:
                 result["activated"] = None
-                result["activate_error"] = activation["error"]
+                result["activate_error"] = err
             else:
-                result["activated"] = (activation.get("project") or {}).get("id", fallback)
+                result["activated"] = fallback
         else:
             active_path = cinema_dir / ACTIVE_PROJECT_FILE
             if active_path.exists():
