@@ -1,4 +1,5 @@
 import json
+import re
 from pathlib import Path
 
 from nexu.cinema_offline_options import write_goal_options_offline
@@ -260,3 +261,51 @@ def test_http_import_offline_colors_recolors_marked_buttons(tmp_path: Path) -> N
     assert "background-color:#38bdf8" in alts["alt_a.html"]
     assert "background-color:#facc15" in alts["alt_b.html"]
     assert "background-color:#e879f9" in alts["alt_c.html"]
+
+
+def test_http_import_offline_colors_respects_keep_marks(tmp_path: Path) -> None:
+    """Mixed KEEP + DELETE: only DELETE-marked buttons get offline recolor CSS."""
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    (cinema / "active_project.json").write_text(
+        json.dumps(
+            {
+                "id": "http-malortgdynia.pl",
+                "kind": "imported",
+                "import_kind": "http",
+                "title": "Malort",
+            }
+        ),
+        encoding="utf-8",
+    )
+    stage = """<!DOCTYPE html><html><head></head><body data-nexu-import-preview="http">
+<button class="button header-button">Zapisz swoje dziecko</button>
+<a class="button kb-btn2_237106-a1" href="#">Zapisz dziecko</a>
+<button class="button kb-btn2_487f06-54">Nasza lokalizacja</button>
+</body></html>"""
+    (cinema / "stage0.html").write_text(stage, encoding="utf-8")
+
+    labels = write_goal_options_offline(
+        cinema,
+        keep_els=["Zapisz dziecko", "Nasza lokalizacja"],
+        delete_els=["Zapisz swoje dziecko"],
+        focus_scope="colors",
+    )
+
+    assert any("colors:" in label for label in labels)
+    for name in ("alt_a.html", "alt_b.html", "alt_c.html"):
+        html = (cinema / name).read_text(encoding="utf-8")
+        assert "nexu-scope-variant" in html
+        style_match = re.search(
+            r'<style id="nexu-scope-variant">\s*(.*?)\s*</style>',
+            html,
+            flags=re.I | re.S,
+        )
+        assert style_match is not None
+        scope_css = style_match.group(1)
+        assert "background-color:" in scope_css
+        assert '[data-nexu-target="Zapisz swoje dziecko"]' in scope_css
+        assert ".button" not in scope_css
+        assert ".kb-btn2_237106-a1" not in scope_css
+        assert ".kb-btn2_487f06-54" not in scope_css
+        assert "html,body" not in scope_css

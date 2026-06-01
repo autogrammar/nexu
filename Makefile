@@ -33,14 +33,12 @@ quality: test docs-links quality-intract quality-redup
 		src/nexu/cinema_llm_contracts.py \
 	src/nexu/cinema_markpact.py \
 	src/nexu/cinema_dom_patch.py \
-	src/nexu/cinema_project_ir.py \
 	src/nexu/cinema_project_imports.py \
 		src/nexu/cinema_projects.py \
 		src/nexu/cinema_scripts.py \
 		src/nexu/cinema_publish.py \
 		src/nexu/cinema_offline_options.py \
 		src/nexu/cinema_options_cache.py \
-		src/nexu/cinema_ui_patch.py \
 		src/nexu/fast_delivery/__init__.py \
 		src/nexu/fast_delivery/context.py \
 		src/nexu/fast_delivery/options.py \

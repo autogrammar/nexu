@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Repatch MCP Live UI Evolution Demo</title>
+  
+  <!-- Premium Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-color: #0b0f19;
+      --card-bg: rgba(17, 24, 39, 0.7);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent-color: #a855f7;
+      --accent-glow: rgba(168, 85, 247, 0.4);
+      --font-primary: 'Outfit', sans-serif;
+      --font-mono: 'Fira Code', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-primary);
+      font-family: var(--font-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.15) 0%, transparent 40%);
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    /* Premium Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 24px;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-glow {
+      width: 14px;
+      height: 14px;
+      background-color: var(--accent-color);
+      border-radius: 50%;
+      box-shadow: 0 0 20px 6px var(--accent-color);
+      animation: pulse 2s infinite alternate;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #f8fafc 0%, #a855f7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .status-badge {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34d399;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #10b981;
+    }
+
+    /* Main Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 30px;
+    }
+
+    @media (max-width: 1024px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Left - Target Workspace Area */
+    .workspace-section {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 30px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #f1f5f9;
+    }
+
+    /* Base UI Elements representing baseline project */
+    #patch-workspace {
+      min-height: 380px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border: 2px dashed rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 40px;
+      transition: all 0.5s ease;
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    .baseline-layout {
+      width: 100%;
+      text-align: center;
+    }
+
+    .baseline-title {
+      font-size: 1.75rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      color: #f1f5f9;
+    }
+
+    .baseline-text {
+      color: var(--text-secondary);
+      max-width: 500px;
+      margin: 0 auto 24px;
+      line-height: 1.6;
+    }
+
+    /* Buttons */
+    .btn {
+      font-family: var(--font-primary);
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 12px 24px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+      color: white;
+      box-shadow: 0 4px 15px var(--accent-glow);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(168, 85, 247, 0.6);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      color: #f1f5f9;
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+    }
+
+    /* DSL Console Log Widget */
+    .console-section {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .console-box {
+      flex: 1;
+      background: #070913;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      padding: 20px;
+      overflow-y: auto;
+      max-height: 400px;
+      min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.8);
+    }
+
+    .console-line {
+      line-height: 1.5;
+      animation: fadeIn 0.2s ease;
+      word-break: break-all;
+    }
+
+    .console-tag {
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-right: 8px;
+    }
+
+    .tag-dsl {
+      background: rgba(168, 85, 247, 0.15);
+      color: #c084fc;
+      border: 1px solid rgba(168, 85, 247, 0.3);
+    }
+
+    .tag-action {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .tag-error {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .console-content {
+      color: #e2e8f0;
+    }
+
+    /* Live Interaction Simulation Sidebar */
+    .control-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .action-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .action-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .action-card:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(168, 85, 247, 0.4);
+      transform: translateX(4px);
+    }
+
+    .action-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .action-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    .action-badge {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      background: rgba(59, 130, 246, 0.1);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .action-desc {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    /* DSL Interactive Editor Card */
+    .dsl-editor-textarea {
+      width: 100%;
+      height: 100px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: #e2e8f0;
+      padding: 12px;
+      margin-bottom: 12px;
+      resize: none;
+    }
+
+    .dsl-editor-textarea:focus {
+      outline: none;
+      border-color: var(--accent-color);
+    }
+
+    /* Keyframes */
+    @keyframes pulse {
+      0% { box-shadow: 0 0 12px 2px var(--accent-glow); }
+      100% { box-shadow: 0 0 20px 8px var(--accent-glow); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- Premium Header -->
+    <header>
+      <div class="logo-container">
+        <div class="logo-glow"></div>
+        <h1>Repatch MCP Live Evolution</h1>
+      </div>
+      <div class="status-badge">
+        <div class="status-dot"></div>
+        <span id="connection-status">Connecting to stream...</span>
+      </div>
+    </header>
+
+    <!-- Main Grid -->
+    <div class="grid">
+      
+      <!-- Left Area: Workspace & Console -->
+      <div class="workspace-section">
+        
+        <!-- Live Evolving UI Workspace -->
+        <div class="card" style="flex: 1;">
+          <div class="card-title">
+            <span>Dynamic UI Preview (Live Target)</span>
+            <span style="font-size: 0.8rem; color: var(--accent-color); font-weight: 600;">Surgical Patch-Based evolution</span>
+          </div>
+          
+          <div id="patch-workspace">
+            <div class="baseline-layout" id="baseline-view">
+              <h2 class="baseline-title">Base Layout Stage 0</h2>
+              <p class="baseline-text">
+                This is a statically served base project skeleton. In a traditional workflow, changing this would require rebuilding and republishing. With Repatch DSL, we mutate it incrementally in-place.
+              </p>
+              <button class="btn btn-primary" id="btn-explore" onclick="simulateFirstStep()">Start Live Evolution</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- DSL Terminal Console -->
+        <div class="card console-section">
+          <div class="card-title">
+            <span>Surgically Applied Patches & DSL Commands</span>
+            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.75rem;" onclick="clearConsole()">Clear Console</button>
+          </div>
+          <div class="console-box" id="terminal-console">
+            <!-- Console items injected dynamically -->
+            <div class="console-line">
+              <span class="console-tag tag-action">SYSTEM</span>
+              <span class="console-content">Terminal ready. Waiting for WS / SSE events...</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Area: Control Sidebar -->
+      <div class="control-sidebar">
+        
+        <!-- Interactive simulation triggers -->
+        <div class="card">
+          <div class="card-title">Simulate UI Evolutions</div>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.4;">
+            Act as an LLM or Developer Agent. Click to send surgical DSL patch instructions to the client workspace.
+          </p>
+          
+          <div class="action-list">
+            <div class="action-card" onclick="triggerPreset('add_dashboard')">
+              <div class="action-header">
+                <span class="action-title">1. Add Analytics View</span>
+                <span class="action-badge">ADD</span>
+              </div>
+              <p class="action-desc">Surgically injects a statistics widget card inside the workspace without reload.</p>
+            </div>
+
+            <div class="action-card" onclick="triggerPreset('style_neon')">
+              <div class="action-header">
+                <span class="action-title">2. Inject Neon Styling</span>
+                <span class="action-badge">STYLE</span>
+              </div>
+              <p class="action-desc">Applies dynamic global stylesheet values targeting new widgets directly.</p>
+            </div>
+
+            <div class="action-card" onclick="triggerPreset('replace_menu')">
+              <div class="action-header">
+                <span class="action-title">3. Upgrade Control bar</span>
+                <span class="action-badge">REPLACE</span>
+              </div>
+              <p class="action-desc">Updates existing menu structures surgically by replacing content.</p>
+            </div>
+
+            <div class="action-card" onclick="triggerPreset('remove_baseline')">
+              <div class="action-header">
+                <span class="action-title">4. Destruct Baseline View</span>
+                <span class="action-badge">REMOVE</span>
+              </div>
+              <p class="action-desc">Physically deletes the baseline tutorial element to clean up the space.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- DSL Direct Editor -->
+        <div class="card">
+          <div class="card-title">Repatch DSL Manual Console</div>
+          <textarea class="dsl-editor-textarea" id="custom-dsl" placeholder="STYLE #patch-workspace {&#10;  background: #1e1b4b;&#10;  border-color: #a855f7;&#10;}"></textarea>
+          <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="sendCustomDsl()">Execute DSL Command</button>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Include the SDK from local sdk path -->
+  <script src="/sdk/repatch-sdk.js"></script>
+
+  <script>
+    let repatch = null;
+    const consoleBox = document.getElementById('terminal-console');
+
+    // Virtual Console Log capture
+    const originalLog = console.log;
+    const originalError = console.error;
+    const originalWarn = console.warn;
+
+    function addConsoleLine(tag, text, type = 'dsl') {
+      const line = document.createElement('div');
+      line.className = 'console-line';
+      
+      const tagSpan = document.createElement('span');
+      tagSpan.className = `console-tag tag-${type}`;
+      tagSpan.textContent = tag;
+
+      const contentSpan = document.createElement('span');
+      contentSpan.className = 'console-content';
+      contentSpan.textContent = text;
+
+      line.appendChild(tagSpan);
+      line.appendChild(contentSpan);
+      consoleBox.appendChild(line);
+      consoleBox.scrollTop = consoleBox.scrollHeight;
+    }
+
+    console.log = function(...args) {
+      originalLog.apply(console, args);
+      const text = args.join(' ');
+      if (text.includes('[Repatch DSL]')) {
+        addConsoleLine('DSL', text.replace('[Repatch DSL]', '').trim(), 'dsl');
+      } else if (text.includes('[Repatch Action]')) {
+        addConsoleLine('ACTION', text.replace('[Repatch Action]', '').trim(), 'action');
+      } else {
+        // Regular log
+        if (text.includes('[Repatch SDK]')) {
+          addConsoleLine('SDK', text.replace('[Repatch SDK]', '').trim(), 'action');
+        }
+      }
+    };
+
+    console.error = function(...args) {
+      originalError.apply(console, args);
+      const text = args.join(' ');
+      addConsoleLine('ERROR', text.replace('[Repatch Error]', '').trim(), 'error');
+    };
+
+    console.warn = function(...args) {
+      originalWarn.apply(console, args);
+      const text = args.join(' ');
+      addConsoleLine('WARN', text, 'error');
+    };
+
+    // Initialize SDK
+    document.addEventListener('DOMContentLoaded', () => {
+      // Connect to WebSocket server served by node
+      const wsUrl = `ws://${window.location.host}/repatch`;
+      repatch = new RepatchSDK({ url: wsUrl, protocol: 'ws' });
+      repatch.connect();
+
+      repatch.onPatch((result) => {
+        if (result.success) {
+          const status = document.getElementById('connection-status');
+          status.textContent = 'Active: Patch received';
+          setTimeout(() => {
+            status.textContent = 'Connected (Live WS)';
+          }, 1500);
+        }
+      });
+
+      // Update UI Status
+      setTimeout(() => {
+        const status = document.getElementById('connection-status');
+        status.innerHTML = '<span class="status-dot"></span>Connected (Live WS)';
+      }, 1000);
+    });
+
+    function clearConsole() {
+      consoleBox.innerHTML = `
+        <div class="console-line">
+          <span class="console-tag tag-action">SYSTEM</span>
+          <span class="console-content">Terminal cleared. Waiting for events...</span>
+        </div>
+      `;
+    }
+
+    function sendCustomDsl() {
+      const textarea = document.getElementById('custom-dsl');
+      const dsl = textarea.value.trim();
+      if (!dsl) return;
+      
+      // Send via WS to server which will broadcast it back, mimicking live server-side MCP agent loop
+      repatch.sendPatchRequest(dsl);
+      textarea.value = '';
+    }
+
+    function simulateFirstStep() {
+      // Direct local simulation
+      repatch.apply(`REPLACE #baseline-view <div class="baseline-layout">
+        <h2 class="baseline-title">Evolving Dashboard Suite</h2>
+        <p class="baseline-text">We are transitioning this layout into a modular analytics portal. Use the sidebar simulator to perform surgical updates.</p>
+        <div style="display:flex; justify-content:center; gap: 12px; margin-top:20px;">
+          <button class="btn btn-primary" onclick="triggerPreset('add_dashboard')">Append Live widgets</button>
+          <button class="btn btn-secondary" onclick="triggerPreset('style_neon')">Change Theme</button>
+        </div>
+      </div>`);
+    }
+
+    // Trigger Server side preset commands
+    function triggerPreset(presetName) {
+      if (repatch) {
+        repatch.sendPatchRequest(`TRIGGER_PRESET ${presetName}`);
+      }
+    }
+  </script>
+</body>
+</html>

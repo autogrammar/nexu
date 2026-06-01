@@ -1,13 +1,14 @@
-# nexu | 120f 21510L | python:116,shell:3,less:1 | 2026-06-01
-# stats: 800 func | 21 cls | 120 mod | CC̄=4.7 | critical:79 | cycles:0
+# nexu | 121f 21725L | python:115,shell:3,javascript:2,less:1 | 2026-06-01
+# stats: 799 func | 20 cls | 121 mod | CC̄=4.7 | critical:79 | cycles:0
 # alerts[5]: CC test_render_server_script_embeds_runtime_context=74; CC test_cinema_player_template_is_externalized=68; CC test_import_http_project_fetches_and_migrates=23; CC test_import_zip_project_creates_markpact_migration_and_options=22; CC test_projects_import_zip_endpoint=19
 # hotspots[5]: test_projects_import_zip_endpoint fan=33; test_iterate_dashboard_kinds_colors_prefers_offline_before_llm fan=32; test_iterate_colors_scope_uses_offline_path fan=31; test_iterate_colors_scope_uses_llm_patch_when_available fan=30; test_iterate_functions_scope_skips_offline_fast_path fan=29
 # evolution: baseline
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[120]:
-  app.doql.less,155
+M[121]:
+  app.doql.less,153
   examples/backend_service/app/users.py,9
   examples/frontend_view/src/menu_icons.py,25
+  examples/mcp_patch_demo/server.js,88
   examples/mcp_service/src/demo.py,11
   examples/nexu_markpact_exporter.py,96
   examples/realtime_lane_nexu_sync.py,63
@@ -29,6 +30,7 @@ M[120]:
   project.sh,50
   scripts/check-doc-links.py,115
   scripts/ci-cinema-smoke.sh,86
+  sdk/js/repatch-sdk.js,187
   src/nexu/__init__.py,6
   src/nexu/__main__.py,5
   src/nexu/blueprint.py,74
@@ -41,7 +43,7 @@ M[120]:
   src/nexu/cinema_history.py,245
   src/nexu/cinema_html.py,17
   src/nexu/cinema_html_validate.py,202
-  src/nexu/cinema_http_preprocess.py,605
+  src/nexu/cinema_http_preprocess.py,607
   src/nexu/cinema_iterate.py,67
   src/nexu/cinema_llm.py,333
   src/nexu/cinema_llm_contracts.py,197
@@ -50,7 +52,6 @@ M[120]:
   src/nexu/cinema_options_cache.py,129
   src/nexu/cinema_policy.py,862
   src/nexu/cinema_project_imports.py,1135
-  src/nexu/cinema_project_ir.py,133
   src/nexu/cinema_projects.py,721
   src/nexu/cinema_publish.py,470
   src/nexu/cinema_scope.py,235
@@ -92,7 +93,7 @@ M[120]:
   tests/test_capsule_next_stage.py,59
   tests/test_capsule_runtime_report.py,51
   tests/test_cinema_baseline_contracts.py,53
-  tests/test_cinema_dom_patch.py,71
+  tests/test_cinema_dom_patch.py,74
   tests/test_cinema_goal_contracts.py,128
   tests/test_cinema_history.py,50
   tests/test_cinema_html_validate.py,106
@@ -100,7 +101,7 @@ M[120]:
   tests/test_cinema_iterate.py,89
   tests/test_cinema_llm.py,279
   tests/test_cinema_llm_contracts.py,61
-  tests/test_cinema_marked_context.py,208
+  tests/test_cinema_marked_context.py,230
   tests/test_cinema_markpact.py,45
   tests/test_cinema_offline_options.py,318
   tests/test_cinema_options_cache.py,65
@@ -109,12 +110,12 @@ M[120]:
   tests/test_cinema_project_ir.py,23
   tests/test_cinema_projects.py,206
   tests/test_cinema_publish.py,99
-  tests/test_cinema_scope.py,263
+  tests/test_cinema_scope.py,312
   tests/test_cinema_scripts.py,45
   tests/test_cinema_server.py,1004
   tests/test_cinema_spatial_patch.py,30
   tests/test_cinema_traces.py,112
-  tests/test_cinema_ui_patch.py,157
+  tests/test_cinema_ui_patch.py,156
   tests/test_export_prompt_ledger.py,42
   tests/test_fast_delivery.py,243
   tests/test_intract.py,12
@@ -584,12 +585,6 @@ D:
     list_imported_projects(cinema_dir)
     merged_projects_catalog(cinema_dir)
     activate_imported_project(cinema_dir;project_id)
-  src/nexu/cinema_project_ir.py:
-    e: _clean_text,build_project_ir,summarize_project_ir,_ProjectIRParser
-    _ProjectIRParser: __init__(0),handle_starttag(2),_classify_node(4),handle_endtag(1),handle_data(1)
-    _clean_text(text)
-    build_project_ir(html)
-    summarize_project_ir(ir)
   src/nexu/cinema_projects.py:
     e: find_nexu_repo_root,deleted_project_ids,mark_project_deleted,is_example_project_id,_project_catalog_entry,_catalog_filters,list_project_catalog,delete_example_project,_resolve_source_cinema,_project_widgets,_seed_html_for_project,_copy_cinema_files,_write_seed_variants,_find_example_project,_active_project_meta,_write_active_project_meta,_resolve_root_for_project_source,_copy_or_seed_project_files,_sync_project_options,_apply_preprocess_meta,_bootstrap_goal_from_project,_init_project_activation,activate_example_project,load_active_project,ExampleProject
     ExampleProject: to_public_dict(0)
@@ -901,9 +896,9 @@ D:
     test_snapshot_includes_calculator_baselines(tmp_path)
     test_merge_does_not_duplicate(tmp_path)
   tests/test_cinema_dom_patch.py:
-    e: test_build_function_option_patches_returns_valid_abc,test_build_function_option_patches_applies_delete_marks,test_function_patch_context_is_compact_ir,test_supports_function_patch_only_for_web_like_projects
+    e: test_build_function_option_patches_returns_valid_abc,test_build_function_option_patches_xpatches_delete_marks,test_function_patch_context_is_compact_ir,test_supports_function_patch_only_for_web_like_projects
     test_build_function_option_patches_returns_valid_abc()
-    test_build_function_option_patches_applies_delete_marks()
+    test_build_function_option_patches_xpatches_delete_marks()
     test_function_patch_context_is_compact_ir()
     test_supports_function_patch_only_for_web_like_projects()
   tests/test_cinema_goal_contracts.py:
@@ -977,7 +972,7 @@ D:
     test_llm_contract_block_tracks_scope_and_policy()
     test_llm_option_variants_are_scope_contracts_not_domain_templates()
   tests/test_cinema_marked_context.py:
-    e: test_build_marked_element_context_extracts_subtree_and_css,test_build_marked_element_context_uses_client_fragment_fallback,test_build_marked_element_context_returns_none_without_marks,test_build_marked_element_context_patch_mode_note,test_ui_patch_prompt_uses_marked_context_fragment,test_has_ui_marks,test_restrict_scope_css_to_marks_targets_delete_only,test_inject_scope_style_skips_global_css_for_keep_only_marks,test_inject_scope_style_scopes_css_to_delete_marks,test_resolve_marked_selectors_includes_classes,test_marked_scope_colors_css_differs_by_variant,test_should_block_full_html_for_imported_marks,test_marked_css_selectors_includes_btn_prefix
+    e: test_build_marked_element_context_extracts_subtree_and_css,test_build_marked_element_context_uses_client_fragment_fallback,test_build_marked_element_context_returns_none_without_marks,test_build_marked_element_context_patch_mode_note,test_ui_patch_prompt_uses_marked_context_fragment,test_has_ui_marks,test_restrict_scope_css_to_marks_targets_delete_only,test_inject_scope_style_skips_global_css_for_keep_only_marks,test_inject_scope_style_scopes_css_to_delete_marks,test_resolve_marked_selectors_includes_classes,test_inject_scope_style_colors_mixed_keep_delete,test_marked_scope_colors_css_differs_by_variant,test_should_block_full_html_for_imported_marks,test_marked_css_selectors_includes_btn_prefix
     test_build_marked_element_context_extracts_subtree_and_css()
     test_build_marked_element_context_uses_client_fragment_fallback()
     test_build_marked_element_context_returns_none_without_marks()
@@ -988,6 +983,7 @@ D:
     test_inject_scope_style_skips_global_css_for_keep_only_marks()
     test_inject_scope_style_scopes_css_to_delete_marks()
     test_resolve_marked_selectors_includes_classes()
+    test_inject_scope_style_colors_mixed_keep_delete()
     test_marked_scope_colors_css_differs_by_variant()
     test_should_block_full_html_for_imported_marks()
     test_marked_css_selectors_includes_btn_prefix()
@@ -1072,7 +1068,7 @@ D:
     test_list_and_start_stop_service(cinema_setup)
     test_publish_missing_stage_returns_error(cinema_setup)
   tests/test_cinema_scope.py:
-    e: test_dashboard_disallows_keypad_scope,test_calculator_allows_keypad_scope,test_offline_fast_scopes_per_kind,test_dashboard_colors_offline_labels,test_scope_option_variants_dashboard_functions,test_strip_and_inject_scope_style,test_scoped_html_fragment_for_calculator_colors,test_cinema_has_offline_baseline,test_inject_scope_style_calculator_colors,test_load_cinema_ui_profile_from_active_and_stage,test_ui_profile_ignores_runtime_script_tokens,test_can_use_offline_fast_iterate,test_imported_kind_uses_web_scopes,test_http_import_offline_colors_keeps_site_markers,test_http_import_offline_colors_recolors_marked_buttons
+    e: test_dashboard_disallows_keypad_scope,test_calculator_allows_keypad_scope,test_offline_fast_scopes_per_kind,test_dashboard_colors_offline_labels,test_scope_option_variants_dashboard_functions,test_strip_and_inject_scope_style,test_scoped_html_fragment_for_calculator_colors,test_cinema_has_offline_baseline,test_inject_scope_style_calculator_colors,test_load_cinema_ui_profile_from_active_and_stage,test_ui_profile_ignores_runtime_script_tokens,test_can_use_offline_fast_iterate,test_imported_kind_uses_web_scopes,test_http_import_offline_colors_keeps_site_markers,test_http_import_offline_colors_recolors_marked_buttons,test_http_import_offline_colors_respects_keep_marks
     test_dashboard_disallows_keypad_scope()
     test_calculator_allows_keypad_scope()
     test_offline_fast_scopes_per_kind()
@@ -1088,6 +1084,7 @@ D:
     test_imported_kind_uses_web_scopes()
     test_http_import_offline_colors_keeps_site_markers(tmp_path;monkeypatch)
     test_http_import_offline_colors_recolors_marked_buttons(tmp_path)
+    test_http_import_offline_colors_respects_keep_marks(tmp_path)
   tests/test_cinema_scripts.py:
     e: test_finalize_strips_truncated_llm_script_and_injects_canonical,test_finalize_marks_web_gui_components_as_selectable_targets,test_inject_cinema_shield_preserves_existing_scripts,test_inject_cinema_shield_posts_compact_marked_fragment
     test_finalize_strips_truncated_llm_script_and_injects_canonical()

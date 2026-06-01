@@ -598,7 +598,7 @@ def _compact_llm_error(err_text: str) -> str:
         return compact[:260]
 
 
-def _load_policy_payload() -> dict:
+def _load_policy_payload(*, stage: int = 0, focus_scope: str = "") -> dict:
     snapshot = {}
     if POLICY_SNAPSHOT_PATH.exists():
         snapshot = json.loads(POLICY_SNAPSHOT_PATH.read_text(encoding="utf-8"))
@@ -607,7 +607,9 @@ def _load_policy_payload() -> dict:
         ledger = json.loads(POLICY_LEDGER_PATH.read_text(encoding="utf-8"))
     if not isinstance(ledger, list):
         ledger = []
-    effective_ui = _effective_ui_constraints_from_ledger(ledger, stage=0)
+    effective_ui = _effective_ui_constraints_from_ledger(
+        ledger, stage=stage, focus_scope=focus_scope
+    )
     return {"snapshot": snapshot, "ledger": ledger, "effective_ui": effective_ui}
 
 
@@ -622,10 +624,20 @@ def _apply_entry_constraints(entry: dict, state: dict):
             state[key] = "delete"
 
 
-def _effective_ui_constraints_from_ledger(ledger: list, stage: int = 0) -> dict:
+def _effective_ui_constraints_from_ledger(
+    ledger: list, stage: int = 0, focus_scope: str = ""
+) -> dict:
     try:
         import nexu_hooks
-        return nexu_hooks.effective_ui_constraints(stage)
+        return nexu_hooks.effective_ui_constraints(stage, focus_scope=focus_scope)
+    except Exception:
+        pass
+    try:
+        from nexu.cinema_policy import effective_ui_constraints_from_ledger
+
+        return effective_ui_constraints_from_ledger(
+            ledger, stage=stage, focus_scope=focus_scope or None
+        )
     except Exception:
         pass
     state = {}
@@ -825,12 +837,22 @@ def _validate_intract_artifact(artifact: str, proposals: list, filename: str):
     return nexu_hooks.validate_artifact(artifact, proposals, filename)
 
 
-def _append_policy_entry(stage: int, keep_els: list, delete_els: list, status: str, model: str) -> dict:
+def _append_policy_entry(
+    stage: int,
+    keep_els: list,
+    delete_els: list,
+    status: str,
+    model: str,
+    *,
+    focus_scope: str = "",
+) -> dict:
     try:
         import nexu_hooks
     except ImportError:
         return _append_policy_entry_legacy(stage, keep_els, delete_els, status, model)
-    return nexu_hooks.append_policy_entry(stage, keep_els, delete_els, status, model)
+    return nexu_hooks.append_policy_entry(
+        stage, keep_els, delete_els, status, model, focus_scope=focus_scope
+    )
 
 
 def _save_history_checkpoint(**kwargs) -> dict | None:
@@ -877,6 +899,7 @@ def _patch_option_previews(
     stage: int = 0,
     session_keep: list | None = None,
     session_delete: list | None = None,
+    focus_scope: str = "",
 ) -> dict:
     try:
         import nexu_hooks
@@ -886,6 +909,7 @@ def _patch_option_previews(
         stage,
         session_keep=session_keep,
         session_delete=session_delete,
+        focus_scope=focus_scope,
     )
 
 
@@ -1723,6 +1747,20 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                     if normalized_element_hints
                     else "none provided"
                 )
+
+                try:
+                    import nexu_hooks
+                    from nexu.cinema_project_imports import restore_http_import_stages_if_needed
+
+                    active = nexu_hooks.active_project() or {}
+                    project_id = str(active.get("id") or "")
+                    if project_id.startswith("http-"):
+                        meta_path = DIRECTORY / "imported_projects" / project_id / "project.json"
+                        if meta_path.is_file():
+                            import_meta = json.loads(meta_path.read_text(encoding="utf-8"))
+                            restore_http_import_stages_if_needed(DIRECTORY, import_meta)
+                except Exception:
+                    pass
                 
                 # Read current active stage HTML
                 stage_file = DIRECTORY / f'stage{current_stage}.html'
@@ -1749,7 +1787,9 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 ]
                 if session_delete or session_keep:
                     pending_goal = False
-                policy_payload = _load_policy_payload()
+                policy_payload = _load_policy_payload(
+                    stage=current_stage, focus_scope=focus_scope
+                )
                 goal_contract_lines: list[str] = []
                 ui_profile = _load_cinema_ui_profile()
                 project_kind = str(ui_profile.get("kind") or "").lower()
@@ -2817,8 +2857,32 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                             trace_label="active workspace",
                         )
                         if evolved_html:
-                            stage_file.write_text(evolved_html, encoding="utf-8")
-                            status_msg = 'evolved_by_llm'
+                            reject_reason = None
+                            try:
+                                import nexu_hooks
+                                from nexu.cinema_project_imports import reject_import_stage_replacement
+
+                                active = nexu_hooks.active_project() or {}
+                                project_id = str(active.get("id") or "")
+                                if project_id.startswith("http-"):
+                                    meta_path = (
+                                        DIRECTORY / "imported_projects" / project_id / "project.json"
+                                    )
+                                    if meta_path.is_file():
+                                        import_meta = json.loads(
+                                            meta_path.read_text(encoding="utf-8")
+                                        )
+                                        reject_reason = reject_import_stage_replacement(
+                                            evolved_html, import_meta
+                                        )
+                            except Exception:
+                                reject_reason = None
+                            if reject_reason:
+                                status_msg = "llm_blocked_import_guard"
+                                llm_error = reject_reason
+                            else:
+                                stage_file.write_text(evolved_html, encoding="utf-8")
+                                status_msg = 'evolved_by_llm'
                         else:
                             status_msg = f'llm_failed: {llm_error or "Invalid HTML returned"}'
                 
@@ -2847,13 +2911,19 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                         current_stage,
                         session_keep=session_keep,
                         session_delete=session_delete,
+                        focus_scope=focus_scope,
                     )
 
                 policy_entry = None
                 intract_validation = None
                 if keep_els or delete_els:
                     policy_entry = _append_policy_entry(
-                        current_stage, keep_els, delete_els, status_msg, model
+                        current_stage,
+                        keep_els,
+                        delete_els,
+                        status_msg,
+                        model,
+                        focus_scope=focus_scope,
                     )
                 if evolved_html and policy_entry:
                     intract_validation = _validate_intract_artifact(

@@ -6,7 +6,12 @@ from pathlib import Path
 from .capsule import load_capsule
 from .diff import diff_capsule
 from .files import collect_files, rel
-from .intract import IntentContract, read_manifest_contracts, scan_contracts_in_file
+from .intract import (
+    IntentContract,
+    read_manifest_contracts,
+    read_toon_manifest_contracts,
+    scan_contracts_in_file,
+)
 from .intract_adapter import check_intract_policy
 from .models import VerificationFinding, VerificationReport, write_yaml
 from .paths import capsule_dir
@@ -39,6 +44,9 @@ def _scan_capsule_contracts(
     manifest_name: str = "intract.yaml",
 ) -> list[IntentContract]:
     contracts = read_manifest_contracts(base / manifest_name)
+    toon_path = base / "intract.toon.yaml"
+    if toon_path.exists():
+        contracts.extend(read_toon_manifest_contracts(toon_path))
     for path in collect_files(base / "src"):
         contracts.extend(scan_contracts_in_file(path, base))
     return contracts

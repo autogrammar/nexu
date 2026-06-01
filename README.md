@@ -8,11 +8,11 @@ Evolution in scope: functions
 
 ## AI Cost Tracking
 
-![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.5.24-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
-![AI Cost](https://img.shields.io/badge/AI%20Cost-$6.87-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-13.2h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
+![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.5.25-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
+![AI Cost](https://img.shields.io/badge/AI%20Cost-$7.26-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-13.3h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
 
-- 🤖 **LLM usage:** $6.8696 (31 commits)
-- 👤 **Human dev:** ~$1316 (13.2h @ $100/h, 30min dedup)
+- 🤖 **LLM usage:** $7.2628 (32 commits)
+- 👤 **Human dev:** ~$1333 (13.3h @ $100/h, 30min dedup)
 
 Generated on 2026-06-01 using [openrouter/qwen/qwen3-coder-next](https://openrouter.ai/qwen/qwen3-coder-next)
 
@@ -391,17 +391,55 @@ pyqual.yaml                     declarative quality profile
 Makefile                        local development commands
 ```
 
-## Related Local Tools
-
-Nexu can benefit from sibling Semcod tools when they are installed locally:
-
-- `intract` for intent contracts and contract coverage,
-- `redup` for duplicate-code scanning,
-- `regix` for regression-oriented quality tracking,
-- `pyqual` for declarative quality pipelines,
-- `vallm`, `llx`, `docval` and `testless` for deeper validation and automation workflows.
-
 The default `make quality` profile already uses `intract` and `redup`.
+
+## Repatch: Real-Time Live UI Evolution (MCP + WebSockets)
+
+Nexu integrates with the **Repatch** package to enable an evolutionary approach to frontend development. Rather than traditional full-page generation and browser reloads, Repatch treats the running page as a **continuous live target** that is mutated in-place via a lightweight WebSocket/SSE streaming protocol.
+
+### Repatch SDK (`./sdk/js/`)
+A pure-JavaScript client-side SDK (`repatch-sdk.js`) connects to the local patch server and parses the surgical **Repatch DSL**:
+- `ADD <selector> <html_content>`: Appends a child element dynamically.
+- `REPLACE <selector> <html_content>`: Replaces the inner HTML of a targeted selector.
+- `STYLE <selector> { css_rules }`: Applies visual style updates to targets in real time.
+- `REMOVE <selector>`: Surgically deletes elements from the page.
+
+### Live Evolution Demo (`./examples/mcp_patch_demo/`)
+A premium glassmorphic live preview dashboard:
+- Mounts the local Repatch JS SDK.
+- Streams live UI mutations via a Node.js WebSocket server.
+- Displays an interactive virtual terminal log of received DSL patches.
+- To run, execute: `cd examples/mcp_patch_demo && npm install && npm start`.
+
+---
+
+## Dual-Mode Intract Support
+
+Intent verification via **Intract** now supports two powerful operation modes:
+1. **Inline Comments (Directly in Code):** Place `@intract.v1` rules directly preceding the classes, functions, or blocks they govern inside source files.
+2. **Standalone Manifest (`intract.toon.yaml`):** An external manifest allowing precise target coordinate addressing:
+   - **`target.file`**: Target file path.
+   - **`target.function`**: Target function name.
+   - **`target.line`**: Target code line number.
+   - **`target.xpath` / `xpatch`**: Target HTML/XML nodes via XPath.
+
+Example `intract.toon.yaml`:
+```yaml
+contracts:
+  - id: forbid-destructive-updates
+    intent: ensure-no-write
+    forbid: [destructive_write, write]
+    target:
+      file: "src/calculator.py"
+      function: "add_numbers"
+      line: 45
+  - id: button-style-check
+    intent: validate-element-style
+    validate: [contrast_ratio]
+    target:
+      file: "index.html"
+      xpath: "//button[@id='btn-eq']"
+```
 
 ## License
 

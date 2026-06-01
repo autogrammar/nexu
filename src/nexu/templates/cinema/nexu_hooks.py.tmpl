@@ -66,9 +66,24 @@ def propose_llm(stage: int, goal: str, model: str):
     return propose_llm_for_stage(ROOT, CAPSULE, stage, goal, model=model)
 
 
-def append_policy_entry(stage: int, keep, delete, status: str, model: str):
+def append_policy_entry(stage: int, keep, delete, status: str, model: str, **kwargs):
+    cinema = Path(__file__).resolve().parent
+    active = load_active_project(cinema) or {}
+    project_id = str(active.get("id") or "").strip()
+    project_kind = str(active.get("kind") or "").strip().lower()
+    domain = "calculator" if project_kind == "calculator" else "web"
     return append_iteration_ledger_entry(
-        ROOT, CAPSULE, stage=stage, keep=keep, delete=delete, status=status, model=model
+        ROOT,
+        CAPSULE,
+        stage=stage,
+        keep=keep,
+        delete=delete,
+        status=status,
+        model=model,
+        domain=domain,
+        project_id=project_id,
+        focus_scope=str(kwargs.get("focus_scope") or "").strip(),
+        cinema_dir=cinema,
     )
 
 
@@ -120,8 +135,15 @@ def restore_history(checkpoint_id: str, *, apply_manifest: bool = True, target: 
     )
 
 
-def effective_ui_constraints(stage: int = 0):
-    return load_effective_ui_constraints(ROOT, CAPSULE, stage=stage)
+def effective_ui_constraints(stage: int = 0, focus_scope: str = ""):
+    cinema = Path(__file__).resolve().parent
+    return load_effective_ui_constraints(
+        ROOT,
+        CAPSULE,
+        stage=stage,
+        focus_scope=focus_scope or None,
+        cinema_dir=cinema,
+    )
 
 
 def sync_option_previews(stage: int = 0, delete_ids=None):
@@ -139,6 +161,7 @@ def patch_option_previews(
     stage: int = 0,
     session_keep=None,
     session_delete=None,
+    focus_scope: str = "",
 ):
     """Apply DELETE policy to alt_a/b/c without copying workspace."""
     from nexu.cinema_policy import (
@@ -148,15 +171,21 @@ def patch_option_previews(
     )
 
     cinema = Path(__file__).resolve().parent
-    effective = load_effective_ui_constraints(ROOT, CAPSULE, stage=stage)
+    effective = load_effective_ui_constraints(
+        ROOT,
+        CAPSULE,
+        stage=stage,
+        focus_scope=focus_scope or None,
+        cinema_dir=cinema,
+    )
     if session_keep is not None or session_delete is not None:
         merged = merge_ui_constraint_lists(
-            list(effective.get("keep") or []),
-            list(effective.get("delete") or []),
-            list(session_keep or []),
-            list(session_delete or []),
+            ledger_keep=list(effective.get("keep") or []),
+            ledger_delete=list(effective.get("delete") or []),
+            session_keep=list(session_keep or []),
+            session_delete=list(session_delete or []),
         )
-        to_delete = list(merged.get("delete") or [])
+        _keep, to_delete = merged
     else:
         to_delete = list(effective.get("delete") or [])
     if not to_delete:

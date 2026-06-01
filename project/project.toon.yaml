@@ -1,38 +1,38 @@
-# nexu | 668 func | 78f | 18710L | python | 2026-06-01
+# nexu | 595 func | 75f | 17035L | python | 2026-06-01
 # generated in 0.00s
 
 HEALTH:
-  CC̄=4.8  critical=69 (limit:10)  dup=0  cycles=0
+  CC̄=4.6  critical=55 (limit:10)  dup=0  cycles=0
 
 ALERTS[20]:
   !!! cc_exceeded      CustomHTTPRequestHandler.do_POST = 211 (limit:15)
   !!! high_fan_out     CustomHTTPRequestHandler.do_POST = 148 (limit:10)
   !!! cc_exceeded      CustomHTTPRequestHandler.do_GET = 34 (limit:15)
-  !!! cc_exceeded      _bind_annotations_to_html = 29 (limit:15)
   !!! high_fan_out     CustomHTTPRequestHandler.do_GET = 29 (limit:10)
-  !!! cc_exceeded      apply_ui_patch_options = 25 (limit:15)
   !!! high_fan_out     run_example = 23 (limit:10)
   !!! high_fan_out     load_config = 23 (limit:10)
   !!! high_fan_out     _finish_import = 22 (limit:10)
   !!! high_fan_out     build_review_packet = 21 (limit:10)
+  !!! high_fan_out     build_capsule_report = 21 (limit:10)
+  !!! high_fan_out     create_capsule = 21 (limit:10)
 
-MODULES[99] (top by size):
+MODULES[96] (top by size):
   M[examples/web_app_calculator/cinema/server.py] 2746L C:2 F:68 CC↑211 D:0 (python)
   M[src/nexu/cinema_project_imports.py] 1134L C:0 F:52 CC↑17 D:1 (python)
-  M[src/nexu/cinema_offline_options.py] 897L C:0 F:32 CC↑13 D:2 (python)
+  M[src/nexu/cinema_offline_options.py] 897L C:0 F:32 CC↑13 D:1 (python)
   M[src/nexu/cinema_policy.py] 861L C:0 F:40 CC↑13 D:6 (python)
-  M[src/nexu/cinema_scripts.py] 772L C:0 F:8 CC↑6 D:7 (python)
   M[src/nexu/cinema_projects.py] 720L C:1 F:25 CC↑14 D:4 (python)
-  M[src/nexu/cinema_scope.py] 686L C:0 F:22 CC↑29 D:7 (python)
-  M[src/nexu/cinema_http_preprocess.py] 623L C:1 F:30 CC↑16 D:5 (python)
+  M[src/nexu/cinema_scripts.py] 672L C:0 F:4 CC↑6 D:6 (python)
+  M[src/nexu/cinema_http_preprocess.py] 606L C:1 F:29 CC↑16 D:4 (python)
   M[goal.yaml] 512L C:0 F:0 CC↑0 D:0 (yaml)
-  M[src/nexu/cinema_marked_context.py] 502L C:0 F:25 CC↑17 D:2 (python)
   M[src/nexu/cinema_publish.py] 469L C:0 F:23 CC↑15 D:1 (python)
   M[src/nexu/mcp_server.py] 393L C:0 F:13 CC↑6 D:1 (python)
   M[src/nexu/cli.py] 379L C:0 F:23 CC↑4 D:0 (python)
   M[src/nexu/cinema_goal_contracts.py] 345L C:0 F:15 CC↑15 D:2 (python)
   M[src/nexu/cinema_llm.py] 332L C:0 F:18 CC↑12 D:1 (python)
-  LANGS: python:80/yaml:9/other:2/txt:2/json:2/shell:2/yml:1/toml:1
+  M[src/nexu/verify.py] 317L C:0 F:14 CC↑12 D:0 (python)
+  M[examples/web_app_calculator/cinema/nexu_hooks.py] 280L C:0 F:28 CC↑11 D:7 (python)
+  LANGS: python:77/yaml:9/other:2/txt:2/json:2/shell:2/yml:1/toml:1
 
 HOTSPOTS[10]:
   ★ CustomHTTPRequestHandler.do_POST fan=148  // Orchestrates 148 calls
@@ -44,9 +44,9 @@ HOTSPOTS[10]:
 REFACTOR[15]:
   [1] H/L Split CustomHTTPRequestHandler.do_GET (CC=34)
   [2] H/L Split CustomHTTPRequestHandler.do_POST (CC=211)
-  [3] H/L Split apply_ui_patch_options (CC=25)
-  [4] H/L Split _bind_annotations_to_html (CC=29)
-  [5] H/H Split god module examples/web_app_calculator/cinema/server.py (2746L, 2 classes)
+  [3] H/H Split god module examples/web_app_calculator/cinema/server.py (2746L, 2 classes)
+  [4] H/H Split god module src/nexu/cinema_project_imports.py (1134L, 0 classes)
+  [5] H/H Split god module src/nexu/cinema_http_preprocess.py (606L, 1 classes)
 
 EVOLUTION:
-  2026-06-01 CC̄=4.8 crit=69 18710L // Automated analysis
+  2026-06-01 CC̄=4.6 crit=55 17035L // Automated analysis

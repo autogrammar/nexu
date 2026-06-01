@@ -185,6 +185,28 @@ def test_resolve_marked_selectors_includes_classes() -> None:
     assert not any(sel.startswith("#Zapisz ") for sel in selectors)
 
 
+def test_inject_scope_style_colors_mixed_keep_delete() -> None:
+    html = (
+        "<html><head></head><body>"
+        '<button class="button header-button">Zapisz swoje dziecko</button>'
+        '<a class="button kb-btn2_237106-a1" href="#">Zapisz dziecko</a>'
+        '<button class="button kb-btn2_487f06-54">Nasza lokalizacja</button>'
+        "</body></html>"
+    )
+    patched = inject_scope_style(
+        html,
+        "colors",
+        "a",
+        project_kind="imported",
+        delete_ids=["Zapisz swoje dziecko"],
+        keep_ids=["Zapisz dziecko", "Nasza lokalizacja"],
+    )
+    assert "nexu-scope-variant" in patched
+    assert "background-color:#38bdf8" in patched
+    assert '[data-nexu-target="Zapisz swoje dziecko"]' in patched
+    assert "html,body" not in patched
+
+
 def test_marked_scope_colors_css_differs_by_variant() -> None:
     selectors = [".kb-btn2_237106-a1"]
     a = marked_scope_colors_css(selectors, "a")

@@ -8,32 +8,74 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Literal
 
-from .cinema_scripts import apply_spatial_deletes_to_html, finalize_cinema_html
+from repatch import (
+    OPTION_PREVIEW_FILES as _REPATCH_OPTION_PREVIEW_FILES,
+    enforce_deletes_on_option_previews as _repatch_enforce_deletes_on_option_previews,
+    html_files_distinct as _repatch_html_files_distinct,
+    replace_html_title as _repatch_replace_html_title,
+    sync_option_previews_from_workspace as _repatch_sync_option_previews_from_workspace,
+)
+
+from .cinema_scripts import finalize_cinema_html
 from .paths import capsule_dir, project_root
 from .verify import verify_capsule
 
-_OPTION_PREVIEW_FILES: tuple[tuple[str, str], ...] = (
-    ("alt_a.html", "Option A (minimal)"),
-    ("alt_b.html", "Option B (balanced)"),
-    ("alt_c.html", "Option C (expanded)"),
-)
+_OPTION_PREVIEW_FILES = _REPATCH_OPTION_PREVIEW_FILES
 
 ManifestTarget = Literal["project", "capsule", "both"]
 
 _VALID_TARGETS = frozenset({"project", "capsule", "both"})
 
 
+def _ledger_entry_matches_project(
+    entry: dict[str, Any],
+    *,
+    project_id: str | None,
+    project_kind: str | None,
+) -> bool:
+    """Ignore legacy calculator marks when an HTTP import is active."""
+    entry_pid = str(entry.get("project_id") or "").strip()
+    if entry_pid:
+        return entry_pid == str(project_id or "").strip()
+    kind = str(project_kind or "").lower()
+    active_id = str(project_id or "").strip()
+    if kind == "imported" or active_id.startswith("http-"):
+        return False
+    return True
+
+
+def _ledger_entry_matches_scope(entry: dict[str, Any], *, focus_scope: str | None) -> bool:
+    """Scope-specific marks apply only within the same #scope iteration."""
+    entry_scope = str(entry.get("focus_scope") or "").strip().lower()
+    if not entry_scope:
+        return True
+    active_scope = str(focus_scope or "").strip().lower()
+    if not active_scope:
+        return True
+    return entry_scope == active_scope
+
+
 def _process_ledger_entry(
     entry: dict[str, Any],
     state: dict[str, str],
     stage: int | None,
+    *,
+    project_id: str | None = None,
+    project_kind: str | None = None,
+    focus_scope: str | None = None,
 ) -> None:
     """Process a single ledger entry and update the state."""
     if stage is not None:
         raw_stage = entry.get("stage")
         if raw_stage is not None and int(raw_stage) != stage:
             return
-    
+    if not _ledger_entry_matches_project(
+        entry, project_id=project_id, project_kind=project_kind
+    ):
+        return
+    if not _ledger_entry_matches_scope(entry, focus_scope=focus_scope):
+        return
+
     _process_keep_delete_entries(entry, state)
     _process_proposed_contracts(entry, state)
 
@@ -75,6 +117,9 @@ def effective_ui_constraints_from_ledger(
     ledger: list[Any],
     *,
     stage: int | None = None,
+    project_id: str | None = None,
+    project_kind: str | None = None,
+    focus_scope: str | None = None,
 ) -> dict[str, Any]:
     """
     Effective KEEP/DELETE per UI element from the cinema policy ledger.
@@ -89,7 +134,14 @@ def effective_ui_constraints_from_ledger(
     for entry in ledger:
         if not isinstance(entry, dict):
             continue
-        _process_ledger_entry(entry, state, stage)
+        _process_ledger_entry(
+            entry,
+            state,
+            stage,
+            project_id=project_id,
+            project_kind=project_kind,
+            focus_scope=focus_scope,
+        )
 
     return _build_constraint_result(state)
 
@@ -125,20 +177,13 @@ def merge_ui_constraint_lists(
 
 
 def _normalize_html_body(html: str) -> str:
-    import re
+    from repatch import normalize_html_body
 
-    stripped = re.sub(r"<title[^>]*>.*?</title>", "", html, flags=re.I | re.S)
-    return stripped.strip()
+    return normalize_html_body(html)
 
 
 def _html_files_distinct(cinema_dir: Path, names: list[str]) -> bool:
-    bodies: list[str] = []
-    for name in names:
-        path = cinema_dir / name
-        if not path.exists():
-            return False
-        bodies.append(_normalize_html_body(path.read_text(encoding="utf-8")))
-    return len(set(bodies)) >= 2
+    return _repatch_html_files_distinct(cinema_dir, names)
 
 
 def option_previews_are_distinct(cinema_dir: Path) -> bool:
@@ -241,17 +286,7 @@ def refresh_imported_policy_snapshot(
 
 
 def _replace_html_title(html: str, title: str) -> str:
-    import re
-
-    if re.search(r"<title[^>]*>", html, flags=re.I):
-        return re.sub(
-            r"<title[^>]*>.*?</title>",
-            f"<title>{title}</title>",
-            html,
-            count=1,
-            flags=re.I | re.S,
-        )
-    return html
+    return _repatch_replace_html_title(html, title)
 
 
 def sync_option_previews_from_workspace(
@@ -271,38 +306,19 @@ def sync_option_previews_from_workspace(
     if not stage_file.exists():
         return {"error": f"missing {stage_file.name}"}
 
-    html = stage_file.read_text(encoding="utf-8")
-    # delete_ids=None → apply ledger policy; delete_ids=[] → mirror workspace as-is.
-    if delete_ids is None and root is not None and capsule_name:
+    def _resolve_delete_ids() -> list[str]:
+        if root is None or not capsule_name:
+            return []
         effective = load_effective_ui_constraints(root, capsule_name, stage=stage)
-        to_delete = list(effective.get("delete") or [])
-    else:
-        to_delete = list(delete_ids or [])
+        return list(effective.get("delete") or [])
 
-    base, removed = apply_spatial_deletes_to_html(html, to_delete)
-    base = finalize_cinema_html(base)
-
-    written: list[str] = []
-    for filename, title in _OPTION_PREVIEW_FILES:
-        (cinema_dir / filename).write_text(_replace_html_title(base, title), encoding="utf-8")
-        written.append(filename)
-
-    stage1 = cinema_dir / "stage1.html"
-    stage2 = cinema_dir / "stage2.html"
-    alt_b = cinema_dir / "alt_b.html"
-    alt_c = cinema_dir / "alt_c.html"
-    if alt_b.exists():
-        stage1.write_text(alt_b.read_text(encoding="utf-8"), encoding="utf-8")
-    if alt_c.exists():
-        stage2.write_text(alt_c.read_text(encoding="utf-8"), encoding="utf-8")
-
-    return {
-        "status": "options_synced_from_workspace",
-        "stage": stage,
-        "files": written,
-        "spatial_removed": removed,
-        "delete_ids": to_delete,
-    }
+    return _repatch_sync_option_previews_from_workspace(
+        cinema_dir,
+        stage=stage,
+        delete_ids=delete_ids,
+        delete_resolver=_resolve_delete_ids if root is not None and capsule_name else None,
+        finalize_html=finalize_cinema_html,
+    )
 
 
 def enforce_deletes_on_option_previews(
@@ -322,29 +338,11 @@ def enforce_deletes_on_option_previews(
         session_keep=list(session_keep or []),
         session_delete=list(session_delete or []),
     )
-    if not effective_delete:
-        return {"status": "options_unchanged", "files": [], "delete_ids": []}
-
-    touched: list[str] = []
-    all_removed: list[str] = []
-    for filename, _title in _OPTION_PREVIEW_FILES:
-        path = cinema_dir / filename
-        if not path.exists():
-            continue
-        html = path.read_text(encoding="utf-8")
-        patched, removed = apply_spatial_deletes_to_html(html, effective_delete)
-        if not removed:
-            continue
-        path.write_text(finalize_cinema_html(patched), encoding="utf-8")
-        touched.append(filename)
-        all_removed.extend(removed)
-
-    return {
-        "status": "options_patched",
-        "files": touched,
-        "spatial_removed": sorted(set(all_removed)),
-        "delete_ids": effective_delete,
-    }
+    return _repatch_enforce_deletes_on_option_previews(
+        cinema_dir,
+        effective_delete,
+        finalize_html=finalize_cinema_html,
+    )
 
 
 def reset_cinema_policy_ledger(cinema_dir: Path) -> None:
@@ -377,15 +375,37 @@ def load_effective_ui_constraints(
     capsule_name: str,
     *,
     stage: int = 0,
+    project_id: str | None = None,
+    project_kind: str | None = None,
+    focus_scope: str | None = None,
+    cinema_dir: Path | None = None,
 ) -> dict[str, Any]:
     """Load ledger from disk and return effective UI constraints for a stage."""
-    ledger_path = policy_ledger_path(root, capsule_name)
+    if cinema_dir is not None and (project_id is None or project_kind is None):
+        from .cinema_projects import load_active_project
+
+        active = load_active_project(Path(cinema_dir)) or {}
+        if project_id is None:
+            project_id = str(active.get("id") or "").strip() or None
+        if project_kind is None:
+            project_kind = str(active.get("kind") or "").strip() or None
+    ledger_path = (
+        Path(cinema_dir) / "intract_policy_ledger.json"
+        if cinema_dir is not None
+        else policy_ledger_path(root, capsule_name)
+    )
     ledger: list[Any] = []
     if ledger_path.exists():
         data = json.loads(ledger_path.read_text(encoding="utf-8"))
         if isinstance(data, list):
             ledger = data
-    return effective_ui_constraints_from_ledger(ledger, stage=stage)
+    return effective_ui_constraints_from_ledger(
+        ledger,
+        stage=stage,
+        project_id=project_id,
+        project_kind=project_kind,
+        focus_scope=focus_scope,
+    )
 
 
 def resolve_iteration_mode(
@@ -742,6 +762,9 @@ def append_iteration_ledger_entry(
     status: str,
     model: str,
     domain: str = "calculator",
+    project_id: str = "",
+    focus_scope: str = "",
+    cinema_dir: Path | None = None,
 ) -> dict[str, Any]:
     proposals = normalize_proposals_for_ledger(
         stage,
@@ -765,7 +788,11 @@ def append_iteration_ledger_entry(
         "delete": delete,
         "proposed_contracts": proposals,
     }
-    append_policy_ledger_entry(root, capsule_name, entry)
+    if project_id:
+        entry["project_id"] = project_id
+    if focus_scope:
+        entry["focus_scope"] = focus_scope
+    append_policy_ledger_entry(root, capsule_name, entry, cinema_dir=cinema_dir)
     return entry
 
 

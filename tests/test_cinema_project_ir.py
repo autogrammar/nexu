@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from nexu.cinema_project_ir import build_project_ir, summarize_project_ir
+from repatch import build_project_ir, summarize_project_ir
 
 
 def test_build_project_ir_extracts_functional_outline() -> None:

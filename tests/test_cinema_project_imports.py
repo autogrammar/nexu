@@ -13,6 +13,7 @@ from nexu.cinema_project_imports import (
     activate_imported_project,
     delete_imported_project,
     delete_project,
+    http_stage_matches_import,
     import_git_project,
     import_http_project,
     import_zip_project,
@@ -20,6 +21,8 @@ from nexu.cinema_project_imports import (
     list_imported_projects,
     merged_projects_catalog,
     read_imported_markpact,
+    reject_import_stage_replacement,
+    restore_http_import_stages_if_needed,
 )
 
 
@@ -498,3 +501,105 @@ def test_read_imported_markpact_returns_markdown(tmp_path: Path):
     payload = read_imported_markpact(cinema, imported["project"]["id"])
     assert "markdown" in payload
     assert "Markpact migration" in payload["markdown"]
+
+
+def test_http_stage_matches_import_rejects_calculator_pollution(tmp_path: Path) -> None:
+    meta = {
+        "id": "http-malortgdynia.pl",
+        "import_kind": "http",
+        "source": "https://malortgdynia.pl/",
+        "source_url": "https://malortgdynia.pl/",
+    }
+    calc_html = '<html><body class="calc-body"><section id="functions">7</section></body></html>'
+    site_html = (
+        '<html><body data-nexu-import-preview="http">'
+        "<h1>Malort Gdynia</h1>https://malortgdynia.pl/</body></html>"
+    )
+    assert not http_stage_matches_import(calc_html, meta)
+    assert http_stage_matches_import(site_html, meta)
+    assert reject_import_stage_replacement(calc_html, meta)
+
+
+def test_restore_http_import_stages_if_needed_rebuilds_from_seed(tmp_path: Path) -> None:
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    project_id = "http-example.org"
+    project_dir = cinema / "imported_projects" / project_id
+    source_dir = project_dir / "source"
+    source_dir.mkdir(parents=True)
+    (source_dir / "index.html").write_text(
+        '<html><body data-nexu-import-preview="http"><h1>Live site</h1>'
+        "https://example.org/</body></html>",
+        encoding="utf-8",
+    )
+    (source_dir / "nexu-fetch-meta.json").write_text(
+        json.dumps({"final_url": "https://example.org/"}),
+        encoding="utf-8",
+    )
+    meta = {
+        "id": project_id,
+        "import_kind": "http",
+        "source": "https://example.org/",
+        "source_dir": str(source_dir),
+    }
+    (project_dir / "project.json").write_text(json.dumps(meta), encoding="utf-8")
+    (cinema / "stage0.html").write_text(
+        '<html><body class="calc-body"><section id="functions">7</section></body></html>',
+        encoding="utf-8",
+    )
+    (cinema / "alt_a.html").write_text("<html>calculator alt</html>", encoding="utf-8")
+
+    result = restore_http_import_stages_if_needed(cinema, meta)
+
+    assert result["status"] == "restored"
+    stage0 = (cinema / "stage0.html").read_text(encoding="utf-8")
+    assert "<h1>Live site</h1>" in stage0
+    assert "calc-body" not in stage0
+    alt_a = (cinema / "alt_a.html").read_text(encoding="utf-8")
+    assert "<h1>Live site</h1>" in alt_a
+    assert "calculator alt" not in alt_a
+
+
+def test_activate_http_import_after_calculator_pollution(tmp_path: Path) -> None:
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    project_id = "http-example.net"
+    project_dir = cinema / "imported_projects" / project_id
+    source_dir = project_dir / "source"
+    source_dir.mkdir(parents=True)
+    (source_dir / "index.html").write_text(
+        '<html><body><h1>Imported homepage</h1>https://example.net/</body></html>',
+        encoding="utf-8",
+    )
+    (source_dir / "nexu-fetch-meta.json").write_text(
+        json.dumps({"final_url": "https://example.net/"}),
+        encoding="utf-8",
+    )
+    meta = {
+        "id": project_id,
+        "title": "Example Net",
+        "import_kind": "http",
+        "source": "https://example.net/",
+        "source_dir": str(source_dir),
+        "markpact_path": str(project_dir / "README.markpact.md"),
+        "file_count": 2,
+        "total_bytes": 100,
+    }
+    (project_dir / "README.markpact.md").write_text("# Markpact\n", encoding="utf-8")
+    (project_dir / "project.json").write_text(json.dumps(meta), encoding="utf-8")
+    (cinema / "stage0.html").write_text(
+        '<html><body class="calc-body"><section id="functions">7</section></body></html>',
+        encoding="utf-8",
+    )
+    (cinema / "intract_policy_ledger.json").write_text(
+        '[{"stage":0,"keep":["sin"],"delete":["log"]}]',
+        encoding="utf-8",
+    )
+
+    result = activate_imported_project(cinema, project_id)
+
+    assert result["status"] == "project_imported"
+    stage0 = (cinema / "stage0.html").read_text(encoding="utf-8")
+    assert "<h1>Imported homepage</h1>" in stage0
+    assert "calc-body" not in stage0
+    assert json.loads((cinema / "intract_policy_ledger.json").read_text(encoding="utf-8")) == []

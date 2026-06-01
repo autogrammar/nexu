@@ -12,6 +12,12 @@
 │   │   ├── README.md
 │   │   └── src
 │   │       └── menu_icons.py
+│   ├── mcp_patch_demo
+│   │   ├── index.html
+│   │   ├── package.json
+│   │   ├── package-lock.json
+│   │   ├── README.md
+│   │   └── server.js
 │   ├── mcp_service
 │   │   ├── README.md
 │   │   └── src
@@ -138,6 +144,9 @@
 ├── scripts
 │   ├── check-doc-links.py
 │   └── ci-cinema-smoke.sh
+├── sdk
+│   └── js
+│       └── repatch-sdk.js
 ├── src
 │   └── nexu
 │       ├── blueprint.py
@@ -153,13 +162,11 @@
 │       ├── cinema_iterate.py
 │       ├── cinema_llm_contracts.py
 │       ├── cinema_llm.py
-│       ├── cinema_marked_context.py
 │       ├── cinema_markpact.py
 │       ├── cinema_offline_options.py
 │       ├── cinema_options_cache.py
 │       ├── cinema_policy.py
 │       ├── cinema_project_imports.py
-│       ├── cinema_project_ir.py
 │       ├── cinema_projects.py
 │       ├── cinema_publish.py
 │       ├── cinema.py
@@ -167,7 +174,6 @@
 │       ├── cinema_scripts.py
 │       ├── cinema_server.py
 │       ├── cinema_traces.py
-│       ├── cinema_ui_patch.py
 │       ├── cli.py
 │       ├── config.py
 │       ├── diff.py
@@ -259,4 +265,4 @@
 ├── uv.lock
 └── VERSION
 
-50 directories, 210 files
+53 directories, 213 files

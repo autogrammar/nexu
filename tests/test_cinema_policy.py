@@ -76,6 +76,45 @@ def test_effective_ui_constraints_from_ledger_last_wins():
     assert effective["delete"] == ["cos"]
 
 
+def test_effective_ui_constraints_filters_project_and_scope():
+    ledger = [
+        {"stage": 0, "keep": ["sin"], "delete": [], "project_id": "web_app_calculator"},
+        {
+            "stage": 0,
+            "keep": ["hero"],
+            "delete": [],
+            "project_id": "http-malortgdynia.pl",
+            "focus_scope": "colors",
+        },
+        {
+            "stage": 0,
+            "keep": ["7"],
+            "delete": [],
+            "project_id": "http-malortgdynia.pl",
+            "focus_scope": "functions",
+        },
+    ]
+    http_colors = effective_ui_constraints_from_ledger(
+        ledger,
+        stage=0,
+        project_id="http-malortgdynia.pl",
+        project_kind="imported",
+        focus_scope="colors",
+    )
+    assert http_colors["keep"] == ["hero"]
+    assert "sin" not in http_colors["keep"]
+    assert "7" not in http_colors["keep"]
+
+    calc = effective_ui_constraints_from_ledger(
+        ledger,
+        stage=0,
+        project_id="web_app_calculator",
+        project_kind="calculator",
+        focus_scope="functions",
+    )
+    assert calc["keep"] == ["sin"]
+
+
 def test_merge_ui_constraint_lists_session_overrides_ledger():
     keep, delete = merge_ui_constraint_lists(
         ledger_keep=["sin"],

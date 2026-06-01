@@ -1,14 +1,10 @@
 flowchart TD
-%% generated in 0.01s
+%% generated in 0.02s
 
     %% Entry points (blue)
     classDef entry fill:#4dabf7,stroke:#1971c2,color:#fff
 
     subgraph Core
-        src__nexu__cinema_project_ir___ProjectIRParser__handle_starttag["handle_starttag"]
-        src__nexu__cinema_project_ir___ProjectIRParser___classify_node["_classify_node"]
-        src__nexu__cinema_project_ir___ProjectIRParser__handle_endtag["handle_endtag"]
-        src__nexu__cinema_project_ir___ProjectIRParser__handle_data["handle_data"]
         src__nexu__cli___print_yaml["_print_yaml"]
         src__nexu__cli___relative_to_root["_relative_to_root"]
         src__nexu__cli__init["init"]
@@ -20,7 +16,11 @@ flowchart TD
         src__nexu__cli__capsule_blueprint["capsule_blueprint"]
         src__nexu__cli__capsule_diff["capsule_diff"]
         src__nexu__cli__capsule_drift["capsule_drift"]
-        ...["+62 more"]
+        src__nexu__cli__capsule_verify["capsule_verify"]
+        src__nexu__cli__capsule_plan["capsule_plan"]
+        src__nexu__cli__capsule_runtime["capsule_runtime"]
+        src__nexu__cli__capsule_report["capsule_report"]
+        ...["+53 more"]
     end
 
     subgraph Exporters
@@ -28,4 +28,4 @@ flowchart TD
         src__vico__models__PromptExport__to_dict["to_dict"]
     end
 
-    class src__nexu__cinema_project_ir___ProjectIRParser__handle_starttag,src__nexu__cinema_project_ir___ProjectIRParser___classify_node,src__nexu__cinema_project_ir___ProjectIRParser__handle_endtag,src__nexu__cinema_project_ir___ProjectIRParser__handle_data,src__nexu__cli___print_yaml,src__nexu__cli___relative_to_root,src__nexu__cli__init,src__nexu__cli__freeze,src__nexu__cli__capsule_create,src__nexu__cli__capsule_list entry
+    class src__nexu__cli___print_yaml,src__nexu__cli___relative_to_root,src__nexu__cli__init,src__nexu__cli__freeze,src__nexu__cli__capsule_create,src__nexu__cli__capsule_list,src__nexu__cli__capsule_status_command,src__nexu__cli__capsule_iterate,src__nexu__cli__capsule_blueprint,src__nexu__cli__capsule_export_prompt entry

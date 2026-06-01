@@ -59,6 +59,67 @@ IMPORTED_ID_RE = re.compile(r"^(zip|git|http)-[a-zA-Z0-9._-]+$")
 DEFAULT_FALLBACK_PROJECT = "web_app_calculator"
 
 
+_IMPORT_PREVIEW_ATTR = 'data-nexu-import-preview="http"'
+_CALCULATOR_POLLUTION_RE = re.compile(
+    r"(?:calc-body|id=[\"']functions[\"']|Scientific Calculator|btn-sci\b|"
+    r'data-project=["\']web_app_calculator["\'])',
+    re.IGNORECASE,
+)
+
+
+def http_stage_matches_import(html: str, meta: dict[str, Any]) -> bool:
+    """True when live stage HTML still reflects the stored HTTP import snapshot."""
+    text = str(html or "")
+    if not text.strip():
+        return False
+    if _CALCULATOR_POLLUTION_RE.search(text):
+        return False
+    project_id = str(meta.get("id") or "")
+    if not project_id.startswith("http-"):
+        return True
+    if _IMPORT_PREVIEW_ATTR in text:
+        netloc = urlparse(_source_url_from_meta(meta)).netloc.lower()
+        if netloc and netloc in text.lower():
+            return True
+    netloc = urlparse(_source_url_from_meta(meta)).netloc.lower()
+    return bool(netloc and netloc in text.lower())
+
+
+def reject_import_stage_replacement(html: str, meta: dict[str, Any]) -> str | None:
+    """Block full-page writes that replace an HTTP import with unrelated template HTML."""
+    project_id = str(meta.get("id") or "")
+    import_kind = str(meta.get("import_kind") or _import_kind_from_id(project_id))
+    if import_kind != "http" and not project_id.startswith("http-"):
+        return None
+    if http_stage_matches_import(html, meta):
+        return None
+    return (
+        "Rejected full-page replacement: HTML does not match imported site snapshot "
+        f"({project_id or import_kind})"
+    )
+
+
+def restore_http_import_stages_if_needed(cinema_dir: Path, meta: dict[str, Any]) -> dict[str, Any]:
+    """Rebuild stage0 and option previews when live HTML drifted from the import seed."""
+    project_id = str(meta.get("id") or "")
+    if not project_id.startswith("http-"):
+        return {"status": "skipped", "files": []}
+    stage0_path = cinema_dir / "stage0.html"
+    current = stage0_path.read_text(encoding="utf-8") if stage0_path.is_file() else ""
+    if current and http_stage_matches_import(current, meta):
+        return {"status": "unchanged", "files": []}
+    stage0_html = _build_http_preview_stage0(meta)
+    if not stage0_html:
+        return {"status": "error", "reason": "missing import seed HTML", "files": []}
+    stage0_path.write_text(stage0_html, encoding="utf-8")
+    options_sync = ensure_http_option_previews_from_stage0(cinema_dir)
+    return {
+        "status": "restored",
+        "files": ["stage0.html", *list(options_sync.get("files") or [])],
+        "options_sync": options_sync,
+    }
+
+
 def _slug(value: str) -> str:
     safe = re.sub(r"[^a-zA-Z0-9._-]+", "-", value).strip("-").lower()
     return safe[:64] or "imported-project"
@@ -810,26 +871,21 @@ def is_deletable_imported_id(project_id: str) -> bool:
     return not suffix.startswith(("zip-", "git-", "http-"))
 
 
-def _compile_meta_fields(cinema_dir: Path, meta: dict[str, Any]) -> dict[str, Any]:
-    project_id = str(meta.get("id") or "")
-    source_dir = Path(str(meta.get("source_dir") or (_project_dir(cinema_dir, project_id) / "source")))
-    scanned_count, scanned_bytes = _source_stats(source_dir)
-    file_count = int(meta.get("file_count") or 0) or scanned_count
-    total_bytes = int(meta.get("total_bytes") or 0) or scanned_bytes
-    capsule, workspace_root = _infer_workspace_context(cinema_dir)
+def _resolve_markpact_path(cinema_dir: Path, project_id: str, meta: dict[str, Any]) -> str:
     markpact_path = str(meta.get("markpact_path") or "")
-    if not markpact_path:
-        candidate = _project_dir(cinema_dir, project_id) / "README.markpact.md"
-        if candidate.is_file():
-            markpact_path = str(candidate)
-    updated = {
-        **meta,
-        "file_count": file_count,
-        "total_bytes": total_bytes,
-        "source_url": _source_url_from_meta(meta),
-        "path_hint": str(meta.get("path_hint") or f"imported_projects/{project_id}"),
-        "markpact_path": markpact_path,
-    }
+    if markpact_path:
+        return markpact_path
+    candidate = _project_dir(cinema_dir, project_id) / "README.markpact.md"
+    return str(candidate) if candidate.is_file() else ""
+
+
+def _with_workspace_meta_defaults(
+    meta: dict[str, Any],
+    updated: dict[str, Any],
+    *,
+    capsule: str,
+    workspace_root: str,
+) -> dict[str, Any]:
     if capsule and not meta.get("capsule"):
         updated["capsule"] = capsule
     if workspace_root and not meta.get("workspace_root"):
@@ -842,6 +898,30 @@ def _compile_meta_fields(cinema_dir: Path, meta: dict[str, Any]) -> dict[str, An
     if "services" not in meta:
         updated["services"] = []
     return updated
+
+
+def _compile_meta_fields(cinema_dir: Path, meta: dict[str, Any]) -> dict[str, Any]:
+    project_id = str(meta.get("id") or "")
+    source_dir = Path(str(meta.get("source_dir") or (_project_dir(cinema_dir, project_id) / "source")))
+    scanned_count, scanned_bytes = _source_stats(source_dir)
+    file_count = int(meta.get("file_count") or 0) or scanned_count
+    total_bytes = int(meta.get("total_bytes") or 0) or scanned_bytes
+    capsule, workspace_root = _infer_workspace_context(cinema_dir)
+    markpact_path = _resolve_markpact_path(cinema_dir, project_id, meta)
+    updated = {
+        **meta,
+        "file_count": file_count,
+        "total_bytes": total_bytes,
+        "source_url": _source_url_from_meta(meta),
+        "path_hint": str(meta.get("path_hint") or f"imported_projects/{project_id}"),
+        "markpact_path": markpact_path,
+    }
+    return _with_workspace_meta_defaults(
+        meta,
+        updated,
+        capsule=capsule,
+        workspace_root=workspace_root,
+    )
 
 
 def _ensure_project_meta_fields(
