@@ -47,11 +47,11 @@ def _ledger_entry_matches_project(
 def _ledger_entry_matches_scope(entry: dict[str, Any], *, focus_scope: str | None) -> bool:
     """Scope-specific marks apply only within the same #scope iteration."""
     entry_scope = str(entry.get("focus_scope") or "").strip().lower()
-    if not entry_scope:
-        return True
     active_scope = str(focus_scope or "").strip().lower()
     if not active_scope:
         return True
+    if not entry_scope:
+        return False
     return entry_scope == active_scope
 
 

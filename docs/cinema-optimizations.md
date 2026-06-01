@@ -3,6 +3,9 @@
 Tracking UX, performance, and routing improvements for the Cinema player and server
 (`/iterate` pipeline: cache -> LLM patch -> offline fast path -> LLM batch/parallel).
 
+For **limitations**, **recovery**, and **open improvements** (not the done-items table), see
+[cinema-limitations-and-improvements.md](cinema-limitations-and-improvements.md).
+
 | Priority | Item | Status | Notes |
 |----------|------|--------|-------|
 | **Performance** | | | |
@@ -76,6 +79,7 @@ When the player sends KEEP/DELETE marks (`annotations` + optional `selected_frag
    - **KEEP (green):** element stays as-is in Options A–C (visual scopes skip global CSS when only KEEP marks are present; offline CSS is scoped to DELETE targets only).
    - **DELETE (red):** scope-dependent change — `#functions` removes/redesigns DOM; `#colors` / `#shapes` / `#display` / `#orientation` restyle marked fragments only (no spatial delete on visual scopes).
 5. **Scope availability:** `cinema_scope.SCOPE_IDS_BY_KIND` — calculator adds `#keypad`; dashboard/slice/imported/web share `#functions` + visual layers; api/mcp omit `#orientation`. Player `allowedScopeIdsForKind` mirrors this set.
+6. **Scope-isolated marks:** KEEP/DELETE overlays and ledger entries are keyed by `focus_scope`; switching scope clears the UI for scopes without marks; returning restores from `scopedAnnotations` or ledger (`GET /policy?focus_scope=…`). Unscoped legacy ledger rows do not apply when a scope filter is active.
 
 Re-run `make cinema-restart` after template changes so generated `server.py` picks up the routing.
 

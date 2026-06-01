@@ -78,7 +78,13 @@ def test_effective_ui_constraints_from_ledger_last_wins():
 
 def test_effective_ui_constraints_filters_project_and_scope():
     ledger = [
-        {"stage": 0, "keep": ["sin"], "delete": [], "project_id": "web_app_calculator"},
+        {
+            "stage": 0,
+            "keep": ["sin"],
+            "delete": [],
+            "project_id": "web_app_calculator",
+            "focus_scope": "functions",
+        },
         {
             "stage": 0,
             "keep": ["hero"],
@@ -113,6 +119,16 @@ def test_effective_ui_constraints_filters_project_and_scope():
         focus_scope="functions",
     )
     assert calc["keep"] == ["sin"]
+
+
+def test_effective_ui_constraints_ignores_unscoped_when_focus_scope_set():
+    ledger = [
+        {"stage": 0, "keep": ["legacy_btn"], "delete": []},
+        {"stage": 0, "keep": ["hero"], "delete": [], "focus_scope": "colors"},
+    ]
+    effective = effective_ui_constraints_from_ledger(ledger, stage=0, focus_scope="colors")
+    assert effective["keep"] == ["hero"]
+    assert "legacy_btn" not in effective["keep"]
 
 
 def test_merge_ui_constraint_lists_session_overrides_ledger():

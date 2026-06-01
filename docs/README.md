@@ -16,3 +16,8 @@ Read in this order:
 10. [MCP service](mcp-service.md)
 11. [Examples](examples.md)
 12. [Roadmap](roadmap.md)
+
+Cinema (live UI player):
+
+- [Cinema optimizations](cinema-optimizations.md) — done work and scope routing
+- [Cinema limitations and improvements](cinema-limitations-and-improvements.md) — constraints, recovery, open debt

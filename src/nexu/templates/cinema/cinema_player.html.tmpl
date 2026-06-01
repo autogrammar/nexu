@@ -1536,6 +1536,7 @@
     <script>
         let activeStage = 0;
         let annotations = [];
+        let scopedAnnotations = {};
         let annotationHistory = [];
         let lastIteration = null;
         let projectGoal = '';
@@ -1565,6 +1566,86 @@
             { id: 'orientation', label: '#orientation', help: 'Layout direction, responsive framing, and screen organization.' },
         ];
         let currentFocusScope = 'functions';
+
+        function scopeAnnotationKey(scopeId) {
+            return String(scopeId || currentFocusScope || 'functions').toLowerCase();
+        }
+
+        function persistActiveScopeAnnotations() {
+            scopedAnnotations[scopeAnnotationKey(currentFocusScope)] = annotations.slice();
+        }
+
+        function ledgerEntryMatchesActiveProject(entry, policyData) {
+            const snap = (policyData && policyData.snapshot) || {};
+            const activeEx = snap.active_example_project || {};
+            const activeId = String(activeProjectId || activeEx.id || '').trim();
+            const proj = activeProjectRecord();
+            const activeKind = String((proj && proj.kind) || activeEx.kind || '').toLowerCase();
+            const entryPid = String(entry.project_id || '').trim();
+            if (entryPid) {
+                return entryPid === activeId;
+            }
+            if (activeKind === 'imported' || activeId.startsWith('http-')) {
+                return false;
+            }
+            return true;
+        }
+
+        function annotationsFromLedgerForScope(scopeId, policyData) {
+            if (!policyData) return [];
+            const ledger = Array.isArray(policyData.ledger) ? policyData.ledger : [];
+            const scope = String(scopeId || '').trim().toLowerCase();
+            if (!scope) return [];
+            const byEl = {};
+            ledger.forEach(entry => {
+                if (!entry || typeof entry !== 'object') return;
+                if (entry.status === 'goal_defined') return;
+                if (!ledgerEntryMatchesActiveProject(entry, policyData)) return;
+                if (entry.stage != null && Number(entry.stage) !== activeStage) return;
+                const entryScope = String(entry.focus_scope || '').trim().toLowerCase();
+                if (!entryScope || entryScope !== scope) return;
+                (entry.keep || []).forEach(id => {
+                    const key = String(id).trim();
+                    if (key) byEl[key] = 'KEEP';
+                });
+                (entry.delete || []).forEach(id => {
+                    const key = String(id).trim();
+                    if (key) byEl[key] = 'DELETE';
+                });
+            });
+            return Object.keys(byEl).map(id => ({
+                id: id,
+                type: byEl[id],
+                scope: scopeId,
+                source: 'policy_ledger'
+            }));
+        }
+
+        function loadActiveScopeAnnotations(scopeId, opts) {
+            const options = opts || {};
+            const key = scopeAnnotationKey(scopeId);
+            if (options.preferLedger && intractPolicyData) {
+                annotations = annotationsFromLedgerForScope(scopeId, intractPolicyData);
+                scopedAnnotations[key] = annotations.slice();
+                return;
+            }
+            if (scopedAnnotations[key] && scopedAnnotations[key].length) {
+                annotations = scopedAnnotations[key].map(a => ({ ...a }));
+                return;
+            }
+            if (intractPolicyData) {
+                annotations = annotationsFromLedgerForScope(scopeId, intractPolicyData);
+                scopedAnnotations[key] = annotations.slice();
+                return;
+            }
+            annotations = [];
+        }
+
+        function resetScopedAnnotations() {
+            annotations = [];
+            scopedAnnotations = {};
+            lastTouchedElementIds = [];
+        }
 
         function allowedScopeIdsForKind(kind) {
             const k = String(kind || 'web').toLowerCase();
@@ -2153,11 +2234,12 @@
                 if (tabEditor) tabEditor.disabled = false;
                 updateProjectActiveBar();
                 const needsGoal = activeProjectRequiresGoal();
-                const tab = needsGoal
-                    ? 'editor'
-                    : (bootTab === 'projects' || bootTab === 'services' ? bootTab : 'editor');
+                const requestedTab = ['projects', 'editor', 'llm', 'services'].includes(bootTab)
+                    ? bootTab
+                    : '';
+                const tab = requestedTab || 'editor';
                 switchMainTab(tab, { skipLog: true });
-                if (needsGoal) {
+                if (needsGoal && tab === 'editor') {
                     promptForRequiredGoalOnEditor({ quiet: true });
                 }
             };
@@ -2298,8 +2380,7 @@
             updatePromptBox();
             const openModal = () => showGoalPromptModal();
             if (mainTab !== 'editor') {
-                switchMainTab('editor', { skipLog: !!options.quiet });
-                requestAnimationFrame(() => requestAnimationFrame(openModal));
+                return;
             } else {
                 openModal();
             }
@@ -2404,11 +2485,21 @@
             const options = opts || {};
             if (!visibleScopeOptions().some(opt => opt.id === scopeId)) return;
             const changed = currentFocusScope !== scopeId;
+            if (changed) {
+                persistActiveScopeAnnotations();
+            }
             currentFocusScope = scopeId;
+            if (changed) {
+                loadActiveScopeAnnotations(scopeId);
+                lastTouchedElementIds = annotations.map(a => a.id).slice(-24);
+                syncAllIframeVisuals(true);
+            }
             if (changed && !options.quiet) {
                 pendingGoalOptions = true;
             }
             renderScopeOptions();
+            updateFeedbackList();
+            updateElementHintButton();
             updatePromptBox();
             updateWorkflowUI();
             updatePlayerUrl();
@@ -3022,7 +3113,7 @@
                 requireGoalPrompt = projectNeedsGoalPrompt(data);
                 pendingGoalOptions = !requireGoalPrompt;
                 workspaceEngaged = false;
-                annotations = [];
+                resetScopedAnnotations();
                 elementHints = [];
                 lastTouchedElementIds = [];
                 updateFeedbackList();
@@ -3235,7 +3326,10 @@
         }
 
         function refreshIntractPolicy() {
-            fetch('/policy')
+            const scopeQs = currentFocusScope
+                ? '?focus_scope=' + encodeURIComponent(currentFocusScope)
+                : '';
+            fetch('/policy' + scopeQs)
                 .then(res => {
                     if (!res.ok) throw new Error('policy HTTP ' + res.status);
                     return res.json();
@@ -3244,6 +3338,7 @@
                     intractPolicyData = data;
                     syncGoalFromLedger(data);
                     renderIntractPolicy(data);
+                    loadActiveScopeAnnotations(currentFocusScope, { preferLedger: true });
                     updateWorkflowUI();
                     updatePromptBox();
                 })
@@ -3686,7 +3781,9 @@
             if (pendingGoalOptions && !workspaceEngaged) {
                 logEvent('ANNOTATE_PRE_OPTIONS', { elementId: elementId, type: type });
             }
-            const existingIdx = annotations.findIndex(a => a.id === elementId);
+            const existingIdx = annotations.findIndex(
+                a => a.id === elementId && (a.scope || currentFocusScope) === currentFocusScope
+            );
             if (existingIdx >= 0) {
                 annotations.splice(existingIdx, 1);
             }
@@ -3700,6 +3797,7 @@
                 fragment: sanitizeAnnotationFragment(fragment),
             };
             annotations.push(entry);
+            persistActiveScopeAnnotations();
             annotationHistory.push(entry);
 
             lastTouchedElementIds.push(elementId);
@@ -3761,6 +3859,7 @@
 
         function syncAllIframeVisuals(force) {
             const syncKey = JSON.stringify({
+                scope: currentFocusScope,
                 n: annotations.length,
                 a: annotations.map(x => x.id + ':' + x.type).join(','),
                 r: elementReviewMode ? 1 : 0
@@ -4024,14 +4123,17 @@
                             batch: 'applied_to_workspace',
                             at: new Date().toISOString(),
                             stage: activeStage,
+                            scope: currentFocusScope,
                             marks: annotations.slice()
                         });
                     }
                     annotations = [];
+                    scopedAnnotations[scopeAnnotationKey(currentFocusScope)] = [];
                     updateFeedbackList();
 
                     reloadCinemaFrames();
                     refreshHistory();
+                    refreshIntractPolicy();
                 } else {
                     const scopeId = data.focus_scope || scopePayload.focus_scope || currentFocusScope;
                     const isLlmFailed = /^llm_failed:/i.test(String(data.status || ''));
@@ -4084,11 +4186,15 @@
 
         const HTML_PREVIEW_MAX_CHARS = 5000;
 
-        function effectiveAnnotationsFromPolicy(policyData) {
+        function effectiveAnnotationsFromPolicy(policyData, scopeId) {
+            const scope = scopeId || currentFocusScope;
+            const fromLedger = annotationsFromLedgerForScope(scope, policyData);
+            if (fromLedger.length) return fromLedger;
             const byEl = policyData?.effective_ui?.by_element || {};
             return Object.keys(byEl).map(id => ({
                 id: id,
                 type: byEl[id] === 'delete' ? 'DELETE' : 'KEEP',
+                scope: scope,
                 source: 'policy_ledger'
             }));
         }
@@ -4213,7 +4319,7 @@
                     if (polRes.ok) policyForExport = await polRes.json();
                 } catch (_) {}
             }
-            const ledgerMarks = effectiveAnnotationsFromPolicy(policyForExport);
+            const ledgerMarks = effectiveAnnotationsFromPolicy(policyForExport, currentFocusScope);
             const allMarks = annotations.length ? annotations : ledgerMarks;
             let htmlPreviews = {};
             try {
@@ -4250,8 +4356,10 @@
                 dashboard: 'Nexu',
                 activeStage: activeStage,
                 activeProjectId: activeProjectId,
+                activeScope: currentFocusScope,
                 playerUrl: location.href,
                 annotations: annotations,
+                scopedAnnotations: scopedAnnotations,
                 selectedFragments: selectedFragmentsPayload(),
                 annotationHistory: annotationHistory,
                 effectiveAnnotations: ledgerMarks,

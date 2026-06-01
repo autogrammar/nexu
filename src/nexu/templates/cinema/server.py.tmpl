@@ -1071,9 +1071,14 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         super().__init__(*args, directory=str(DIRECTORY), **kwargs)
 
     def do_GET(self):
-        if self.path in ("/policy", "/policy/"):
+        if self.path.startswith("/policy"):
             try:
-                payload = _load_policy_payload()
+                from urllib.parse import parse_qs, urlparse
+
+                parsed = urlparse(self.path)
+                qs = parse_qs(parsed.query or "")
+                focus_scope = str((qs.get("focus_scope") or [""])[0] or "").strip()
+                payload = _load_policy_payload(focus_scope=focus_scope)
                 body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
                 self.send_response(200)
                 self.send_header("Content-type", "application/json; charset=utf-8")

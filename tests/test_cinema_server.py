@@ -207,7 +207,9 @@ def test_cinema_player_template_is_externalized() -> None:
     assert "function deleteImportedProject(projectId)" in html
     assert "/projects/delete" in html
     assert "function promptForRequiredGoalOnEditor" in html
-    assert "if (mainTab !== 'editor') return" in html
+    assert "const requestedTab = ['projects', 'editor', 'llm', 'services'].includes(bootTab)" in html
+    assert "if (needsGoal && tab === 'editor')" in html
+    assert "if (mainTab !== 'editor') {" in html
     assert "iterationAllowedWithoutGoal" in html
     assert "FRAGMENT_ITERATE_MS" in html
     assert "skipEditorSwitch: !httpImport" in html
