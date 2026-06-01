@@ -51,12 +51,17 @@ def test_publish_creates_service_files(cinema_setup):
     assert svc["id"] == "demo-app-s0"
     assert svc["published"] is True
     assert svc["markpact"] is True
+    assert svc["url"] == "/services/view/demo-app-s0/"
+    assert svc["public_url"] == "/services/view/demo-app-s0/"
+    assert svc["local_url"].startswith("http://127.0.0.1:")
     service_dir = cinema / "services" / "demo-app-s0"
     assert (service_dir / "index.html").exists()
     assert (service_dir / "README.md").exists()
     assert (service_dir / "service-meta.json").exists()
     assert (service_dir / "export-markpact.md").exists()
     service_meta = json.loads((service_dir / "service-meta.json").read_text(encoding="utf-8"))
+    assert service_meta["public_url"] == "/services/view/demo-app-s0/"
+    assert service_meta["local_url"].startswith("http://127.0.0.1:")
     capsule_contracts = service_meta["baseline_contracts"]["capsule"]
     assert any(item["id"] == "calc.app.kind" for item in capsule_contracts)
     assert "Intract baseline model" in (service_dir / "export-markpact.md").read_text(
@@ -81,6 +86,9 @@ def test_list_and_start_stop_service(cinema_setup):
     started = start_published_service(cinema, "run-app-s0")
     assert started.get("status") in ("started", "already_running")
     assert started["service"]["status"] == "running"
+    assert started["service"]["url"] == "/services/view/run-app-s0/"
+    assert started["service"]["public_url"] == "/services/view/run-app-s0/"
+    assert started["service"]["local_url"].startswith("http://127.0.0.1:")
 
     catalog2 = list_published_services(cinema)
     assert catalog2["services"][0]["status"] == "running"
@@ -91,6 +99,30 @@ def test_list_and_start_stop_service(cinema_setup):
     registry = json.loads((cinema / "services" / "registry.json").read_text(encoding="utf-8"))
     entry = next(s for s in registry["services"] if s["id"] == "run-app-s0")
     assert entry["status"] == "stopped"
+
+
+def test_list_migrates_old_localhost_service_urls(cinema_setup):
+    cinema, root, capsule = cinema_setup
+    publish_project_service(
+        cinema,
+        root,
+        capsule,
+        stage=0,
+        project_id="legacy-app",
+        auto_start=False,
+    )
+    registry_path = cinema / "services" / "registry.json"
+    registry = json.loads(registry_path.read_text(encoding="utf-8"))
+    registry["services"][0].pop("public_url", None)
+    registry["services"][0].pop("local_url", None)
+    registry["services"][0]["url"] = "http://127.0.0.1:9200/"
+    registry_path.write_text(json.dumps(registry), encoding="utf-8")
+
+    catalog = list_published_services(cinema)
+    service = catalog["services"][0]
+    assert service["url"] == "/services/view/legacy-app-s0/"
+    assert service["public_url"] == "/services/view/legacy-app-s0/"
+    assert service["local_url"] == f"http://127.0.0.1:{service['port']}/"
 
 
 def test_publish_missing_stage_returns_error(cinema_setup):

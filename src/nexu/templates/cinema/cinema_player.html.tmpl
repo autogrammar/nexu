@@ -2961,7 +2961,7 @@
                 const running = s.status === 'running';
                 const statusClass = running ? 'badge-status-running' : 'badge-status-stopped';
                 const statusLabel = running ? 'running' : 'stopped';
-                const url = s.url || ('http://127.0.0.1:' + (s.port || '') + '/');
+                const url = s.public_url || s.url || ('/services/view/' + encodeURIComponent(s.id || '') + '/');
                 const sid = (s.id || '').replace(/'/g, "\\'");
                 return `
                 <article class="service-card" data-id="${s.id}">

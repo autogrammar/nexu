@@ -1145,6 +1145,44 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(DIRECTORY), **kwargs)
 
+    def _serve_published_service_file(self, request_path: str):
+        from urllib.parse import unquote
+
+        prefix = "/services/view/"
+        tail = request_path[len(prefix):].strip("/")
+        if not tail:
+            self.send_error(404, "missing service id")
+            return
+
+        parts = tail.split("/", 1)
+        service_id = unquote(parts[0])
+        if not re.fullmatch(r"[a-zA-Z0-9._-]+", service_id or ""):
+            self.send_error(404, "invalid service id")
+            return
+
+        rel = unquote(parts[1]) if len(parts) > 1 else "index.html"
+        if not rel or rel.endswith("/"):
+            rel = rel + "index.html"
+        service_root = (DIRECTORY / "services" / service_id).resolve()
+        target = (service_root / rel).resolve()
+        try:
+            target.relative_to(service_root)
+        except ValueError:
+            self.send_error(403, "path escapes service")
+            return
+        if not target.is_file():
+            self.send_error(404, "service file not found")
+            return
+
+        ctype = self.guess_type(str(target))
+        self.send_response(200)
+        self.send_header("Content-type", ctype)
+        self.send_header("Content-Length", str(target.stat().st_size))
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
+        with target.open("rb") as fh:
+            shutil.copyfileobj(fh, self.wfile)
+
     def do_GET(self):
         from urllib.parse import urlparse
 
@@ -1157,6 +1195,9 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             self.send_header("Location", "cinema_player.html" + suffix)
             self.send_header("Access-Control-Allow-Origin", "*")
             self.end_headers()
+            return
+        if parsed_root_path.startswith("/services/view/"):
+            self._serve_published_service_file(parsed_root_path)
             return
         if self.path.startswith("/policy"):
             try:

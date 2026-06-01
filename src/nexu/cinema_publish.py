@@ -26,6 +26,7 @@ _IMPORTED_SOURCE_PREFIX_RE = re.compile(
     r"imported_projects/([a-zA-Z0-9._-]+)/source/",
     re.IGNORECASE,
 )
+_LOCAL_SERVICE_URL_RE = re.compile(r"^https?://(?:127\.0\.0\.1|localhost):\d+/?", re.I)
 
 
 def services_root(cinema_dir: Path) -> Path:
@@ -102,12 +103,21 @@ def _service_alive(entry: dict[str, Any]) -> bool:
         except (OSError, ProcessLookupError, ValueError):
             return False
     if port and _port_open(int(port)):
-        url = entry.get("url") or f"http://127.0.0.1:{port}/"
+        url = entry.get("local_url") or f"http://127.0.0.1:{port}/"
         return _http_ok(url)
     return False
 
 
 def _refresh_service_status(entry: dict[str, Any]) -> dict[str, Any]:
+    service_id = str(entry.get("id") or "").strip()
+    if service_id:
+        public_url = f"/services/view/{service_id}/"
+        if not entry.get("public_url"):
+            entry["public_url"] = public_url
+        if not entry.get("url") or _LOCAL_SERVICE_URL_RE.match(str(entry.get("url"))):
+            entry["url"] = public_url
+    if entry.get("port") and not entry.get("local_url"):
+        entry["local_url"] = f"http://127.0.0.1:{int(entry['port'])}/"
     alive = _service_alive(entry)
     entry["status"] = "running" if alive else "stopped"
     if not alive:
@@ -132,6 +142,7 @@ def _write_service_readme(
     user_goal: str,
     effective_ui: dict[str, Any],
     port: int,
+    public_url: str,
     baseline_contracts: dict[str, Any] | None = None,
 ) -> str:
     html = (service_dir / "index.html").read_text(encoding="utf-8")
@@ -146,6 +157,8 @@ def _write_service_readme(
         "capsule": capsule_name,
         "stage": stage,
         "port": port,
+        "public_url": public_url,
+        "local_url": f"http://127.0.0.1:{port}/",
         "user_goal": goal_line,
         "policy_keep": list(effective_ui.get("keep") or []),
         "policy_delete": list(effective_ui.get("delete") or []),
@@ -171,7 +184,7 @@ Runnable **Markpact** service published from Nexu (stage {stage}).
 python -m http.server {port}
 ```
 
-Open **http://127.0.0.1:{port}/** after start.
+Open **{public_url}** from the Nexu Services tab. Local process URL: **http://127.0.0.1:{port}/**.
 
 ## Intract baseline model
 
@@ -302,6 +315,7 @@ def _create_service_entry(
     port: int,
 ) -> dict[str, Any]:
     """Create a new service registry entry."""
+    public_url = f"/services/view/{service_id}/"
     return {
         "id": service_id,
         "title": project_title or capsule_name,
@@ -310,7 +324,9 @@ def _create_service_entry(
         "stage": stage,
         "published_at": datetime.now(timezone.utc).isoformat(),
         "port": port,
-        "url": f"http://127.0.0.1:{port}/",
+        "url": public_url,
+        "public_url": public_url,
+        "local_url": f"http://127.0.0.1:{port}/",
         "status": "stopped",
         "pid": None,
         "readme_path": f"{SERVICES_DIR_NAME}/{service_id}/README.md",
@@ -388,6 +404,7 @@ def publish_project_service(
         user_goal=user_goal,
         effective_ui=effective,
         port=port,
+        public_url=f"/services/view/{service_id}/",
         baseline_contracts=baseline_contracts,
     )
 
@@ -464,7 +481,9 @@ def start_published_service(cinema_dir: Path, service_id: str) -> dict[str, Any]
 
     entry["port"] = port
     entry["pid"] = proc.pid
-    entry["url"] = f"http://127.0.0.1:{port}/"
+    entry["local_url"] = f"http://127.0.0.1:{port}/"
+    entry["public_url"] = f"/services/view/{service_id}/"
+    entry["url"] = entry["public_url"]
     entry["status"] = "running"
 
     for idx, item in enumerate(services):
