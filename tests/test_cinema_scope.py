@@ -218,3 +218,45 @@ def test_http_import_offline_colors_keeps_site_markers(tmp_path: Path, monkeypat
     policy = json.loads((cinema / "intract_policy.json").read_text(encoding="utf-8"))
     assert policy["capsule"]["is_calculator"] is False
     assert project_id.startswith("http-")
+
+
+def test_http_import_offline_colors_recolors_marked_buttons(tmp_path: Path) -> None:
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    (cinema / "active_project.json").write_text(
+        json.dumps(
+            {
+                "id": "http-malortgdynia.pl",
+                "kind": "imported",
+                "import_kind": "http",
+                "title": "Malort",
+            }
+        ),
+        encoding="utf-8",
+    )
+    stage = """<!DOCTYPE html><html><head></head><body data-nexu-import-preview="http">
+<a class="kb-btn2_237106-a1" href="#">Zapisz dziecko</a>
+<button class="kb-btn2_999">Nasza lokalizacja</button>
+</body></html>"""
+    (cinema / "stage0.html").write_text(stage, encoding="utf-8")
+
+    labels = write_goal_options_offline(
+        cinema,
+        keep_els=[],
+        delete_els=["Zapisz dziecko", "Nasza lokalizacja"],
+        focus_scope="colors",
+    )
+
+    assert any("colors:" in label for label in labels)
+    alts = {
+        name: (cinema / name).read_text(encoding="utf-8")
+        for name in ("alt_a.html", "alt_b.html", "alt_c.html")
+    }
+    assert alts["alt_a.html"] != alts["alt_b.html"]
+    for html in alts.values():
+        assert "nexu-scope-variant" in html
+        assert "background-color:" in html
+        assert ".kb-btn2_237106-a1" in html or '[data-nexu-target="Zapisz dziecko"]' in html
+    assert "background-color:#38bdf8" in alts["alt_a.html"]
+    assert "background-color:#facc15" in alts["alt_b.html"]
+    assert "background-color:#e879f9" in alts["alt_c.html"]

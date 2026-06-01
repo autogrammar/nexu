@@ -1,23 +1,22 @@
-# code2llm | 99f 18428L | python:80,yaml:9,txt:2,shell:2,json:2,toml:1,yml:1 | 2026-06-01
-# generated in 0.04s
-# CC̅=4.8 | critical:12/653 | dups:0 | cycles:0
+# code2llm | 99f 18710L | python:80,yaml:9,txt:2,shell:2,json:2,yml:1,toml:1 | 2026-06-01
+# generated in 0.05s
+# CC̅=4.8 | critical:11/668 | dups:0 | cycles:0
 
-HEALTH[12]:
+HEALTH[11]:
   🟡 CC    _effective_ui_constraints_from_ledger CC=17 (limit:15)
   🟡 CC    _merge_ui_constraints CC=17 (limit:15)
   🟡 CC    do_GET CC=34 (limit:15)
   🟡 CC    do_POST CC=211 (limit:15)
-  🟡 CC    _extract_content CC=16 (limit:15)
   🟡 CC    load_http_preprocess_artifacts CC=16 (limit:15)
-  🟡 CC    _compile_meta_fields CC=17 (limit:15)
   🟡 CC    propose_goal_extension_contracts CC=15 (limit:15)
   🟡 CC    start_published_service CC=15 (limit:15)
-  🟡 CC    inject_scope_style CC=22 (limit:15)
-  🟡 CC    _find_marked_subtrees CC=22 (limit:15)
-  🟡 CC    build_marked_element_context CC=28 (limit:15)
+  🟡 CC    _compile_meta_fields CC=17 (limit:15)
+  🟡 CC    apply_ui_patch_options CC=25 (limit:15)
+  🟡 CC    _bind_annotations_to_html CC=29 (limit:15)
+  🟡 CC    _find_marked_subtrees CC=17 (limit:15)
 
 REFACTOR[1]:
-  1. split 12 high-CC methods  (CC>15)
+  1. split 11 high-CC methods  (CC>15)
 
 PIPELINES[107]:
   [1] Src [main]: main → print
@@ -155,22 +154,22 @@ LAYERS:
   │ requirements.txt             1L  0C    0m  CC=0.0    ←0
   │
   src/                            CC̄=4.7    ←in:0  →out:0
-  │ !! cinema_project_imports    1112L  0C   50m  CC=17     ←1
+  │ !! cinema_project_imports    1134L  0C   52m  CC=17     ←1
   │ !! cinema_offline_options     897L  0C   32m  CC=13     ←2
   │ !! cinema_policy              861L  0C   40m  CC=13     ←6
   │ !! cinema_scripts             772L  0C    8m  CC=6      ←7
   │ !! cinema_projects            720L  1C   25m  CC=14     ←4
+  │ !! cinema_scope               686L  0C   22m  CC=29     ←7
   │ !! cinema_http_preprocess     623L  1C   30m  CC=16     ←5
-  │ !! cinema_scope               588L  0C   19m  CC=22     ←7
+  │ !! cinema_marked_context      502L  0C   25m  CC=17     ←2
   │ !! cinema_publish             469L  0C   23m  CC=15     ←1
   │ mcp_server                 393L  0C   13m  CC=6      ←1
   │ cli                        379L  0C   23m  CC=4      ←0
-  │ !! cinema_marked_context      379L  0C   16m  CC=28     ←1
   │ !! cinema_goal_contracts      345L  0C   15m  CC=15     ←2
-  │ !! cinema_llm                 326L  0C   17m  CC=16     ←1
+  │ cinema_llm                 332L  0C   18m  CC=12     ←1
   │ verify                     317L  0C   14m  CC=12     ←0
+  │ !! cinema_ui_patch            268L  0C   10m  CC=25     ←1
   │ cinema_history             244L  0C   13m  CC=8      ←2
-  │ cinema_ui_patch            237L  0C   10m  CC=9      ←1
   │ orchestrate                232L  0C    6m  CC=13     ←2
   │ cinema_html_validate       229L  0C   13m  CC=14     ←5
   │ cinema_markpact            215L  0C    7m  CC=14     ←2
@@ -222,7 +221,7 @@ LAYERS:
   │
   ./                              CC̄=0.0    ←in:0  →out:0
   │ !! goal.yaml                  512L  0C    0m  CC=0.0    ←0
-  │ tree.txt                   260L  0C    0m  CC=0.0    ←0
+  │ tree.txt                   262L  0C    0m  CC=0.0    ←0
   │ Makefile                   100L  0C    0m  CC=0.0    ←0
   │ pyproject.toml              85L  0C    0m  CC=0.0    ←0
   │ project.sh                  50L  0C    0m  CC=0.0    ←0
@@ -252,15 +251,15 @@ COUPLING:
           examples.web_app_dashboard                                   9                                                                      10                                   1                                                                                                          ──                                      !! fan-out
       examples.web_app_event_monitor                                                                                                          19                                                                                                                                                                                  ──  !! fan-out
   CYCLES: none
-  HUB: src.nexu/ (fan-in=128)
   HUB: examples.web_app_calculator/ (fan-in=7)
+  HUB: src.nexu/ (fan-in=128)
   HUB: scripts/ (fan-in=91)
   HUB: src.vico/ (fan-in=60)
-  SMELL: src.nexu/ fan-out=61 → split needed
-  SMELL: examples.web_app_event_monitor/ fan-out=19 → split needed
   SMELL: examples.web_app_dashboard/ fan-out=20 → split needed
   SMELL: examples.web_app_calculator/ fan-out=92 → split needed
+  SMELL: src.nexu/ fan-out=61 → split needed
   SMELL: examples/ fan-out=60 → split needed
+  SMELL: examples.web_app_event_monitor/ fan-out=19 → split needed
   SMELL: examples.web_app_pactown_ecosystem/ fan-out=22 → split needed
   SMELL: src.vico/ fan-out=12 → split needed
 

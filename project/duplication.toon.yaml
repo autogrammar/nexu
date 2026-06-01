@@ -1,12 +1,12 @@
-# redup/duplication | 8 groups | 81f 17366L | 2026-06-01
+# redup/duplication | 8 groups | 81f 17646L | 2026-06-01
 
 SUMMARY:
   files_scanned: 81
-  total_lines:   17366
+  total_lines:   17646
   dup_groups:    8
   dup_fragments: 22
   saved_lines:   193
-  scan_ms:       4507
+  scan_ms:       2633
 
 HOTSPOTS[7] (files with most duplication):
   src/nexu/cinema_scope.py  dup=103L  groups=1  frags=2  (0.6%)

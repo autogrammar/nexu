@@ -49,25 +49,95 @@ def has_ui_marks(
     return bool(keep or delete)
 
 
+_ID_SELECTOR_RE = re.compile(r"^[A-Za-z_][\w:-]*$")
+
+_MARKED_COLOR_DECL: dict[str, str] = {
+    "a": (
+        "background-color:#38bdf8!important;color:#0f172a!important;"
+        "border-color:#0ea5e9!important;"
+    ),
+    "b": (
+        "background-color:#facc15!important;color:#000!important;"
+        "border-color:#ca8a04!important;"
+    ),
+    "c": (
+        "background-color:#e879f9!important;color:#1e1b4b!important;"
+        "border-color:#c026d3!important;"
+    ),
+}
+
+
+def _css_id_selector(token: str) -> str | None:
+    """Return a valid ``#id`` selector or None when the token is not a safe id."""
+    raw = str(token or "").strip()
+    if not raw or not _ID_SELECTOR_RE.match(raw):
+        return None
+    return f"#{raw}"
+
+
 def marked_css_selectors(element_ids: list[str]) -> list[str]:
     """CSS selectors for marked logical element ids (id, btn- prefix, data-nexu-target)."""
     selectors: list[str] = []
     seen: set[str] = set()
     for element_id in element_ids:
         for token in _id_candidates(element_id):
-            for sel in (f"#{token}", f'[data-nexu-target="{token}"]'):
-                if sel not in seen:
+            id_sel = _css_id_selector(token)
+            for sel in (id_sel, f'[data-nexu-target="{token}"]'):
+                if sel and sel not in seen:
                     seen.add(sel)
                     selectors.append(sel)
     return selectors
 
 
-def restrict_scope_css_to_marks(css: str, delete_ids: list[str]) -> str:
+def resolve_marked_selectors(html: str, element_ids: list[str]) -> list[str]:
+    """Marked selectors from ids plus class/id tokens found in matching HTML fragments."""
+    delete = [str(x).strip() for x in (element_ids or []) if str(x).strip()]
+    if not delete:
+        return []
+    selectors: list[str] = []
+    seen: set[str] = set()
+
+    def add(sel: str | None) -> None:
+        if sel and sel not in seen:
+            seen.add(sel)
+            selectors.append(sel)
+
+    for element_id in delete:
+        for sel in marked_css_selectors([element_id]):
+            add(sel)
+
+    subtrees = _find_marked_subtrees(str(html or ""), set(delete))
+    for fragment in subtrees.values():
+        for match in re.finditer(r"""\bid\s*=\s*(['"])(.*?)\1""", fragment, re.IGNORECASE):
+            add(_css_id_selector(match.group(2).strip()))
+        for match in re.finditer(
+            r"""\bclass\s*=\s*(['"])(.*?)\1""", fragment, re.IGNORECASE
+        ):
+            for cls in re.split(r"\s+", match.group(2).strip()):
+                if cls and re.match(r"^[\w-]+$", cls):
+                    add(f".{cls}")
+    return selectors
+
+
+def marked_scope_colors_css(selectors: list[str], variant: str) -> str:
+    """Per-variant button recolor declarations for DELETE marks in #colors scope."""
+    decl = _MARKED_COLOR_DECL.get(variant if variant in ("a", "b", "c") else "b", "")
+    if not selectors or not decl:
+        return ""
+    return f"{', '.join(selectors)} {{{decl}}}"
+
+
+def restrict_scope_css_to_marks(
+    css: str,
+    delete_ids: list[str],
+    *,
+    html: str = "",
+) -> str:
     """Limit offline/LLM scope CSS to DELETE-marked selectors; drop page-wide rules."""
     delete = [str(x).strip() for x in (delete_ids or []) if str(x).strip()]
     if not css or not delete:
         return css
-    prefix_list = marked_css_selectors(delete)
+    prefix_list = resolve_marked_selectors(html, delete) if html else marked_css_selectors(delete)
     if not prefix_list:
         return css
     prefix = ", ".join(prefix_list)
@@ -118,7 +188,7 @@ def _logical_id(tag: str, attrs: dict[str, str], *, text: str = "") -> str | Non
     target = str(attrs.get("data-nexu-target") or "").strip()
     if target:
         return target
-    if tag.lower() == "button":
+    if tag.lower() in ("button", "a", "span", "div"):
         label = re.sub(r"\s+", " ", text).strip()
         if label:
             return label
@@ -157,6 +227,39 @@ def _extract_balanced_html(html: str, start: int) -> tuple[str, int] | None:
     return html[start:pos], pos
 
 
+def _collect_match_candidates(tag: str, attrs: dict[str, str]) -> set[str]:
+    raw_id = str(attrs.get("id") or "").strip()
+    candidates = _id_candidates(raw_id) if raw_id else set()
+    target = str(attrs.get("data-nexu-target") or "").strip()
+    if target:
+        candidates |= _id_candidates(target)
+    logical = _logical_id(tag, attrs)
+    if logical:
+        candidates |= _id_candidates(logical)
+    return candidates
+
+
+def _collect_button_candidates(tag: str, attrs: dict[str, str], match, raw_html: str) -> set[str]:
+    inner_start = match.end()
+    inner_end = raw_html.lower().find(f"</{tag}>", inner_start)
+    label = re.sub(r"\s+", " ", raw_html[inner_start:inner_end if inner_end >= 0 else inner_start]).strip()
+    logical = _logical_id(tag, attrs, text=label)
+    if logical:
+        return _id_candidates(logical)
+    return set()
+
+
+def _extract_and_format_fragment(text: str, start: int) -> str | None:
+    extracted = _extract_balanced_html(text, start)
+    if not extracted:
+        return None
+    fragment, _ = extracted
+    compact = re.sub(r"\s+", " ", fragment).strip()
+    if len(compact.encode("utf-8")) > MAX_FRAGMENT_BYTES:
+        compact = compact[: MAX_FRAGMENT_BYTES - 32].rstrip() + " <!-- truncated -->"
+    return compact
+
+
 def _find_marked_subtrees(html: str, marked_ids: set[str]) -> dict[str, str]:
     """Map logical element id → compact outerHTML fragment."""
     if not marked_ids:
@@ -168,31 +271,26 @@ def _find_marked_subtrees(html: str, marked_ids: set[str]) -> dict[str, str]:
         tag = match.group(1).lower()
         attrs = _parse_attrs(match.group(2))
         raw_id = str(attrs.get("id") or "").strip()
-        candidates = _id_candidates(raw_id) if raw_id else set()
         target = str(attrs.get("data-nexu-target") or "").strip()
-        if target:
-            candidates |= _id_candidates(target)
-        logical = _logical_id(tag, attrs)
-        if logical:
-            candidates |= _id_candidates(logical)
+        candidates = _collect_match_candidates(tag, attrs)
         hit = wanted & candidates
-        if not hit and tag == "button" and not raw_id and not target:
-            # Match buttons identified only by visible label.
-            inner_start = match.end()
-            inner_end = text.lower().find(f"</{tag}>", inner_start)
-            label = re.sub(r"\s+", " ", text[inner_start:inner_end if inner_end >= 0 else inner_start]).strip()
-            logical = _logical_id(tag, attrs, text=label)
-            if logical:
-                hit = wanted & _id_candidates(logical)
+        if not hit and tag not in _VOID_TAGS and tag not in (
+            "html",
+            "head",
+            "body",
+            "style",
+            "script",
+            "link",
+            "meta",
+        ):
+            if not raw_id and not target:
+                btn_candidates = _collect_button_candidates(tag, attrs, match, text)
+                hit = wanted & btn_candidates
         if not hit:
             continue
-        extracted = _extract_balanced_html(text, match.start())
-        if not extracted:
+        compact = _extract_and_format_fragment(text, match.start())
+        if not compact:
             continue
-        fragment, _ = extracted
-        compact = re.sub(r"\s+", " ", fragment).strip()
-        if len(compact.encode("utf-8")) > MAX_FRAGMENT_BYTES:
-            compact = compact[: MAX_FRAGMENT_BYTES - 32].rstrip() + " <!-- truncated -->"
         for element_id in hit:
             found.setdefault(element_id, compact)
         if len(found) >= len(wanted):
@@ -283,23 +381,11 @@ def _client_fragment_html(client_fragments: list[Any] | None, element_id: str) -
     return None
 
 
-def build_marked_element_context(
+def _assemble_marked_subtrees(
     html: str,
-    *,
-    keep_ids: list[str] | None = None,
-    delete_ids: list[str] | None = None,
-    focus_scope: str = "",
-    project_kind: str = "",
-    ui_profile: dict[str, Any] | None = None,
-    client_fragments: list[Any] | None = None,
-) -> str | None:
-    """Extract HTML subtrees + relevant CSS for marked ids; None when no matches."""
-    keep = [str(x).strip() for x in (keep_ids or []) if str(x).strip()]
-    delete = [str(x).strip() for x in (delete_ids or []) if str(x).strip()]
-    marked_ids = keep + [x for x in delete if x not in keep]
-    if not marked_ids:
-        return None
-
+    marked_ids: list[str],
+    client_fragments: list[Any] | None,
+) -> dict[str, str]:
     subtrees = _find_marked_subtrees(html, set(marked_ids))
     for element_id in marked_ids:
         if element_id in subtrees:
@@ -307,15 +393,26 @@ def build_marked_element_context(
         client_html = _client_fragment_html(client_fragments, element_id)
         if client_html:
             subtrees[element_id] = client_html
-    if not subtrees:
-        return None
+    return subtrees
 
-    scope = normalize_focus_scope(focus_scope, project_kind)
+
+def _get_relevant_css(html: str, subtrees: dict[str, str], ui_profile: dict[str, Any] | None) -> str:
     tokens = _selector_tokens(subtrees)
     css = _filter_css_for_tokens(_collect_css_sources(html, ui_profile), tokens)
     if len(css.encode("utf-8")) > MAX_CSS_BYTES:
         css = _cap_text(css, MAX_CSS_BYTES)
+    return css
 
+
+def _format_context_body(
+    keep: list[str],
+    delete: list[str],
+    marked_ids: list[str],
+    subtrees: dict[str, str],
+    css: str,
+    scope: str,
+    ui_profile: dict[str, Any] | None,
+) -> str:
     profile = ui_profile if isinstance(ui_profile, dict) else {}
     patch_mode = str(profile.get("llm_context_mode") or "") == "patch"
     outline = str(profile.get("html_outline") or "").strip()
@@ -349,7 +446,33 @@ def build_marked_element_context(
             "target selectors matching marked ids/classes only."
         )
 
-    body = "\n\n".join(parts)
+    return "\n\n".join(parts)
+
+
+def build_marked_element_context(
+    html: str,
+    *,
+    keep_ids: list[str] | None = None,
+    delete_ids: list[str] | None = None,
+    focus_scope: str = "",
+    project_kind: str = "",
+    ui_profile: dict[str, Any] | None = None,
+    client_fragments: list[Any] | None = None,
+) -> str | None:
+    """Extract HTML subtrees + relevant CSS for marked ids; None when no matches."""
+    keep = [str(x).strip() for x in (keep_ids or []) if str(x).strip()]
+    delete = [str(x).strip() for x in (delete_ids or []) if str(x).strip()]
+    marked_ids = keep + [x for x in delete if x not in keep]
+    if not marked_ids:
+        return None
+
+    subtrees = _assemble_marked_subtrees(html, marked_ids, client_fragments)
+    if not subtrees:
+        return None
+
+    scope = normalize_focus_scope(focus_scope, project_kind)
+    css = _get_relevant_css(html, subtrees, ui_profile)
+    body = _format_context_body(keep, delete, marked_ids, subtrees, css, scope, ui_profile)
     return _cap_text(body, MAX_MARKED_CONTEXT_BYTES)
 
 

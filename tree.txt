@@ -153,6 +153,7 @@
 │       ├── cinema_iterate.py
 │       ├── cinema_llm_contracts.py
 │       ├── cinema_llm.py
+│       ├── cinema_marked_context.py
 │       ├── cinema_markpact.py
 │       ├── cinema_offline_options.py
 │       ├── cinema_options_cache.py
@@ -227,6 +228,7 @@
 │   ├── test_cinema_iterate.py
 │   ├── test_cinema_llm_contracts.py
 │   ├── test_cinema_llm.py
+│   ├── test_cinema_marked_context.py
 │   ├── test_cinema_markpact.py
 │   ├── test_cinema_offline_options.py
 │   ├── test_cinema_options_cache.py
@@ -257,4 +259,4 @@
 ├── uv.lock
 └── VERSION
 
-50 directories, 208 files
+50 directories, 210 files

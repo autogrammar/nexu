@@ -70,6 +70,58 @@ def test_parse_and_apply_ui_patch_response() -> None:
     assert "<script" not in files["alt_a.html"].lower()
 
 
+def test_apply_ui_patch_restricts_visual_scope_to_red_marks() -> None:
+    html = """<!DOCTYPE html><html><head></head><body>
+    <button id="btn-keep" class="cta">Keep</button>
+    <button id="btn-change" class="cta">Change</button>
+    </body></html>"""
+    patch = {
+        "variants": {
+            "alt_a.html": {"css": ".cta{background:#38bdf8;color:#000;}"},
+            "alt_b.html": {"css": ".cta{background:#facc15;color:#000;}"},
+            "alt_c.html": {"css": ".cta{background:#e879f9;color:#000;}"},
+        }
+    }
+
+    files, _labels = apply_ui_patch_options(
+        html,
+        patch,
+        option_variants=VARIANTS,
+        focus_scope="colors",
+        project_kind="imported",
+        keep_els=["keep"],
+        delete_els=["change"],
+    )
+
+    css_block = files["alt_a.html"]
+    assert "#btn-change" in css_block or "#change" in css_block
+    assert "#btn-keep" not in css_block
+    assert ".cta{" not in css_block
+
+
+def test_apply_ui_patch_noops_visual_scope_with_keep_only_marks() -> None:
+    patch = {
+        "variants": {
+            "alt_a.html": {"css": ".screen{color:#38bdf8;}"},
+            "alt_b.html": {"css": ".screen{color:#facc15;}"},
+            "alt_c.html": {"css": ".screen{color:#e879f9;}"},
+        }
+    }
+
+    files, _labels = apply_ui_patch_options(
+        HTML,
+        patch,
+        option_variants=VARIANTS,
+        focus_scope="colors",
+        project_kind="calculator",
+        keep_els=["screen"],
+        delete_els=[],
+    )
+
+    assert "xpatch noop" in files["alt_a.html"]
+    assert ".screen{color:#38bdf8;}" not in files["alt_a.html"]
+
+
 def test_apply_ui_patch_rejects_unsafe_css() -> None:
     patch = {
         "variants": {

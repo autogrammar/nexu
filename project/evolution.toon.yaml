@@ -1,10 +1,10 @@
-# code2llm/evolution | 529 func | 57f | 2026-06-01
+# code2llm/evolution | 544 func | 57f | 2026-06-01
 # generated in 0.00s
 
-NEXT[9] (ranked by impact):
+NEXT[8] (ranked by impact):
   [1] !! SPLIT           src/nexu/cinema_project_imports.py
-      WHY: 1112L, 0 classes, max CC=17
-      EFFORT: ~4h  IMPACT: 18904
+      WHY: 1134L, 0 classes, max CC=17
+      EFFORT: ~4h  IMPACT: 19278
 
   [2] !! SPLIT           src/nexu/cinema_offline_options.py
       WHY: 897L, 0 classes, max CC=13
@@ -14,41 +14,37 @@ NEXT[9] (ranked by impact):
       WHY: 861L, 0 classes, max CC=13
       EFFORT: ~4h  IMPACT: 11193
 
-  [4] !! SPLIT-FUNC      build_marked_element_context  CC=28  fan=18
-      WHY: CC=28 exceeds 15
-      EFFORT: ~1h  IMPACT: 504
+  [4] !! SPLIT-FUNC      _bind_annotations_to_html  CC=29  fan=20
+      WHY: CC=29 exceeds 15
+      EFFORT: ~1h  IMPACT: 580
 
-  [5] !  SPLIT-FUNC      _find_marked_subtrees  CC=22  fan=20
-      WHY: CC=22 exceeds 15
-      EFFORT: ~1h  IMPACT: 440
+  [5] !! SPLIT-FUNC      apply_ui_patch_options  CC=25  fan=21
+      WHY: CC=25 exceeds 15
+      EFFORT: ~1h  IMPACT: 525
 
-  [6] !  SPLIT-FUNC      inject_scope_style  CC=22  fan=15
-      WHY: CC=22 exceeds 15
-      EFFORT: ~1h  IMPACT: 330
-
-  [7] !  SPLIT-FUNC      start_published_service  CC=15  fan=17
+  [6] !  SPLIT-FUNC      start_published_service  CC=15  fan=17
       WHY: CC=15 exceeds 15
       EFFORT: ~1h  IMPACT: 255
 
-  [8] !  SPLIT-FUNC      load_http_preprocess_artifacts  CC=16  fan=15
+  [7] !  SPLIT-FUNC      load_http_preprocess_artifacts  CC=16  fan=15
       WHY: CC=16 exceeds 15
       EFFORT: ~1h  IMPACT: 240
 
-  [9] !  SPLIT-FUNC      _extract_content  CC=16  fan=13
-      WHY: CC=16 exceeds 15
-      EFFORT: ~1h  IMPACT: 208
+  [8] !  SPLIT-FUNC      _find_marked_subtrees  CC=17  fan=13
+      WHY: CC=17 exceeds 15
+      EFFORT: ~1h  IMPACT: 221
 
 
 RISKS[3]:
-  ⚠ Splitting src/nexu/cinema_project_imports.py may break 50 import paths
+  ⚠ Splitting src/nexu/cinema_project_imports.py may break 52 import paths
   ⚠ Splitting src/nexu/cinema_offline_options.py may break 32 import paths
   ⚠ Splitting src/nexu/cinema_policy.py may break 40 import paths
 
 METRICS-TARGET:
   CC̄:          4.7 → ≤3.3
-  max-CC:      28 → ≤14
-  god-modules: 8 → 0
-  high-CC(≥15): 8 → ≤4
+  max-CC:      29 → ≤14
+  god-modules: 9 → 0
+  high-CC(≥15): 7 → ≤3
   hub-types:   0 → ≤0
 
 PATTERNS (language parser shared logic):

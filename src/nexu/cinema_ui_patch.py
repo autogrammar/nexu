@@ -9,6 +9,7 @@ from typing import Any
 from .cinema_html_validate import validate_css_safety
 from .cinema_scope import (
     SCOPE_STYLE_ID,
+    VISUAL_REDESIGN_SCOPES,
     normalize_focus_scope,
     scoped_html_fragment,
     strip_scope_style,
@@ -59,7 +60,8 @@ def _patch_scope_rules(
     delete = list(delete_els or [])
     rules = [
         f"Focus only on #{scope}.",
-        "Do not return HTML. Return CSS patches only.",
+        "Do not return HTML. Return CSS/xpatches only.",
+        "This is an xpatch workflow: modify selected layers/fragments, never replace the page.",
         "Preserve DOM structure, ids, labels, workflows, and JavaScript behavior.",
         "No external assets, imports, urls, scripts, or markdown.",
     ]
@@ -74,7 +76,10 @@ def _patch_scope_rules(
         rules.extend(
             [
                 f"Apply #{scope} changes primarily to DELETE-marked elements.",
-                "KEEP-marked elements are hard constraints — preserve their styling.",
+                "KEEP-marked elements are hard constraints — preserve their current CSS, "
+                "text, DOM, and behavior.",
+                "DELETE-marked elements mean CHANGE within the selected scope, "
+                "not physical removal.",
                 "Do not restyle unrelated controls outside marked fragments.",
             ]
         )
@@ -115,7 +120,7 @@ def build_ui_patch_prompt(
         if filename in _ALT_FILES
     ]
     contract = {
-        "task": "Generate scoped UI option patches for Nexu Cinema.",
+        "task": "Generate scoped xpatch UI option patches for Nexu Cinema.",
         "output": "JSON only, no markdown fences, no prose.",
         "schema": {
             "variants": {
@@ -204,6 +209,10 @@ def apply_ui_patch_options(
     patch: dict[str, Any],
     *,
     option_variants: list[tuple[str, str, str]],
+    focus_scope: str = "",
+    project_kind: str = "",
+    keep_els: list[str] | None = None,
+    delete_els: list[str] | None = None,
 ) -> tuple[dict[str, str], list[str]]:
     """Apply validated CSS patches to one baseline HTML document."""
     variants = patch.get("variants")
@@ -211,6 +220,9 @@ def apply_ui_patch_options(
         raise ValueError("patch variants must be an object")
     fallback_labels = {filename: label for filename, label, _note in option_variants}
     base = strip_scope_style(str(html or ""))
+    scope = normalize_focus_scope(focus_scope, project_kind) if focus_scope else ""
+    delete = [str(x).strip() for x in (delete_els or []) if str(x).strip()]
+    keep = [str(x).strip() for x in (keep_els or []) if str(x).strip()]
     files: dict[str, str] = {}
     labels: list[str] = []
     for filename in _ALT_FILES:
@@ -218,6 +230,25 @@ def apply_ui_patch_options(
         if item is None:
             raise ValueError(f"missing {filename} in LLM patch response")
         css = _css_for(item)
+        if scope in VISUAL_REDESIGN_SCOPES and delete:
+            from .cinema_marked_context import (
+                marked_scope_colors_css,
+                resolve_marked_selectors,
+                restrict_scope_css_to_marks,
+            )
+
+            restricted = restrict_scope_css_to_marks(css, delete, html=base).strip()
+            if not restricted and scope == "colors":
+                variant_key = filename.removeprefix("alt_").removesuffix(".html")
+                restricted = marked_scope_colors_css(
+                    resolve_marked_selectors(base, delete),
+                    variant_key,
+                )
+            css = restricted or css
+        elif scope in VISUAL_REDESIGN_SCOPES and keep and not delete:
+            css = ""
+        if not css.strip():
+            css = "/* xpatch noop: only KEEP marks were provided */"
         label = _label_for(filename, item, fallback_labels)
         block = f'<style id="{SCOPE_STYLE_ID}">\n/* llm patch: {label} */\n{css}\n</style>\n'
         lower = base.lower()

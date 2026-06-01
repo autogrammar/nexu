@@ -465,6 +465,114 @@ def should_block_full_html_iterate(
     return kind in MARKED_PATCH_KINDS
 
 
+def _bind_annotations_to_html(
+    html: str,
+    keep_ids: list[str] | None,
+    delete_ids: list[str] | None,
+) -> str:
+    from .cinema_marked_context import (
+        _TAG_OPEN_RE,
+        _parse_attrs,
+        _id_candidates,
+        _logical_id,
+    )
+
+    keep = [str(x).strip() for x in (keep_ids or []) if str(x).strip()]
+    delete = [str(x).strip() for x in (delete_ids or []) if str(x).strip()]
+    marked_ids = keep + [x for x in delete if x not in keep]
+    if not marked_ids:
+        return html
+
+    wanted = set(marked_ids)
+    text = str(html or "")
+    
+    matches = list(_TAG_OPEN_RE.finditer(text))
+    matched_ranges: list[tuple[int, int, str]] = []
+    seen_elements = set()
+    
+    for match in matches:
+        tag = match.group(1).lower()
+        if tag in ("html", "head", "body", "style", "script", "link", "meta"):
+            continue
+        attrs_text = match.group(2)
+        attrs = _parse_attrs(attrs_text)
+        
+        raw_id = str(attrs.get("id") or "").strip()
+        candidates = _id_candidates(raw_id) if raw_id else set()
+        target = str(attrs.get("data-nexu-target") or "").strip()
+        if target:
+            candidates |= _id_candidates(target)
+        logical = _logical_id(tag, attrs)
+        if logical:
+            candidates |= _id_candidates(logical)
+            
+        hit = wanted & candidates
+        if not hit and tag not in ("html", "head", "body", "style", "script", "link", "meta"):
+            if raw_id or target:
+                continue
+            inner_start = match.end()
+            inner_end = text.lower().find(f"</{tag}>", inner_start)
+            if inner_end >= 0:
+                inner_content = text[inner_start:inner_end]
+                label = re.sub(r"<[^>]+>", "", inner_content)
+                label = re.sub(r"\s+", " ", label).strip()
+                logical = _logical_id(tag, attrs, text=label)
+                if logical:
+                    hit = wanted & _id_candidates(logical)
+                    
+        if not hit:
+            continue
+            
+        matched_id = list(hit)[0]
+        if matched_id in seen_elements:
+            continue
+        seen_elements.add(matched_id)
+        
+        if "data-nexu-target" in attrs:
+            continue
+            
+        new_tag = f"<{tag} data-nexu-target=\"{matched_id}\" {attrs_text}>"
+        matched_ranges.append((match.start(), match.end(), new_tag))
+        
+    if not matched_ranges:
+        return html
+        
+    parts: list[str] = []
+    last_idx = 0
+    for start, end, replacement in matched_ranges:
+        parts.append(text[last_idx:start])
+        parts.append(replacement)
+        last_idx = end
+    parts.append(text[last_idx:])
+    return "".join(parts)
+
+
+def _get_scope_css(inferred: str, html: str, scope: str, variant: str) -> str:
+    if inferred == "calculator" or (
+        inferred not in IMPORTED_KINDS.union(DASHBOARD_KINDS) and "calc-body" in html.lower()
+    ):
+        return _calc_scope_css(scope, variant)
+    if inferred in DASHBOARD_KINDS or "kpi-grid" in html.lower():
+        return _scope_css(scope, variant)
+    return _web_scope_css(scope, variant) or _scope_css(scope, variant)
+
+
+def _inject_css_block(html: str, css: str) -> str:
+    if not css:
+        return html
+    block = f'<style id="{SCOPE_STYLE_ID}">\n{css}\n</style>'
+    lower = html.lower()
+    if "</head>" in lower:
+        idx = lower.rfind("</head>")
+        return html[:idx] + block + html[idx:]
+    if "<body" in lower:
+        match = re.search(r"<body[^>]*>", html, flags=re.I)
+        if match:
+            pos = match.start()
+            return html[:pos] + block + html[pos:]
+    return block + html
+
+
 def inject_scope_style(
     html: str,
     scope: str,
@@ -474,38 +582,28 @@ def inject_scope_style(
     delete_ids: list[str] | None = None,
     keep_ids: list[str] | None = None,
 ) -> str:
+    html = _bind_annotations_to_html(html, keep_ids, delete_ids)
     inferred = _resolve_scope_kind(project_kind, html)
     scope = normalize_focus_scope(scope, inferred)
     delete_list = [str(x).strip() for x in (delete_ids or []) if str(x).strip()]
     keep_list = [str(x).strip() for x in (keep_ids or []) if str(x).strip()]
     if scope in VISUAL_REDESIGN_SCOPES and keep_list and not delete_list:
         return strip_scope_style(html)
-    if inferred == "calculator" or (
-        inferred not in IMPORTED_KINDS.union(DASHBOARD_KINDS) and "calc-body" in html.lower()
-    ):
-        css = _calc_scope_css(scope, variant)
-    elif inferred in DASHBOARD_KINDS or "kpi-grid" in html.lower():
-        css = _scope_css(scope, variant)
-    else:
-        css = _web_scope_css(scope, variant) or _scope_css(scope, variant)
+    css = _get_scope_css(inferred, html, scope, variant)
     cleaned = strip_scope_style(html)
     if scope in VISUAL_REDESIGN_SCOPES and delete_list:
-        from .cinema_marked_context import restrict_scope_css_to_marks
+        from .cinema_marked_context import (
+            marked_scope_colors_css,
+            resolve_marked_selectors,
+            restrict_scope_css_to_marks,
+        )
 
-        css = restrict_scope_css_to_marks(css, delete_list)
-    if not css:
-        return cleaned
-    block = f'<style id="{SCOPE_STYLE_ID}">\n{css}\n</style>'
-    lower = cleaned.lower()
-    if "</head>" in lower:
-        idx = lower.rfind("</head>")
-        return cleaned[:idx] + block + cleaned[idx:]
-    if "<body" in lower:
-        match = re.search(r"<body[^>]*>", cleaned, flags=re.I)
-        if match:
-            pos = match.start()
-            return cleaned[:pos] + block + cleaned[pos:]
-    return block + cleaned
+        selectors = resolve_marked_selectors(cleaned, delete_list)
+        if scope == "colors" and selectors:
+            css = marked_scope_colors_css(selectors, variant)
+        else:
+            css = restrict_scope_css_to_marks(css, delete_list, html=cleaned)
+    return _inject_css_block(cleaned, css)
 
 
 def scoped_html_fragment(html: str, focus_scope: str, project_kind: str) -> str | None:

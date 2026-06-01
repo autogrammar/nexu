@@ -120,6 +120,14 @@ flowchart TD
         src__nexu__runtime___collect_fixtures["_collect_fixtures"]
         src__nexu__runtime___html_page("_html_page CC=9")
         src__nexu__runtime__build_capsule_runtime["build_capsule_runtime"]
+        src__nexu__cinema_project_ir___ProjectIRParser____init__["__init__"]
+        src__nexu__cinema_project_ir___ProjectIRParser__handle_starttag["handle_starttag"]
+        src__nexu__cinema_project_ir___ProjectIRParser___classify_node("_classify_node CC=12")
+        src__nexu__cinema_project_ir___ProjectIRParser__handle_endtag("handle_endtag CC=8")
+        src__nexu__cinema_project_ir___ProjectIRParser__handle_data["handle_data"]
+        src__nexu__cinema_project_ir___clean_text["_clean_text"]
+        src__nexu__cinema_project_ir__build_project_ir["build_project_ir"]
+        src__nexu__cinema_project_ir__summarize_project_ir("summarize_project_ir CC=12")
         src__nexu__init_project__init_project["init_project"]
         src__nexu__config___as_list["_as_list"]
         src__nexu__config___load_env_file("_load_env_file CC=10")
@@ -168,14 +176,6 @@ flowchart TD
         src__nexu__cinema_server__start_cinema_player_server["start_cinema_player_server"]
         src__nexu__llm___extract_content["_extract_content"]
         src__nexu__llm___strip_fences["_strip_fences"]
-        src__nexu__llm__call_litellm_json("call_litellm_json CC=8")
-        src__nexu__llm__offline_review_from_status["offline_review_from_status"]
-        src__nexu__llm__call_litellm_review["call_litellm_review"]
-        src__nexu__cinema___cinema_template_text["_cinema_template_text"]
-        src__nexu__cinema___render_cinema_template["_render_cinema_template"]
-        src__nexu__cinema__write_cinema_nexu_hooks["write_cinema_nexu_hooks"]
-        src__nexu__cinema___contract_to_public_dict["_contract_to_public_dict"]
-        src__nexu__cinema__build_intract_policy_snapshot("build_intract_policy_snapshot CC=11")
     end
     subgraph src__vico
         src__vico__freeze__freeze_project["freeze_project"]
@@ -326,6 +326,9 @@ flowchart TD
     src__nexu__runtime__build_capsule_runtime --> src__vico__models__utc_now
     src__nexu__runtime__build_capsule_runtime --> src__nexu__runtime___collect_fixtures
     src__nexu__runtime__build_capsule_runtime --> src__nexu__runtime___html_page
+    src__nexu__cinema_project_ir___ProjectIRParser___classify_node --> src__nexu__cinema_project_ir___clean_text
+    src__nexu__cinema_project_ir___ProjectIRParser__handle_endtag --> src__nexu__cinema_project_ir___clean_text
+    src__nexu__cinema_project_ir___ProjectIRParser__handle_data --> src__nexu__cinema_project_ir___clean_text
     src__nexu__init_project__init_project --> src__nexu__paths__ensure_project_dirs
     src__nexu__init_project__init_project --> src__vico__models__write_yaml
     src__nexu__config__load_env_files --> src__nexu__config___load_env_file
@@ -471,6 +474,27 @@ flowchart TD
     src__vico__status__capsule_status --> src__nexu__paths__capsule_dir
     src__vico__status__capsule_status --> src__vico__diff__diff_capsule
     src__vico__status__capsule_status --> src__vico__models__read_yaml
+    src__nexu__cinema_http_preprocess___normalize_linked_paths --> src__nexu__cinema_http_preprocess___extract_stylesheet_hrefs
+    src__nexu__cinema_http_preprocess___filter_visual_css --> src__nexu__cinema_http_preprocess___split_css_rules
+    src__nexu__cinema_http_preprocess___filter_visual_css --> src__nexu__cinema_http_preprocess___rule_is_visual
+    src__nexu__cinema_http_preprocess__extract_visual_css --> src__nexu__cinema_http_preprocess___extract_inline_css
+    src__nexu__cinema_http_preprocess__extract_visual_css --> src__nexu__cinema_http_preprocess___normalize_linked_paths
+    src__nexu__cinema_http_preprocess__extract_visual_css --> src__nexu__cinema_http_preprocess___filter_visual_css
+    src__nexu__cinema_http_preprocess__extract_visual_css --> src__nexu__cinema_http_preprocess___safe_read_under
+    src__nexu__cinema_http_preprocess___should_remove_preview_script --> src__nexu__cinema_http_preprocess___script_src_allowed_for_preview
+    src__nexu__cinema_http_preprocess__sanitize_http_preview_html --> src__nexu__cinema_http_preprocess___should_remove_preview_script
+    src__nexu__cinema_http_preprocess__prepare_http_preview_html --> src__nexu__cinema_http_preprocess__sanitize_http_preview_html
+    src__nexu__cinema_http_preprocess__prepare_http_preview_html --> src__nexu__cinema_http_preprocess__inject_http_preview_shim
+    src__nexu__cinema_http_preprocess___write_preprocess_artifacts --> src__nexu__cinema_http_preprocess__extract_visual_css
+    src__nexu__cinema_http_preprocess___write_preprocess_artifacts --> src__nexu__cinema_http_preprocess__build_html_outline
+    src__nexu__cinema_http_preprocess__preprocess_cinema_seed --> src__nexu__cinema_http_preprocess___write_preprocess_artifacts
+    src__nexu__cinema_http_preprocess__ensure_http_preprocess_artifacts --> src__nexu__cinema_http_preprocess__http_preprocess_artifacts_present
+    src__nexu__cinema_http_preprocess__ensure_http_preprocess_artifacts --> src__nexu__cinema_http_preprocess__preprocess_http_import
+    src__nexu__cinema_http_preprocess__preprocess_http_import --> src__nexu__cinema_http_preprocess___write_preprocess_artifacts
+    src__nexu__cinema_http_preprocess__load_cinema_seed_preprocess_artifacts --> src__nexu__cinema_http_preprocess___safe_read_under
+    src__nexu__cinema_http_preprocess__load_http_preprocess_artifacts --> src__nexu__cinema_http_preprocess___project_meta_path
+    src__nexu__cinema_http_preprocess__load_http_preprocess_artifacts --> src__nexu__cinema_http_preprocess___load_project_meta
+    src__nexu__cinema_http_preprocess__load_http_preprocess_artifacts --> src__nexu__cinema_http_preprocess___safe_read_under
     src__nexu__cinema_traces__write_llm_trace --> src__nexu__cinema_traces__redact_secrets
     src__nexu__cinema_traces__write_llm_trace --> src__nexu__cinema_traces__text_metrics
     src__nexu__cinema_traces__write_llm_trace --> src__nexu__cinema_traces__read_trace_index
@@ -478,30 +502,6 @@ flowchart TD
     src__nexu__cinema_traces__list_llm_traces --> src__nexu__cinema_traces__read_trace_index
     src__nexu__cinema_traces__read_llm_trace --> src__nexu__cinema_traces__trace_slug
     src__nexu__cinema_traces__read_llm_trace --> src__nexu__cinema_traces__text_metrics
-    src__nexu__cinema_llm___cached_config --> src__nexu__config__load_env_files
-    src__nexu__cinema_llm___cached_config --> src__nexu__config__load_config
-    src__nexu__cinema_llm__normalize_html_document --> src__nexu__cinema_llm___strip_rich_console_artifacts
-    src__nexu__cinema_llm__normalize_html_document --> src__nexu__cinema_llm___strip_markdown_fences
-    src__nexu__cinema_llm__normalize_html_document --> src__nexu__cinema_html__ensure_html_document_closure
-    src__nexu__cinema_llm__extract_html_document --> src__nexu__cinema_llm__normalize_html_document
-    src__nexu__cinema_llm__parse_batch_alt_options --> src__nexu__cinema_llm___strip_rich_console_artifacts
-    src__nexu__cinema_llm__parse_batch_alt_options --> src__nexu__cinema_html_validate__prepare_cinema_html_document
-    src__nexu__cinema_llm__parse_batch_alt_options --> src__nexu__cinema_llm__normalize_html_document
-    src__nexu__cinema_llm__parse_batch_alt_options --> src__nexu__cinema_llm__looks_like_html_document
-    src__nexu__cinema_llm___lookup --> src__nexu__cinema_llm___as_plain_data
-    src__nexu__cinema_llm___response_shape --> src__nexu__cinema_llm___as_plain_data
-    src__nexu__cinema_llm___extract_content --> src__nexu__cinema_llm___as_plain_data
-    src__nexu__cinema_llm___extract_content --> src__nexu__cinema_llm___lookup
-    src__nexu__cinema_llm__call_cinema_text_llm --> src__nexu__cinema_llm___cached_config
-    src__nexu__cinema_llm__call_cinema_text_llm --> src__nexu__cinema_llm___litellm_completion
-    src__nexu__cinema_llm__call_cinema_text_llm --> src__nexu__cinema_llm___extract_content
-    src__nexu__cinema_llm__call_cinema_text_llm --> src__nexu__cinema_llm__compact_llm_error
-    src__nexu__cinema_llm__call_cinema_html_llm --> src__nexu__cinema_llm__call_cinema_text_llm
-    src__nexu__cinema_llm__call_cinema_html_llm --> src__nexu__cinema_llm__normalize_html_document
-    src__nexu__cinema_llm__call_cinema_html_llm --> src__nexu__cinema_llm___compact_response_preview
-    src__nexu__cinema_llm__call_cinema_html_llm --> src__nexu__cinema_llm__looks_like_html_document
-    src__nexu__cinema_llm__call_cinema_html_llm --> src__nexu__cinema_llm__has_terminal_artifacts
-    src__nexu__cinema_llm__call_cinema_html_llm --> src__nexu__cinema_html_validate__prepare_cinema_html_document
     src__nexu__iterate__iterate_capsule --> src__nexu__capsule__load_capsule
     src__nexu__iterate__iterate_capsule --> src__nexu__paths__capsule_dir
     src__nexu__iterate__iterate_capsule --> src__nexu__capsule__save_capsule
@@ -512,6 +512,43 @@ flowchart TD
     src__vico__drift__check_source_drift --> src__vico__hashing__sha256_file
     src__vico__drift__check_source_drift --> src__vico__models__utc_now
     src__vico__drift__check_source_drift --> src__nexu__paths__capsule_dir
+    src__nexu__cinema_projects__mark_project_deleted --> src__nexu__cinema_projects__deleted_project_ids
+    src__nexu__cinema_projects__list_project_catalog --> src__nexu__cinema_projects__deleted_project_ids
+    src__nexu__cinema_projects__list_project_catalog --> src__nexu__cinema_projects___project_catalog_entry
+    src__nexu__cinema_projects__list_project_catalog --> src__nexu__cinema_projects___catalog_filters
+    src__nexu__cinema_projects__delete_example_project --> src__nexu__cinema_projects__mark_project_deleted
+    src__nexu__cinema_projects__delete_example_project --> src__nexu__cinema_projects__is_example_project_id
+    src__nexu__cinema_projects__delete_example_project --> src__nexu__cinema_projects__load_active_project
+    src__nexu__cinema_projects__delete_example_project --> src__nexu__cinema_projects__deleted_project_ids
+    src__nexu__cinema_projects__delete_example_project --> src__nexu__cinema_projects__activate_example_project
+    src__nexu__cinema_projects___seed_html_for_project --> src__nexu__cinema_projects___project_widgets
+    src__nexu__cinema_projects___write_seed_variants --> src__nexu__cinema_projects___seed_html_for_project
+    src__nexu__cinema_projects___resolve_root_for_project_source --> src__nexu__cinema_projects__find_nexu_repo_root
+    src__nexu__cinema_projects___copy_or_seed_project_files --> src__nexu__cinema_projects___write_seed_variants
+    src__nexu__cinema_projects___copy_or_seed_project_files --> src__nexu__cinema_projects___copy_cinema_files
+    src__nexu__cinema_projects___sync_project_options --> src__nexu__cinema_policy__ensure_option_previews_from_stages
+    src__nexu__cinema_projects___sync_project_options --> src__nexu__cinema_policy__stage_files_are_distinct
+    src__nexu__cinema_projects___sync_project_options --> src__nexu__cinema_policy__option_previews_are_distinct
+    src__nexu__cinema_projects___apply_preprocess_meta --> src__nexu__cinema_http_preprocess__preprocess_cinema_seed
+    src__nexu__cinema_projects___bootstrap_goal_from_project --> src__nexu__cinema_policy__append_goal_ledger_entry
+    src__nexu__cinema_projects___bootstrap_goal_from_project --> src__nexu__cinema_policy__refresh_cinema_policy_snapshot
+    src__nexu__cinema_projects___bootstrap_goal_from_project --> src__nexu__cinema_scope__scope_meta_for_project
+    src__nexu__cinema_projects___init_project_activation --> src__nexu__cinema_projects___active_project_meta
+    src__nexu__cinema_projects___init_project_activation --> src__nexu__cinema_projects___write_active_project_meta
+    src__nexu__cinema_projects___init_project_activation --> src__nexu__cinema_policy__reset_cinema_policy_ledger
+    src__nexu__cinema_projects___init_project_activation --> src__nexu__cinema_policy__refresh_cinema_policy_snapshot
+    src__nexu__cinema_projects__activate_example_project --> src__nexu__cinema_projects___find_example_project
+    src__nexu__cinema_projects__activate_example_project --> src__nexu__cinema_projects___init_project_activation
+    src__nexu__cinema_projects__activate_example_project --> src__nexu__cinema_projects___resolve_root_for_project_source
+    src__nexu__cinema_projects__activate_example_project --> src__nexu__cinema_projects___resolve_source_cinema
+    src__nexu__cinema_projects__activate_example_project --> src__nexu__cinema_projects___copy_or_seed_project_files
+    src__nexu__cinema_projects__activate_example_project --> src__nexu__cinema_scripts__write_cinema_inject_files
+    src__nexu__cinema_projects__activate_example_project --> src__nexu__cinema_scripts__repair_cinema_html_files
+    src__nexu__cinema_projects__activate_example_project --> src__nexu__cinema_projects___sync_project_options
+    src__nexu__cinema_projects__activate_example_project --> src__nexu__cinema_projects___apply_preprocess_meta
+    src__nexu__cinema_projects__activate_example_project --> src__nexu__cinema_projects___write_active_project_meta
+    src__nexu__cinema_projects__activate_example_project --> src__nexu__cinema_projects___bootstrap_goal_from_project
+    src__nexu__cinema_projects__activate_example_project --> src__nexu__cinema_scope__scope_meta_for_project
     src__nexu__cinema_history__history_index_path --> src__nexu__cinema_history__history_dir
     src__nexu__cinema_history___load_index --> src__nexu__cinema_history__history_index_path
     src__nexu__cinema_history___write_index --> src__nexu__cinema_history__history_dir
@@ -533,6 +570,27 @@ flowchart TD
     src__nexu__cinema_history__ensure_initial_checkpoint --> src__nexu__cinema_history___ledger_snapshot
     src__nexu__cinema_history__ledger_archive_for_display --> src__nexu__cinema_history___ledger_snapshot
     src__nexu__cinema_history__ledger_archive_for_display --> src__nexu__cinema_history___build_label
+    src__nexu__cinema_goal_contracts__is_chemical_goal --> src__nexu__cinema_goal_contracts___hints_text
+    src__nexu__cinema_goal_contracts___goal_contract_dict --> src__nexu__cinema_baseline_contracts___contract
+    src__nexu__cinema_goal_contracts___goal_contract_dict --> src__nexu__intract__format_intract_v1_line
+    src__nexu__cinema_goal_contracts___detect_chemical_trait --> src__nexu__cinema_goal_contracts___goal_contract_dict
+    src__nexu__cinema_goal_contracts___detect_chemical_trait --> src__nexu__cinema_goal_contracts__is_chemical_goal
+    src__nexu__cinema_goal_contracts___detect_minimal_trait --> src__nexu__cinema_goal_contracts___goal_contract_dict
+    src__nexu__cinema_goal_contracts___detect_expanded_trait --> src__nexu__cinema_goal_contracts___goal_contract_dict
+    src__nexu__cinema_goal_contracts___detect_api_trait --> src__nexu__cinema_goal_contracts___goal_contract_dict
+    src__nexu__cinema_goal_contracts___detect_dashboard_trait --> src__nexu__cinema_goal_contracts___goal_contract_dict
+    src__nexu__cinema_goal_contracts___detect_engineering_trait --> src__nexu__cinema_goal_contracts___goal_contract_dict
+    src__nexu__cinema_goal_contracts___collect_trait_proposals --> src__nexu__cinema_goal_contracts___detect_chemical_trait
+    src__nexu__cinema_goal_contracts___collect_trait_proposals --> src__nexu__cinema_goal_contracts___detect_minimal_trait
+    src__nexu__cinema_goal_contracts___collect_trait_proposals --> src__nexu__cinema_goal_contracts___detect_expanded_trait
+    src__nexu__cinema_goal_contracts___collect_trait_proposals --> src__nexu__cinema_goal_contracts___detect_api_trait
+    src__nexu__cinema_goal_contracts___collect_trait_proposals --> src__nexu__cinema_goal_contracts___detect_dashboard_trait
+    src__nexu__cinema_goal_contracts___collect_trait_proposals --> src__nexu__cinema_goal_contracts___detect_engineering_trait
+    src__nexu__cinema_goal_contracts__propose_goal_extension_contracts --> src__nexu__cinema_goal_contracts___slug
+    src__nexu__cinema_goal_contracts__propose_goal_extension_contracts --> src__nexu__cinema_goal_contracts___resolve_baseline_anchor
+    src__nexu__cinema_goal_contracts__propose_goal_extension_contracts --> src__nexu__cinema_goal_contracts___build_detail_text
+    src__nexu__cinema_goal_contracts__propose_goal_extension_contracts --> src__nexu__cinema_goal_contracts___collect_trait_proposals
+    src__nexu__cinema_goal_contracts__propose_goal_extension_contracts --> src__nexu__cinema_goal_contracts___goal_contract_dict
     src__nexu__cinema_policy___process_ledger_entry --> src__nexu__cinema_policy___process_keep_delete_entries
     src__nexu__cinema_policy___process_ledger_entry --> src__nexu__cinema_policy___process_proposed_contracts
     src__nexu__cinema_policy___process_proposed_contracts --> src__nexu__cinema_policy___proposal_kind_and_element
@@ -603,6 +661,9 @@ flowchart TD
     src__nexu__cinema_baseline_contracts__ensure_capsule_intract_yaml --> src__nexu__paths__capsule_dir
     src__nexu__cinema_baseline_contracts__ensure_capsule_intract_yaml --> src__nexu__cinema_baseline_contracts__calculator_baseline_contracts
     src__nexu__cinema_baseline_contracts__ensure_capsule_intract_yaml --> src__nexu__cinema_baseline_contracts__is_calculator_capsule
+    src__nexu__cinema_markpact__build_markpact_readme --> src__nexu__cinema_markpact___get_app_title
+    src__nexu__cinema_markpact__build_markpact_readme --> src__nexu__cinema_markpact___escape_markdown_fence
+    src__nexu__cinema_markpact__build_markpact_readme --> src__nexu__cinema_markpact___get_baseline_block
     src__nexu__paths__snapshots_dir --> src__nexu__paths__nexu_dir
     src__nexu__paths__capsules_dir --> src__nexu__paths__nexu_dir
     src__nexu__paths__capsule_dir --> src__nexu__paths__capsules_dir
@@ -639,165 +700,104 @@ flowchart TD
     src__nexu__orchestrate__build_capsule_orchestration --> src__nexu__llm__call_litellm_json
     src__vico__models__FrozenSnapshot__from_dict --> src__vico__models__utc_now
     src__vico__models__Capsule__from_dict --> src__vico__models__utc_now
+    src__nexu__cinema_dom_patch__build_function_patch_context --> src__nexu__cinema_project_ir__build_project_ir
+    src__nexu__cinema_dom_patch__build_function_patch_context --> src__nexu__cinema_project_ir__summarize_project_ir
+    src__nexu__cinema_dom_patch___variant_section --> src__nexu__cinema_dom_patch___goal_label
+    src__nexu__cinema_dom_patch__build_function_option_patches --> src__nexu__cinema_dom_patch___strip_existing_patch
+    src__nexu__cinema_dom_patch__build_function_option_patches --> src__nexu__cinema_project_ir__build_project_ir
+    src__nexu__cinema_dom_patch__build_function_option_patches --> src__nexu__cinema_offline_options___delete_without_keeps
+    src__nexu__cinema_dom_patch__build_function_option_patches --> src__nexu__cinema_dom_patch__supports_function_patch
+    src__nexu__cinema_dom_patch__build_function_option_patches --> src__nexu__cinema_dom_patch___inject_into_head
+    src__nexu__cinema_dom_patch__build_function_option_patches --> src__nexu__cinema_dom_patch___inject_into_body
+    src__nexu__cinema_dom_patch__build_function_option_patches --> src__nexu__cinema_html_validate__prepare_cinema_html_document
+    src__nexu__cinema_dom_patch__build_function_option_patches --> src__nexu__cinema_dom_patch___patch_style
+    src__nexu__cinema_dom_patch__build_function_option_patches --> src__nexu__cinema_dom_patch___variant_section
+    src__nexu__cinema_dom_patch__build_function_option_patches --> src__nexu__cinema_scripts__apply_spatial_deletes_to_html
+    src__nexu__cinema_dom_patch__build_function_option_patches --> src__nexu__cinema_scripts__finalize_cinema_html
     src__nexu__cinema_options_cache__options_cache_key --> src__nexu__cinema_options_cache___digest
     src__nexu__cinema_options_cache__options_cache_key --> src__nexu__cinema_options_cache__goal_slug
     src__nexu__cinema_options_cache__write_options_cache --> src__nexu__cinema_options_cache__goal_slug
-    src__vico__diff__diff_capsule --> src__nexu__capsule__load_capsule
-    src__vico__diff__diff_capsule --> src__nexu__paths__capsule_dir
-    src__vico__diff__diff_capsule --> src__vico__models__write_yaml
-    src__vico__diff__diff_capsule --> src__nexu__files__rel
-    src__vico__diff__diff_capsule --> src__vico__hashing__sha256_file
-    src__vico__diff__diff_capsule --> src__nexu__files__collect_files
-    src__nexu__verify___scan_capsule_contracts --> src__nexu__intract__read_manifest_contracts
-    src__nexu__verify___scan_capsule_contracts --> src__nexu__files__collect_files
-    src__nexu__verify___scan_capsule_contracts --> src__nexu__intract__scan_contracts_in_file
-    src__nexu__verify___contains_patterns --> src__nexu__verify___text
-    src__nexu__verify___find_term_evidence --> src__nexu__verify___text
-    src__nexu__verify___find_term_evidence --> src__nexu__files__rel
-    src__nexu__verify___check_source_files_presence --> src__nexu__files__rel
-    src__nexu__verify___check_baseline_lock --> src__vico__diff__diff_capsule
-    src__nexu__verify___check_forbidden_write --> src__nexu__verify___contains_patterns
-    src__nexu__verify___check_forbidden_secret --> src__nexu__verify___contains_patterns
-    src__nexu__verify___check_output_presence --> src__nexu__verify___find_term_evidence
-    src__nexu__verify__verify_capsule --> src__nexu__capsule__load_capsule
-    src__nexu__verify__verify_capsule --> src__nexu__paths__capsule_dir
-    src__nexu__verify__verify_capsule --> src__nexu__verify___scan_capsule_contracts
-    src__nexu__verify__verify_capsule --> src__nexu__files__collect_files
-    src__nexu__verify__verify_capsule --> src__nexu__verify___summary_status
-    src__nexu__journal__journal_path --> src__nexu__paths__capsule_dir
-    src__nexu__journal__read_journal --> src__nexu__journal__journal_path
-    src__nexu__journal__read_journal --> src__vico__models__read_yaml
-    src__nexu__journal__append_journal --> src__nexu__journal__read_journal
-    src__nexu__journal__append_journal --> src__vico__models__write_yaml
-    src__nexu__journal__append_journal --> src__vico__models__utc_now
-    src__nexu__journal__append_journal --> src__nexu__journal__journal_path
-    src__nexu__report__build_capsule_report --> src__nexu__paths__capsule_dir
-    src__nexu__report__build_capsule_report --> examples__web_app_calculator__cinema__nexu_hooks__verify_capsule
-    src__nexu__report__build_capsule_report --> src__vico__diff__diff_capsule
-    src__nexu__report__build_capsule_report --> src__vico__drift__check_source_drift
-    src__nexu__report__build_capsule_report --> src__vico__status__capsule_status
-    src__nexu__report__build_capsule_report --> src__nexu__journal__read_journal
-    src__nexu__report__build_capsule_report --> src__vico__models__write_yaml
-    src__nexu__report__build_capsule_report --> src__nexu__journal__append_journal
-    src__nexu__report__build_capsule_report --> src__vico__models__utc_now
-    src__nexu__capsule__create_capsule --> src__nexu__paths__ensure_project_dirs
-    src__nexu__capsule__create_capsule --> src__nexu__paths__capsule_dir
-    src__nexu__capsule__create_capsule --> src__nexu__files__collect_files
-    src__nexu__capsule__create_capsule --> src__vico__models__write_yaml
-    src__nexu__capsule__create_capsule --> src__nexu__journal__append_journal
-    src__nexu__capsule__create_capsule --> src__nexu__files__rel
-    src__nexu__capsule__list_capsules --> src__nexu__paths__capsules_dir
-    src__nexu__capsule__load_capsule --> src__vico__models__read_yaml
-    src__nexu__capsule__load_capsule --> src__nexu__paths__capsule_dir
-    src__nexu__capsule__save_capsule --> src__vico__models__write_yaml
-    src__nexu__capsule__save_capsule --> src__nexu__paths__capsule_dir
-    src__nexu__mcp_server___apply_promotion_from_mcp --> src__nexu__promote__build_promotion_plan
-    src__nexu__mcp_server___apply_promotion_from_mcp --> src__nexu__promote__apply_promotion_plan
-    src__nexu__mcp_server__call_tool --> src__nexu__mcp_server___tool_map
-    src__nexu__mcp_server___resource_list --> src__nexu__capsule__list_capsules
-    src__nexu__mcp_server___read_resource --> src__vico__status__capsule_status
-    src__nexu__mcp_server___read_resource --> src__nexu__capsule__list_capsules
-    src__nexu__mcp_server___rpc_handlers --> src__nexu__mcp_server___rpc_initialize
-    src__nexu__mcp_server___rpc_handlers --> src__nexu__mcp_server___result_content
-    src__nexu__mcp_server___rpc_handlers --> src__nexu__mcp_server___read_resource
-    src__nexu__mcp_server___rpc_handlers --> src__nexu__mcp_server___prompt_get
-    src__nexu__mcp_server___rpc_handlers --> src__nexu__mcp_server__call_tool
-    src__nexu__mcp_server___rpc_handlers --> src__nexu__mcp_server___resource_list
-    src__nexu__mcp_server___rpc_handlers --> src__nexu__mcp_server___prompts_list
-    src__nexu__mcp_server__handle_mcp_message --> src__nexu__mcp_server___rpc_handlers
-    src__nexu__mcp_server__run_mcp_stdio --> src__nexu__mcp_server__handle_mcp_message
-    src__nexu__fast_delivery__options___compatible_with_stage --> src__nexu__fast_delivery__options___looks_like_calculator
-    src__nexu__fast_delivery__options__read_cached_options --> src__nexu__cinema_options_cache__options_cache_key
-    src__nexu__fast_delivery__options__read_cached_options --> src__nexu__cinema_options_cache__read_options_cache
-    src__nexu__fast_delivery__options__read_cached_options --> src__nexu__cinema_html_validate__filter_valid_option_batch
-    src__nexu__fast_delivery__options__read_cached_options --> src__nexu__fast_delivery__options___compatible_with_stage
-    src__nexu__fast_delivery__options__store_options_cache --> src__nexu__cinema_options_cache__options_cache_key
-    src__nexu__fast_delivery__options__store_options_cache --> src__nexu__cinema_options_cache__write_options_cache
-    src__nexu__fast_delivery__context__effective_markpact_mode --> src__nexu__cinema_scope__scope_supports_offline_fast_path
-    scripts__check_doc_links___anchors --> scripts__check_doc_links___slug
-    scripts__check_doc_links__check_links --> scripts__check_doc_links___markdown_files
-    scripts__check_doc_links__check_links --> scripts__check_doc_links___targets
-    scripts__check_doc_links__check_links --> scripts__check_doc_links___resolve
-    scripts__check_doc_links__check_links --> scripts__check_doc_links___is_external
-    scripts__check_doc_links__main --> scripts__check_doc_links__check_links
-    scripts__check_doc_links__main --> scripts__ci_cinema_smoke__print
-    src__nexu__cinema_project_ir___ProjectIRParser___classify_node --> src__nexu__cinema_project_ir___clean_text
-    src__nexu__cinema_project_ir___ProjectIRParser__handle_endtag --> src__nexu__cinema_project_ir___clean_text
-    src__nexu__cinema_project_ir___ProjectIRParser__handle_data --> src__nexu__cinema_project_ir___clean_text
-    src__nexu__cinema_http_preprocess___normalize_linked_paths --> src__nexu__cinema_http_preprocess___extract_stylesheet_hrefs
-    src__nexu__cinema_http_preprocess___filter_visual_css --> src__nexu__cinema_http_preprocess___split_css_rules
-    src__nexu__cinema_http_preprocess___filter_visual_css --> src__nexu__cinema_http_preprocess___rule_is_visual
-    src__nexu__cinema_http_preprocess__extract_visual_css --> src__nexu__cinema_http_preprocess___extract_inline_css
-    src__nexu__cinema_http_preprocess__extract_visual_css --> src__nexu__cinema_http_preprocess___normalize_linked_paths
-    src__nexu__cinema_http_preprocess__extract_visual_css --> src__nexu__cinema_http_preprocess___filter_visual_css
-    src__nexu__cinema_http_preprocess__extract_visual_css --> src__nexu__cinema_http_preprocess___safe_read_under
-    src__nexu__cinema_http_preprocess___should_remove_preview_script --> src__nexu__cinema_http_preprocess___script_src_allowed_for_preview
-    src__nexu__cinema_http_preprocess__sanitize_http_preview_html --> src__nexu__cinema_http_preprocess___should_remove_preview_script
-    src__nexu__cinema_http_preprocess__prepare_http_preview_html --> src__nexu__cinema_http_preprocess__sanitize_http_preview_html
-    src__nexu__cinema_http_preprocess__prepare_http_preview_html --> src__nexu__cinema_http_preprocess__inject_http_preview_shim
-    src__nexu__cinema_http_preprocess___write_preprocess_artifacts --> src__nexu__cinema_http_preprocess__extract_visual_css
-    src__nexu__cinema_http_preprocess___write_preprocess_artifacts --> src__nexu__cinema_http_preprocess__build_html_outline
-    src__nexu__cinema_http_preprocess__preprocess_cinema_seed --> src__nexu__cinema_http_preprocess___write_preprocess_artifacts
-    src__nexu__cinema_http_preprocess__ensure_http_preprocess_artifacts --> src__nexu__cinema_http_preprocess__http_preprocess_artifacts_present
-    src__nexu__cinema_http_preprocess__ensure_http_preprocess_artifacts --> src__nexu__cinema_http_preprocess__preprocess_http_import
-    src__nexu__cinema_http_preprocess__preprocess_http_import --> src__nexu__cinema_http_preprocess___write_preprocess_artifacts
-    src__nexu__cinema_http_preprocess__load_cinema_seed_preprocess_artifacts --> src__nexu__cinema_http_preprocess___safe_read_under
-    src__nexu__cinema_http_preprocess__load_http_preprocess_artifacts --> src__nexu__cinema_http_preprocess___project_meta_path
-    src__nexu__cinema_http_preprocess__load_http_preprocess_artifacts --> src__nexu__cinema_http_preprocess___load_project_meta
-    src__nexu__cinema_http_preprocess__load_http_preprocess_artifacts --> src__nexu__cinema_http_preprocess___safe_read_under
-    src__nexu__cinema_project_imports___project_dir --> src__nexu__cinema_project_imports___imports_root
-    src__nexu__cinema_project_imports___decode_http_bytes --> src__nexu__cinema_project_imports___charset_from_content_type
-    src__nexu__cinema_project_imports___fetch_http_body --> src__nexu__cinema_project_imports___validate_http_url
-    src__nexu__cinema_project_imports___fetch_http_body --> src__nexu__cinema_project_imports___charset_from_content_type
-    src__nexu__cinema_project_imports___fetch_http_stylesheets --> src__nexu__cinema_project_imports___extract_stylesheet_hrefs
-    src__nexu__cinema_project_imports___fetch_http_stylesheets --> src__nexu__cinema_project_imports___same_origin
-    src__nexu__cinema_project_imports___fetch_http_stylesheets --> src__nexu__cinema_project_imports___fetch_http_body
-    src__nexu__cinema_project_imports___build_http_preview_stage0 --> src__nexu__cinema_project_imports___find_http_index_path
-    src__nexu__cinema_project_imports___build_http_preview_stage0 --> src__nexu__cinema_project_imports___load_http_fetch_meta
-    src__nexu__cinema_project_imports___build_http_preview_stage0 --> src__nexu__cinema_project_imports___inject_base_href
-    src__nexu__cinema_project_imports___build_http_preview_stage0 --> src__nexu__cinema_http_preprocess__prepare_http_preview_html
-    src__nexu__cinema_project_imports___build_http_preview_stage0 --> src__nexu__cinema_scripts__inject_cinema_shield
-    src__nexu__cinema_project_imports___build_http_preview_stage0 --> src__nexu__cinema_project_imports___rewrite_local_stylesheets
-    src__nexu__cinema_project_imports___build_markpact_migration --> src__nexu__cinema_project_imports___iter_project_files
-    src__nexu__cinema_project_imports___build_markpact_migration --> src__nexu__cinema_project_imports___read_text_for_markpact
-    src__nexu__cinema_project_imports___build_markpact_migration --> src__nexu__cinema_project_imports___detect_run_notes
-    src__nexu__cinema_project_imports___refresh_http_preprocess_if_needed --> src__nexu__cinema_project_imports___load_http_fetch_meta
-    src__nexu__cinema_project_imports___refresh_http_preprocess_if_needed --> src__nexu__cinema_http_preprocess__ensure_http_preprocess_artifacts
-    src__nexu__cinema_project_imports___refresh_http_preprocess_if_needed --> src__nexu__cinema_project_imports___apply_http_preprocess_fields
-    src__nexu__cinema_project_imports___refresh_http_preprocess_if_needed --> src__nexu__cinema_project_imports___project_dir
-    src__nexu__cinema_project_imports___activate_imported --> src__nexu__cinema_policy__reset_cinema_policy_ledger
-    src__nexu__cinema_project_imports___activate_imported --> src__nexu__cinema_scripts__write_cinema_inject_files
-    src__nexu__cinema_project_imports___activate_imported --> src__nexu__cinema_policy__refresh_imported_policy_snapshot
-    src__nexu__cinema_project_imports___activate_imported --> src__nexu__cinema_project_imports___refresh_http_preprocess_if_needed
-    src__nexu__cinema_project_imports___activate_imported --> src__nexu__cinema_project_imports___build_http_preview_stage0
-    src__nexu__cinema_project_imports___activate_imported --> src__nexu__cinema_project_imports___stage_html
-    src__nexu__cinema_project_imports___activate_imported --> src__nexu__cinema_policy__ensure_http_option_previews_from_stage0
-    src__nexu__cinema_project_imports___activate_imported --> src__nexu__cinema_policy__ensure_option_previews_from_stages
-    src__nexu__cinema_project_imports__import_git_project --> src__nexu__cinema_project_imports___validate_git_url
-    src__nexu__cinema_project_imports__import_git_project --> src__nexu__cinema_project_imports___project_dir
-    src__nexu__cinema_project_imports__import_git_project --> src__nexu__cinema_project_imports___finish_import
-    src__nexu__cinema_project_imports__import_git_project --> src__nexu__cinema_project_imports___slug
-    src__nexu__cinema_project_imports__import_http_project --> src__nexu__cinema_project_imports___project_dir
-    src__nexu__cinema_project_imports__import_http_project --> src__nexu__cinema_project_imports___decode_http_bytes
-    src__nexu__cinema_project_imports__import_http_project --> src__nexu__cinema_project_imports___finish_import
-    src__nexu__cinema_project_imports__import_http_project --> src__nexu__cinema_project_imports___slug
-    src__nexu__cinema_project_imports__import_http_project --> src__nexu__cinema_project_imports___fetch_http_body
-    src__nexu__cinema_project_imports__import_http_project --> src__nexu__cinema_project_imports___fetch_http_stylesheets
-    src__nexu__cinema_project_imports__import_zip_project --> src__nexu__cinema_project_imports___project_dir
-    src__nexu__cinema_project_imports__import_zip_project --> src__nexu__cinema_project_imports___finish_import
-    src__nexu__cinema_project_imports__import_zip_project --> src__nexu__cinema_project_imports___slug
-    src__nexu__cinema_project_imports__import_zip_project --> src__nexu__cinema_project_imports___safe_extract_zip
-    src__nexu__cinema_project_imports___finish_import --> src__nexu__cinema_project_imports___project_title_from_id
-    src__nexu__cinema_project_imports___finish_import --> src__nexu__cinema_project_imports___iter_project_files
-    src__nexu__cinema_project_imports___finish_import --> src__nexu__cinema_project_imports___source_stats
-    src__nexu__cinema_project_imports___finish_import --> src__nexu__cinema_project_imports___build_markpact_migration
-    src__nexu__cinema_project_imports___finish_import --> src__nexu__cinema_project_imports___infer_workspace_context
-    src__nexu__cinema_project_imports___finish_import --> src__nexu__cinema_project_imports___activate_imported
-    src__nexu__cinema_project_imports___finish_import --> src__nexu__cinema_project_imports___import_kind_from_id
-    src__nexu__cinema_project_imports___finish_import --> src__nexu__cinema_http_preprocess__preprocess_http_import
-    src__nexu__cinema_project_imports___finish_import --> src__nexu__cinema_project_imports___project_dir
+    src__nexu__cinema_publish___registry_path --> src__nexu__cinema_publish__services_root
+    src__nexu__cinema_publish___load_registry --> src__nexu__cinema_publish___registry_path
+    src__nexu__cinema_publish___save_registry --> src__nexu__cinema_publish__services_root
+    src__nexu__cinema_publish___save_registry --> src__nexu__cinema_publish___registry_path
+    src__nexu__cinema_publish___service_alive --> src__nexu__cinema_publish___port_open
+    src__nexu__cinema_publish___service_alive --> src__nexu__cinema_publish___http_ok
+    src__nexu__cinema_publish___refresh_service_status --> src__nexu__cinema_publish___service_alive
+    src__nexu__cinema_publish__list_published_services --> src__nexu__cinema_publish___load_registry
+    src__nexu__cinema_publish__list_published_services --> src__nexu__cinema_publish___save_registry
+    src__nexu__cinema_publish__list_published_services --> src__nexu__cinema_publish___refresh_service_status
+    src__nexu__cinema_publish___write_service_readme --> src__nexu__cinema_markpact___escape_markdown_fence
+    src__nexu__cinema_publish___prepare_service_directory --> src__nexu__cinema_publish__services_root
+    src__nexu__cinema_publish___generate_markpact_export --> src__nexu__cinema__build_intract_policy_snapshot
+    src__nexu__cinema_publish___generate_markpact_export --> src__nexu__cinema_markpact__build_markpact_readme
+    src__nexu__cinema_publish___generate_markpact_export --> src__nexu__cinema_policy__load_effective_ui_constraints
+    src__nexu__cinema_publish___allocate_service_port --> src__nexu__cinema_publish___load_registry
+    src__nexu__cinema_publish___allocate_service_port --> src__nexu__cinema_publish___pick_port
+    src__nexu__cinema_publish___register_service --> src__nexu__cinema_publish___load_registry
+    src__nexu__cinema_publish___register_service --> src__nexu__cinema_publish___save_registry
+    src__nexu__cinema_publish___handle_existing_service --> src__nexu__cinema_publish___load_registry
+    src__nexu__cinema_publish___handle_existing_service --> src__nexu__cinema_publish___service_alive
+    src__nexu__cinema_publish___handle_existing_service --> src__nexu__cinema_publish__stop_published_service
+    src__nexu__cinema_publish__publish_project_service --> src__nexu__cinema_publish___slug_service_id
+    src__nexu__cinema_publish__publish_project_service --> src__nexu__cinema_publish___prepare_service_directory
+    src__nexu__cinema_publish__publish_project_service --> src__nexu__cinema__build_intract_policy_snapshot
+    src__nexu__cinema_publish__publish_project_service --> src__nexu__cinema_publish___generate_markpact_export
+    src__nexu__cinema_publish__publish_project_service --> src__nexu__cinema_publish___allocate_service_port
+    src__nexu__cinema_publish__publish_project_service --> src__nexu__cinema_policy__load_effective_ui_constraints
+    src__nexu__cinema_publish__publish_project_service --> src__nexu__cinema_publish___write_service_readme
+    src__nexu__cinema_publish__publish_project_service --> src__nexu__cinema_publish___handle_existing_service
+    src__nexu__cinema_publish__publish_project_service --> src__nexu__cinema_publish___create_service_entry
+    src__nexu__cinema_publish__publish_project_service --> src__nexu__cinema_publish___register_service
+    src__nexu__cinema_publish__publish_project_service --> src__nexu__cinema_publish__start_published_service
+    src__nexu__cinema_publish___wait_for_service_running --> src__nexu__cinema_publish___refresh_service_status
+    src__nexu__cinema_publish__start_published_service --> src__nexu__cinema_publish___load_registry
+    src__nexu__cinema_publish__start_published_service --> src__nexu__cinema_publish___refresh_service_status
+    src__nexu__cinema_publish__start_published_service --> src__nexu__cinema_publish___spawn_http_server
+    src__nexu__cinema_publish__start_published_service --> src__nexu__cinema_publish___save_registry
+    src__nexu__cinema_publish__start_published_service --> src__nexu__cinema_publish___wait_for_service_running
+    src__nexu__cinema_publish__start_published_service --> src__nexu__cinema_publish__services_root
+    src__nexu__cinema_publish__stop_published_service --> src__nexu__cinema_publish___load_registry
+    src__nexu__cinema_publish__stop_published_service --> src__nexu__cinema_publish___save_registry
+    src__nexu__cinema_offline_options___keep_ids_lower --> src__nexu__cinema_offline_options___normal_id
+    src__nexu__cinema_offline_options___delete_without_keeps --> src__nexu__cinema_offline_options___keep_ids_lower
+    src__nexu__cinema_offline_options___delete_without_keeps --> src__nexu__cinema_offline_options___normal_id
+    src__nexu__cinema_offline_options___mandatory_trig --> src__nexu__cinema_offline_options___keep_ids_lower
+    src__nexu__cinema_offline_options___trig_row --> src__nexu__cinema_offline_options___mandatory_trig
+    src__nexu__cinema_offline_options___trig_row --> src__nexu__cinema_offline_options___btn
+    src__nexu__cinema_offline_options___trig_row --> src__nexu__cinema_offline_options___keep_ids_lower
+    src__nexu__cinema_offline_options___numpad_token_btn --> src__nexu__cinema_offline_options___btn
+    src__nexu__cinema_offline_options___numpad_rows --> src__nexu__cinema_offline_options___numpad_token_btn
+    src__nexu__cinema_offline_options___numpad_from_policy --> src__nexu__cinema_offline_options___keep_ids_lower
+    src__nexu__cinema_offline_options___numpad_from_policy --> src__nexu__cinema_offline_options___numpad_rows
+    src__nexu__cinema_offline_options___numpad_from_policy --> src__nexu__cinema_offline_options___numpad_token_btn
+    src__nexu__cinema_offline_options___policy_screen_text --> src__nexu__cinema_offline_options___mandatory_trig
+    src__nexu__cinema_offline_options___policy_screen_text --> src__nexu__cinema_offline_options___short_goal_label
+    src__nexu__cinema_offline_options___expanded_excess_row --> src__nexu__cinema_offline_options___keep_ids_lower
+    src__nexu__cinema_offline_options___expanded_excess_row --> src__nexu__cinema_offline_options___btn
+    src__nexu__cinema_offline_options___active_project_meta --> src__nexu__cinema_projects__load_active_project
+    src__nexu__cinema_offline_options___active_is_imported --> src__nexu__cinema_projects__load_active_project
+    src__nexu__cinema_offline_options___cinema_is_calculator --> src__nexu__cinema_projects__load_active_project
+    src__nexu__cinema_offline_options___cinema_is_calculator --> src__nexu__cinema_scope__ui_type_for_kind
+    src__nexu__cinema_offline_options___inject_goal_banner --> src__nexu__cinema_offline_options___short_goal_label
+    src__nexu__cinema_offline_options___write_project_options_from_stages --> src__nexu__cinema_offline_options___active_project_meta
+    src__nexu__cinema_offline_options___write_project_options_from_stages --> src__nexu__cinema_scope__normalize_focus_scope
+    src__nexu__cinema_offline_options___write_project_options_from_stages --> src__nexu__cinema_scope__ui_type_for_kind
+    src__nexu__cinema_offline_options___write_project_options_from_stages --> src__nexu__cinema_scope__scope_option_variants
+    src__nexu__cinema_offline_options___write_project_options_from_stages --> src__nexu__cinema_scripts__finalize_cinema_html
+    src__nexu__cinema_offline_options___write_project_options_from_stages --> src__nexu__cinema_offline_options___inject_goal_banner
+    src__nexu__cinema_offline_options___write_project_options_from_stages --> src__nexu__cinema_offline_options___delete_without_keeps
+    src__nexu__cinema_offline_options___write_project_options_from_stages --> src__nexu__cinema_scope__inject_scope_style
+    src__nexu__cinema_offline_options___write_scoped_calculator_options --> src__nexu__cinema_offline_options___active_project_meta
+    src__nexu__cinema_offline_options___write_scoped_calculator_options --> src__nexu__cinema_scope__ui_type_for_kind
+    src__nexu__cinema_offline_options___write_scoped_calculator_options --> src__nexu__cinema_scope__scope_option_variants
+    src__nexu__cinema_offline_options___write_scoped_calculator_options --> src__nexu__cinema_scripts__finalize_cinema_html
+    src__nexu__cinema_offline_options___write_scoped_calculator_options --> src__nexu__cinema_offline_options___delete_without_keeps
+    src__nexu__cinema_offline_options___write_scoped_calculator_options --> src__nexu__cinema_scope__inject_scope_style
+    src__nexu__cinema_offline_options___write_scoped_calculator_options --> src__nexu__cinema_offline_options___inject_goal_banner
+    src__nexu__cinema_offline_options__build_policy_scientific_option_html --> src__nexu__cinema_offline_options___trig_row
 
     classDef highCC fill:#ff6b6b,stroke:#c92a2a,color:#fff
     classDef medCC fill:#ffd43b,stroke:#f08c00,color:#000
-    class examples__web_app_calculator__cinema__server___effective_ui_constraints_from_ledger,examples__web_app_calculator__cinema__server___merge_ui_constraints,examples__web_app_calculator__cinema__server__CustomHTTPRequestHandler__do_GET,examples__web_app_calculator__cinema__server__CustomHTTPRequestHandler__do_POST,src__nexu__cinema_llm___extract_content,src__nexu__cinema_http_preprocess__load_http_preprocess_artifacts,src__nexu__cinema_project_imports___compile_meta_fields,src__nexu__cinema_goal_contracts__propose_goal_extension_contracts,src__nexu__cinema_publish__start_published_service,src__nexu__cinema_scope__inject_scope_style,src__nexu__cinema_marked_context___find_marked_subtrees,src__nexu__cinema_marked_context__build_marked_element_context highCC
-    class examples__web_app_event_monitor__run__main,examples__web_app_calculator__cinema__nexu_hooks__append_goal_policy_entry,examples__web_app_calculator__cinema__nexu_hooks__patch_option_previews,examples__web_app_calculator__cinema__server___load_env_file,examples__web_app_calculator__cinema__server___extract_llm_content,examples__web_app_calculator__cinema__server___proposal_kind_and_element,examples__web_app_calculator__cinema__server___import_project,examples__web_app_calculator__cinema__server__CustomHTTPRequestHandler__do_DELETE,examples__web_app_pactown_ecosystem__run__main,src__nexu__runtime___html_page,src__nexu__config___load_env_file,src__nexu__config__load_config,src__nexu__intract__read_manifest_contracts,src__nexu__llm__call_litellm_json,src__nexu__cinema__build_intract_policy_snapshot,src__nexu__intract_adapter___finding_for_result,src__nexu__plan___contract_summary,src__nexu__files__collect_files,src__nexu__cinema_traces__redact_secrets,src__nexu__cinema_traces__write_llm_trace,src__nexu__cinema_llm___strip_markdown_fences,src__nexu__cinema_llm__parse_batch_alt_options,src__nexu__cinema_llm__call_cinema_text_llm,src__nexu__cinema_llm__call_cinema_html_llm,src__nexu__cinema_history__restore_history_checkpoint,src__nexu__cinema_policy___process_proposed_contracts,src__nexu__cinema_policy__merge_ui_constraint_lists,src__nexu__cinema_policy__sync_option_previews_from_workspace,src__nexu__cinema_policy__resolve_iteration_mode,src__nexu__cinema_policy__apply_ledger_from_cinema medCC
+    class examples__web_app_calculator__cinema__server___effective_ui_constraints_from_ledger,examples__web_app_calculator__cinema__server___merge_ui_constraints,examples__web_app_calculator__cinema__server__CustomHTTPRequestHandler__do_GET,examples__web_app_calculator__cinema__server__CustomHTTPRequestHandler__do_POST,src__nexu__cinema_http_preprocess__load_http_preprocess_artifacts,src__nexu__cinema_goal_contracts__propose_goal_extension_contracts,src__nexu__cinema_publish__start_published_service,src__nexu__cinema_project_imports___compile_meta_fields,src__nexu__cinema_ui_patch__apply_ui_patch_options,src__nexu__cinema_scope___bind_annotations_to_html,src__nexu__cinema_marked_context___find_marked_subtrees highCC
+    class examples__web_app_event_monitor__run__main,examples__web_app_calculator__cinema__nexu_hooks__append_goal_policy_entry,examples__web_app_calculator__cinema__nexu_hooks__patch_option_previews,examples__web_app_calculator__cinema__server___load_env_file,examples__web_app_calculator__cinema__server___extract_llm_content,examples__web_app_calculator__cinema__server___proposal_kind_and_element,examples__web_app_calculator__cinema__server___import_project,examples__web_app_calculator__cinema__server__CustomHTTPRequestHandler__do_DELETE,examples__web_app_pactown_ecosystem__run__main,src__nexu__runtime___html_page,src__nexu__cinema_project_ir___ProjectIRParser___classify_node,src__nexu__cinema_project_ir___ProjectIRParser__handle_endtag,src__nexu__cinema_project_ir__summarize_project_ir,src__nexu__config___load_env_file,src__nexu__config__load_config,src__nexu__intract__read_manifest_contracts,src__nexu__llm__call_litellm_json,src__nexu__cinema__build_intract_policy_snapshot,src__nexu__intract_adapter___finding_for_result,src__nexu__plan___contract_summary,src__nexu__files__collect_files,src__nexu__cinema_http_preprocess___normalize_linked_paths,src__nexu__cinema_http_preprocess___split_css_rules,src__nexu__cinema_http_preprocess__extract_visual_css,src__nexu__cinema_http_preprocess___OutlineParser__handle_starttag,src__nexu__cinema_http_preprocess__http_preprocess_artifacts_present,src__nexu__cinema_http_preprocess__preprocess_http_import,src__nexu__cinema_http_preprocess__load_cinema_seed_preprocess_artifacts,src__nexu__cinema_traces__redact_secrets,src__nexu__cinema_traces__write_llm_trace medCC

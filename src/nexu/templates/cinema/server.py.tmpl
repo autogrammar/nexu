@@ -611,6 +611,17 @@ def _load_policy_payload() -> dict:
     return {"snapshot": snapshot, "ledger": ledger, "effective_ui": effective_ui}
 
 
+def _apply_entry_constraints(entry: dict, state: dict):
+    for el in entry.get("keep") or []:
+        key = str(el).strip()
+        if key:
+            state[key] = "keep"
+    for el in entry.get("delete") or []:
+        key = str(el).strip()
+        if key:
+            state[key] = "delete"
+
+
 def _effective_ui_constraints_from_ledger(ledger: list, stage: int = 0) -> dict:
     try:
         import nexu_hooks
@@ -625,37 +636,25 @@ def _effective_ui_constraints_from_ledger(ledger: list, stage: int = 0) -> dict:
             continue
         if entry.get("stage") is not None and int(entry.get("stage", 0)) != stage:
             continue
-        for el in entry.get("keep") or []:
-            key = str(el).strip()
-            if key:
-                state[key] = "keep"
-        for el in entry.get("delete") or []:
-            key = str(el).strip()
-            if key:
-                state[key] = "delete"
+        _apply_entry_constraints(entry, state)
     keep = sorted(k for k, v in state.items() if v == "keep")
     delete = sorted(k for k, v in state.items() if v == "delete")
     return {"keep": keep, "delete": delete, "by_element": state}
 
 
+def _update_constraints(state: dict, elements: list | None, value: str):
+    for el in elements or []:
+        key = str(el).strip()
+        if key:
+            state[key] = value
+
+
 def _merge_ui_constraints(ledger_keep, ledger_delete, session_keep, session_delete):
     state = {}
-    for el in ledger_keep or []:
-        key = str(el).strip()
-        if key:
-            state[key] = "keep"
-    for el in ledger_delete or []:
-        key = str(el).strip()
-        if key:
-            state[key] = "delete"
-    for el in session_keep or []:
-        key = str(el).strip()
-        if key:
-            state[key] = "keep"
-    for el in session_delete or []:
-        key = str(el).strip()
-        if key:
-            state[key] = "delete"
+    _update_constraints(state, ledger_keep, "keep")
+    _update_constraints(state, ledger_delete, "delete")
+    _update_constraints(state, session_keep, "keep")
+    _update_constraints(state, session_delete, "delete")
     keep = sorted(k for k, v in state.items() if v == "keep")
     delete = sorted(k for k, v in state.items() if v == "delete")
     return keep, delete
@@ -2358,6 +2357,10 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                             current_html,
                             patch,
                             option_variants=option_variants,
+                            focus_scope=active_scope,
+                            project_kind=project_kind,
+                            keep_els=keep_els,
+                            delete_els=delete_els,
                         )
                         _write_llm_trace(
                             label=f"Options A-C LLM patch ({active_scope or 'none'})",

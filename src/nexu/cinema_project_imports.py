@@ -1007,6 +1007,32 @@ def _activate_delete_fallback(
     return None
 
 
+def _clear_active_project(cinema_dir: Path) -> None:
+    active_path = cinema_dir / ACTIVE_PROJECT_FILE
+    if active_path.exists():
+        active_path.unlink()
+
+
+def _delete_active_project_fallback(
+    cinema_dir: Path,
+    result: dict[str, Any],
+    workspace_root: Path | None,
+    capsule_name: str | None,
+    repo_root: Path | None,
+) -> None:
+    fallback = DEFAULT_FALLBACK_PROJECT
+    if repo_root and workspace_root and capsule_name:
+        err = _activate_delete_fallback(cinema_dir, fallback, workspace_root, capsule_name, repo_root)
+        if err:
+            result["activated"] = None
+            result["activate_error"] = err
+        else:
+            result["activated"] = fallback
+        return
+    _clear_active_project(cinema_dir)
+    result["activated"] = None
+
+
 def delete_imported_project(
     cinema_dir: Path,
     project_id: str,
@@ -1015,34 +1041,30 @@ def delete_imported_project(
     capsule_name: str | None = None,
     repo_root: Path | None = None,
 ) -> dict[str, Any]:
-    project_id = normalize_imported_project_id(project_id)
-    if not is_deletable_imported_id(project_id):
+    normalized_id = normalize_imported_project_id(project_id)
+    if not is_deletable_imported_id(normalized_id):
         return {"error": "only imported projects (zip-/git-/http-) can be deleted"}
-    project_dir = _project_dir(cinema_dir, project_id)
+
+    project_dir = _project_dir(cinema_dir, normalized_id)
     imports_root = _imports_root(cinema_dir).resolve()
     path_err = _verify_delete_paths(project_dir, imports_root)
     if path_err:
         return {"error": path_err}
     if not project_dir.is_dir():
-        return {"error": f"unknown imported project: {project_id}"}
+        return {"error": f"unknown imported project: {normalized_id}"}
+
     active = load_active_project(cinema_dir) or {}
-    was_active = str(active.get("id") or "") == project_id
+    was_active = str(active.get("id") or "") == normalized_id
     shutil.rmtree(project_dir)
-    result: dict[str, Any] = {"status": "deleted", "id": project_id, "was_active": was_active}
+    result: dict[str, Any] = {"status": "deleted", "id": normalized_id, "was_active": was_active}
     if was_active:
-        fallback = DEFAULT_FALLBACK_PROJECT
-        if repo_root and workspace_root and capsule_name:
-            err = _activate_delete_fallback(cinema_dir, fallback, workspace_root, capsule_name, repo_root)
-            if err:
-                result["activated"] = None
-                result["activate_error"] = err
-            else:
-                result["activated"] = fallback
-        else:
-            active_path = cinema_dir / ACTIVE_PROJECT_FILE
-            if active_path.exists():
-                active_path.unlink()
-            result["activated"] = None
+        _delete_active_project_fallback(
+            cinema_dir,
+            result,
+            workspace_root,
+            capsule_name,
+            repo_root,
+        )
     return result
 
 

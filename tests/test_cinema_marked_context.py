@@ -6,7 +6,9 @@ from nexu.cinema_marked_context import (
     build_marked_element_context,
     has_ui_marks,
     marked_css_selectors,
+    marked_scope_colors_css,
     resolve_marked_llm_context,
+    resolve_marked_selectors,
     restrict_scope_css_to_marks,
 )
 from nexu.cinema_scope import (
@@ -166,7 +168,32 @@ def test_inject_scope_style_scopes_css_to_delete_marks() -> None:
     )
     assert "nexu-scope-variant" in patched
     assert "#btn-tan" in patched or "#tan" in patched
+    assert "background-color:#38bdf8" in patched
     assert "html,body" not in patched
+
+
+def test_resolve_marked_selectors_includes_classes() -> None:
+    html = (
+        "<body><a class='kb-btn2_237106-a1' href='#'>Zapisz dziecko</a>"
+        "<button class='kb-btn2_999'>Nasza lokalizacja</button></body>"
+    )
+    selectors = resolve_marked_selectors(
+        html,
+        ["Zapisz dziecko", "Nasza lokalizacja"],
+    )
+    assert ".kb-btn2_237106-a1" in selectors
+    assert ".kb-btn2_999" in selectors
+    assert '[data-nexu-target="Zapisz dziecko"]' in selectors
+    assert not any(sel.startswith("#Zapisz ") for sel in selectors)
+
+
+def test_marked_scope_colors_css_differs_by_variant() -> None:
+    selectors = [".kb-btn2_237106-a1"]
+    a = marked_scope_colors_css(selectors, "a")
+    b = marked_scope_colors_css(selectors, "b")
+    assert "background-color:#38bdf8" in a
+    assert "background-color:#facc15" in b
+    assert a != b
 
 
 def test_should_block_full_html_for_imported_marks() -> None:

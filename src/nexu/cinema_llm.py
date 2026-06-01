@@ -170,6 +170,21 @@ def _response_shape(response: Any) -> str:
     return text[:1200]
 
 
+def _extract_parts(content: list) -> str | None:
+    parts: list[str] = []
+    for item in content:
+        if isinstance(item, dict):
+            text = item.get("text")
+            if isinstance(text, str):
+                parts.append(text)
+        elif isinstance(item, str):
+            parts.append(item)
+    joined = "".join(parts)
+    if joined.strip():
+        return joined
+    return None
+
+
 def _extract_content(response: Any) -> str:
     data = _as_plain_data(response)
     choices = _lookup(data, "choices")
@@ -185,16 +200,8 @@ def _extract_content(response: Any) -> str:
     message = _lookup(first, "message", {})
     content = _lookup(message, "content")
     if isinstance(content, list):
-        parts: list[str] = []
-        for item in content:
-            if isinstance(item, dict):
-                text = item.get("text")
-                if isinstance(text, str):
-                    parts.append(text)
-            elif isinstance(item, str):
-                parts.append(item)
-        joined = "".join(parts)
-        if joined.strip():
+        joined = _extract_parts(content)
+        if joined is not None:
             return joined
     if isinstance(content, str) and content.strip():
         return content
@@ -209,7 +216,6 @@ def _extract_content(response: Any) -> str:
         "LLM response did not contain message content"
         f" (finish_reason={finish}); shape={_response_shape(response)}"
     )
-    return str(content)
 
 
 def compact_llm_error(err_text: str) -> str:
