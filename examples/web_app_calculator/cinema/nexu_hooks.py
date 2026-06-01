@@ -30,12 +30,14 @@ from nexu.cinema_project_imports import (
     delete_imported_project,
     import_git_project,
     import_http_project,
+    import_markpact_project,
     import_zip_project,
     imported_project_llm_log,
     merged_projects_catalog,
     read_imported_markpact,
 )
 from nexu.cinema_publish import (
+    delete_published_service,
     list_published_services,
     publish_project_service,
     start_published_service,
@@ -44,8 +46,8 @@ from nexu.cinema_publish import (
 from nexu.cinema_scripts import finalize_cinema_html
 from repatch import apply_spatial_deletes_to_html
 
-ROOT = Path('/home/tom/github/semcod/nexu/examples/web_app_calculator/workspace')
-CAPSULE = 'scientific_calc'
+ROOT = Path('/home/tom/github/semcod/nexu/examples/web_app_calculator')
+CAPSULE = 'web_app_calculator'
 
 
 def apply_manifest_from_ledger(*, dry_run: bool = False, target: str = "both"):
@@ -246,6 +248,21 @@ def import_project_from_http(site_url: str, *, allow_network: bool = True):
     return import_http_project(cinema, site_url, allow_network=allow_network)
 
 
+def import_project_from_markpact(
+    filename: str,
+    content_base64: str = "",
+    *,
+    content_bytes: bytes | None = None,
+):
+    cinema = Path(__file__).resolve().parent
+    return import_markpact_project(
+        cinema,
+        filename,
+        content_base64,
+        content_bytes=content_bytes,
+    )
+
+
 def delete_imported(project_id: str):
     cinema = Path(__file__).resolve().parent
     repo_root = find_nexu_repo_root(ROOT)
@@ -329,3 +346,8 @@ def start_service(service_id: str):
 def stop_service(service_id: str):
     cinema = Path(__file__).resolve().parent
     return stop_published_service(cinema, service_id)
+
+
+def delete_service(service_id: str):
+    cinema = Path(__file__).resolve().parent
+    return delete_published_service(cinema, service_id)

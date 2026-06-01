@@ -1,4 +1,4 @@
-#!/usr/bin/python3.13
+#!/home/tom/github/semcod/nexu/.venv/bin/python3
 import http.server
 import socketserver
 import sys
@@ -20,6 +20,7 @@ mimetypes.add_type("application/javascript; charset=utf-8", ".js")
 mimetypes.add_type("text/css; charset=utf-8", ".css")
 
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8080
+BIND_HOST = os.environ.get("CINEMA_BIND_HOST", "127.0.0.1")
 DIRECTORY = Path(__file__).parent.absolute()
 LOG_CSV = DIRECTORY / "log.csv"
 POLICY_SNAPSHOT_PATH = DIRECTORY / "intract_policy.json"
@@ -28,13 +29,13 @@ LLM_TRACE_DIR = DIRECTORY / "llm_traces"
 LLM_TRACE_INDEX = LLM_TRACE_DIR / "index.json"
 LLM_TRACE_LOCK = Lock()
 
-WORKSPACE_PATH = '/home/tom/github/semcod/nexu/examples/web_app_calculator/workspace'
+WORKSPACE_PATH = '/home/tom/github/semcod/nexu/examples/web_app_calculator'
 ROOT_PATH = Path(WORKSPACE_PATH).absolute()
-CAPSULE_NAME = 'scientific_calc'
-SYS_EXE = '/usr/bin/python3.13'
-ALLOW_NETWORK_CALLS = True
+CAPSULE_NAME = 'web_app_calculator'
+SYS_EXE = '/home/tom/github/semcod/nexu/.venv/bin/python3'
+ALLOW_NETWORK_CALLS = False
 API_KEY_ENV = 'OPENROUTER_API_KEY'
-DEFAULT_MODEL = 'openrouter/x-ai/grok-4.3'
+DEFAULT_MODEL = 'openrouter/deepseek/deepseek-v4-pro'
 MAX_TOKENS = int(os.environ.get("CINEMA_MAX_TOKENS", 20480))
 OPTION_GENERATION_MODE = os.environ.get(
     "CINEMA_OPTION_GENERATION_MODE",
@@ -688,7 +689,13 @@ def _ensure_intract_on_path() -> bool:
 
 
 def _propose_cinema_contracts(stage: int, keep_els: list, delete_els: list) -> list:
-    if _ensure_intract_on_path():
+    active = _active_project().get("project") or {}
+    active_project_id = str(active.get("id") or "").strip()
+    active_kind = str(active.get("kind") or "").strip().lower()
+    domain = "calculator" if active_kind == "calculator" else "web"
+    contract_scope = "ui"
+    contract_subject = active_project_id or CAPSULE_NAME
+    if _ensure_intract_on_path() and not active_project_id:
         try:
             from intract.proposals import propose_ui_delta_contract_dicts
 
@@ -697,36 +704,38 @@ def _propose_cinema_contracts(stage: int, keep_els: list, delete_els: list) -> l
                 keep=keep_els,
                 delete=delete_els,
                 capsule=CAPSULE_NAME,
-                domain="calculator",
+                domain=domain,
             )
         except Exception:
             pass
 
     proposals = []
     for element_id in delete_els:
-        contract_id = f"cinema.{CAPSULE_NAME}.S{stage}.ui.remove.{element_id}"
+        contract_id = f"cinema.{contract_subject}.S{stage}.{contract_scope}.remove.{element_id}"
         proposals.append({
             "id": contract_id,
             "kind": "delete",
             "element": element_id,
             "line": (
-                f"@intract.v1 id:{contract_id} scope:ui intent:ui:remove:{element_id} "
-                f"priority:3 domain:calculator effect:ui_change forbid:destructive_write,secret_leak "
+                f"@intract.v1 id:{contract_id} scope:{contract_scope} "
+                f"intent:ui:{contract_scope}:remove:{element_id} "
+                f"priority:3 domain:{domain} effect:ui_change forbid:destructive_write,secret_leak "
                 f"require:human_review validate:no_forbidden_effect "
-                f'meaning:"Cinema S{stage} removed #{element_id}"'
+                f'project:{contract_subject} meaning:"Cinema S{stage} removed #{element_id} in #{contract_scope}"'
             ),
         })
     for element_id in keep_els:
-        contract_id = f"cinema.{CAPSULE_NAME}.S{stage}.ui.keep.{element_id}"
+        contract_id = f"cinema.{contract_subject}.S{stage}.{contract_scope}.keep.{element_id}"
         proposals.append({
             "id": contract_id,
             "kind": "keep",
             "element": element_id,
             "line": (
-                f"@intract.v1 id:{contract_id} scope:ui intent:ui:keep:{element_id} "
-                f"priority:3 domain:calculator effect:read forbid:destructive_write,secret_leak "
+                f"@intract.v1 id:{contract_id} scope:{contract_scope} "
+                f"intent:ui:{contract_scope}:keep:{element_id} "
+                f"priority:3 domain:{domain} effect:read forbid:destructive_write,secret_leak "
                 f"require:human_review validate:no_forbidden_effect "
-                f'meaning:"Cinema S{stage} preserved #{element_id}"'
+                f'project:{contract_subject} meaning:"Cinema S{stage} preserved #{element_id} in #{contract_scope}"'
             ),
         })
     return proposals
@@ -960,6 +969,11 @@ def _import_project(data: dict) -> dict:
             str(data.get("filename") or "project.zip"),
             str(data.get("content_base64") or ""),
         )
+    if kind == "markpact":
+        return nexu_hooks.import_project_from_markpact(
+            str(data.get("filename") or "project.md"),
+            str(data.get("content_base64") or ""),
+        )
     return {"error": "unsupported import kind"}
 
 
@@ -997,28 +1011,81 @@ def _import_project_http(data: dict) -> dict:
     )
 
 
-def _parse_multipart_zip(post_data: bytes, content_type: str) -> tuple[str, bytes] | dict:
-    import cgi
-
-    environ = {
-        "REQUEST_METHOD": "POST",
-        "CONTENT_TYPE": content_type,
-        "CONTENT_LENGTH": str(len(post_data)),
-    }
-    form = cgi.FieldStorage(
-        fp=__import__("io").BytesIO(post_data),
-        headers={"content-type": content_type},
-        environ=environ,
-        keep_blank_values=True,
+def _import_project_markpact(content: bytes, filename: str) -> dict:
+    try:
+        import nexu_hooks
+    except ImportError:
+        return {"error": "nexu_hooks.py missing; regenerate cinema (make cinema)"}
+    return nexu_hooks.import_project_from_markpact(
+        filename or "project.md",
+        content_bytes=content,
     )
-    upload = form["file"] if "file" in form else form["zip"] if "zip" in form else None
-    if upload is None or not getattr(upload, "file", None):
-        return {"error": "missing zip file field (file or zip)"}
-    filename = str(getattr(upload, "filename", "") or "project.zip")
-    content = upload.file.read()
-    if not content:
-        return {"error": "empty zip upload"}
-    return filename, content
+
+
+
+def _parse_multipart_upload(
+    post_data: bytes,
+    content_type: str,
+    *,
+    field_names: tuple[str, ...],
+    default_filename: str,
+    empty_error: str,
+    missing_error: str,
+) -> tuple[str, bytes] | dict:
+    from email.parser import BytesParser
+    from email.policy import default
+
+    if "multipart/form-data" not in (content_type or "").lower():
+        return {"error": "expected multipart/form-data"}
+    crlf = bytes([13, 10])
+    raw = (
+        b"MIME-Version: 1.0" + crlf
+        + b"Content-Type: "
+        + content_type.encode("utf-8", "surrogateescape")
+        + crlf + crlf
+        + post_data
+    )
+    msg = BytesParser(policy=default).parsebytes(raw)
+    for part in msg.walk():
+        if part.get_content_maintype() == "multipart":
+            continue
+        disposition = part.get("Content-Disposition", "")
+        if not disposition:
+            continue
+        name = part.get_param("name", header="content-disposition")
+        if name not in field_names:
+            continue
+        filename = part.get_filename() or default_filename
+        payload = part.get_payload(decode=True)
+        if payload is None:
+            text = part.get_payload()
+            payload = text.encode("utf-8") if isinstance(text, str) else b""
+        if not payload:
+            return {"error": empty_error}
+        return str(filename), payload
+    return {"error": missing_error}
+
+
+def _parse_multipart_zip(post_data: bytes, content_type: str) -> tuple[str, bytes] | dict:
+    return _parse_multipart_upload(
+        post_data,
+        content_type,
+        field_names=("file", "zip"),
+        default_filename="project.zip",
+        empty_error="empty zip upload",
+        missing_error="missing zip file field (file or zip)",
+    )
+
+
+def _parse_multipart_markpact(post_data: bytes, content_type: str) -> tuple[str, bytes] | dict:
+    return _parse_multipart_upload(
+        post_data,
+        content_type,
+        field_names=("file", "markpact"),
+        default_filename="project.md",
+        empty_error="empty markpact upload",
+        missing_error="missing markpact file field (file or markpact)",
+    )
 
 
 def _export_markpact_markdown(*, stage: int = 0, user_goal: str = "") -> dict:
@@ -1066,11 +1133,31 @@ def _stop_service(service_id: str) -> dict:
     return nexu_hooks.stop_service(service_id)
 
 
+def _delete_service(service_id: str) -> dict:
+    try:
+        import nexu_hooks
+    except ImportError:
+        return {"error": "nexu_hooks.py missing; regenerate cinema (make cinema)"}
+    return nexu_hooks.delete_service(service_id)
+
+
 class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(DIRECTORY), **kwargs)
 
     def do_GET(self):
+        from urllib.parse import urlparse
+
+        parsed_root_path = urlparse(self.path).path
+        if parsed_root_path in ("", "/"):
+            suffix = ""
+            if "?" in self.path:
+                suffix = "?" + self.path.split("?", 1)[1]
+            self.send_response(302)
+            self.send_header("Location", "cinema_player.html" + suffix)
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            return
         if self.path.startswith("/policy"):
             try:
                 from urllib.parse import parse_qs, urlparse
@@ -1514,6 +1601,29 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(str(e).encode('utf-8'))
                 return
 
+        elif self.path == '/services/delete':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            try:
+                data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+                service_id = str(data.get('service_id') or data.get('id') or '').strip()
+                if not service_id:
+                    payload = {"error": "missing service_id"}
+                else:
+                    payload = _delete_service(service_id)
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json; charset=utf-8')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(str(e).encode('utf-8'))
+                return
+
         elif self.path == '/projects/activate':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
@@ -1625,6 +1735,37 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(str(e).encode('utf-8'))
                 return
 
+        elif self.path in ('/projects/import/markpact', '/projects/import/markpact/'):
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            try:
+                content_type = str(self.headers.get('Content-Type') or '')
+                if 'multipart/form-data' in content_type:
+                    parsed = _parse_multipart_markpact(post_data, content_type)
+                    if isinstance(parsed, dict):
+                        payload = parsed
+                    else:
+                        filename, content = parsed
+                        payload = _import_project_markpact(content, filename)
+                else:
+                    data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+                    payload = _import_project_markpact(
+                        base64.b64decode(str(data.get('content_base64') or '')),
+                        str(data.get('filename') or 'project.md'),
+                    )
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json; charset=utf-8')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(str(e).encode('utf-8'))
+                return
+
         elif self.path in ('/projects/delete', '/projects/delete/'):
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
@@ -1665,15 +1806,25 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 elif stage < 0 or stage > 2:
                     payload = {"error": f"unsupported stage: S{stage}"}
                 else:
-                    alt_path = DIRECTORY / alt_name
-                    stage_path = DIRECTORY / f'stage{stage}.html'
-                    if not alt_path.exists():
-                        payload = {"error": f"option file not found: {alt_name}"}
+                    from nexu.cinema_project_imports import promote_cinema_option
+
+                    promote_result = promote_cinema_option(
+                        DIRECTORY,
+                        alt_name=alt_name,
+                        stage=stage,
+                    )
+                    if promote_result.get("error"):
+                        payload = {"error": promote_result["error"]}
                     else:
-                        stage_path.write_text(alt_path.read_text(encoding='utf-8'), encoding='utf-8')
                         options_sync = _patch_option_previews(
                             stage, focus_scope=focus_scope
                         )
+                        patch_files = list(options_sync.get("files") or [])
+                        restore_files = list(
+                            (promote_result.get("options_sync") or {}).get("files") or []
+                        )
+                        if restore_files and not patch_files:
+                            options_sync = promote_result.get("options_sync") or options_sync
                         history_entry = _save_history_checkpoint(
                             action='promote',
                             stage=stage,
@@ -1684,7 +1835,7 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                             "status": "promoted",
                             "alt": alt_name,
                             "stage": stage,
-                            "stage_path": str(stage_path.name),
+                            "stage_path": promote_result.get("stage_path"),
                             "history_checkpoint": history_entry,
                             "options_sync": options_sync,
                         }
@@ -3035,5 +3186,5 @@ class ThreadingHTTPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     daemon_threads = True
 
 
-with ThreadingHTTPServer(('127.0.0.1', PORT), CustomHTTPRequestHandler) as httpd:
+with ThreadingHTTPServer((BIND_HOST, PORT), CustomHTTPRequestHandler) as httpd:
     httpd.serve_forever()

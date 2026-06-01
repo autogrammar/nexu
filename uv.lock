@@ -1905,7 +1905,7 @@ wheels = [
 
 [[package]]
 name = "nexu"
-version = "0.5.33"
+version = "0.5.34"
 source = { editable = "." }
 dependencies = [
     { name = "litellm" },
@@ -3087,7 +3087,7 @@ wheels = [
 
 [[package]]
 name = "repatch"
-version = "0.2.14"
+version = "0.2.17"
 source = { directory = "/home/tom/github/semcod/repatch" }
 dependencies = [
     { name = "litellm" },

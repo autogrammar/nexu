@@ -237,6 +237,7 @@
             border-bottom: 1px solid var(--nexu-border);
             padding: 12px 30px;
             display: flex;
+            flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
             gap: 16px;
@@ -248,6 +249,8 @@
             align-items: center;
             gap: 20px;
             min-width: 0;
+            position: relative;
+            z-index: 2;
         }
         .header h1 {
             margin: 0;
@@ -862,6 +865,14 @@
         .btn-service:hover { border-color: var(--nexu-accent); color: var(--nexu-link); }
         .btn-service-primary { background: var(--nexu-primary-btn); color: var(--nexu-accent-contrast); border-color: transparent; }
         .btn-service-primary:hover { background: var(--nexu-accent); color: var(--nexu-accent-contrast); }
+        .btn-service.danger {
+            border-color: var(--nexu-danger-border);
+            color: var(--nexu-danger-text);
+        }
+        .btn-service.danger:hover {
+            border-color: var(--nexu-danger);
+            color: var(--nexu-danger-text);
+        }
         .services-empty {
             grid-column: 1 / -1;
             text-align: center;
@@ -881,6 +892,12 @@
             display: flex;
             gap: 10px;
             align-items: center;
+            justify-content: flex-end;
+            flex: 1 1 640px;
+            flex-wrap: wrap;
+            min-width: 0;
+            position: relative;
+            z-index: 1;
         }
         .llm-status-badge {
             max-width: 360px;
@@ -894,6 +911,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            pointer-events: none;
         }
         .llm-status-badge.ready { border-color: var(--nexu-success-text); color: var(--nexu-success-text); }
         .llm-status-badge.warn { border-color: var(--nexu-warning); color: var(--nexu-warning); }
@@ -1574,7 +1592,7 @@
         </div>
         <section class="projects-import" aria-label="Import project">
             <div class="projects-workflow" aria-label="Import workflow">
-                <div class="projects-workflow-step"><strong>1. Import</strong>ZIP, Git URL albo HTTP website.</div>
+                <div class="projects-workflow-step"><strong>1. Import</strong>ZIP, Markpact README, Git URL albo HTTP website.</div>
                 <div class="projects-workflow-step"><strong>2. Markpact</strong>Nexu zapisuje lokalny README.markpact.md.</div>
                 <div class="projects-workflow-step"><strong>3. Editor</strong>Projekt działa lokalnie w pętli ABC.</div>
                 <div class="projects-workflow-step"><strong>4. Publish</strong>Aktualny stage można opublikować do Services.</div>
@@ -1587,6 +1605,15 @@
                     <button type="button" class="btn-import" id="import-zip-btn" onclick="importProjectZip()">Importuj ZIP</button>
                 </div>
                 <div class="import-status" id="import-zip-status"></div>
+            </article>
+            <article class="import-card">
+                <h3>📄 Upload Markpact</h3>
+                <p>Wgraj gotowy kontrakt Markpact (<code>README.md</code> z blokami <code>markpact:file</code>).</p>
+                <input type="file" id="import-markpact-file" accept=".md,.markdown,text/markdown">
+                <div class="import-actions">
+                    <button type="button" class="btn-import" id="import-markpact-btn" onclick="importProjectMarkpact()">Importuj Markpact</button>
+                </div>
+                <div class="import-status" id="import-markpact-status"></div>
             </article>
             <article class="import-card">
                 <h3>🔗 Git URL</h3>
@@ -1955,6 +1982,9 @@
             if (k === 'calculator') {
                 return ['functions', 'keypad', 'display', 'colors', 'shapes', 'orientation'];
             }
+            if (k === 'imported') {
+                return ['functions', 'display', 'colors', 'shapes', 'orientation'];
+            }
             return ['functions', 'display', 'colors', 'shapes', 'orientation'];
         }
 
@@ -1979,7 +2009,9 @@
             const ids = visible.map(o => o.id);
             const projKind = activeProjectRecord() ? activeProjectRecord().kind : 'web';
             const fallback = options.defaultScope || defaultScopeForKind(projKind);
-            const next = ids.includes(currentFocusScope) ? currentFocusScope : fallback;
+            const bootPreferred = bootFocusScope && ids.includes(bootFocusScope) ? bootFocusScope : null;
+            const next = bootPreferred
+                || (ids.includes(currentFocusScope) ? currentFocusScope : fallback);
             if (next !== currentFocusScope || options.force) {
                 selectFocusScope(next, { quiet: true, force: true });
             } else {
@@ -2482,6 +2514,7 @@
 
         let bootProjectId = null;
         let bootTab = null;
+        let bootFocusScope = null;
 
         (function applyBootUrlParams() {
             const boot = new URLSearchParams(location.search);
@@ -2490,11 +2523,10 @@
                 const s = parseInt(boot.get('stage'), 10);
                 if (!isNaN(s)) activeStage = s;
             }
-            if (boot.has('scope')) {
-                const scope = boot.get('scope');
-                if (allScopeOptions.some(opt => opt.id === scope)) {
-                    currentFocusScope = scope;
-                }
+            const bootScope = String(boot.get('scope') || boot.get('focus_scope') || '').trim().toLowerCase();
+            if (bootScope && allScopeOptions.some(opt => opt.id === bootScope)) {
+                currentFocusScope = bootScope;
+                bootFocusScope = bootScope;
             }
             if (boot.has('tab')) bootTab = boot.get('tab');
             if (boot.has('project')) bootProjectId = boot.get('project');
@@ -2951,6 +2983,7 @@
                             : `<button type="button" class="btn-service btn-service-primary" onclick="startPublishedService('${sid}')">Start</button>`}
                         <button type="button" class="btn-service" onclick="switchMainTab('editor')">Editor</button>
                         <button type="button" class="btn-service" onclick="switchMainTab('projects')">Projects</button>
+                        <button type="button" class="btn-service danger" onclick="deletePublishedService('${sid}')">Usuń</button>
                     </div>
                 </article>`;
             }).join('');
@@ -3020,6 +3053,27 @@
                 logEvent('SERVICE_STOP', serviceId);
             })
             .catch(err => addChatLog('system', '❌ <strong>Stop failed: ' + err.message + '</strong>'));
+        }
+
+        function deletePublishedService(serviceId) {
+            const svc = servicesCatalog.find(s => s.id === serviceId);
+            const label = (svc && (svc.title || svc.id)) ? (svc.title || svc.id) : serviceId;
+            if (!confirm('Usunąć opublikowaną usługę „' + label + '”? Proces HTTP zostanie zatrzymany, a pliki usunięte z cinema/services/.')) {
+                return;
+            }
+            fetch('/services/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ service_id: serviceId })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) throw new Error(data.error);
+                addChatLog('system', '🗑️ <strong>Usunięto usługę:</strong> ' + (data.id || serviceId));
+                logEvent('SERVICE_DELETE', serviceId);
+                loadServicesCatalog();
+            })
+            .catch(err => addChatLog('system', '❌ <strong>Usunięcie nie powiodło się: ' + err.message + '</strong>'));
         }
 
         function loadProjectsCatalog() {
@@ -3116,6 +3170,24 @@
                 .then(data => handleImportResult(data, 'zip'))
                 .catch(err => setImportStatus('zip', err.message, true))
                 .finally(() => setImportBusy('zip', false));
+        }
+
+        function importProjectMarkpact() {
+            const input = document.getElementById('import-markpact-file');
+            const file = input && input.files && input.files[0];
+            if (!file) {
+                setImportStatus('markpact', 'Wybierz plik .md (Markpact README)', true);
+                return;
+            }
+            setImportBusy('markpact', true);
+            setImportStatus('markpact', 'Wysyłanie…', false);
+            const form = new FormData();
+            form.append('file', file, file.name);
+            fetch('/projects/import/markpact', { method: 'POST', body: form })
+                .then(res => res.json())
+                .then(data => handleImportResult(data, 'markpact'))
+                .catch(err => setImportStatus('markpact', err.message, true))
+                .finally(() => setImportBusy('markpact', false));
         }
 
         function importProjectGit() {
@@ -3702,8 +3774,25 @@
             renderBaseline('project', baseline.project);
             renderBaseline('capsule (frozen model)', baseline.capsule);
 
-            const goalEntries = ledger.filter(e => e && e.status === 'goal_defined');
-            const evolveEntries = ledger.filter(e => e && e.status !== 'goal_defined');
+            const activeScope = String(currentFocusScope || '').trim().toLowerCase();
+            const entryMatchesVisibleContractScope = (entry) => {
+                if (!entry || typeof entry !== 'object') return false;
+                if (!ledgerEntryMatchesActiveProject(entry, data)) return false;
+                const entryScope = String(entry.focus_scope || '').trim().toLowerCase();
+                if (!activeScope) return true;
+                if (!entryScope) return entry.status === 'goal_defined';
+                return entryScope === activeScope;
+            };
+            const visibleLedger = ledger.filter(entryMatchesVisibleContractScope);
+            const goalEntries = visibleLedger.filter(e => e && e.status === 'goal_defined');
+            const evolveEntries = visibleLedger.filter(e => e && e.status !== 'goal_defined');
+            const seenPolicyLines = new Set();
+            const renderPolicyLine = (line) => {
+                const key = String(line || '').trim();
+                if (!key || seenPolicyLines.has(key)) return;
+                seenPolicyLines.add(key);
+                html += `<code class="policy-contract-line">${key}</code>`;
+            };
 
             html += '<div class="policy-section-title">Goal extensions (from project goal)</div>';
             if (!goalEntries.length) {
@@ -3715,7 +3804,7 @@
                     }
                     (entry.proposed_contracts || []).forEach(p => {
                         const line = p.line || p.delta_text || `@intract.v1 id:${p.id || 'unknown'}`;
-                        html += `<code class="policy-contract-line">${line}</code>`;
+                        renderPolicyLine(line);
                     });
                 });
             }
@@ -3727,7 +3816,7 @@
                 evolveEntries.forEach(entry => {
                     (entry.proposed_contracts || []).forEach(p => {
                         const line = p.line || p.delta_text || `@intract.v1 id:${p.id || 'unknown'}`;
-                        html += `<code class="policy-contract-line">${line}</code>`;
+                        renderPolicyLine(line);
                     });
                 });
             }
@@ -3736,7 +3825,7 @@
             if (meta) {
                 const pCount = (baseline.project || []).length;
                 const cCount = (baseline.capsule || []).length;
-                meta.textContent = `baseline ${pCount}+${cCount} · goal ${goalEntries.length} · deltas ${evolveEntries.length}`;
+                meta.textContent = `scope ${activeScope || 'all'} · baseline ${pCount}+${cCount} · goal ${goalEntries.length} · deltas ${evolveEntries.length}`;
             }
         }
 

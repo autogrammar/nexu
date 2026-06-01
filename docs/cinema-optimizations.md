@@ -21,7 +21,7 @@ For **limitations**, **recovery**, and **open improvements** (not the done-items
 | P0 | Visual scopes → offline / cache before LLM | done | Verified in `test_iterate_colors_scope_uses_offline_path` |
 | P1 | README note: visual scopes = offline; `#functions` = LLM | done | Cinema section in root README |
 | **UX** | | | |
-| P1 | Projects tab import (ZIP / Git / HTTP → Markpact) | done | `cinema_project_imports.py`; `/projects/import/*`; local `imported_projects/` |
+| P1 | Projects tab import (ZIP / Markpact README / Git / HTTP) | done | `cinema_project_imports.py`; `/projects/import/*`; local `imported_projects/` |
 | P1 | HTTP import stage0 preview (base href + local CSS) | done | Fetched HTML in workspace iframe; Markpact README stays metadata |
 | P1 | HTTP import preprocess (visual CSS + HTML outline) | done | `cinema_http_preprocess.py`; `source/nexu-visual.css`, `source/nexu-outline.html`; `llm_context_mode: patch` |
 | P1 | Catalog/example seed preprocess on activation | done | `preprocess_cinema_seed`; `nexu-visual.css` + `nexu-outline.html` beside `stage0.html`; `active_project.json` patch mode |
@@ -186,11 +186,11 @@ Shared capsules (e.g. `scientific_calc`) can hold both calculator and HTTP-impor
 
 **Ledger filtering (`cinema_policy.py`):** `effective_ui_constraints_from_ledger` now accepts `project_id`, `project_kind`, and `focus_scope`. Entries tagged with a different `project_id` are ignored. Legacy entries without `project_id` are dropped when an HTTP import (`http-*`) or `imported` kind is active. Scope-specific marks apply only within the same `#scope` iteration.
 
-**HTTP stage restore (`cinema_project_imports.py`):** On each `/iterate`, when the active project is `http-*`, `restore_http_import_stages_if_needed` checks whether `stage0.html` still matches the stored import snapshot (`http_stage_matches_import` rejects calculator pollution markers like `calc-body`, `id="functions"`, `Scientific Calculator`). If drifted, stage0 and Options A–C are rebuilt from `source/index.html` without re-fetching.
+**HTTP stage restore (`cinema_project_imports.py`):** On each `/iterate` and `/promote`, when the active project is `http-*`, `restore_http_import_stages_if_needed` checks whether `stage0.html` **or any** `alt_*.html` still matches the stored import snapshot (`http_stage_matches_import` rejects calculator pollution markers like `calc-body`, `id="functions"`, `Scientific Calculator`). If drifted, stage0 and Options A–C are rebuilt from `source/index.html` without re-fetching. `promote_cinema_option` runs this repair before copying the promoted alt so a polluted Option B cannot overwrite the workspace with calculator HTML.
 
 **LLM full-page guard:** Before writing new option HTML, `reject_import_stage_replacement` blocks responses that would replace an HTTP import with unrelated template HTML (e.g. calculator layout). Combined with `should_block_full_html_iterate` for marked imported projects, iteration stays on patch/offline paths instead of regenerating the whole document.
 
-**Recovery:** Re-activate the HTTP import from Projects, or run `make cinema-restart` (regenerates `server.py` from template and restarts the player). Checked-in `examples/*/cinema/server.py` may lag the template; the runtime copy under `<workspace>/.nexu/capsules/<capsule>/cinema/` is always refreshed on server start.
+**Recovery (production):** In the Cinema player, open **Projects** and re-activate the HTTP import (`http-malortgdynia.pl` or your domain id). That rebuilds `stage0.html` and `alt_a/b/c.html` from `imported_projects/<id>/source/index.html` and clears a calculator-polluted ledger. If the player still shows the wrong app, restart the cinema server so `server.py` is regenerated from the template (`make cinema-restart` in dev, or restart the workspace capsule process on the host). Manual fallback: copy `imported_projects/<id>/source/index.html` through `_build_http_preview_stage0` logic by re-activating; do not copy files from `examples/web_app_calculator`.
 
 **Limitations:** cross-origin CDN assets may still fail in the iframe; JavaScript (cookie banners, SPAs) may not run fully; only the initial HTML snapshot is stored (not a full crawl). Re-import after code changes to refresh the snapshot. **Preview network isolation:** stage0/alt HTML strips live-site scripts and injects a head shim that blocks cross-origin `fetch`/XHR so local cinema origin does not hit CORS errors (CSS/images still load via `<base href>`).
 
