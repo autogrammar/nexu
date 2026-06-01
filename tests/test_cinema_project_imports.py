@@ -91,6 +91,58 @@ def test_delete_project_hides_demo_from_workspace_catalog(tmp_path: Path):
     assert "web_app_dashboard" not in {p["id"] for p in catalog["projects"]}
 
 
+def test_import_zip_with_index_html_organizes_source(tmp_path: Path):
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    html = """<!DOCTYPE html><html><head>
+<style>
+.hero { color: #112233; padding: 2rem; margin: 1rem; border-radius: 8px; }
+.card { background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,.1); }
+</style>
+</head><body><h1>Landing</h1></body></html>"""
+    archive = tmp_path / "site.zip"
+    with zipfile.ZipFile(archive, "w") as zf:
+        zf.writestr("index.html", html)
+
+    result = import_zip_project(
+        cinema,
+        "site.zip",
+        base64.b64encode(archive.read_bytes()).decode("ascii"),
+    )
+
+    assert result["status"] == "project_imported"
+    project_id = result["project"]["id"]
+    project_dir = cinema / "imported_projects" / project_id
+    source_dir = project_dir / "source"
+    meta = json.loads((project_dir / "project.json").read_text(encoding="utf-8"))
+    organize = meta.get("organize") or {}
+    assert organize.get("styles_extracted") is True
+    assert organize.get("extracted_files") == ["nexu-extracted.css"]
+    assert (source_dir / "nexu-extracted.css").is_file()
+    assert "<style" not in (source_dir / "index.html").read_text(encoding="utf-8").lower()
+    assert "Markpact migration" in (cinema / "stage0.html").read_text(encoding="utf-8")
+
+
+def test_import_zip_without_index_html_skips_organize(tmp_path: Path):
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    archive = tmp_path / "code.zip"
+    with zipfile.ZipFile(archive, "w") as zf:
+        zf.writestr("src/main.py", "print('hi')")
+
+    result = import_zip_project(
+        cinema,
+        "code.zip",
+        base64.b64encode(archive.read_bytes()).decode("ascii"),
+    )
+
+    project_id = result["project"]["id"]
+    meta = json.loads(
+        (cinema / "imported_projects" / project_id / "project.json").read_text(encoding="utf-8")
+    )
+    assert "organize" not in meta
+
+
 def test_activate_imported_project_reloads_stages(tmp_path: Path):
     cinema = tmp_path / "cinema"
     cinema.mkdir()
@@ -131,9 +183,10 @@ def test_import_http_project_fetches_and_migrates(tmp_path: Path):
     body = (
         b"<!DOCTYPE html><html><head>"
         b'<link rel="stylesheet" href="/styles/main.css">'
-        b"</head><body><h1>Site</h1></body></html>"
+        b'</head><body><h1>Site</h1><img src="/img/hero.png" alt="Hero"></body></html>'
     )
     css_body = b"body { color: navy; }"
+    image_body = b"\x89PNG\r\n"
 
     class FakeResp:
         def __init__(self, payload: bytes, *, url: str, content_type: str):
@@ -162,13 +215,22 @@ def test_import_http_project_fetches_and_migrates(tmp_path: Path):
                 url="https://example.com/styles/main.css",
                 content_type="text/css; charset=utf-8",
             )
+        if target.endswith("/img/hero.png"):
+            return FakeResp(
+                image_body,
+                url="https://example.com/img/hero.png",
+                content_type="image/png",
+            )
         return FakeResp(
             body,
             url="https://example.com/demo",
             content_type="text/html; charset=utf-8",
         )
 
-    with patch("nexu.cinema_project_imports.urlopen", side_effect=fake_urlopen):
+    with (
+        patch("repatch.web_fetch._render_with_playwright", return_value=None),
+        patch("repatch.web_fetch.urlopen", side_effect=fake_urlopen),
+    ):
         result = import_http_project(cinema, "https://example.com/demo", allow_network=True)
 
     assert result["status"] == "project_imported"
@@ -182,10 +244,12 @@ def test_import_http_project_fetches_and_migrates(tmp_path: Path):
     stage0 = (cinema / "stage0.html").read_text(encoding="utf-8")
     assert ">Site</h1>" in stage0
     assert '<base href="https://example.com/demo/">' in stage0
-    assert f'imported_projects/{project_id}/source/assets/asset-0.css' in stage0
+    assert f'imported_projects/{project_id}/source/assets/stylesheet-0.css' in stage0
+    assert f'imported_projects/{project_id}/source/assets/image-0.png' in stage0
     assert "nexu preview: block cross-origin fetch" in stage0
     assert "Markpact migration" not in stage0
-    assert (project_dir / "source" / "assets" / "asset-0.css").exists()
+    assert (project_dir / "source" / "assets" / "stylesheet-0.css").exists()
+    assert (project_dir / "source" / "assets" / "image-0.png").exists()
     alt_a = (cinema / "alt_a.html").read_text(encoding="utf-8")
     assert ">Site</h1>" in alt_a
     assert "calc-body" not in alt_a
@@ -198,6 +262,8 @@ def test_import_http_project_fetches_and_migrates(tmp_path: Path):
     assert meta["visual_css_bytes"] > 0
     assert meta["outline_node_count"] >= 1
     assert meta.get("organize", {}).get("targets_added", 0) >= 1
+    assert meta.get("organize", {}).get("tagged_targets_count", 0) >= 1
+    assert "extracted_files" in meta.get("organize", {})
     outline = (project_dir / "source" / "nexu-outline.html").read_text(encoding="utf-8")
     index_html = (project_dir / "source" / "index.html").read_text(encoding="utf-8")
     assert len(outline) < len(index_html)
@@ -228,7 +294,10 @@ def test_activate_http_import_regenerates_preview_stage0(tmp_path: Path):
         def __exit__(self, *args):
             return False
 
-    with patch("nexu.cinema_project_imports.urlopen", return_value=FakeResp()):
+    with (
+        patch("repatch.web_fetch._render_with_playwright", return_value=None),
+        patch("repatch.web_fetch.urlopen", return_value=FakeResp()),
+    ):
         imported = import_http_project(cinema, "https://example.org/", allow_network=True)
 
     project_id = imported["project"]["id"]
@@ -280,7 +349,10 @@ def test_activate_http_import_regenerates_preprocess_when_missing(tmp_path: Path
         def __exit__(self, *args):
             return False
 
-    with patch("nexu.cinema_project_imports.urlopen", return_value=FakeResp()):
+    with (
+        patch("repatch.web_fetch._render_with_playwright", return_value=None),
+        patch("repatch.web_fetch.urlopen", return_value=FakeResp()),
+    ):
         imported = import_http_project(cinema, "https://legacy.example/", allow_network=True)
 
     project_id = imported["project"]["id"]
@@ -355,7 +427,10 @@ def test_activate_http_import_empty_subtitle_not_goal(tmp_path: Path):
         def __exit__(self, *args):
             return False
 
-    with patch("nexu.cinema_project_imports.urlopen", return_value=FakeResp()):
+    with (
+        patch("repatch.web_fetch._render_with_playwright", return_value=None),
+        patch("repatch.web_fetch.urlopen", return_value=FakeResp()),
+    ):
         imported = import_http_project(cinema, "https://example.net/", allow_network=True)
 
     project_id = imported["project"]["id"]

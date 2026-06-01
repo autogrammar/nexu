@@ -1,4 +1,5 @@
 source: code2llm
+# generated in 0.12s
 schema: code2llm.planfile_tickets.v1
 project_root: /home/tom/github/semcod/nexu
 tickets:
@@ -42,10 +43,10 @@ tickets:
   dedupe_key: code2llm:cc:examples/web_app_calculator/cinema/server.py:examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler.do_POST
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: _build_http_preview_stage0'
-  description: 'code2llm reports `God Function: _build_http_preview_stage0` in `src/nexu/cinema_project_imports.py:345`.
+  description: 'code2llm reports `God Function: _build_http_preview_stage0` in `src/nexu/cinema_project_imports.py:384`.
 
 
-    Function ''_build_http_preview_stage0'' is oversized: CC=14, fan-out=17, mutations=16.
+    Function ''_build_http_preview_stage0'' is oversized: CC=14, fan-out=19, mutations=17.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -57,14 +58,14 @@ tickets:
   - god-function
   files:
   - src/nexu/cinema_project_imports.py
-  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:345:God
+  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:384:God
     Function: _build_http_preview_stage0'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: _finish_import'
-  description: 'code2llm reports `God Function: _finish_import` in `src/nexu/cinema_project_imports.py:769`.
+  description: 'code2llm reports `God Function: _finish_import` in `src/nexu/cinema_project_imports.py:832`.
 
 
-    Function ''_finish_import'' is oversized: CC=8, fan-out=22, mutations=21.
+    Function ''_finish_import'' is oversized: CC=10, fan-out=24, mutations=25.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -76,7 +77,7 @@ tickets:
   - god-function
   files:
   - src/nexu/cinema_project_imports.py
-  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:769:God
+  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:832:God
     Function: _finish_import'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: _write_project_options_from_stages'
@@ -122,10 +123,10 @@ tickets:
     Function: _write_scoped_calculator_options'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: import_http_project'
-  description: 'code2llm reports `God Function: import_http_project` in `src/nexu/cinema_project_imports.py:665`.
+  description: 'code2llm reports `God Function: import_http_project` in `src/nexu/cinema_project_imports.py:705`.
 
 
-    Function ''import_http_project'' is oversized: CC=7, fan-out=18, mutations=22.
+    Function ''import_http_project'' is oversized: CC=12, fan-out=18, mutations=18.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -137,7 +138,7 @@ tickets:
   - god-function
   files:
   - src/nexu/cinema_project_imports.py
-  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:665:God
+  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:705:God
     Function: import_http_project'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: load_config'
@@ -178,7 +179,7 @@ tickets:
     Function: write_goal_options_offline'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: _'
-  description: 'code2llm reports `Shotgun Surgery: _` in `src/nexu/cinema_offline_options.py:793`.
+  description: 'code2llm reports `Shotgun Surgery: _` in `src/nexu/cinema_offline_options.py:420`.
 
 
     Mutation of variable ''_'' spans 6 functions. Changing this logic requires work
@@ -194,31 +195,11 @@ tickets:
   - shotgun-surgery
   files:
   - src/nexu/cinema_offline_options.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_offline_options.py:793:Shotgun
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_offline_options.py:420:Shotgun
     Surgery: _'
 - signal: code2llm_smell_shotgun_surgery
-  title: 'Address code smell: Shotgun Surgery: action'
-  description: 'code2llm reports `Shotgun Surgery: action` in `src/nexu/cinema_policy.py:670`.
-
-
-    Mutation of variable ''action'' spans 5 functions. Changing this logic requires
-    work in many places.
-
-
-    Make the smallest refactor that removes the smell and run local tests.'
-  priority: high
-  labels:
-  - llm-ready
-  - code2llm
-  - code-smell
-  - shotgun-surgery
-  files:
-  - src/nexu/cinema_policy.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_policy.py:670:Shotgun
-    Surgery: action'
-- signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: active'
-  description: 'code2llm reports `Shotgun Surgery: active` in `src/nexu/cinema_policy.py:58`.
+  description: 'code2llm reports `Shotgun Surgery: active` in `src/nexu/cinema_policy.py:391`.
 
 
     Mutation of variable ''active'' spans 14 functions. Changing this logic requires
@@ -234,11 +215,11 @@ tickets:
   - shotgun-surgery
   files:
   - src/nexu/cinema_policy.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_policy.py:58:Shotgun
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_policy.py:391:Shotgun
     Surgery: active'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: base'
-  description: 'code2llm reports `Shotgun Surgery: base` in `src/nexu/cinema_baseline_contracts.py:107`.
+  description: 'code2llm reports `Shotgun Surgery: base` in `src/nexu/cinema.py:132`.
 
 
     Mutation of variable ''base'' spans 25 functions. Changing this logic requires
@@ -253,12 +234,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/cinema_baseline_contracts.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_baseline_contracts.py:107:Shotgun
-    Surgery: base'
+  - src/nexu/cinema.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema.py:132:Shotgun Surgery:
+    base'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: blueprint'
-  description: 'code2llm reports `Shotgun Surgery: blueprint` in `src/nexu/orchestrate.py:41`.
+  description: 'code2llm reports `Shotgun Surgery: blueprint` in `src/nexu/cli.py:159`.
 
 
     Mutation of variable ''blueprint'' spans 9 functions. Changing this logic requires
@@ -273,12 +254,32 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/orchestrate.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/orchestrate.py:41:Shotgun Surgery:
+  - src/nexu/cli.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cli.py:159:Shotgun Surgery:
     blueprint'
 - signal: code2llm_smell_shotgun_surgery
+  title: 'Address code smell: Shotgun Surgery: body'
+  description: 'code2llm reports `Shotgun Surgery: body` in `src/nexu/cinema_project_imports.py:253`.
+
+
+    Mutation of variable ''body'' spans 7 functions. Changing this logic requires
+    work in many places.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: high
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - shotgun-surgery
+  files:
+  - src/nexu/cinema_project_imports.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_project_imports.py:253:Shotgun
+    Surgery: body'
+- signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: candidate'
-  description: 'code2llm reports `Shotgun Surgery: candidate` in `src/nexu/cinema_projects.py:267`.
+  description: 'code2llm reports `Shotgun Surgery: candidate` in `src/nexu/cinema_project_imports.py:362`.
 
 
     Mutation of variable ''candidate'' spans 6 functions. Changing this logic requires
@@ -293,12 +294,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/cinema_projects.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_projects.py:267:Shotgun
+  - src/nexu/cinema_project_imports.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_project_imports.py:362:Shotgun
     Surgery: candidate'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: capsule'
-  description: 'code2llm reports `Shotgun Surgery: capsule` in `src/vico/drift.py:11`.
+  description: 'code2llm reports `Shotgun Surgery: capsule` in `src/vico/diff.py:12`.
 
 
     Mutation of variable ''capsule'' spans 23 functions. Changing this logic requires
@@ -313,12 +314,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/vico/drift.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/vico/drift.py:11:Shotgun Surgery:
+  - src/vico/diff.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/vico/diff.py:12:Shotgun Surgery:
     capsule'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: cinema'
-  description: 'code2llm reports `Shotgun Surgery: cinema` in `examples/web_app_calculator/cinema/nexu_hooks.py:210`.
+  description: 'code2llm reports `Shotgun Surgery: cinema` in `examples/web_app_calculator/cinema/nexu_hooks.py:261`.
 
 
     Mutation of variable ''cinema'' spans 21 functions. Changing this logic requires
@@ -334,11 +335,11 @@ tickets:
   - shotgun-surgery
   files:
   - examples/web_app_calculator/cinema/nexu_hooks.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:examples/web_app_calculator/cinema/nexu_hooks.py:210:Shotgun
+  dedupe_key: 'code2llm:smell:shotgun_surgery:examples/web_app_calculator/cinema/nexu_hooks.py:261:Shotgun
     Surgery: cinema'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: cinema_dir'
-  description: 'code2llm reports `Shotgun Surgery: cinema_dir` in `src/nexu/cinema_history.py:86`.
+  description: 'code2llm reports `Shotgun Surgery: cinema_dir` in `src/nexu/cinema_history.py:141`.
 
 
     Mutation of variable ''cinema_dir'' spans 6 functions. Changing this logic requires
@@ -354,11 +355,11 @@ tickets:
   - shotgun-surgery
   files:
   - src/nexu/cinema_history.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_history.py:86:Shotgun
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_history.py:141:Shotgun
     Surgery: cinema_dir'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: cleaned'
-  description: 'code2llm reports `Shotgun Surgery: cleaned` in `src/nexu/cinema_llm.py:56`.
+  description: 'code2llm reports `Shotgun Surgery: cleaned` in `src/nexu/cinema_http_preprocess.py:381`.
 
 
     Mutation of variable ''cleaned'' spans 11 functions. Changing this logic requires
@@ -373,12 +374,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/cinema_llm.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_llm.py:56:Shotgun Surgery:
-    cleaned'
+  - src/nexu/cinema_http_preprocess.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_http_preprocess.py:381:Shotgun
+    Surgery: cleaned'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: config'
-  description: 'code2llm reports `Shotgun Surgery: config` in `src/nexu/cinema_llm.py:19`.
+  description: 'code2llm reports `Shotgun Surgery: config` in `examples/web_app_calculator/cinema/server.py:274`.
 
 
     Mutation of variable ''config'' spans 6 functions. Changing this logic requires
@@ -393,12 +394,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/cinema_llm.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_llm.py:19:Shotgun Surgery:
-    config'
+  - examples/web_app_calculator/cinema/server.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:examples/web_app_calculator/cinema/server.py:274:Shotgun
+    Surgery: config'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: content'
-  description: 'code2llm reports `Shotgun Surgery: content` in `examples/web_app_calculator/cinema/server.py:568`.
+  description: 'code2llm reports `Shotgun Surgery: content` in `src/nexu/cinema_llm.py:298`.
 
 
     Mutation of variable ''content'' spans 7 functions. Changing this logic requires
@@ -413,12 +414,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - examples/web_app_calculator/cinema/server.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:examples/web_app_calculator/cinema/server.py:568:Shotgun
-    Surgery: content'
+  - src/nexu/cinema_llm.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_llm.py:298:Shotgun Surgery:
+    content'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: contracts'
-  description: 'code2llm reports `Shotgun Surgery: contracts` in `src/nexu/orchestrate.py:91`.
+  description: 'code2llm reports `Shotgun Surgery: contracts` in `src/nexu/orchestrate.py:41`.
 
 
     Mutation of variable ''contracts'' spans 9 functions. Changing this logic requires
@@ -434,11 +435,11 @@ tickets:
   - shotgun-surgery
   files:
   - src/nexu/orchestrate.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/orchestrate.py:91:Shotgun Surgery:
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/orchestrate.py:41:Shotgun Surgery:
     contracts'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: copied'
-  description: 'code2llm reports `Shotgun Surgery: copied` in `src/nexu/cinema_history.py:49`.
+  description: 'code2llm reports `Shotgun Surgery: copied` in `src/nexu/capsule.py:38`.
 
 
     Mutation of variable ''copied'' spans 5 functions. Changing this logic requires
@@ -453,12 +454,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/cinema_history.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_history.py:49:Shotgun
-    Surgery: copied'
+  - src/nexu/capsule.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/capsule.py:38:Shotgun Surgery:
+    copied'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: data'
-  description: 'code2llm reports `Shotgun Surgery: data` in `src/nexu/journal.py:14`.
+  description: 'code2llm reports `Shotgun Surgery: data` in `src/nexu/cinema_history.py:59`.
 
 
     Mutation of variable ''data'' spans 30 functions. Changing this logic requires
@@ -473,12 +474,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/journal.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/journal.py:14:Shotgun Surgery:
-    data'
+  - src/nexu/cinema_history.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_history.py:59:Shotgun
+    Surgery: data'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: delete'
-  description: 'code2llm reports `Shotgun Surgery: delete` in `src/nexu/cinema_history.py:86`.
+  description: 'code2llm reports `Shotgun Surgery: delete` in `src/nexu/cinema_markpact.py:113`.
 
 
     Mutation of variable ''delete'' spans 10 functions. Changing this logic requires
@@ -493,12 +494,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/cinema_history.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_history.py:86:Shotgun
+  - src/nexu/cinema_markpact.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_markpact.py:113:Shotgun
     Surgery: delete'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: diff'
-  description: 'code2llm reports `Shotgun Surgery: diff` in `src/nexu/promote.py:30`.
+  description: 'code2llm reports `Shotgun Surgery: diff` in `src/vico/status.py:11`.
 
 
     Mutation of variable ''diff'' spans 8 functions. Changing this logic requires
@@ -513,9 +514,29 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/promote.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/promote.py:30:Shotgun Surgery:
+  - src/vico/status.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/vico/status.py:11:Shotgun Surgery:
     diff'
+- signal: code2llm_smell_shotgun_surgery
+  title: 'Address code smell: Shotgun Surgery: effective'
+  description: 'code2llm reports `Shotgun Surgery: effective` in `src/nexu/cinema_publish.py:312`.
+
+
+    Mutation of variable ''effective'' spans 5 functions. Changing this logic requires
+    work in many places.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: high
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - shotgun-surgery
+  files:
+  - src/nexu/cinema_publish.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_publish.py:312:Shotgun
+    Surgery: effective'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: element'
   description: 'code2llm reports `Shotgun Surgery: element` in `examples/web_app_calculator/cinema/server.py:764`.
@@ -538,7 +559,7 @@ tickets:
     Surgery: element'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: entry'
-  description: 'code2llm reports `Shotgun Surgery: entry` in `src/nexu/cinema_publish.py:104`.
+  description: 'code2llm reports `Shotgun Surgery: entry` in `examples/web_app_calculator/cinema/server.py:779`.
 
 
     Mutation of variable ''entry'' spans 10 functions. Changing this logic requires
@@ -553,12 +574,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/cinema_publish.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_publish.py:104:Shotgun
+  - examples/web_app_calculator/cinema/server.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:examples/web_app_calculator/cinema/server.py:779:Shotgun
     Surgery: entry'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: err'
-  description: 'code2llm reports `Shotgun Surgery: err` in `src/nexu/cinema_project_imports.py:621`.
+  description: 'code2llm reports `Shotgun Surgery: err` in `src/nexu/cinema_llm.py:298`.
 
 
     Mutation of variable ''err'' spans 10 functions. Changing this logic requires
@@ -573,12 +594,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/cinema_project_imports.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_project_imports.py:621:Shotgun
-    Surgery: err'
+  - src/nexu/cinema_llm.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_llm.py:298:Shotgun Surgery:
+    err'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: errors'
-  description: 'code2llm reports `Shotgun Surgery: errors` in `src/nexu/cinema_html_validate.py:168`.
+  description: 'code2llm reports `Shotgun Surgery: errors` in `src/nexu/cinema_html_validate.py:117`.
 
 
     Mutation of variable ''errors'' spans 8 functions. Changing this logic requires
@@ -594,31 +615,11 @@ tickets:
   - shotgun-surgery
   files:
   - src/nexu/cinema_html_validate.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_html_validate.py:168:Shotgun
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_html_validate.py:117:Shotgun
     Surgery: errors'
 - signal: code2llm_smell_shotgun_surgery
-  title: 'Address code smell: Shotgun Surgery: filename'
-  description: 'code2llm reports `Shotgun Surgery: filename` in `src/nexu/cinema_html_validate.py:181`.
-
-
-    Mutation of variable ''filename'' spans 6 functions. Changing this logic requires
-    work in many places.
-
-
-    Make the smallest refactor that removes the smell and run local tests.'
-  priority: high
-  labels:
-  - llm-ready
-  - code2llm
-  - code-smell
-  - shotgun-surgery
-  files:
-  - src/nexu/cinema_html_validate.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_html_validate.py:181:Shotgun
-    Surgery: filename'
-- signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: files'
-  description: 'code2llm reports `Shotgun Surgery: files` in `src/nexu/cinema_history.py:86`.
+  description: 'code2llm reports `Shotgun Surgery: files` in `src/nexu/files.py:36`.
 
 
     Mutation of variable ''files'' spans 14 functions. Changing this logic requires
@@ -633,12 +634,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/cinema_history.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_history.py:86:Shotgun
-    Surgery: files'
+  - src/nexu/files.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/files.py:36:Shotgun Surgery:
+    files'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: html'
-  description: 'code2llm reports `Shotgun Surgery: html` in `src/nexu/cinema_policy.py:235`.
+  description: 'code2llm reports `Shotgun Surgery: html` in `src/nexu/cinema_policy.py:817`.
 
 
     Mutation of variable ''html'' spans 20 functions. Changing this logic requires
@@ -654,11 +655,11 @@ tickets:
   - shotgun-surgery
   files:
   - src/nexu/cinema_policy.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_policy.py:235:Shotgun
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_policy.py:817:Shotgun
     Surgery: html'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: idx'
-  description: 'code2llm reports `Shotgun Surgery: idx` in `src/nexu/cinema_publish.py:405`.
+  description: 'code2llm reports `Shotgun Surgery: idx` in `src/nexu/cinema_scripts.py:661`.
 
 
     Mutation of variable ''idx'' spans 6 functions. Changing this logic requires work
@@ -673,12 +674,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/cinema_publish.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_publish.py:405:Shotgun
+  - src/nexu/cinema_scripts.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_scripts.py:661:Shotgun
     Surgery: idx'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: keep'
-  description: 'code2llm reports `Shotgun Surgery: keep` in `src/nexu/cinema_history.py:86`.
+  description: 'code2llm reports `Shotgun Surgery: keep` in `src/nexu/cinema_markpact.py:113`.
 
 
     Mutation of variable ''keep'' spans 10 functions. Changing this logic requires
@@ -693,12 +694,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/cinema_history.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_history.py:86:Shotgun
+  - src/nexu/cinema_markpact.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_markpact.py:113:Shotgun
     Surgery: keep'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: kept'
-  description: 'code2llm reports `Shotgun Surgery: kept` in `src/nexu/cinema_offline_options.py:78`.
+  description: 'code2llm reports `Shotgun Surgery: kept` in `src/nexu/cinema_offline_options.py:87`.
 
 
     Mutation of variable ''kept'' spans 6 functions. Changing this logic requires
@@ -714,11 +715,11 @@ tickets:
   - shotgun-surgery
   files:
   - src/nexu/cinema_offline_options.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_offline_options.py:78:Shotgun
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_offline_options.py:87:Shotgun
     Surgery: kept'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: key'
-  description: 'code2llm reports `Shotgun Surgery: key` in `src/nexu/cinema_policy.py:100`.
+  description: 'code2llm reports `Shotgun Surgery: key` in `src/nexu/fast_delivery/options.py:83`.
 
 
     Mutation of variable ''key'' spans 11 functions. Changing this logic requires
@@ -733,8 +734,8 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/cinema_policy.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_policy.py:100:Shotgun
+  - src/nexu/fast_delivery/options.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/fast_delivery/options.py:83:Shotgun
     Surgery: key'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: kind'
@@ -757,28 +758,8 @@ tickets:
   dedupe_key: 'code2llm:smell:shotgun_surgery:examples/web_app_calculator/cinema/server.py:764:Shotgun
     Surgery: kind'
 - signal: code2llm_smell_shotgun_surgery
-  title: 'Address code smell: Shotgun Surgery: labels'
-  description: 'code2llm reports `Shotgun Surgery: labels` in `src/nexu/cinema_options_cache.py:109`.
-
-
-    Mutation of variable ''labels'' spans 10 functions. Changing this logic requires
-    work in many places.
-
-
-    Make the smallest refactor that removes the smell and run local tests.'
-  priority: high
-  labels:
-  - llm-ready
-  - code2llm
-  - code-smell
-  - shotgun-surgery
-  files:
-  - src/nexu/cinema_options_cache.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_options_cache.py:109:Shotgun
-    Surgery: labels'
-- signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: ledger'
-  description: 'code2llm reports `Shotgun Surgery: ledger` in `src/nexu/cinema_history.py:86`.
+  description: 'code2llm reports `Shotgun Surgery: ledger` in `src/nexu/cinema_policy.py:391`.
 
 
     Mutation of variable ''ledger'' spans 7 functions. Changing this logic requires
@@ -793,12 +774,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/cinema_history.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_history.py:86:Shotgun
+  - src/nexu/cinema_policy.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_policy.py:391:Shotgun
     Surgery: ledger'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: ledger_path'
-  description: 'code2llm reports `Shotgun Surgery: ledger_path` in `src/nexu/export_prompt.py:16`.
+  description: 'code2llm reports `Shotgun Surgery: ledger_path` in `src/nexu/cinema_policy.py:391`.
 
 
     Mutation of variable ''ledger_path'' spans 7 functions. Changing this logic requires
@@ -813,12 +794,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/export_prompt.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/export_prompt.py:16:Shotgun
+  - src/nexu/cinema_policy.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_policy.py:391:Shotgun
     Surgery: ledger_path'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: lines'
-  description: 'code2llm reports `Shotgun Surgery: lines` in `src/nexu/cinema_llm.py:38`.
+  description: 'code2llm reports `Shotgun Surgery: lines` in `src/nexu/orchestrate.py:200`.
 
 
     Mutation of variable ''lines'' spans 10 functions. Changing this logic requires
@@ -833,12 +814,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/cinema_llm.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_llm.py:38:Shotgun Surgery:
-    lines'
+  - src/nexu/orchestrate.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/orchestrate.py:200:Shotgun
+    Surgery: lines'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: lower'
-  description: 'code2llm reports `Shotgun Surgery: lower` in `src/nexu/cinema_html.py:6`.
+  description: 'code2llm reports `Shotgun Surgery: lower` in `src/nexu/cinema_goal_contracts.py:264`.
 
 
     Mutation of variable ''lower'' spans 9 functions. Changing this logic requires
@@ -853,12 +834,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/cinema_html.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_html.py:6:Shotgun Surgery:
-    lower'
+  - src/nexu/cinema_goal_contracts.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_goal_contracts.py:264:Shotgun
+    Surgery: lower'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: markdown'
-  description: 'code2llm reports `Shotgun Surgery: markdown` in `src/nexu/cinema_traces.py:154`.
+  description: 'code2llm reports `Shotgun Surgery: markdown` in `src/nexu/cinema_project_imports.py:1073`.
 
 
     Mutation of variable ''markdown'' spans 6 functions. Changing this logic requires
@@ -873,12 +854,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/cinema_traces.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_traces.py:154:Shotgun
+  - src/nexu/cinema_project_imports.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_project_imports.py:1073:Shotgun
     Surgery: markdown'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: markpact_path'
-  description: 'code2llm reports `Shotgun Surgery: markpact_path` in `src/nexu/cinema_policy.py:252`.
+  description: 'code2llm reports `Shotgun Surgery: markpact_path` in `src/nexu/cinema_project_imports.py:1073`.
 
 
     Mutation of variable ''markpact_path'' spans 5 functions. Changing this logic
@@ -893,12 +874,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/cinema_policy.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_policy.py:252:Shotgun
+  - src/nexu/cinema_project_imports.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_project_imports.py:1073:Shotgun
     Surgery: markpact_path'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: match'
-  description: 'code2llm reports `Shotgun Surgery: match` in `src/nexu/cinema_project_imports.py:870`.
+  description: 'code2llm reports `Shotgun Surgery: match` in `src/nexu/fast_delivery/context.py:42`.
 
 
     Mutation of variable ''match'' spans 5 functions. Changing this logic requires
@@ -913,12 +894,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/cinema_project_imports.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_project_imports.py:870:Shotgun
+  - src/nexu/fast_delivery/context.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/fast_delivery/context.py:42:Shotgun
     Surgery: match'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: meta'
-  description: 'code2llm reports `Shotgun Surgery: meta` in `src/nexu/cinema_project_imports.py:1184`.
+  description: 'code2llm reports `Shotgun Surgery: meta` in `src/nexu/cinema_options_cache.py:50`.
 
 
     Mutation of variable ''meta'' spans 25 functions. Changing this logic requires
@@ -933,12 +914,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/cinema_project_imports.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_project_imports.py:1184:Shotgun
+  - src/nexu/cinema_options_cache.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_options_cache.py:50:Shotgun
     Surgery: meta'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: meta_path'
-  description: 'code2llm reports `Shotgun Surgery: meta_path` in `src/nexu/cinema_project_imports.py:334`.
+  description: 'code2llm reports `Shotgun Surgery: meta_path` in `src/nexu/cinema_project_imports.py:1073`.
 
 
     Mutation of variable ''meta_path'' spans 10 functions. Changing this logic requires
@@ -954,7 +935,7 @@ tickets:
   - shotgun-surgery
   files:
   - src/nexu/cinema_project_imports.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_project_imports.py:334:Shotgun
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_project_imports.py:1073:Shotgun
     Surgery: meta_path'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: normalized'
@@ -978,7 +959,7 @@ tickets:
     Surgery: normalized'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: out'
-  description: 'code2llm reports `Shotgun Surgery: out` in `src/nexu/fast_delivery/options.py:120`.
+  description: 'code2llm reports `Shotgun Surgery: out` in `src/nexu/cinema_offline_options.py:420`.
 
 
     Mutation of variable ''out'' spans 11 functions. Changing this logic requires
@@ -993,52 +974,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/fast_delivery/options.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/fast_delivery/options.py:120:Shotgun
+  - src/nexu/cinema_offline_options.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_offline_options.py:420:Shotgun
     Surgery: out'
 - signal: code2llm_smell_shotgun_surgery
-  title: 'Address code smell: Shotgun Surgery: parsed'
-  description: 'code2llm reports `Shotgun Surgery: parsed` in `src/nexu/cinema_project_imports.py:199`.
-
-
-    Mutation of variable ''parsed'' spans 8 functions. Changing this logic requires
-    work in many places.
-
-
-    Make the smallest refactor that removes the smell and run local tests.'
-  priority: high
-  labels:
-  - llm-ready
-  - code2llm
-  - code-smell
-  - shotgun-surgery
-  files:
-  - src/nexu/cinema_project_imports.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_project_imports.py:199:Shotgun
-    Surgery: parsed'
-- signal: code2llm_smell_shotgun_surgery
-  title: 'Address code smell: Shotgun Surgery: parts'
-  description: 'code2llm reports `Shotgun Surgery: parts` in `examples/web_app_calculator/cinema/server.py:568`.
-
-
-    Mutation of variable ''parts'' spans 13 functions. Changing this logic requires
-    work in many places.
-
-
-    Make the smallest refactor that removes the smell and run local tests.'
-  priority: high
-  labels:
-  - llm-ready
-  - code2llm
-  - code-smell
-  - shotgun-surgery
-  files:
-  - examples/web_app_calculator/cinema/server.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:examples/web_app_calculator/cinema/server.py:568:Shotgun
-    Surgery: parts'
-- signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: path'
-  description: 'code2llm reports `Shotgun Surgery: path` in `src/nexu/journal.py:14`.
+  description: 'code2llm reports `Shotgun Surgery: path` in `src/nexu/cinema_history.py:59`.
 
 
     Mutation of variable ''path'' spans 23 functions. Changing this logic requires
@@ -1053,12 +994,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/journal.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/journal.py:14:Shotgun Surgery:
-    path'
+  - src/nexu/cinema_history.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_history.py:59:Shotgun
+    Surgery: path'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: payload'
-  description: 'code2llm reports `Shotgun Surgery: payload` in `examples/web_app_calculator/cinema/server.py:372`.
+  description: 'code2llm reports `Shotgun Surgery: payload` in `src/nexu/runtime.py:40`.
 
 
     Mutation of variable ''payload'' spans 8 functions. Changing this logic requires
@@ -1073,12 +1014,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - examples/web_app_calculator/cinema/server.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:examples/web_app_calculator/cinema/server.py:372:Shotgun
-    Surgery: payload'
+  - src/nexu/runtime.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/runtime.py:40:Shotgun Surgery:
+    payload'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: plan'
-  description: 'code2llm reports `Shotgun Surgery: plan` in `src/nexu/promote.py:30`.
+  description: 'code2llm reports `Shotgun Surgery: plan` in `src/nexu/cli.py:340`.
 
 
     Mutation of variable ''plan'' spans 9 functions. Changing this logic requires
@@ -1093,12 +1034,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/promote.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/promote.py:30:Shotgun Surgery:
+  - src/nexu/cli.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cli.py:340:Shotgun Surgery:
     plan'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: port'
-  description: 'code2llm reports `Shotgun Surgery: port` in `src/nexu/cinema_publish.py:405`.
+  description: 'code2llm reports `Shotgun Surgery: port` in `src/nexu/cinema_publish.py:312`.
 
 
     Mutation of variable ''port'' spans 5 functions. Changing this logic requires
@@ -1114,11 +1055,11 @@ tickets:
   - shotgun-surgery
   files:
   - src/nexu/cinema_publish.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_publish.py:405:Shotgun
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_publish.py:312:Shotgun
     Surgery: port'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: proc'
-  description: 'code2llm reports `Shotgun Surgery: proc` in `src/nexu/cinema_project_imports.py:621`.
+  description: 'code2llm reports `Shotgun Surgery: proc` in `examples/web_app_pactown_ecosystem/run.py:15`.
 
 
     Mutation of variable ''proc'' spans 5 functions. Changing this logic requires
@@ -1133,12 +1074,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/cinema_project_imports.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_project_imports.py:621:Shotgun
+  - examples/web_app_pactown_ecosystem/run.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:examples/web_app_pactown_ecosystem/run.py:15:Shotgun
     Surgery: proc'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: project'
-  description: 'code2llm reports `Shotgun Surgery: project` in `src/nexu/cinema_policy.py:489`.
+  description: 'code2llm reports `Shotgun Surgery: project` in `src/nexu/cinema_projects.py:663`.
 
 
     Mutation of variable ''project'' spans 8 functions. Changing this logic requires
@@ -1153,12 +1094,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/cinema_policy.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_policy.py:489:Shotgun
+  - src/nexu/cinema_projects.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_projects.py:663:Shotgun
     Surgery: project'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: project_id'
-  description: 'code2llm reports `Shotgun Surgery: project_id` in `src/nexu/cinema_project_imports.py:952`.
+  description: 'code2llm reports `Shotgun Surgery: project_id` in `src/nexu/cinema_project_imports.py:1003`.
 
 
     Mutation of variable ''project_id'' spans 25 functions. Changing this logic requires
@@ -1174,11 +1115,31 @@ tickets:
   - shotgun-surgery
   files:
   - src/nexu/cinema_project_imports.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_project_imports.py:952:Shotgun
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_project_imports.py:1003:Shotgun
     Surgery: project_id'
 - signal: code2llm_smell_shotgun_surgery
+  title: 'Address code smell: Shotgun Surgery: project_kind'
+  description: 'code2llm reports `Shotgun Surgery: project_kind` in `src/nexu/cinema_policy.py:391`.
+
+
+    Mutation of variable ''project_kind'' spans 6 functions. Changing this logic requires
+    work in many places.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: high
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - shotgun-surgery
+  files:
+  - src/nexu/cinema_policy.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_policy.py:391:Shotgun
+    Surgery: project_kind'
+- signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: prompt'
-  description: 'code2llm reports `Shotgun Surgery: prompt` in `examples/run_examples.py:34`.
+  description: 'code2llm reports `Shotgun Surgery: prompt` in `src/nexu/review.py:70`.
 
 
     Mutation of variable ''prompt'' spans 10 functions. Changing this logic requires
@@ -1193,12 +1154,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - examples/run_examples.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:examples/run_examples.py:34:Shotgun
-    Surgery: prompt'
+  - src/nexu/review.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/review.py:70:Shotgun Surgery:
+    prompt'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: proposals'
-  description: 'code2llm reports `Shotgun Surgery: proposals` in `src/nexu/cinema_policy.py:692`.
+  description: 'code2llm reports `Shotgun Surgery: proposals` in `examples/web_app_calculator/cinema/server.py:779`.
 
 
     Mutation of variable ''proposals'' spans 8 functions. Changing this logic requires
@@ -1213,12 +1174,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/cinema_policy.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_policy.py:692:Shotgun
+  - examples/web_app_calculator/cinema/server.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:examples/web_app_calculator/cinema/server.py:779:Shotgun
     Surgery: proposals'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: raw'
-  description: 'code2llm reports `Shotgun Surgery: raw` in `src/nexu/cinema_llm.py:38`.
+  description: 'code2llm reports `Shotgun Surgery: raw` in `src/nexu/cinema_llm.py:298`.
 
 
     Mutation of variable ''raw'' spans 8 functions. Changing this logic requires work
@@ -1234,11 +1195,11 @@ tickets:
   - shotgun-surgery
   files:
   - src/nexu/cinema_llm.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_llm.py:38:Shotgun Surgery:
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_llm.py:298:Shotgun Surgery:
     raw'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: relative'
-  description: 'code2llm reports `Shotgun Surgery: relative` in `src/nexu/promote.py:14`.
+  description: 'code2llm reports `Shotgun Surgery: relative` in `src/nexu/files.py:36`.
 
 
     Mutation of variable ''relative'' spans 5 functions. Changing this logic requires
@@ -1253,12 +1214,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/promote.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/promote.py:14:Shotgun Surgery:
+  - src/nexu/files.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/files.py:36:Shotgun Surgery:
     relative'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: report'
-  description: 'code2llm reports `Shotgun Surgery: report` in `src/nexu/cli.py:266`.
+  description: 'code2llm reports `Shotgun Surgery: report` in `src/nexu/cli.py:215`.
 
 
     Mutation of variable ''report'' spans 9 functions. Changing this logic requires
@@ -1274,11 +1235,11 @@ tickets:
   - shotgun-surgery
   files:
   - src/nexu/cli.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cli.py:266:Shotgun Surgery:
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cli.py:215:Shotgun Surgery:
     report'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: result'
-  description: 'code2llm reports `Shotgun Surgery: result` in `src/vico/git.py:7`.
+  description: 'code2llm reports `Shotgun Surgery: result` in `src/nexu/cinema_publish.py:312`.
 
 
     Mutation of variable ''result'' spans 8 functions. Changing this logic requires
@@ -1293,11 +1254,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/vico/git.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/vico/git.py:7:Shotgun Surgery: result'
+  - src/nexu/cinema_publish.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_publish.py:312:Shotgun
+    Surgery: result'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: root'
-  description: 'code2llm reports `Shotgun Surgery: root` in `src/nexu/cli.py:266`.
+  description: 'code2llm reports `Shotgun Surgery: root` in `src/nexu/cli.py:340`.
 
 
     Mutation of variable ''root'' spans 32 functions. Changing this logic requires
@@ -1313,11 +1275,11 @@ tickets:
   - shotgun-surgery
   files:
   - src/nexu/cli.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cli.py:266:Shotgun Surgery:
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cli.py:340:Shotgun Surgery:
     root'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: scope'
-  description: 'code2llm reports `Shotgun Surgery: scope` in `src/nexu/cinema_llm_contracts.py:57`.
+  description: 'code2llm reports `Shotgun Surgery: scope` in `src/nexu/cinema_goal_contracts.py:264`.
 
 
     Mutation of variable ''scope'' spans 7 functions. Changing this logic requires
@@ -1332,12 +1294,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/cinema_llm_contracts.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_llm_contracts.py:57:Shotgun
+  - src/nexu/cinema_goal_contracts.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_goal_contracts.py:264:Shotgun
     Surgery: scope'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: slug'
-  description: 'code2llm reports `Shotgun Surgery: slug` in `src/nexu/cinema_traces.py:38`.
+  description: 'code2llm reports `Shotgun Surgery: slug` in `src/nexu/cinema_goal_contracts.py:264`.
 
 
     Mutation of variable ''slug'' spans 5 functions. Changing this logic requires
@@ -1352,12 +1314,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/cinema_traces.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_traces.py:38:Shotgun
+  - src/nexu/cinema_goal_contracts.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_goal_contracts.py:264:Shotgun
     Surgery: slug'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: snapshot'
-  description: 'code2llm reports `Shotgun Surgery: snapshot` in `src/nexu/cli.py:64`.
+  description: 'code2llm reports `Shotgun Surgery: snapshot` in `src/nexu/cinema.py:121`.
 
 
     Mutation of variable ''snapshot'' spans 15 functions. Changing this logic requires
@@ -1372,12 +1334,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/cli.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cli.py:64:Shotgun Surgery:
+  - src/nexu/cinema.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema.py:121:Shotgun Surgery:
     snapshot'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: source'
-  description: 'code2llm reports `Shotgun Surgery: source` in `src/nexu/cinema_project_imports.py:621`.
+  description: 'code2llm reports `Shotgun Surgery: source` in `src/nexu/cinema_project_imports.py:154`.
 
 
     Mutation of variable ''source'' spans 7 functions. Changing this logic requires
@@ -1393,11 +1355,11 @@ tickets:
   - shotgun-surgery
   files:
   - src/nexu/cinema_project_imports.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_project_imports.py:621:Shotgun
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_project_imports.py:154:Shotgun
     Surgery: source'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: source_dir'
-  description: 'code2llm reports `Shotgun Surgery: source_dir` in `src/nexu/cinema_project_imports.py:621`.
+  description: 'code2llm reports `Shotgun Surgery: source_dir` in `src/nexu/cinema_project_imports.py:384`.
 
 
     Mutation of variable ''source_dir'' spans 7 functions. Changing this logic requires
@@ -1413,11 +1375,11 @@ tickets:
   - shotgun-surgery
   files:
   - src/nexu/cinema_project_imports.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_project_imports.py:621:Shotgun
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_project_imports.py:384:Shotgun
     Surgery: source_dir'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: stage0'
-  description: 'code2llm reports `Shotgun Surgery: stage0` in `src/nexu/cinema_policy.py:235`.
+  description: 'code2llm reports `Shotgun Surgery: stage0` in `src/nexu/cinema_baseline_contracts.py:107`.
 
 
     Mutation of variable ''stage0'' spans 7 functions. Changing this logic requires
@@ -1432,8 +1394,8 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/cinema_policy.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_policy.py:235:Shotgun
+  - src/nexu/cinema_baseline_contracts.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_baseline_contracts.py:107:Shotgun
     Surgery: stage0'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: stage_file'
@@ -1497,7 +1459,7 @@ tickets:
     Surgery: status'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: subprocess'
-  description: 'code2llm reports `Shotgun Surgery: subprocess` in `src/nexu/cinema_server.py:109`.
+  description: 'code2llm reports `Shotgun Surgery: subprocess` in `examples/web_app_pactown_ecosystem/run.py:15`.
 
 
     Mutation of variable ''subprocess'' spans 5 functions. Changing this logic requires
@@ -1512,8 +1474,8 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/cinema_server.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_server.py:109:Shotgun
+  - examples/web_app_pactown_ecosystem/run.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:examples/web_app_pactown_ecosystem/run.py:15:Shotgun
     Surgery: subprocess'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: suffix'
@@ -1537,7 +1499,7 @@ tickets:
     suffix'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: table'
-  description: 'code2llm reports `Shotgun Surgery: table` in `src/nexu/cli.py:279`.
+  description: 'code2llm reports `Shotgun Surgery: table` in `src/nexu/cli.py:361`.
 
 
     Mutation of variable ''table'' spans 6 functions. Changing this logic requires
@@ -1553,11 +1515,11 @@ tickets:
   - shotgun-surgery
   files:
   - src/nexu/cli.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cli.py:279:Shotgun Surgery:
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cli.py:361:Shotgun Surgery:
     table'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: target'
-  description: 'code2llm reports `Shotgun Surgery: target` in `src/nexu/promote.py:79`.
+  description: 'code2llm reports `Shotgun Surgery: target` in `src/nexu/capsule.py:38`.
 
 
     Mutation of variable ''target'' spans 5 functions. Changing this logic requires
@@ -1572,32 +1534,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/promote.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/promote.py:79:Shotgun Surgery:
+  - src/nexu/capsule.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/capsule.py:38:Shotgun Surgery:
     target'
 - signal: code2llm_smell_shotgun_surgery
-  title: 'Address code smell: Shotgun Surgery: text'
-  description: 'code2llm reports `Shotgun Surgery: text` in `src/nexu/fast_delivery/options.py:18`.
-
-
-    Mutation of variable ''text'' spans 31 functions. Changing this logic requires
-    work in many places.
-
-
-    Make the smallest refactor that removes the smell and run local tests.'
-  priority: high
-  labels:
-  - llm-ready
-  - code2llm
-  - code-smell
-  - shotgun-surgery
-  files:
-  - src/nexu/fast_delivery/options.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/fast_delivery/options.py:18:Shotgun
-    Surgery: text'
-- signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: title'
-  description: 'code2llm reports `Shotgun Surgery: title` in `src/nexu/cinema_project_imports.py:769`.
+  description: 'code2llm reports `Shotgun Surgery: title` in `examples/web_app_calculator/cinema/nexu_hooks.py:91`.
 
 
     Mutation of variable ''title'' spans 8 functions. Changing this logic requires
@@ -1612,12 +1554,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/cinema_project_imports.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_project_imports.py:769:Shotgun
+  - examples/web_app_calculator/cinema/nexu_hooks.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:examples/web_app_calculator/cinema/nexu_hooks.py:91:Shotgun
     Surgery: title'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: updated'
-  description: 'code2llm reports `Shotgun Surgery: updated` in `src/nexu/cinema_project_imports.py:520`.
+  description: 'code2llm reports `Shotgun Surgery: updated` in `src/nexu/cinema_project_imports.py:1003`.
 
 
     Mutation of variable ''updated'' spans 5 functions. Changing this logic requires
@@ -1633,11 +1575,31 @@ tickets:
   - shotgun-surgery
   files:
   - src/nexu/cinema_project_imports.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_project_imports.py:520:Shotgun
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_project_imports.py:1003:Shotgun
     Surgery: updated'
 - signal: code2llm_smell_shotgun_surgery
+  title: 'Address code smell: Shotgun Surgery: value'
+  description: 'code2llm reports `Shotgun Surgery: value` in `src/nexu/cinema_project_imports.py:326`.
+
+
+    Mutation of variable ''value'' spans 5 functions. Changing this logic requires
+    work in many places.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: high
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - shotgun-surgery
+  files:
+  - src/nexu/cinema_project_imports.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_project_imports.py:326:Shotgun
+    Surgery: value'
+- signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: verification'
-  description: 'code2llm reports `Shotgun Surgery: verification` in `src/nexu/promote.py:30`.
+  description: 'code2llm reports `Shotgun Surgery: verification` in `src/vico/status.py:11`.
 
 
     Mutation of variable ''verification'' spans 7 functions. Changing this logic requires
@@ -1652,12 +1614,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - src/nexu/promote.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/promote.py:30:Shotgun Surgery:
+  - src/vico/status.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/vico/status.py:11:Shotgun Surgery:
     verification'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: work'
-  description: 'code2llm reports `Shotgun Surgery: work` in `examples/run_examples.py:34`.
+  description: 'code2llm reports `Shotgun Surgery: work` in `examples/scientific_calculator_demo.py:17`.
 
 
     Mutation of variable ''work'' spans 5 functions. Changing this logic requires
@@ -1672,12 +1634,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - examples/run_examples.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:examples/run_examples.py:34:Shotgun
+  - examples/scientific_calculator_demo.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:examples/scientific_calculator_demo.py:17:Shotgun
     Surgery: work'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: written'
-  description: 'code2llm reports `Shotgun Surgery: written` in `src/nexu/cinema_policy.py:235`.
+  description: 'code2llm reports `Shotgun Surgery: written` in `src/nexu/cinema_policy.py:218`.
 
 
     Mutation of variable ''written'' spans 5 functions. Changing this logic requires
@@ -1693,7 +1655,7 @@ tickets:
   - shotgun-surgery
   files:
   - src/nexu/cinema_policy.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_policy.py:235:Shotgun
+  dedupe_key: 'code2llm:smell:shotgun_surgery:src/nexu/cinema_policy.py:218:Shotgun
     Surgery: written'
 - signal: code2llm_cc
   title: 'Reduce cyclomatic complexity: src.nexu.cinema_goal_contracts.propose_goal_extension_contracts
@@ -1718,7 +1680,7 @@ tickets:
   title: 'Reduce cyclomatic complexity: src.nexu.cinema_http_preprocess.load_http_preprocess_artifacts
     (CC=16)'
   description: 'code2llm reports `src.nexu.cinema_http_preprocess.load_http_preprocess_artifacts`
-    at `src/nexu/cinema_http_preprocess.py:546` with cyclomatic complexity 16 (limit
+    at `src/nexu/cinema_http_preprocess.py:556` with cyclomatic complexity 16 (limit
     15).
 
 
@@ -1752,13 +1714,12 @@ tickets:
   - src/nexu/cinema_publish.py
   dedupe_key: code2llm:cc:src/nexu/cinema_publish.py:src.nexu.cinema_publish.start_published_service
 - signal: code2llm_smell_data_clump
-  title: 'Address code smell: Data Clump: capsule_name, template_base, lower, stage'
-  description: 'code2llm reports `Data Clump: capsule_name, template_base, lower,
-    stage` in `src/nexu/cinema_goal_contracts.py:181`.
+  title: 'Address code smell: Data Clump: artifact, proposals, filename'
+  description: 'code2llm reports `Data Clump: artifact, proposals, filename` in `examples/web_app_calculator/cinema/nexu_hooks.py:115`.
 
 
-    Arguments (capsule_name, template_base, lower, stage) are used together in multiple
-    functions: src.nexu.cinema_goal_contracts._detect_api_trait, src.nexu.cinema_goal_contracts._detect_dashboard_trait.
+    Arguments (artifact, proposals, filename) are used together in multiple functions:
+    examples.web_app_calculator.cinema.nexu_hooks.validate_artifact, examples.web_app_calculator.cinema.server._validate_intract_artifact.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -1769,17 +1730,16 @@ tickets:
   - code-smell
   - data-clump
   files:
-  - src/nexu/cinema_goal_contracts.py
-  dedupe_key: 'code2llm:smell:data_clump:src/nexu/cinema_goal_contracts.py:181:Data
-    Clump: capsule_name, template_base, lower, stage'
+  - examples/web_app_calculator/cinema/nexu_hooks.py
+  dedupe_key: 'code2llm:smell:data_clump:examples/web_app_calculator/cinema/nexu_hooks.py:115:Data
+    Clump: artifact, proposals, filename'
 - signal: code2llm_smell_data_clump
-  title: 'Address code smell: Data Clump: capsule_name, template_base, lower, stage'
-  description: 'code2llm reports `Data Clump: capsule_name, template_base, lower,
-    stage` in `src/nexu/cinema_goal_contracts.py:202`.
+  title: 'Address code smell: Data Clump: artifact, proposals, filename'
+  description: 'code2llm reports `Data Clump: artifact, proposals, filename` in `examples/web_app_calculator/cinema/server.py:832`.
 
 
-    Arguments (capsule_name, template_base, lower, stage) are used together in multiple
-    functions: src.nexu.cinema_goal_contracts._detect_api_trait, src.nexu.cinema_goal_contracts._detect_dashboard_trait.
+    Arguments (artifact, proposals, filename) are used together in multiple functions:
+    examples.web_app_calculator.cinema.nexu_hooks.validate_artifact, examples.web_app_calculator.cinema.server._validate_intract_artifact.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -1790,9 +1750,9 @@ tickets:
   - code-smell
   - data-clump
   files:
-  - src/nexu/cinema_goal_contracts.py
-  dedupe_key: 'code2llm:smell:data_clump:src/nexu/cinema_goal_contracts.py:202:Data
-    Clump: capsule_name, template_base, lower, stage'
+  - examples/web_app_calculator/cinema/server.py
+  dedupe_key: 'code2llm:smell:data_clump:examples/web_app_calculator/cinema/server.py:832:Data
+    Clump: artifact, proposals, filename'
 - signal: code2llm_smell_data_clump
   title: 'Address code smell: Data Clump: cinema_dir, capsule_name, root'
   description: 'code2llm reports `Data Clump: cinema_dir, capsule_name, root` in `src/nexu/cinema_history.py:195`.
@@ -1857,118 +1817,13 @@ tickets:
   dedupe_key: 'code2llm:smell:data_clump:src/nexu/cinema_publish.py:312:Data Clump:
     cinema_dir, capsule_name, root'
 - signal: code2llm_smell_data_clump
-  title: 'Address code smell: Data Clump: cinema_dir, name, root'
-  description: 'code2llm reports `Data Clump: cinema_dir, name, root` in `src/nexu/cinema_server.py:127`.
-
-
-    Arguments (cinema_dir, name, root) are used together in multiple functions: src.nexu.cinema_server.start_cinema_player_server,
-    src.nexu.cinema.write_cinema_nexu_hooks, src.nexu.cinema.sync_cinema_templates,
-    src.nexu.cinema.write_intract_policy_files, src.nexu.cinema._start_cinema_server.
-
-
-    Make the smallest refactor that removes the smell and run local tests.'
-  priority: normal
-  labels:
-  - llm-ready
-  - code2llm
-  - code-smell
-  - data-clump
-  files:
-  - src/nexu/cinema_server.py
-  dedupe_key: 'code2llm:smell:data_clump:src/nexu/cinema_server.py:127:Data Clump:
-    cinema_dir, name, root'
-- signal: code2llm_smell_data_clump
-  title: 'Address code smell: Data Clump: cinema_dir, name, root'
-  description: 'code2llm reports `Data Clump: cinema_dir, name, root` in `src/nexu/cinema.py:36`.
-
-
-    Arguments (cinema_dir, name, root) are used together in multiple functions: src.nexu.cinema_server.start_cinema_player_server,
-    src.nexu.cinema.write_cinema_nexu_hooks, src.nexu.cinema.sync_cinema_templates,
-    src.nexu.cinema.write_intract_policy_files, src.nexu.cinema._start_cinema_server.
-
-
-    Make the smallest refactor that removes the smell and run local tests.'
-  priority: normal
-  labels:
-  - llm-ready
-  - code2llm
-  - code-smell
-  - data-clump
-  files:
-  - src/nexu/cinema.py
-  dedupe_key: 'code2llm:smell:data_clump:src/nexu/cinema.py:36:Data Clump: cinema_dir,
-    name, root'
-- signal: code2llm_smell_data_clump
-  title: 'Address code smell: Data Clump: cinema_dir, name, root'
-  description: 'code2llm reports `Data Clump: cinema_dir, name, root` in `src/nexu/cinema.py:111`.
-
-
-    Arguments (cinema_dir, name, root) are used together in multiple functions: src.nexu.cinema_server.start_cinema_player_server,
-    src.nexu.cinema.write_cinema_nexu_hooks, src.nexu.cinema.sync_cinema_templates,
-    src.nexu.cinema.write_intract_policy_files, src.nexu.cinema._start_cinema_server.
-
-
-    Make the smallest refactor that removes the smell and run local tests.'
-  priority: normal
-  labels:
-  - llm-ready
-  - code2llm
-  - code-smell
-  - data-clump
-  files:
-  - src/nexu/cinema.py
-  dedupe_key: 'code2llm:smell:data_clump:src/nexu/cinema.py:111:Data Clump: cinema_dir,
-    name, root'
-- signal: code2llm_smell_data_clump
-  title: 'Address code smell: Data Clump: cinema_dir, name, root'
-  description: 'code2llm reports `Data Clump: cinema_dir, name, root` in `src/nexu/cinema.py:121`.
-
-
-    Arguments (cinema_dir, name, root) are used together in multiple functions: src.nexu.cinema_server.start_cinema_player_server,
-    src.nexu.cinema.write_cinema_nexu_hooks, src.nexu.cinema.sync_cinema_templates,
-    src.nexu.cinema.write_intract_policy_files, src.nexu.cinema._start_cinema_server.
-
-
-    Make the smallest refactor that removes the smell and run local tests.'
-  priority: normal
-  labels:
-  - llm-ready
-  - code2llm
-  - code-smell
-  - data-clump
-  files:
-  - src/nexu/cinema.py
-  dedupe_key: 'code2llm:smell:data_clump:src/nexu/cinema.py:121:Data Clump: cinema_dir,
-    name, root'
-- signal: code2llm_smell_data_clump
-  title: 'Address code smell: Data Clump: cinema_dir, name, root'
-  description: 'code2llm reports `Data Clump: cinema_dir, name, root` in `src/nexu/cinema.py:185`.
-
-
-    Arguments (cinema_dir, name, root) are used together in multiple functions: src.nexu.cinema_server.start_cinema_player_server,
-    src.nexu.cinema.write_cinema_nexu_hooks, src.nexu.cinema.sync_cinema_templates,
-    src.nexu.cinema.write_intract_policy_files, src.nexu.cinema._start_cinema_server.
-
-
-    Make the smallest refactor that removes the smell and run local tests.'
-  priority: normal
-  labels:
-  - llm-ready
-  - code2llm
-  - code-smell
-  - data-clump
-  files:
-  - src/nexu/cinema.py
-  dedupe_key: 'code2llm:smell:data_clump:src/nexu/cinema.py:185:Data Clump: cinema_dir,
-    name, root'
-- signal: code2llm_smell_data_clump
-  title: 'Address code smell: Data Clump: cinema_dir, workspace_root, capsule_name,
+  title: 'Address code smell: Data Clump: cinema_dir, capsule_name, workspace_root,
     project'
-  description: 'code2llm reports `Data Clump: cinema_dir, workspace_root, capsule_name,
+  description: 'code2llm reports `Data Clump: cinema_dir, capsule_name, workspace_root,
     project` in `src/nexu/cinema_projects.py:621`.
 
 
-    Arguments (cinema_dir, workspace_root, capsule_name, project) are used together
+    Arguments (cinema_dir, capsule_name, workspace_root, project) are used together
     in multiple functions: src.nexu.cinema_projects._bootstrap_goal_from_project,
     src.nexu.cinema_projects._init_project_activation.
 
@@ -1983,15 +1838,15 @@ tickets:
   files:
   - src/nexu/cinema_projects.py
   dedupe_key: 'code2llm:smell:data_clump:src/nexu/cinema_projects.py:621:Data Clump:
-    cinema_dir, workspace_root, capsule_name, project'
+    cinema_dir, capsule_name, workspace_root, project'
 - signal: code2llm_smell_data_clump
-  title: 'Address code smell: Data Clump: cinema_dir, workspace_root, capsule_name,
+  title: 'Address code smell: Data Clump: cinema_dir, capsule_name, workspace_root,
     project'
-  description: 'code2llm reports `Data Clump: cinema_dir, workspace_root, capsule_name,
+  description: 'code2llm reports `Data Clump: cinema_dir, capsule_name, workspace_root,
     project` in `src/nexu/cinema_projects.py:649`.
 
 
-    Arguments (cinema_dir, workspace_root, capsule_name, project) are used together
+    Arguments (cinema_dir, capsule_name, workspace_root, project) are used together
     in multiple functions: src.nexu.cinema_projects._bootstrap_goal_from_project,
     src.nexu.cinema_projects._init_project_activation.
 
@@ -2006,7 +1861,112 @@ tickets:
   files:
   - src/nexu/cinema_projects.py
   dedupe_key: 'code2llm:smell:data_clump:src/nexu/cinema_projects.py:649:Data Clump:
-    cinema_dir, workspace_root, capsule_name, project'
+    cinema_dir, capsule_name, workspace_root, project'
+- signal: code2llm_smell_data_clump
+  title: 'Address code smell: Data Clump: cinema_dir, root, name'
+  description: 'code2llm reports `Data Clump: cinema_dir, root, name` in `src/nexu/cinema_server.py:127`.
+
+
+    Arguments (cinema_dir, root, name) are used together in multiple functions: src.nexu.cinema_server.start_cinema_player_server,
+    src.nexu.cinema.write_cinema_nexu_hooks, src.nexu.cinema.sync_cinema_templates,
+    src.nexu.cinema.write_intract_policy_files, src.nexu.cinema._start_cinema_server.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - data-clump
+  files:
+  - src/nexu/cinema_server.py
+  dedupe_key: 'code2llm:smell:data_clump:src/nexu/cinema_server.py:127:Data Clump:
+    cinema_dir, root, name'
+- signal: code2llm_smell_data_clump
+  title: 'Address code smell: Data Clump: cinema_dir, root, name'
+  description: 'code2llm reports `Data Clump: cinema_dir, root, name` in `src/nexu/cinema.py:36`.
+
+
+    Arguments (cinema_dir, root, name) are used together in multiple functions: src.nexu.cinema_server.start_cinema_player_server,
+    src.nexu.cinema.write_cinema_nexu_hooks, src.nexu.cinema.sync_cinema_templates,
+    src.nexu.cinema.write_intract_policy_files, src.nexu.cinema._start_cinema_server.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - data-clump
+  files:
+  - src/nexu/cinema.py
+  dedupe_key: 'code2llm:smell:data_clump:src/nexu/cinema.py:36:Data Clump: cinema_dir,
+    root, name'
+- signal: code2llm_smell_data_clump
+  title: 'Address code smell: Data Clump: cinema_dir, root, name'
+  description: 'code2llm reports `Data Clump: cinema_dir, root, name` in `src/nexu/cinema.py:111`.
+
+
+    Arguments (cinema_dir, root, name) are used together in multiple functions: src.nexu.cinema_server.start_cinema_player_server,
+    src.nexu.cinema.write_cinema_nexu_hooks, src.nexu.cinema.sync_cinema_templates,
+    src.nexu.cinema.write_intract_policy_files, src.nexu.cinema._start_cinema_server.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - data-clump
+  files:
+  - src/nexu/cinema.py
+  dedupe_key: 'code2llm:smell:data_clump:src/nexu/cinema.py:111:Data Clump: cinema_dir,
+    root, name'
+- signal: code2llm_smell_data_clump
+  title: 'Address code smell: Data Clump: cinema_dir, root, name'
+  description: 'code2llm reports `Data Clump: cinema_dir, root, name` in `src/nexu/cinema.py:121`.
+
+
+    Arguments (cinema_dir, root, name) are used together in multiple functions: src.nexu.cinema_server.start_cinema_player_server,
+    src.nexu.cinema.write_cinema_nexu_hooks, src.nexu.cinema.sync_cinema_templates,
+    src.nexu.cinema.write_intract_policy_files, src.nexu.cinema._start_cinema_server.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - data-clump
+  files:
+  - src/nexu/cinema.py
+  dedupe_key: 'code2llm:smell:data_clump:src/nexu/cinema.py:121:Data Clump: cinema_dir,
+    root, name'
+- signal: code2llm_smell_data_clump
+  title: 'Address code smell: Data Clump: cinema_dir, root, name'
+  description: 'code2llm reports `Data Clump: cinema_dir, root, name` in `src/nexu/cinema.py:185`.
+
+
+    Arguments (cinema_dir, root, name) are used together in multiple functions: src.nexu.cinema_server.start_cinema_player_server,
+    src.nexu.cinema.write_cinema_nexu_hooks, src.nexu.cinema.sync_cinema_templates,
+    src.nexu.cinema.write_intract_policy_files, src.nexu.cinema._start_cinema_server.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - data-clump
+  files:
+  - src/nexu/cinema.py
+  dedupe_key: 'code2llm:smell:data_clump:src/nexu/cinema.py:185:Data Clump: cinema_dir,
+    root, name'
 - signal: code2llm_smell_data_clump
   title: 'Address code smell: Data Clump: contract_id, intent, meaning'
   description: 'code2llm reports `Data Clump: contract_id, intent, meaning` in `src/nexu/cinema_goal_contracts.py:41`.
@@ -2071,12 +2031,12 @@ tickets:
   dedupe_key: 'code2llm:smell:data_clump:src/nexu/cinema_llm_contracts.py:16:Data
     Clump: contract_id, intent, meaning'
 - signal: code2llm_smell_data_clump
-  title: 'Address code smell: Data Clump: delete_els, keep_els, model, status, stage'
-  description: 'code2llm reports `Data Clump: delete_els, keep_els, model, status,
-    stage` in `examples/web_app_calculator/cinema/server.py:779`.
+  title: 'Address code smell: Data Clump: keep_els, delete_els, model, stage, status'
+  description: 'code2llm reports `Data Clump: keep_els, delete_els, model, stage,
+    status` in `examples/web_app_calculator/cinema/server.py:779`.
 
 
-    Arguments (delete_els, keep_els, model, status, stage) are used together in multiple
+    Arguments (keep_els, delete_els, model, stage, status) are used together in multiple
     functions: examples.web_app_calculator.cinema.server._append_policy_entry_legacy,
     examples.web_app_calculator.cinema.server._append_policy_entry.
 
@@ -2091,14 +2051,14 @@ tickets:
   files:
   - examples/web_app_calculator/cinema/server.py
   dedupe_key: 'code2llm:smell:data_clump:examples/web_app_calculator/cinema/server.py:779:Data
-    Clump: delete_els, keep_els, model, status, stage'
+    Clump: keep_els, delete_els, model, stage, status'
 - signal: code2llm_smell_data_clump
-  title: 'Address code smell: Data Clump: delete_els, keep_els, model, status, stage'
-  description: 'code2llm reports `Data Clump: delete_els, keep_els, model, status,
-    stage` in `examples/web_app_calculator/cinema/server.py:840`.
+  title: 'Address code smell: Data Clump: keep_els, delete_els, model, stage, status'
+  description: 'code2llm reports `Data Clump: keep_els, delete_els, model, stage,
+    status` in `examples/web_app_calculator/cinema/server.py:840`.
 
 
-    Arguments (delete_els, keep_els, model, status, stage) are used together in multiple
+    Arguments (keep_els, delete_els, model, stage, status) are used together in multiple
     functions: examples.web_app_calculator.cinema.server._append_policy_entry_legacy,
     examples.web_app_calculator.cinema.server._append_policy_entry.
 
@@ -2113,54 +2073,14 @@ tickets:
   files:
   - examples/web_app_calculator/cinema/server.py
   dedupe_key: 'code2llm:smell:data_clump:examples/web_app_calculator/cinema/server.py:840:Data
-    Clump: delete_els, keep_els, model, status, stage'
+    Clump: keep_els, delete_els, model, stage, status'
 - signal: code2llm_smell_data_clump
-  title: 'Address code smell: Data Clump: filename, proposals, artifact'
-  description: 'code2llm reports `Data Clump: filename, proposals, artifact` in `examples/web_app_calculator/cinema/nexu_hooks.py:115`.
+  title: 'Address code smell: Data Clump: session_delete, stage, session_keep, focus_scope'
+  description: 'code2llm reports `Data Clump: session_delete, stage, session_keep,
+    focus_scope` in `examples/web_app_calculator/cinema/nexu_hooks.py:161`.
 
 
-    Arguments (filename, proposals, artifact) are used together in multiple functions:
-    examples.web_app_calculator.cinema.nexu_hooks.validate_artifact, examples.web_app_calculator.cinema.server._validate_intract_artifact.
-
-
-    Make the smallest refactor that removes the smell and run local tests.'
-  priority: normal
-  labels:
-  - llm-ready
-  - code2llm
-  - code-smell
-  - data-clump
-  files:
-  - examples/web_app_calculator/cinema/nexu_hooks.py
-  dedupe_key: 'code2llm:smell:data_clump:examples/web_app_calculator/cinema/nexu_hooks.py:115:Data
-    Clump: filename, proposals, artifact'
-- signal: code2llm_smell_data_clump
-  title: 'Address code smell: Data Clump: filename, proposals, artifact'
-  description: 'code2llm reports `Data Clump: filename, proposals, artifact` in `examples/web_app_calculator/cinema/server.py:832`.
-
-
-    Arguments (filename, proposals, artifact) are used together in multiple functions:
-    examples.web_app_calculator.cinema.nexu_hooks.validate_artifact, examples.web_app_calculator.cinema.server._validate_intract_artifact.
-
-
-    Make the smallest refactor that removes the smell and run local tests.'
-  priority: normal
-  labels:
-  - llm-ready
-  - code2llm
-  - code-smell
-  - data-clump
-  files:
-  - examples/web_app_calculator/cinema/server.py
-  dedupe_key: 'code2llm:smell:data_clump:examples/web_app_calculator/cinema/server.py:832:Data
-    Clump: filename, proposals, artifact'
-- signal: code2llm_smell_data_clump
-  title: 'Address code smell: Data Clump: stage, focus_scope, session_delete, session_keep'
-  description: 'code2llm reports `Data Clump: stage, focus_scope, session_delete,
-    session_keep` in `examples/web_app_calculator/cinema/nexu_hooks.py:161`.
-
-
-    Arguments (stage, focus_scope, session_delete, session_keep) are used together
+    Arguments (session_delete, stage, session_keep, focus_scope) are used together
     in multiple functions: examples.web_app_calculator.cinema.nexu_hooks.patch_option_previews,
     examples.web_app_calculator.cinema.server._patch_option_previews.
 
@@ -2175,14 +2095,14 @@ tickets:
   files:
   - examples/web_app_calculator/cinema/nexu_hooks.py
   dedupe_key: 'code2llm:smell:data_clump:examples/web_app_calculator/cinema/nexu_hooks.py:161:Data
-    Clump: stage, focus_scope, session_delete, session_keep'
+    Clump: session_delete, stage, session_keep, focus_scope'
 - signal: code2llm_smell_data_clump
-  title: 'Address code smell: Data Clump: stage, focus_scope, session_delete, session_keep'
-  description: 'code2llm reports `Data Clump: stage, focus_scope, session_delete,
-    session_keep` in `examples/web_app_calculator/cinema/server.py:898`.
+  title: 'Address code smell: Data Clump: session_delete, stage, session_keep, focus_scope'
+  description: 'code2llm reports `Data Clump: session_delete, stage, session_keep,
+    focus_scope` in `examples/web_app_calculator/cinema/server.py:898`.
 
 
-    Arguments (stage, focus_scope, session_delete, session_keep) are used together
+    Arguments (session_delete, stage, session_keep, focus_scope) are used together
     in multiple functions: examples.web_app_calculator.cinema.nexu_hooks.patch_option_previews,
     examples.web_app_calculator.cinema.server._patch_option_previews.
 
@@ -2197,14 +2117,14 @@ tickets:
   files:
   - examples/web_app_calculator/cinema/server.py
   dedupe_key: 'code2llm:smell:data_clump:examples/web_app_calculator/cinema/server.py:898:Data
-    Clump: stage, focus_scope, session_delete, session_keep'
+    Clump: session_delete, stage, session_keep, focus_scope'
 - signal: code2llm_smell_data_clump
-  title: 'Address code smell: Data Clump: text, kind, capsule_name, stage'
-  description: 'code2llm reports `Data Clump: text, kind, capsule_name, stage` in
+  title: 'Address code smell: Data Clump: stage, capsule_name, kind, text'
+  description: 'code2llm reports `Data Clump: stage, capsule_name, kind, text` in
     `src/nexu/cinema_goal_contracts.py:143`.
 
 
-    Arguments (text, kind, capsule_name, stage) are used together in multiple functions:
+    Arguments (stage, capsule_name, kind, text) are used together in multiple functions:
     src.nexu.cinema_goal_contracts._detect_minimal_trait, src.nexu.cinema_goal_contracts._detect_expanded_trait.
 
 
@@ -2218,14 +2138,14 @@ tickets:
   files:
   - src/nexu/cinema_goal_contracts.py
   dedupe_key: 'code2llm:smell:data_clump:src/nexu/cinema_goal_contracts.py:143:Data
-    Clump: text, kind, capsule_name, stage'
+    Clump: stage, capsule_name, kind, text'
 - signal: code2llm_smell_data_clump
-  title: 'Address code smell: Data Clump: text, kind, capsule_name, stage'
-  description: 'code2llm reports `Data Clump: text, kind, capsule_name, stage` in
+  title: 'Address code smell: Data Clump: stage, capsule_name, kind, text'
+  description: 'code2llm reports `Data Clump: stage, capsule_name, kind, text` in
     `src/nexu/cinema_goal_contracts.py:162`.
 
 
-    Arguments (text, kind, capsule_name, stage) are used together in multiple functions:
+    Arguments (stage, capsule_name, kind, text) are used together in multiple functions:
     src.nexu.cinema_goal_contracts._detect_minimal_trait, src.nexu.cinema_goal_contracts._detect_expanded_trait.
 
 
@@ -2239,10 +2159,52 @@ tickets:
   files:
   - src/nexu/cinema_goal_contracts.py
   dedupe_key: 'code2llm:smell:data_clump:src/nexu/cinema_goal_contracts.py:162:Data
-    Clump: text, kind, capsule_name, stage'
+    Clump: stage, capsule_name, kind, text'
+- signal: code2llm_smell_data_clump
+  title: 'Address code smell: Data Clump: template_base, stage, capsule_name, lower'
+  description: 'code2llm reports `Data Clump: template_base, stage, capsule_name,
+    lower` in `src/nexu/cinema_goal_contracts.py:181`.
+
+
+    Arguments (template_base, stage, capsule_name, lower) are used together in multiple
+    functions: src.nexu.cinema_goal_contracts._detect_api_trait, src.nexu.cinema_goal_contracts._detect_dashboard_trait.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - data-clump
+  files:
+  - src/nexu/cinema_goal_contracts.py
+  dedupe_key: 'code2llm:smell:data_clump:src/nexu/cinema_goal_contracts.py:181:Data
+    Clump: template_base, stage, capsule_name, lower'
+- signal: code2llm_smell_data_clump
+  title: 'Address code smell: Data Clump: template_base, stage, capsule_name, lower'
+  description: 'code2llm reports `Data Clump: template_base, stage, capsule_name,
+    lower` in `src/nexu/cinema_goal_contracts.py:202`.
+
+
+    Arguments (template_base, stage, capsule_name, lower) are used together in multiple
+    functions: src.nexu.cinema_goal_contracts._detect_api_trait, src.nexu.cinema_goal_contracts._detect_dashboard_trait.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - data-clump
+  files:
+  - src/nexu/cinema_goal_contracts.py
+  dedupe_key: 'code2llm:smell:data_clump:src/nexu/cinema_goal_contracts.py:202:Data
+    Clump: template_base, stage, capsule_name, lower'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: _activate_imported'
-  description: 'code2llm reports `God Function: _activate_imported` in `src/nexu/cinema_project_imports.py:563`.
+  description: 'code2llm reports `God Function: _activate_imported` in `src/nexu/cinema_project_imports.py:603`.
 
 
     Function ''_activate_imported'' is oversized: CC=11, fan-out=19, mutations=8.
@@ -2257,7 +2219,7 @@ tickets:
   - god-function
   files:
   - src/nexu/cinema_project_imports.py
-  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:563:God
+  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:603:God
     Function: _activate_imported'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: _append_policy_entry_legacy'
@@ -2280,7 +2242,7 @@ tickets:
     Function: _append_policy_entry_legacy'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: _build_markpact_migration'
-  description: 'code2llm reports `God Function: _build_markpact_migration` in `src/nexu/cinema_project_imports.py:417`.
+  description: 'code2llm reports `God Function: _build_markpact_migration` in `src/nexu/cinema_project_imports.py:457`.
 
 
     Function ''_build_markpact_migration'' is oversized: CC=8, fan-out=12, mutations=9.
@@ -2295,7 +2257,7 @@ tickets:
   - god-function
   files:
   - src/nexu/cinema_project_imports.py
-  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:417:God
+  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:457:God
     Function: _build_markpact_migration'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: _catalog_filters'
@@ -2337,7 +2299,7 @@ tickets:
     Function: _cinema_is_calculator'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: _compile_meta_fields'
-  description: 'code2llm reports `God Function: _compile_meta_fields` in `src/nexu/cinema_project_imports.py:908`.
+  description: 'code2llm reports `God Function: _compile_meta_fields` in `src/nexu/cinema_project_imports.py:979`.
 
 
     Function ''_compile_meta_fields'' is oversized: CC=8, fan-out=10, mutations=14.
@@ -2352,7 +2314,7 @@ tickets:
   - god-function
   files:
   - src/nexu/cinema_project_imports.py
-  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:908:God
+  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:979:God
     Function: _compile_meta_fields'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: _detect_project_types'
@@ -2434,7 +2396,7 @@ tickets:
     _extract_content'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: _fetch_http_body'
-  description: 'code2llm reports `God Function: _fetch_http_body` in `src/nexu/cinema_project_imports.py:211`.
+  description: 'code2llm reports `God Function: _fetch_http_body` in `src/nexu/cinema_project_imports.py:213`.
 
 
     Function ''_fetch_http_body'' is oversized: CC=7, fan-out=13, mutations=9.
@@ -2449,11 +2411,11 @@ tickets:
   - god-function
   files:
   - src/nexu/cinema_project_imports.py
-  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:211:God
+  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:213:God
     Function: _fetch_http_body'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: _fetch_http_stylesheets'
-  description: 'code2llm reports `God Function: _fetch_http_stylesheets` in `src/nexu/cinema_project_imports.py:251`.
+  description: 'code2llm reports `God Function: _fetch_http_stylesheets` in `src/nexu/cinema_project_imports.py:253`.
 
 
     Function ''_fetch_http_stylesheets'' is oversized: CC=6, fan-out=10, mutations=13.
@@ -2468,7 +2430,7 @@ tickets:
   - god-function
   files:
   - src/nexu/cinema_project_imports.py
-  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:251:God
+  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:253:God
     Function: _fetch_http_stylesheets'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: _goal_contract_dict'
@@ -2718,8 +2680,27 @@ tickets:
   dedupe_key: 'code2llm:smell:god_function:src/nexu/orchestrate.py:200:God Function:
     _render_orchestration_markdown'
 - signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: _rewrite_local_asset_refs'
+  description: 'code2llm reports `God Function: _rewrite_local_asset_refs` in `src/nexu/cinema_project_imports.py:307`.
+
+
+    Function ''_rewrite_local_asset_refs'' is oversized: CC=6, fan-out=6, mutations=8.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - src/nexu/cinema_project_imports.py
+  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:307:God
+    Function: _rewrite_local_asset_refs'
+- signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: _safe_extract_zip'
-  description: 'code2llm reports `God Function: _safe_extract_zip` in `src/nexu/cinema_project_imports.py:166`.
+  description: 'code2llm reports `God Function: _safe_extract_zip` in `src/nexu/cinema_project_imports.py:168`.
 
 
     Function ''_safe_extract_zip'' is oversized: CC=6, fan-out=11, mutations=4.
@@ -2734,7 +2715,7 @@ tickets:
   - god-function
   files:
   - src/nexu/cinema_project_imports.py
-  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:166:God
+  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:168:God
     Function: _safe_extract_zip'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: _seed_html_for_project'
@@ -2814,7 +2795,7 @@ tickets:
     Function: _write_option_files'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: _write_preprocess_artifacts'
-  description: 'code2llm reports `God Function: _write_preprocess_artifacts` in `src/nexu/cinema_http_preprocess.py:384`.
+  description: 'code2llm reports `God Function: _write_preprocess_artifacts` in `src/nexu/cinema_http_preprocess.py:394`.
 
 
     Function ''_write_preprocess_artifacts'' is oversized: CC=4, fan-out=8, mutations=11.
@@ -2829,7 +2810,7 @@ tickets:
   - god-function
   files:
   - src/nexu/cinema_http_preprocess.py
-  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_http_preprocess.py:384:God
+  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_http_preprocess.py:394:God
     Function: _write_preprocess_artifacts'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: _write_service_readme'
@@ -3058,7 +3039,7 @@ tickets:
     Function: build_chemical_option_html'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: build_html_outline'
-  description: 'code2llm reports `God Function: build_html_outline` in `src/nexu/cinema_http_preprocess.py:371`.
+  description: 'code2llm reports `God Function: build_html_outline` in `src/nexu/cinema_http_preprocess.py:381`.
 
 
     Function ''build_html_outline'' is oversized: CC=3, fan-out=11, mutations=5.
@@ -3073,7 +3054,7 @@ tickets:
   - god-function
   files:
   - src/nexu/cinema_http_preprocess.py
-  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_http_preprocess.py:371:God
+  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_http_preprocess.py:381:God
     Function: build_html_outline'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: build_intract_policy_snapshot'
@@ -3433,7 +3414,7 @@ tickets:
     delete_example_project'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: delete_imported_project'
-  description: 'code2llm reports `God Function: delete_imported_project` in `src/nexu/cinema_project_imports.py:1121`.
+  description: 'code2llm reports `God Function: delete_imported_project` in `src/nexu/cinema_project_imports.py:1192`.
 
 
     Function ''delete_imported_project'' is oversized: CC=7, fan-out=12, mutations=6.
@@ -3448,7 +3429,7 @@ tickets:
   - god-function
   files:
   - src/nexu/cinema_project_imports.py
-  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:1121:God
+  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:1192:God
     Function: delete_imported_project'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: diff_capsule'
@@ -3527,7 +3508,7 @@ tickets:
     export_iteration_prompt'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: extract_visual_css'
-  description: 'code2llm reports `God Function: extract_visual_css` in `src/nexu/cinema_http_preprocess.py:202`.
+  description: 'code2llm reports `God Function: extract_visual_css` in `src/nexu/cinema_http_preprocess.py:212`.
 
 
     Function ''extract_visual_css'' is oversized: CC=8, fan-out=12, mutations=14.
@@ -3542,7 +3523,7 @@ tickets:
   - god-function
   files:
   - src/nexu/cinema_http_preprocess.py
-  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_http_preprocess.py:202:God
+  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_http_preprocess.py:212:God
     Function: extract_visual_css'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: filter_valid_option_batch'
@@ -3602,7 +3583,7 @@ tickets:
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: http_preprocess_artifacts_present'
   description: 'code2llm reports `God Function: http_preprocess_artifacts_present`
-    in `src/nexu/cinema_http_preprocess.py:430`.
+    in `src/nexu/cinema_http_preprocess.py:440`.
 
 
     Function ''http_preprocess_artifacts_present'' is oversized: CC=9, fan-out=7,
@@ -3618,11 +3599,11 @@ tickets:
   - god-function
   files:
   - src/nexu/cinema_http_preprocess.py
-  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_http_preprocess.py:430:God
+  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_http_preprocess.py:440:God
     Function: http_preprocess_artifacts_present'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: import_git_project'
-  description: 'code2llm reports `God Function: import_git_project` in `src/nexu/cinema_project_imports.py:621`.
+  description: 'code2llm reports `God Function: import_git_project` in `src/nexu/cinema_project_imports.py:661`.
 
 
     Function ''import_git_project'' is oversized: CC=11, fan-out=14, mutations=10.
@@ -3637,11 +3618,11 @@ tickets:
   - god-function
   files:
   - src/nexu/cinema_project_imports.py
-  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:621:God
+  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:661:God
     Function: import_git_project'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: import_zip_project'
-  description: 'code2llm reports `God Function: import_zip_project` in `src/nexu/cinema_project_imports.py:720`.
+  description: 'code2llm reports `God Function: import_zip_project` in `src/nexu/cinema_project_imports.py:773`.
 
 
     Function ''import_zip_project'' is oversized: CC=5, fan-out=11, mutations=5.
@@ -3656,11 +3637,11 @@ tickets:
   - god-function
   files:
   - src/nexu/cinema_project_imports.py
-  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:720:God
+  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:773:God
     Function: import_zip_project'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: imported_project_llm_log'
-  description: 'code2llm reports `God Function: imported_project_llm_log` in `src/nexu/cinema_project_imports.py:1033`.
+  description: 'code2llm reports `God Function: imported_project_llm_log` in `src/nexu/cinema_project_imports.py:1104`.
 
 
     Function ''imported_project_llm_log'' is oversized: CC=8, fan-out=13, mutations=6.
@@ -3675,7 +3656,7 @@ tickets:
   - god-function
   files:
   - src/nexu/cinema_project_imports.py
-  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:1033:God
+  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:1104:God
     Function: imported_project_llm_log'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: iterate_capsule'
@@ -4005,7 +3986,7 @@ tickets:
     Function: patch_option_previews'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: preprocess_http_import'
-  description: 'code2llm reports `God Function: preprocess_http_import` in `src/nexu/cinema_http_preprocess.py:467`.
+  description: 'code2llm reports `God Function: preprocess_http_import` in `src/nexu/cinema_http_preprocess.py:477`.
 
 
     Function ''preprocess_http_import'' is oversized: CC=12, fan-out=10, mutations=8.
@@ -4020,7 +4001,7 @@ tickets:
   - god-function
   files:
   - src/nexu/cinema_http_preprocess.py
-  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_http_preprocess.py:467:God
+  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_http_preprocess.py:477:God
     Function: preprocess_http_import'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: propose_llm_for_stage'
@@ -4081,7 +4062,7 @@ tickets:
     Function: read_cached_options'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: read_imported_markpact'
-  description: 'code2llm reports `God Function: read_imported_markpact` in `src/nexu/cinema_project_imports.py:1002`.
+  description: 'code2llm reports `God Function: read_imported_markpact` in `src/nexu/cinema_project_imports.py:1073`.
 
 
     Function ''read_imported_markpact'' is oversized: CC=9, fan-out=13, mutations=7.
@@ -4096,7 +4077,7 @@ tickets:
   - god-function
   files:
   - src/nexu/cinema_project_imports.py
-  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:1002:God
+  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:1073:God
     Function: read_imported_markpact'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: read_options_cache'
@@ -4196,7 +4177,7 @@ tickets:
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: restore_http_import_stages_if_needed'
   description: 'code2llm reports `God Function: restore_http_import_stages_if_needed`
-    in `src/nexu/cinema_project_imports.py:107`.
+    in `src/nexu/cinema_project_imports.py:109`.
 
 
     Function ''restore_http_import_stages_if_needed'' is oversized: CC=8, fan-out=11,
@@ -4212,7 +4193,7 @@ tickets:
   - god-function
   files:
   - src/nexu/cinema_project_imports.py
-  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:107:God
+  dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:109:God
     Function: restore_http_import_stages_if_needed'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: run_example'
@@ -4413,7 +4394,7 @@ tickets:
     `src/nexu/cinema_project_imports.py:1`.
 
 
-    Module ''src.nexu.cinema_project_imports'' is too large (57 functions, 0 classes).
+    Module ''src.nexu.cinema_project_imports'' is too large (60 functions, 0 classes).
     Consider splitting into sub-modules.
 
 
@@ -4428,85 +4409,5 @@ tickets:
   - src/nexu/cinema_project_imports.py
   dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:1:God
     Module: src.nexu.cinema_project_imports'
-- signal: slow_test_warning
-  title: 'Address slow test: tests.test_cinema_server.test_iterate_dashboard_kinds_colors_prefers_offline_before_llm'
-  description: 'Test `tests.test_cinema_server.test_iterate_dashboard_kinds_colors_prefers_offline_before_llm`
-    took 6.36s to run.
-
-
-    Optimize its setup, mock slow external dependencies, or refactor its logic to
-    reduce overall test suite execution time.'
-  priority: medium
-  labels:
-  - llm-ready
-  - test-optimization
-  - slow-test
-  files:
-  - tests/test_cinema_server.py
-  dedupe_key: test-optimization:tests.test_cinema_server:test_iterate_dashboard_kinds_colors_prefers_offline_before_llm
-- signal: slow_test_warning
-  title: 'Address slow test: tests.test_cinema_server.test_iterate_functions_scope_skips_offline_fast_path'
-  description: 'Test `tests.test_cinema_server.test_iterate_functions_scope_skips_offline_fast_path`
-    took 2.57s to run.
-
-
-    Optimize its setup, mock slow external dependencies, or refactor its logic to
-    reduce overall test suite execution time.'
-  priority: medium
-  labels:
-  - llm-ready
-  - test-optimization
-  - slow-test
-  files:
-  - tests/test_cinema_server.py
-  dedupe_key: test-optimization:tests.test_cinema_server:test_iterate_functions_scope_skips_offline_fast_path
-- signal: slow_test_warning
-  title: 'Address slow test: tests.test_cinema_server.test_iterate_colors_scope_uses_offline_path'
-  description: 'Test `tests.test_cinema_server.test_iterate_colors_scope_uses_offline_path`
-    took 2.55s to run.
-
-
-    Optimize its setup, mock slow external dependencies, or refactor its logic to
-    reduce overall test suite execution time.'
-  priority: medium
-  labels:
-  - llm-ready
-  - test-optimization
-  - slow-test
-  files:
-  - tests/test_cinema_server.py
-  dedupe_key: test-optimization:tests.test_cinema_server:test_iterate_colors_scope_uses_offline_path
-- signal: slow_test_warning
-  title: 'Address slow test: tests.test_cinema_server.test_iterate_colors_scope_uses_llm_patch_when_available'
-  description: 'Test `tests.test_cinema_server.test_iterate_colors_scope_uses_llm_patch_when_available`
-    took 2.50s to run.
-
-
-    Optimize its setup, mock slow external dependencies, or refactor its logic to
-    reduce overall test suite execution time.'
-  priority: medium
-  labels:
-  - llm-ready
-  - test-optimization
-  - slow-test
-  files:
-  - tests/test_cinema_server.py
-  dedupe_key: test-optimization:tests.test_cinema_server:test_iterate_colors_scope_uses_llm_patch_when_available
-- signal: slow_test_warning
-  title: 'Address slow test: tests.test_cinema_server.test_iterate_colors_without_stage0_skips_offline'
-  description: 'Test `tests.test_cinema_server.test_iterate_colors_without_stage0_skips_offline`
-    took 2.40s to run.
-
-
-    Optimize its setup, mock slow external dependencies, or refactor its logic to
-    reduce overall test suite execution time.'
-  priority: medium
-  labels:
-  - llm-ready
-  - test-optimization
-  - slow-test
-  files:
-  - tests/test_cinema_server.py
-  dedupe_key: test-optimization:tests.test_cinema_server:test_iterate_colors_without_stage0_skips_offline
 applied: []
 skipped: []

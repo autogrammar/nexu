@@ -168,6 +168,16 @@ When you import a website via **HTTP URL**, Nexu:
 
 **Re-activate** an existing HTTP import from the Projects tab to rebuild stage0 and Options A–C from stored `source/index.html` without re-fetching. If you iterated before this fix, delete stale `alt_*.html` or re-activate to replace calculator pollution. **Re-import** after `make cinema-restart` to generate preprocess artifacts for imports created before this feature.
 
+## Pre-import HTML organize (2026-06)
+
+Before HTTP preprocess (or Markpact migration for ZIP/git), `_maybe_organize_import_source` runs `repatch.organize_html_project_dir` when `source/index.html` exists:
+
+1. Extracts substantial inline `<style>` / `<script>` to `nexu-extracted.css` / `nexu-extracted.js`.
+2. Strips preview scripts and lazy placeholder `<img>` tags.
+3. Adds `data-nexu-target` on markable nodes without `id`.
+
+`project.json` → `organize` records `extracted_files`, `stripped_lazy_img_count`, and `tagged_targets_count` (via `repatch.organize_result_manifest`). HTTP imports still get `nexu-visual.css` / `nexu-outline.html` preprocess; ZIP/git with index HTML get organized source only (stage0 remains the Markpact migration shell until a web preview path exists). Pure code archives without `index.html` skip organize. Built-in catalog projects (calculator, dashboard) are unaffected — they never pass through `_finish_import`.
+
 ## Policy ledger scoping + HTTP stage restore (2026-06)
 
 Shared capsules (e.g. `scientific_calc`) can hold both calculator and HTTP-import projects. Without filtering, KEEP/DELETE marks from a prior calculator session could bleed into an active HTTP import.

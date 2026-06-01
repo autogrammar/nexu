@@ -16,7 +16,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urljoin, urlparse
 from urllib.request import Request, urlopen
 
-from repatch import organize_html_project_dir
+from repatch import fetch_complete_web_page, organize_html_project_dir, organize_result_manifest
 
 from .cinema_http_preprocess import (
     ensure_http_preprocess_artifacts,
@@ -304,6 +304,43 @@ def _rewrite_local_stylesheets(html: str, *, project_id: str, saved: list[dict[s
     return _LINK_TAG_RE.sub(lambda match: _replace_tag(match.group(0)), html)
 
 
+def _rewrite_local_asset_refs(html: str, *, project_id: str, assets: list[dict[str, Any]]) -> str:
+    """Rewrite mirrored source asset paths so preview HTML can load them from Cinema."""
+    if not assets:
+        return html
+    rewritten = html
+    seen: set[str] = set()
+    for item in assets:
+        local = str(item.get("local") or "").strip()
+        if not local or local in seen:
+            continue
+        seen.add(local)
+        cinema_path = f"imported_projects/{project_id}/source/{local}"
+        rewritten = rewritten.replace(f'"{local}"', f'"{cinema_path}"')
+        rewritten = rewritten.replace(f"'{local}'", f"'{cinema_path}'")
+        rewritten = rewritten.replace(f"{local} ", f"{cinema_path} ")
+        rewritten = rewritten.replace(f"{local},", f"{cinema_path},")
+    return rewritten
+
+
+def _fetch_meta_assets(fetch_meta: dict[str, Any]) -> list[dict[str, Any]]:
+    assets: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for key in ("assets", "stylesheets", "images"):
+        value = fetch_meta.get(key)
+        if not isinstance(value, list):
+            continue
+        for item in value:
+            if not isinstance(item, dict):
+                continue
+            local = str(item.get("local") or "").strip()
+            if not local or local in seen:
+                continue
+            seen.add(local)
+            assets.append(item)
+    return assets
+
+
 def _inject_base_href(html: str, base_href: str) -> str:
     if re.search(r"<base\b", html, re.IGNORECASE):
         return html
@@ -366,6 +403,7 @@ def _build_http_preview_stage0(meta: dict[str, Any]) -> str | None:
     if isinstance(saved_assets, list):
         saved = [item for item in saved_assets if isinstance(item, dict)]
         html = _rewrite_local_stylesheets(html, project_id=project_id, saved=saved)
+    html = _rewrite_local_asset_refs(html, project_id=project_id, assets=_fetch_meta_assets(fetch_meta))
     html = _inject_base_href(html, _document_base_href(page_url))
     html, _preview_meta = prepare_http_preview_html(html)
     html = inject_cinema_shield(html)
@@ -680,29 +718,42 @@ def import_http_project(
         shutil.rmtree(dest)
     source_dir = dest / "source"
     source_dir.mkdir(parents=True, exist_ok=True)
-    fetch_errors: list[str] = []
     try:
-        body, content_type, final_url, charset = _fetch_http_body(site_url)
+        fetched = fetch_complete_web_page(site_url, source_dir=source_dir, render_js=True, mirror_assets=True)
     except (HTTPError, URLError, TimeoutError, ValueError) as exc:
         return {"error": str(exc)[:500]}
-    html = _decode_http_bytes(body, content_type=content_type, charset=charset)
+    content_type = fetched.content_type
+    final_url = fetched.final_url
+    charset = fetched.charset
+    html = fetched.html
     ext = ".html" if "html" in content_type.lower() else ".txt"
     index_path = source_dir / f"index{ext}"
     index_path.write_text(html, encoding="utf-8")
-    stylesheets: list[dict[str, str]] = []
-    if "html" in content_type.lower():
-        stylesheets, sheet_errors = _fetch_http_stylesheets(
-            html,
-            page_url=final_url,
-            assets_dir=source_dir / "assets",
-        )
-        fetch_errors.extend(sheet_errors)
+    assets = [
+        {
+            "url": asset.url,
+            "href": asset.original,
+            "original": asset.original,
+            "local": asset.local,
+            "content_type": asset.content_type,
+            "kind": asset.kind,
+        }
+        for asset in fetched.assets
+    ]
+    stylesheets = [item for item in assets if item.get("kind") == "stylesheet"]
+    images = [item for item in assets if item.get("kind") == "image"]
+    fetch_errors = list(fetched.errors)
+    if fetched.render_error:
+        fetch_errors.append(f"playwright: {fetched.render_error}"[:500])
     fetch_meta = {
         "url": site_url.strip(),
         "final_url": final_url,
         "content_type": content_type,
         "charset": charset,
+        "fetch_method": fetched.method,
+        "assets": assets,
         "stylesheets": stylesheets,
+        "images": images,
         "fetch_errors": fetch_errors,
     }
     (source_dir / "nexu-fetch-meta.json").write_text(
@@ -768,6 +819,16 @@ def _project_title_from_id(project_id: str) -> str:
     return project_id.replace("-", " ").title()
 
 
+def _maybe_organize_import_source(source_dir: Path, import_kind: str) -> dict[str, Any]:
+    """Organize index HTML for imported web snapshots (HTTP/ZIP/git); skip when no index."""
+    if import_kind not in {"http", "zip", "git"}:
+        return {}
+    organized = organize_html_project_dir(source_dir)
+    if organized is None:
+        return {}
+    return organize_result_manifest(organized)
+
+
 def _finish_import(
     cinema_dir: Path,
     *,
@@ -780,11 +841,8 @@ def _finish_import(
     title = _project_title_from_id(project_id)
     resolved_kind = import_kind or _import_kind_from_id(project_id)
     preprocess_fields: dict[str, Any] = {}
-    organize_meta: dict[str, Any] = {}
+    organize_meta = _maybe_organize_import_source(source_dir, resolved_kind)
     if resolved_kind == "http":
-        organized = organize_html_project_dir(source_dir)
-        if organized is not None:
-            organize_meta = dict(organized.meta)
         preprocess_fields = preprocess_http_import(source_dir, fetch_meta=fetch_meta)
     files = _iter_project_files(source_dir)
     _, total_bytes = _source_stats(source_dir)

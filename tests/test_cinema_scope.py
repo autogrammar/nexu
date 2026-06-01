@@ -187,9 +187,10 @@ def test_http_import_offline_colors_keeps_site_markers(tmp_path: Path, monkeypat
             return False
 
     monkeypatch.setattr(
-        "nexu.cinema_project_imports.urlopen",
+        "repatch.web_fetch.urlopen",
         lambda req, timeout=0: FakeResp(),
     )
+    monkeypatch.setattr("repatch.web_fetch._render_with_playwright", lambda url: None)
     imported = import_http_project(cinema, "https://malort.example/", allow_network=True)
     project_id = imported["project"]["id"]
     (cinema / "alt_a.html").write_text(

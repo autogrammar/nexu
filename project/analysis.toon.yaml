@@ -1,18 +1,18 @@
-# code2llm | 99f 17754L | python:77,yaml:9,json:3,txt:2,shell:2,javascript:2,toml:1,yml:1 | 2026-06-01
-# generated in 0.03s
-# CC̅=4.5 | critical:5/633 | dups:0 | cycles:0
+# code2llm | 99f 17879L | python:77,yaml:9,json:3,txt:2,shell:2,javascript:2,yml:1,toml:1 | 2026-06-01
+# generated in 0.02s
+# CC̅=4.5 | critical:5/636 | dups:0 | cycles:0
 
 HEALTH[5]:
   🟡 CC    do_GET CC=37 (limit:15)
   🟡 CC    do_POST CC=258 (limit:15)
-  🟡 CC    load_http_preprocess_artifacts CC=16 (limit:15)
   🟡 CC    propose_goal_extension_contracts CC=15 (limit:15)
   🟡 CC    start_published_service CC=15 (limit:15)
+  🟡 CC    load_http_preprocess_artifacts CC=16 (limit:15)
 
 REFACTOR[1]:
   1. split 5 high-CC methods  (CC>15)
 
-PIPELINES[127]:
+PIPELINES[129]:
   [1] Src [main]: main → print
       PURITY: 100% pure
   [2] Src [main]: main → print
@@ -149,13 +149,13 @@ LAYERS:
   │ inputs.json                  4L  0C    0m  CC=0.0    ←0
   │ requirements.txt             1L  0C    0m  CC=0.0    ←0
   │
-  src/                            CC̄=4.4    ←in:0  →out:0
-  │ !! cinema_project_imports    1219L  0C   57m  CC=14     ←2
+  src/                            CC̄=4.5    ←in:0  →out:0
+  │ !! cinema_project_imports    1290L  0C   60m  CC=14     ←2
   │ !! cinema_policy              906L  0C   44m  CC=14     ←6
   │ !! cinema_offline_options     901L  0C   32m  CC=13     ←1
   │ !! cinema_projects            720L  1C   25m  CC=14     ←4
-  │ !! cinema_scripts             680L  0C    4m  CC=6      ←5
-  │ !! cinema_http_preprocess     606L  1C   29m  CC=16     ←4
+  │ !! cinema_scripts             712L  0C    4m  CC=6      ←5
+  │ !! cinema_http_preprocess     628L  1C   29m  CC=16     ←4
   │ !! cinema_publish             469L  0C   23m  CC=15     ←1
   │ mcp_server                 393L  0C   13m  CC=6      ←1
   │ cli                        379L  0C   23m  CC=4      ←0
@@ -247,17 +247,17 @@ COUPLING:
           examples.web_app_dashboard                                   9                                                                      10                                   1                                                                                                          ──                                      !! fan-out
       examples.web_app_event_monitor                                                                                                          19                                                                                                                                                                                  ──  !! fan-out
   CYCLES: none
-  HUB: src.vico/ (fan-in=60)
-  HUB: examples.web_app_calculator/ (fan-in=7)
-  HUB: src.nexu/ (fan-in=133)
   HUB: scripts/ (fan-in=91)
+  HUB: src.vico/ (fan-in=60)
+  HUB: src.nexu/ (fan-in=133)
+  HUB: examples.web_app_calculator/ (fan-in=7)
+  SMELL: examples.web_app_pactown_ecosystem/ fan-out=22 → split needed
   SMELL: src.vico/ fan-out=12 → split needed
+  SMELL: examples/ fan-out=60 → split needed
+  SMELL: src.nexu/ fan-out=61 → split needed
+  SMELL: examples.web_app_event_monitor/ fan-out=19 → split needed
   SMELL: examples.web_app_calculator/ fan-out=97 → split needed
   SMELL: examples.web_app_dashboard/ fan-out=20 → split needed
-  SMELL: src.nexu/ fan-out=61 → split needed
-  SMELL: examples/ fan-out=60 → split needed
-  SMELL: examples.web_app_event_monitor/ fan-out=19 → split needed
-  SMELL: examples.web_app_pactown_ecosystem/ fan-out=22 → split needed
 
 EXTERNAL:
   validation: run `vallm batch .` → validation.toon

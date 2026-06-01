@@ -1,6 +1,6 @@
 # code2llm call graph | /home/tom/github/semcod/nexu
-# generated in 0.25s
-# nodes: 392 | edges: 500 | modules: 60
+# generated in 0.17s
+# nodes: 367 | edges: 500 | modules: 61
 # CC̄=4.5
 
 HUBS[20]:
@@ -20,30 +20,30 @@ HUBS[20]:
     CC=2  in:0  out:35  total:35
   src.nexu.report.build_capsule_report
     CC=1  in:2  out:32  total:34
-  src.nexu.cinema_project_imports._activate_imported
-    CC=11  in:2  out:32  total:34
-  src.nexu.paths.project_root
-    CC=1  in:29  out:3  total:32
   src.nexu.cinema_server._render_server_script
     CC=1  in:1  out:31  total:32
+  src.nexu.paths.project_root
+    CC=1  in:29  out:3  total:32
   src.nexu.capsule.create_capsule
     CC=8  in:7  out:24  total:31
   src.nexu.orchestrate.build_capsule_orchestration
     CC=2  in:2  out:28  total:30
-  src.nexu.cinema_project_imports._finish_import
-    CC=8  in:3  out:26  total:29
-  src.nexu.cinema_http_preprocess.load_http_preprocess_artifacts
-    CC=16  in:1  out:27  total:28
   examples.web_app_calculator.cinema.server._write_llm_trace
     CC=3  in:22  out:6  total:28
   examples.run_examples.run_example
     CC=2  in:1  out:26  total:27
-  examples.web_app_calculator.cinema.server._llm_status_payload
-    CC=3  in:1  out:25  total:26
-  src.nexu.review.build_review_packet
-    CC=5  in:2  out:24  total:26
   src.nexu.paths.capsule_dir
     CC=1  in:25  out:1  total:26
+  src.nexu.review.build_review_packet
+    CC=5  in:2  out:24  total:26
+  examples.web_app_calculator.cinema.server._llm_status_payload
+    CC=3  in:1  out:25  total:26
+  src.nexu.cinema_baseline_contracts.ensure_capsule_intract_yaml
+    CC=9  in:1  out:25  total:26
+  src.nexu.cinema_publish._write_service_readme
+    CC=14  in:1  out:24  total:25
+  src.vico.models.write_yaml
+    CC=1  in:22  out:3  total:25
 
 MODULES:
   examples.mcp_patch_demo.server  [5 funcs]
@@ -116,9 +116,11 @@ MODULES:
     sync_cinema_templates  CC=1  out:4
     write_cinema_nexu_hooks  CC=1  out:8
     write_intract_policy_files  CC=2  out:5
-  src.nexu.cinema_baseline_contracts  [3 funcs]
+  src.nexu.cinema_baseline_contracts  [5 funcs]
     _contract  CC=3  out:2
+    calculator_baseline_contracts  CC=1  out:7
     ensure_capsule_intract_yaml  CC=9  out:25
+    is_calculator_capsule  CC=5  out:5
     merge_calculator_baselines  CC=5  out:5
   src.nexu.cinema_goal_contracts  [14 funcs]
     _build_detail_text  CC=5  out:5
@@ -146,17 +148,9 @@ MODULES:
     ensure_html_document_closure  CC=5  out:3
   src.nexu.cinema_html_validate  [1 funcs]
     prepare_cinema_html_document  CC=2  out:2
-  src.nexu.cinema_http_preprocess  [23 funcs]
-    _extract_inline_css  CC=4  out:4
-    _extract_stylesheet_hrefs  CC=7  out:4
-    _filter_visual_css  CC=3  out:4
-    _load_project_meta  CC=4  out:4
-    _normalize_linked_paths  CC=9  out:9
-    _project_meta_path  CC=1  out:0
-    _rule_is_visual  CC=7  out:8
-    _safe_read_under  CC=5  out:7
-    _script_src_allowed_for_preview  CC=4  out:5
-    _should_remove_preview_script  CC=2  out:3
+  src.nexu.cinema_http_preprocess  [2 funcs]
+    http_patch_llm_rules  CC=1  out:1
+    preprocess_cinema_seed  CC=3  out:3
   src.nexu.cinema_llm  [17 funcs]
     _as_plain_data  CC=5  out:4
     _cached_config  CC=4  out:4
@@ -170,10 +164,18 @@ MODULES:
     call_cinema_html_llm  CC=12  out:8
   src.nexu.cinema_llm_contracts  [1 funcs]
     build_llm_contract_block  CC=2  out:2
-  src.nexu.cinema_markpact  [2 funcs]
+  src.nexu.cinema_markpact  [5 funcs]
+    _escape_markdown_fence  CC=2  out:1
+    _get_app_title  CC=3  out:3
+    _get_baseline_block  CC=6  out:4
     build_markpact_readme  CC=11  out:21
     markpact_download_filename  CC=2  out:2
-  src.nexu.cinema_policy  [37 funcs]
+  src.nexu.cinema_options_cache  [4 funcs]
+    _digest  CC=2  out:4
+    goal_slug  CC=4  out:5
+    options_cache_key  CC=7  out:16
+    write_options_cache  CC=5  out:14
+  src.nexu.cinema_policy  [41 funcs]
     _build_constraint_result  CC=5  out:4
     _html_files_distinct  CC=1  out:1
     _intract_manifest_path  CC=4  out:4
@@ -184,17 +186,16 @@ MODULES:
     _process_proposed_contracts  CC=8  out:3
     _proposal_kind_and_element  CC=12  out:8
     _replace_html_title  CC=1  out:1
-  src.nexu.cinema_project_imports  [54 funcs]
-    _activate_delete_fallback  CC=3  out:5
-    _activate_imported  CC=11  out:32
-    _apply_http_preprocess_fields  CC=9  out:9
-    _build_http_preview_stage0  CC=14  out:23
-    _build_markpact_migration  CC=8  out:14
-    _catalog_entry_from_meta  CC=7  out:22
-    _charset_from_content_type  CC=3  out:4
-    _clear_active_project  CC=2  out:2
-    _compile_meta_fields  CC=8  out:17
-    _decode_http_bytes  CC=4  out:3
+  src.nexu.cinema_project_imports  [9 funcs]
+    activate_imported_project  CC=4  out:6
+    delete_imported_project  CC=7  out:12
+    delete_project  CC=3  out:6
+    import_git_project  CC=11  out:16
+    import_http_project  CC=12  out:21
+    import_zip_project  CC=5  out:13
+    imported_project_llm_log  CC=8  out:14
+    merged_projects_catalog  CC=10  out:13
+    read_imported_markpact  CC=9  out:17
   src.nexu.cinema_projects  [24 funcs]
     _active_project_meta  CC=1  out:2
     _apply_preprocess_meta  CC=3  out:5
@@ -206,17 +207,22 @@ MODULES:
     _init_project_activation  CC=3  out:4
     _project_catalog_entry  CC=2  out:2
     _project_widgets  CC=1  out:1
-  src.nexu.cinema_publish  [4 funcs]
-    list_published_services  CC=3  out:6
-    publish_project_service  CC=6  out:16
-    start_published_service  CC=15  out:20
-    stop_published_service  CC=9  out:11
+  src.nexu.cinema_publish  [23 funcs]
+    _allocate_service_port  CC=11  out:11
+    _create_service_entry  CC=3  out:2
+    _generate_markpact_export  CC=1  out:5
+    _handle_existing_service  CC=7  out:8
+    _http_ok  CC=2  out:1
+    _load_registry  CC=3  out:6
+    _pick_port  CC=4  out:2
+    _port_open  CC=2  out:1
+    _prepare_service_directory  CC=1  out:4
+    _refresh_service_status  CC=3  out:1
   src.nexu.cinema_scope  [2 funcs]
     load_cinema_ui_profile  CC=10  out:15
     scope_meta_for_project  CC=1  out:3
-  src.nexu.cinema_scripts  [4 funcs]
+  src.nexu.cinema_scripts  [3 funcs]
     finalize_cinema_html  CC=6  out:6
-    inject_cinema_shield  CC=6  out:4
     repair_cinema_html_files  CC=5  out:8
     write_cinema_inject_files  CC=1  out:3
   src.nexu.cinema_server  [7 funcs]
@@ -250,7 +256,8 @@ MODULES:
     _load_env_file  CC=10  out:11
     load_config  CC=14  out:76
     load_env_files  CC=3  out:3
-  src.nexu.export_prompt  [1 funcs]
+  src.nexu.export_prompt  [2 funcs]
+    _cinema_policy_ledger_block  CC=12  out:13
     export_iteration_prompt  CC=3  out:18
   src.nexu.fast_delivery.context  [3 funcs]
     compact_html_for_llm  CC=3  out:6
@@ -286,17 +293,25 @@ MODULES:
     offline_review_from_status  CC=4  out:0
   src.nexu.mcp_server  [1 funcs]
     run_mcp_stdio  CC=6  out:7
-  src.nexu.orchestrate  [1 funcs]
+  src.nexu.orchestrate  [6 funcs]
+    _contract_dicts  CC=2  out:0
+    _render_orchestration_markdown  CC=9  out:22
     build_capsule_orchestration  CC=2  out:28
-  src.nexu.paths  [4 funcs]
+    build_orchestration_context  CC=2  out:11
+    build_orchestration_prompt  CC=1  out:2
+    offline_orchestration_from_context  CC=13  out:22
+  src.nexu.paths  [6 funcs]
     capsule_dir  CC=1  out:1
+    capsules_dir  CC=1  out:1
     ensure_project_dirs  CC=2  out:7
+    nexu_dir  CC=1  out:0
     project_root  CC=1  out:3
     snapshots_dir  CC=1  out:1
   src.nexu.plan  [2 funcs]
     _contract_summary  CC=9  out:3
     build_iteration_plan  CC=7  out:15
-  src.nexu.promote  [2 funcs]
+  src.nexu.promote  [3 funcs]
+    _promotion_map  CC=2  out:4
     apply_promotion_plan  CC=4  out:8
     build_promotion_plan  CC=6  out:16
   src.nexu.report  [1 funcs]
@@ -318,7 +333,8 @@ MODULES:
     current_git_sha  CC=4  out:3
   src.vico.hashing  [1 funcs]
     sha256_file  CC=2  out:6
-  src.vico.models  [3 funcs]
+  src.vico.models  [4 funcs]
+    from_dict  CC=2  out:6
     read_yaml  CC=3  out:4
     utc_now  CC=1  out:2
     write_yaml  CC=1  out:3
