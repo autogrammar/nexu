@@ -237,6 +237,7 @@
             border-bottom: 1px solid var(--nexu-border);
             padding: 12px 30px;
             display: flex;
+            flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
             gap: 16px;
@@ -248,6 +249,8 @@
             align-items: center;
             gap: 20px;
             min-width: 0;
+            position: relative;
+            z-index: 2;
         }
         .header h1 {
             margin: 0;
@@ -881,6 +884,12 @@
             display: flex;
             gap: 10px;
             align-items: center;
+            justify-content: flex-end;
+            flex: 1 1 640px;
+            flex-wrap: wrap;
+            min-width: 0;
+            position: relative;
+            z-index: 1;
         }
         .llm-status-badge {
             max-width: 360px;
@@ -894,6 +903,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            pointer-events: none;
         }
         .llm-status-badge.ready { border-color: var(--nexu-success-text); color: var(--nexu-success-text); }
         .llm-status-badge.warn { border-color: var(--nexu-warning); color: var(--nexu-warning); }

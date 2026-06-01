@@ -169,6 +169,8 @@ def test_cinema_player_template_is_externalized() -> None:
     assert 'id="llm-status-badge"' in html
     assert "refreshLlmStatus" in html
     assert 'id="tab-llm"' in html
+    assert "flex-wrap: wrap;" in html
+    assert "pointer-events: none;" in html
     assert 'id="llm-shell"' in html
     assert "loadLlmTraces" in html
     assert "renderTraceMarkdown" in html
