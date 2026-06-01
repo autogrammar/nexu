@@ -125,6 +125,26 @@ def test_list_migrates_old_localhost_service_urls(cinema_setup):
     assert service["local_url"] == f"http://127.0.0.1:{service['port']}/"
 
 
+def test_publish_can_generate_subdomain_public_urls(cinema_setup, monkeypatch):
+    monkeypatch.setenv("NEXU_SERVICE_URL_MODE", "subdomain")
+    monkeypatch.setenv("NEXU_SERVICE_DOMAIN", "repact.dev")
+    cinema, root, capsule = cinema_setup
+
+    result = publish_project_service(
+        cinema,
+        root,
+        capsule,
+        stage=0,
+        project_id="sub-app",
+        auto_start=False,
+    )
+
+    service = result["service"]
+    assert service["url"] == "https://sub-app-s0.repact.dev/"
+    assert service["public_url"] == "https://sub-app-s0.repact.dev/"
+    assert service["local_url"].startswith("http://127.0.0.1:")
+
+
 def test_publish_missing_stage_returns_error(cinema_setup):
     cinema, root, capsule = cinema_setup
     result = publish_project_service(cinema, root, capsule, stage=9, auto_start=False)

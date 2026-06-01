@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import shutil
 import socket
@@ -27,6 +28,19 @@ _IMPORTED_SOURCE_PREFIX_RE = re.compile(
     re.IGNORECASE,
 )
 _LOCAL_SERVICE_URL_RE = re.compile(r"^https?://(?:127\.0\.0\.1|localhost):\d+/?", re.I)
+
+
+def _service_url_mode() -> str:
+    return os.environ.get("NEXU_SERVICE_URL_MODE", "path").strip().lower() or "path"
+
+
+def _public_service_url(service_id: str) -> str:
+    """Return the externally openable URL for a published service."""
+    domain = os.environ.get("NEXU_SERVICE_DOMAIN", "").strip().strip(".")
+    scheme = os.environ.get("NEXU_SERVICE_SCHEME", "https").strip() or "https"
+    if _service_url_mode() == "subdomain" and domain:
+        return f"{scheme}://{service_id}.{domain}/"
+    return f"/services/view/{service_id}/"
 
 
 def services_root(cinema_dir: Path) -> Path:
@@ -111,7 +125,7 @@ def _service_alive(entry: dict[str, Any]) -> bool:
 def _refresh_service_status(entry: dict[str, Any]) -> dict[str, Any]:
     service_id = str(entry.get("id") or "").strip()
     if service_id:
-        public_url = f"/services/view/{service_id}/"
+        public_url = _public_service_url(service_id)
         if not entry.get("public_url"):
             entry["public_url"] = public_url
         if not entry.get("url") or _LOCAL_SERVICE_URL_RE.match(str(entry.get("url"))):
@@ -315,7 +329,7 @@ def _create_service_entry(
     port: int,
 ) -> dict[str, Any]:
     """Create a new service registry entry."""
-    public_url = f"/services/view/{service_id}/"
+    public_url = _public_service_url(service_id)
     return {
         "id": service_id,
         "title": project_title or capsule_name,
@@ -404,7 +418,7 @@ def publish_project_service(
         user_goal=user_goal,
         effective_ui=effective,
         port=port,
-        public_url=f"/services/view/{service_id}/",
+        public_url=_public_service_url(service_id),
         baseline_contracts=baseline_contracts,
     )
 
@@ -482,7 +496,7 @@ def start_published_service(cinema_dir: Path, service_id: str) -> dict[str, Any]
     entry["port"] = port
     entry["pid"] = proc.pid
     entry["local_url"] = f"http://127.0.0.1:{port}/"
-    entry["public_url"] = f"/services/view/{service_id}/"
+    entry["public_url"] = _public_service_url(service_id)
     entry["url"] = entry["public_url"]
     entry["status"] = "running"
 

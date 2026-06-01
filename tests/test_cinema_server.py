@@ -100,6 +100,8 @@ def test_render_server_script_embeds_runtime_context() -> None:
     assert "def _llm_network_allowed()" in script
     assert "def _llm_status_payload()" in script
     assert "import shutil" in script
+    assert "def _service_id_from_host(self)" in script
+    assert 'os.environ.get("NEXU_SERVICE_DOMAIN"' in script
     assert 'prefix = "/services/view/"' in script
     assert "shutil.copyfileobj(fh, self.wfile)" in script
     assert '"/llm/status"' in script

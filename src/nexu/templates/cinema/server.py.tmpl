@@ -1146,22 +1146,40 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(DIRECTORY), **kwargs)
 
+    def _service_id_from_host(self) -> str:
+        domain = os.environ.get("NEXU_SERVICE_DOMAIN", "").strip().strip(".").lower()
+        if not domain:
+            return ""
+        host = (self.headers.get("Host") or "").split(":", 1)[0].strip().lower().strip(".")
+        suffix = "." + domain
+        if not host.endswith(suffix):
+            return ""
+        service_id = host[: -len(suffix)]
+        if not re.fullmatch(r"[a-zA-Z0-9._-]+", service_id or ""):
+            return ""
+        if service_id in {"www", "repact", "nexu"}:
+            return ""
+        return service_id
+
     def _serve_published_service_file(self, request_path: str):
         from urllib.parse import unquote
 
         prefix = "/services/view/"
-        tail = request_path[len(prefix):].strip("/")
-        if not tail:
-            self.send_error(404, "missing service id")
-            return
-
-        parts = tail.split("/", 1)
-        service_id = unquote(parts[0])
+        if request_path.startswith(prefix):
+            tail = request_path[len(prefix):].strip("/")
+            if not tail:
+                self.send_error(404, "missing service id")
+                return
+            parts = tail.split("/", 1)
+            service_id = unquote(parts[0])
+            rel = unquote(parts[1]) if len(parts) > 1 else "index.html"
+        else:
+            service_id = self._service_id_from_host()
+            rel = unquote(request_path.lstrip("/")) or "index.html"
         if not re.fullmatch(r"[a-zA-Z0-9._-]+", service_id or ""):
             self.send_error(404, "invalid service id")
             return
 
-        rel = unquote(parts[1]) if len(parts) > 1 else "index.html"
         if not rel or rel.endswith("/"):
             rel = rel + "index.html"
         service_root = (DIRECTORY / "services" / service_id).resolve()
@@ -1188,6 +1206,9 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         from urllib.parse import urlparse
 
         parsed_root_path = urlparse(self.path).path
+        if self._service_id_from_host():
+            self._serve_published_service_file(parsed_root_path)
+            return
         if parsed_root_path in ("", "/"):
             suffix = ""
             if "?" in self.path:
