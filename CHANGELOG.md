@@ -27,6 +27,21 @@
 - `tests/test_cinema_policy.py`, `tests/test_export_prompt_ledger.py`, `tests/test_verify_intract.py`; `tests/conftest.py` adds sibling intract.
 - Full suite: `pytest -q` (16 passed); `make ci-cinema-smoke`.
 
+## [0.5.26] - 2026-06-01
+
+### Docs
+- Update README.md
+- Update docs/cinema-optimizations.md
+
+### Test
+- Update tests/test_cinema_project_imports.py
+
+### Other
+- Update examples/web_app_calculator/cinema/server.py
+- Update project/planfile-tickets.yaml
+- Update src/nexu/templates/cinema/nexu_hooks.py.tmpl
+- Update uv.lock
+
 ## [0.5.25] - 2026-06-01
 
 ### Docs

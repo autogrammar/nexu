@@ -61,8 +61,13 @@ DEFAULT_FALLBACK_PROJECT = "web_app_calculator"
 
 _IMPORT_PREVIEW_ATTR = 'data-nexu-import-preview="http"'
 _CALCULATOR_POLLUTION_RE = re.compile(
-    r"(?:calc-body|id=[\"']functions[\"']|Scientific Calculator|btn-sci\b|"
-    r'data-project=["\']web_app_calculator["\'])',
+    r"(?:"
+    r"calc-body|"
+    r'id=["\']functions["\']|'
+    r"Scientific Calculator|"
+    r'class=["\'][^"\']*\bbtn-sci\b|'
+    r'data-project=["\']web_app_calculator["\']'
+    r")",
     re.IGNORECASE,
 )
 

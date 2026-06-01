@@ -12,10 +12,12 @@ from importlib.resources import files
 from pathlib import Path
 from string import Template
 
+from repatch import apply_spatial_deletes_to_html
+
 from .cinema_goal_contracts import goal_traits_from_contract_lines, is_chemical_goal
 from .cinema_projects import load_active_project
 from .cinema_scope import DASHBOARD_KINDS, ui_type_for_kind
-from .cinema_scripts import apply_spatial_deletes_to_html, finalize_cinema_html
+from .cinema_scripts import finalize_cinema_html
 
 _TRIGGERS = frozenset({"sin", "cos", "tan", "log", "ln"})
 

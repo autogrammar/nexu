@@ -8,7 +8,7 @@ Tracking UX, performance, and routing improvements for the Cinema player and ser
 | **Performance** | | | |
 | P1 | Options cache for goal_options (`cinema_options_cache.py`) | done | Keyed by stage HTML, ledger, scope, goal, marks |
 | P1 | Offline fast path for visual scopes (`cinema_offline_options` + `inject_scope_style`) | done | ~10–50 ms; colors/shapes/display/orientation/keypad |
-| P1 | LLM CSS patch path for visual scopes (`cinema_ui_patch.py`) | done | JSON/CSS A-C patches before full HTML generation |
+| P1 | LLM CSS patch path for visual scopes (`repatch.ui_patch`) | done | JSON/CSS A-C patches before full HTML generation |
 | P1 | Fast delivery package (`nexu.fast_delivery`) | done | Shared routing/context primitives for quick improvement loops |
 | P1 | Fast delivery option cache helpers | done | `read_cached_options`, `store_options_cache`, `read_option_files` |
 | P1 | LLM batch / parallel option generation | done | `OPTION_GENERATION_MODE`; ThreadPoolExecutor fallback |
@@ -132,7 +132,7 @@ cinema:
 ### Nice-to-have (still open)
 
 - [ ] Extract more `/iterate` orchestration from `server.py.tmpl` into testable Python (cache read/write, LLM batch wiring) — template remains ~2300 lines
-- [x] Wire `cinema_ui_patch.py` LLM CSS patch workflow before offline/full HTML fallback
+- [x] Wire `repatch.ui_patch` LLM CSS patch workflow before offline/full HTML fallback
 - [x] Extract `nexu.fast_delivery` package for context compaction and ready-status routing
 - [x] Move option cache read/store/apply helpers into `nexu.fast_delivery.options`
 - [x] Extract shared HTML document closure helper to remove duplicate validation/LLM code
@@ -163,6 +163,18 @@ When you import a website via **HTTP URL**, Nexu:
 **LLM iteration:** when an HTTP import is active, `/iterate` and the LLM CSS patch path prefer `nexu-visual.css` + `nexu-outline.html` over full `stage0.html`. Prompts instruct the model to patch CSS values and minimal HTML attributes — not regenerate the whole document.
 
 **Re-activate** an existing HTTP import from the Projects tab to rebuild stage0 and Options A–C from stored `source/index.html` without re-fetching. If you iterated before this fix, delete stale `alt_*.html` or re-activate to replace calculator pollution. **Re-import** after `make cinema-restart` to generate preprocess artifacts for imports created before this feature.
+
+## Policy ledger scoping + HTTP stage restore (2026-06)
+
+Shared capsules (e.g. `scientific_calc`) can hold both calculator and HTTP-import projects. Without filtering, KEEP/DELETE marks from a prior calculator session could bleed into an active HTTP import.
+
+**Ledger filtering (`cinema_policy.py`):** `effective_ui_constraints_from_ledger` now accepts `project_id`, `project_kind`, and `focus_scope`. Entries tagged with a different `project_id` are ignored. Legacy entries without `project_id` are dropped when an HTTP import (`http-*`) or `imported` kind is active. Scope-specific marks apply only within the same `#scope` iteration.
+
+**HTTP stage restore (`cinema_project_imports.py`):** On each `/iterate`, when the active project is `http-*`, `restore_http_import_stages_if_needed` checks whether `stage0.html` still matches the stored import snapshot (`http_stage_matches_import` rejects calculator pollution markers like `calc-body`, `id="functions"`, `Scientific Calculator`). If drifted, stage0 and Options A–C are rebuilt from `source/index.html` without re-fetching.
+
+**LLM full-page guard:** Before writing new option HTML, `reject_import_stage_replacement` blocks responses that would replace an HTTP import with unrelated template HTML (e.g. calculator layout). Combined with `should_block_full_html_iterate` for marked imported projects, iteration stays on patch/offline paths instead of regenerating the whole document.
+
+**Recovery:** Re-activate the HTTP import from Projects, or run `make cinema-restart` (regenerates `server.py` from template and restarts the player). Checked-in `examples/*/cinema/server.py` may lag the template; the runtime copy under `<workspace>/.nexu/capsules/<capsule>/cinema/` is always refreshed on server start.
 
 **Limitations:** cross-origin CDN assets may still fail in the iframe; JavaScript (cookie banners, SPAs) may not run fully; only the initial HTML snapshot is stored (not a full crawl). Re-import after code changes to refresh the snapshot. **Preview network isolation:** stage0/alt HTML strips live-site scripts and injects a head shim that blocks cross-origin `fetch`/XHR so local cinema origin does not hit CORS errors (CSS/images still load via `<base href>`).
 

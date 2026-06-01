@@ -520,6 +520,22 @@ def test_http_stage_matches_import_rejects_calculator_pollution(tmp_path: Path) 
     assert reject_import_stage_replacement(calc_html, meta)
 
 
+def test_http_stage_matches_import_ignores_nexu_shield_selectors(tmp_path: Path) -> None:
+    meta = {
+        "id": "http-malortgdynia.pl",
+        "import_kind": "http",
+        "source": "https://malortgdynia.pl/",
+        "source_url": "https://malortgdynia.pl/",
+    }
+    shield_html = (
+        '<html><body data-nexu-import-preview="http">'
+        "<h1>Malort Gdynia</h1>https://malortgdynia.pl/"
+        "<script>const SELECTOR_BASE = ['.btn', '.btn-sci', '.btn-sci-excess'];</script>"
+        "</body></html>"
+    )
+    assert http_stage_matches_import(shield_html, meta)
+
+
 def test_restore_http_import_stages_if_needed_rebuilds_from_seed(tmp_path: Path) -> None:
     cinema = tmp_path / "cinema"
     cinema.mkdir()
