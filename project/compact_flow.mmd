@@ -1,5 +1,6 @@
 flowchart TD
-%% generated in 0.01s
+%% generated in 0.02s
+    deploy__docker["deploy.docker<br/>1 funcs"]
     examples__nexu_markpact_exporter["examples.nexu_markpact_exporter<br/>1 funcs"]
     examples__realtime_lane_nexu_sync["examples.realtime_lane_nexu_sync<br/>1 funcs"]
     examples__run_examples["examples.run_examples<br/>2 funcs"]
@@ -13,7 +14,7 @@ flowchart TD
     scripts__ci_cinema_smoke["scripts.ci-cinema-smoke<br/>1 funcs"]
     src__nexu["src.nexu<br/>459 funcs"]
     src__vico["src.vico<br/>17 funcs"]
-    examples__web_app_calculator ==>|92| src__nexu
+    examples__web_app_calculator ==>|90| src__nexu
     src__nexu ==>|53| src__vico
     examples__web_app_pactown_ecosystem ==>|22| scripts__ci_cinema_smoke
     examples__web_app_event_monitor ==>|19| scripts__ci_cinema_smoke
@@ -26,6 +27,7 @@ flowchart TD
     examples__web_app_dashboard ==>|9| src__nexu
     src__nexu ==>|6| examples__web_app_calculator
     examples__scientific_calculator_demo ==>|5| src__nexu
+    deploy__docker ==>|5| src__nexu
     examples__scientific_calculator_demo2 ==>|4| src__nexu
     examples__web_app_calculator ==>|4| scripts__ci_cinema_smoke
     examples__run_examples -->|3| src__vico
@@ -38,3 +40,4 @@ flowchart TD
     examples__scientific_calculator_demo2 -->|1| src__vico
     examples__web_app_calculator -->|1| src__vico
     examples__web_app_dashboard -->|1| src__vico
+    deploy__docker -->|1| examples__web_app_calculator

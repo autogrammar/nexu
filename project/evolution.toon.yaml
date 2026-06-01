@@ -1,4 +1,4 @@
-# code2llm/evolution | 494 func | 54f | 2026-06-01
+# code2llm/evolution | 495 func | 55f | 2026-06-01
 # generated in 0.00s
 
 NEXT[5] (ranked by impact):
@@ -14,13 +14,13 @@ NEXT[5] (ranked by impact):
       WHY: 901L, 0 classes, max CC=13
       EFFORT: ~4h  IMPACT: 11713
 
-  [4] !  SPLIT-FUNC      start_published_service  CC=15  fan=17
+  [4] !  SPLIT-FUNC      load_http_preprocess_artifacts  CC=18  fan=16
+      WHY: CC=18 exceeds 15
+      EFFORT: ~1h  IMPACT: 288
+
+  [5] !  SPLIT-FUNC      start_published_service  CC=15  fan=17
       WHY: CC=15 exceeds 15
       EFFORT: ~1h  IMPACT: 255
-
-  [5] !  SPLIT-FUNC      load_http_preprocess_artifacts  CC=16  fan=15
-      WHY: CC=16 exceeds 15
-      EFFORT: ~1h  IMPACT: 240
 
 
 RISKS[3]:
@@ -30,7 +30,7 @@ RISKS[3]:
 
 METRICS-TARGET:
   CC̄:          4.4 → ≤3.1
-  max-CC:      16 → ≤8
+  max-CC:      18 → ≤9
   god-modules: 7 → 0
   high-CC(≥15): 3 → ≤1
   hub-types:   0 → ≤0

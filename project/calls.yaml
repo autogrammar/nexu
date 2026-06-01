@@ -1,66 +1,157 @@
 project: /home/tom/github/semcod/nexu
 generated_from: code2llm call graph analysis
 stats:
-  total_nodes: 367
+  total_nodes: 379
   total_edges: 500
-  modules_count: 61
+  modules_count: 60
 nodes:
-  src.nexu.cli.init:
-    name: init
+  src.nexu.cli.capsule_orchestrate:
+    name: capsule_orchestrate
     module: src.nexu.cli
-    line: 52
+    line: 294
+    cyclomatic_complexity: 1
+    calls_out: 14
+    calls_in: 0
+  src.nexu.cinema_traces.redact_secrets:
+    name: redact_secrets
+    module: src.nexu.cinema_traces
+    line: 20
+    cyclomatic_complexity: 9
+    calls_out: 9
+    calls_in: 3
+  src.nexu.capsule.save_capsule:
+    name: save_capsule
+    module: src.nexu.capsule
+    line: 123
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 1
+  src.nexu.init_project.init_project:
+    name: init_project
+    module: src.nexu.init_project
+    line: 9
     cyclomatic_complexity: 3
     calls_out: 7
-    calls_in: 0
-  src.nexu.cinema.generate_cinema_player:
-    name: generate_cinema_player
-    module: src.nexu.cinema
-    line: 132
+    calls_in: 6
+  examples.web_app_calculator.cinema.server._compact_html_for_llm:
+    name: _compact_html_for_llm
+    module: examples.web_app_calculator.cinema.server
+    line: 477
     cyclomatic_complexity: 1
+    calls_out: 4
+    calls_in: 2
+  src.nexu.runtime.build_capsule_runtime:
+    name: build_capsule_runtime
+    module: src.nexu.runtime
+    line: 111
+    cyclomatic_complexity: 3
+    calls_out: 16
+    calls_in: 7
+  examples.web_app_calculator.cinema.nexu_hooks.validate_artifact:
+    name: validate_artifact
+    module: examples.web_app_calculator.cinema.nexu_hooks
+    line: 115
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 0
+  src.nexu.cinema_traces.write_llm_trace:
+    name: write_llm_trace
+    module: src.nexu.cinema_traces
+    line: 61
+    cyclomatic_complexity: 8
     calls_out: 18
     calls_in: 1
-  src.nexu.cli.capsule_journal:
-    name: capsule_journal
-    module: src.nexu.cli
-    line: 279
-    cyclomatic_complexity: 2
-    calls_out: 17
-    calls_in: 0
-  src.nexu.cinema_publish._slug_service_id:
-    name: _slug_service_id
-    module: src.nexu.cinema_publish
-    line: 53
+  src.nexu.capsule.list_capsules:
+    name: list_capsules
+    module: src.nexu.capsule
+    line: 111
     cyclomatic_complexity: 4
+    calls_out: 5
+    calls_in: 3
+  examples.web_app_calculator.cinema.server._parse_imported_project_route:
+    name: _parse_imported_project_route
+    module: examples.web_app_calculator.cinema.server
+    line: 399
+    cyclomatic_complexity: 5
     calls_out: 2
     calls_in: 1
-  src.nexu.files.is_text_file:
-    name: is_text_file
-    module: src.nexu.files
-    line: 32
-    cyclomatic_complexity: 2
-    calls_out: 1
-    calls_in: 1
-  src.vico.diff.diff_capsule:
-    name: diff_capsule
-    module: src.vico.diff
-    line: 12
-    cyclomatic_complexity: 12
-    calls_out: 14
-    calls_in: 9
-  src.nexu.cinema_project_imports.imported_project_llm_log:
-    name: imported_project_llm_log
-    module: src.nexu.cinema_project_imports
-    line: 1104
-    cyclomatic_complexity: 8
-    calls_out: 14
-    calls_in: 1
-  src.nexu.cli.capsule_status_command:
-    name: capsule_status_command
-    module: src.nexu.cli
-    line: 120
+  src.nexu.cinema_scope.scope_meta_for_project:
+    name: scope_meta_for_project
+    module: src.nexu.cinema_scope
+    line: 196
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 3
+  src.nexu.cinema_http_preprocess.preprocess_cinema_seed:
+    name: preprocess_cinema_seed
+    module: src.nexu.cinema_http_preprocess
+    line: 423
     cyclomatic_complexity: 3
-    calls_out: 17
+    calls_out: 3
+    calls_in: 1
+  src.nexu.plan._contract_summary:
+    name: _contract_summary
+    module: src.nexu.plan
+    line: 27
+    cyclomatic_complexity: 9
+    calls_out: 3
+    calls_in: 1
+  src.nexu.bundle._should_include:
+    name: _should_include
+    module: src.nexu.bundle
+    line: 13
+    cyclomatic_complexity: 5
+    calls_out: 4
+    calls_in: 1
+  examples.web_app_calculator.cinema.server._proposal_kind_and_element:
+    name: _proposal_kind_and_element
+    module: examples.web_app_calculator.cinema.server
+    line: 735
+    cyclomatic_complexity: 12
+    calls_out: 8
+    calls_in: 2
+  examples.web_app_calculator.cinema.nexu_hooks.services_catalog:
+    name: services_catalog
+    module: examples.web_app_calculator.cinema.nexu_hooks
+    line: 305
+    cyclomatic_complexity: 1
+    calls_out: 3
     calls_in: 0
+  src.nexu.cinema_projects.find_nexu_repo_root:
+    name: find_nexu_repo_root
+    module: src.nexu.cinema_projects
+    line: 44
+    cyclomatic_complexity: 5
+    calls_out: 4
+    calls_in: 5
+  src.nexu.cinema_project_imports._decode_http_bytes:
+    name: _decode_http_bytes
+    module: src.nexu.cinema_project_imports
+    line: 193
+    cyclomatic_complexity: 4
+    calls_out: 3
+    calls_in: 0
+  src.nexu.cinema_project_imports._load_http_fetch_meta:
+    name: _load_http_fetch_meta
+    module: src.nexu.cinema_project_imports
+    line: 373
+    cyclomatic_complexity: 4
+    calls_out: 4
+    calls_in: 2
+  src.nexu.cinema_scripts.repair_cinema_html_files:
+    name: repair_cinema_html_files
+    module: src.nexu.cinema_scripts
+    line: 700
+    cyclomatic_complexity: 5
+    calls_out: 8
+    calls_in: 1
+  src.nexu.cinema_goal_contracts.is_chemical_goal:
+    name: is_chemical_goal
+    module: src.nexu.cinema_goal_contracts
+    line: 16
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 2
   src.nexu.cinema_traces.trace_slug:
     name: trace_slug
     module: src.nexu.cinema_traces
@@ -68,19 +159,26 @@ nodes:
     cyclomatic_complexity: 3
     calls_out: 3
     calls_in: 3
-  src.nexu.cinema_projects.activate_example_project:
-    name: activate_example_project
-    module: src.nexu.cinema_projects
-    line: 663
-    cyclomatic_complexity: 2
-    calls_out: 13
-    calls_in: 3
-  examples.web_app_calculator.cinema.server._strip_markdown_fences:
-    name: _strip_markdown_fences
-    module: examples.web_app_calculator.cinema.server
-    line: 454
-    cyclomatic_complexity: 6
-    calls_out: 8
+  src.nexu.cinema_project_imports._resolve_markpact_path:
+    name: _resolve_markpact_path
+    module: src.nexu.cinema_project_imports
+    line: 950
+    cyclomatic_complexity: 4
+    calls_out: 5
+    calls_in: 1
+  src.nexu.fast_delivery.context.compact_markpact_for_llm:
+    name: compact_markpact_for_llm
+    module: src.nexu.fast_delivery.context
+    line: 42
+    cyclomatic_complexity: 9
+    calls_out: 12
+    calls_in: 1
+  src.nexu.cinema_goal_contracts._collect_trait_proposals:
+    name: _collect_trait_proposals
+    module: src.nexu.cinema_goal_contracts
+    line: 245
+    cyclomatic_complexity: 3
+    calls_out: 6
     calls_in: 1
   examples.web_app_event_monitor.run.main:
     name: main
@@ -89,6 +187,1343 @@ nodes:
     cyclomatic_complexity: 13
     calls_out: 37
     calls_in: 0
+  examples.web_app_calculator.cinema.nexu_hooks.apply_spatial_patch:
+    name: apply_spatial_patch
+    module: examples.web_app_calculator.cinema.nexu_hooks
+    line: 59
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 0
+  src.nexu.cinema_traces.text_metrics:
+    name: text_metrics
+    module: src.nexu.cinema_traces
+    line: 43
+    cyclomatic_complexity: 3
+    calls_out: 6
+    calls_in: 3
+  src.nexu.config.load_env_files:
+    name: load_env_files
+    module: src.nexu.config
+    line: 83
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 5
+  src.nexu.cinema_project_imports._activate_imported:
+    name: _activate_imported
+    module: src.nexu.cinema_project_imports
+    line: 603
+    cyclomatic_complexity: 11
+    calls_out: 32
+    calls_in: 2
+  examples.run_examples.run_example:
+    name: run_example
+    module: examples.run_examples
+    line: 34
+    cyclomatic_complexity: 2
+    calls_out: 26
+    calls_in: 1
+  src.nexu.journal.read_journal:
+    name: read_journal
+    module: src.nexu.journal
+    line: 14
+    cyclomatic_complexity: 5
+    calls_out: 6
+    calls_in: 3
+  src.nexu.files.collect_files:
+    name: collect_files
+    module: src.nexu.files
+    line: 36
+    cyclomatic_complexity: 8
+    calls_out: 8
+    calls_in: 6
+  src.nexu.cinema_project_imports._maybe_organize_import_source:
+    name: _maybe_organize_import_source
+    module: src.nexu.cinema_project_imports
+    line: 822
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 1
+  examples.web_app_calculator.cinema.server._load_all_env:
+    name: _load_all_env
+    module: examples.web_app_calculator.cinema.server
+    line: 239
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 2
+  src.nexu.cinema_project_imports.import_zip_project:
+    name: import_zip_project
+    module: src.nexu.cinema_project_imports
+    line: 773
+    cyclomatic_complexity: 5
+    calls_out: 13
+    calls_in: 1
+  src.nexu.cinema_history._write_index:
+    name: _write_index
+    module: src.nexu.cinema_history
+    line: 40
+    cyclomatic_complexity: 1
+    calls_out: 5
+    calls_in: 1
+  src.nexu.cinema_project_imports._build_http_preview_stage0:
+    name: _build_http_preview_stage0
+    module: src.nexu.cinema_project_imports
+    line: 384
+    cyclomatic_complexity: 14
+    calls_out: 25
+    calls_in: 2
+  src.nexu.cinema_policy.enforce_deletes_on_option_previews:
+    name: enforce_deletes_on_option_previews
+    module: src.nexu.cinema_policy
+    line: 342
+    cyclomatic_complexity: 3
+    calls_out: 5
+    calls_in: 1
+  src.nexu.cli.capsule_list:
+    name: capsule_list
+    module: src.nexu.cli
+    line: 106
+    cyclomatic_complexity: 3
+    calls_out: 8
+    calls_in: 0
+  src.nexu.cinema_server.start_persistent_http_server:
+    name: start_persistent_http_server
+    module: src.nexu.cinema_server
+    line: 88
+    cyclomatic_complexity: 2
+    calls_out: 7
+    calls_in: 1
+  examples.web_app_calculator.cinema.nexu_hooks.save_history:
+    name: save_history
+    module: examples.web_app_calculator.cinema.nexu_hooks
+    line: 119
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 0
+  examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler.do_DELETE:
+    name: do_DELETE
+    module: examples.web_app_calculator.cinema.server
+    line: 2998
+    cyclomatic_complexity: 9
+    calls_out: 23
+    calls_in: 0
+  src.nexu.cinema_policy.ensure_intract_on_path:
+    name: ensure_intract_on_path
+    module: src.nexu.cinema_policy
+    line: 554
+    cyclomatic_complexity: 5
+    calls_out: 5
+    calls_in: 4
+  examples.scientific_calculator_demo.main:
+    name: main
+    module: examples.scientific_calculator_demo
+    line: 17
+    cyclomatic_complexity: 2
+    calls_out: 23
+    calls_in: 0
+  src.nexu.cinema_goal_contracts._goal_contract_dict:
+    name: _goal_contract_dict
+    module: src.nexu.cinema_goal_contracts
+    line: 41
+    cyclomatic_complexity: 6
+    calls_out: 15
+    calls_in: 8
+  src.nexu.cinema_project_imports._rewrite_local_asset_refs:
+    name: _rewrite_local_asset_refs
+    module: src.nexu.cinema_project_imports
+    line: 307
+    cyclomatic_complexity: 6
+    calls_out: 9
+    calls_in: 1
+  src.nexu.llm._strip_fences:
+    name: _strip_fences
+    module: src.nexu.llm
+    line: 65
+    cyclomatic_complexity: 7
+    calls_out: 9
+    calls_in: 1
+  src.nexu.cinema_goal_contracts.propose_goal_extension_contracts:
+    name: propose_goal_extension_contracts
+    module: src.nexu.cinema_goal_contracts
+    line: 264
+    cyclomatic_complexity: 15
+    calls_out: 17
+    calls_in: 1
+  examples.web_app_calculator.cinema.nexu_hooks.restore_history:
+    name: restore_history
+    module: examples.web_app_calculator.cinema.nexu_hooks
+    line: 133
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 0
+  examples.web_app_calculator.cinema.nexu_hooks.stop_service:
+    name: stop_service
+    module: examples.web_app_calculator.cinema.nexu_hooks
+    line: 329
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 0
+  src.nexu.cinema_projects._copy_or_seed_project_files:
+    name: _copy_or_seed_project_files
+    module: src.nexu.cinema_projects
+    line: 578
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 1
+  src.nexu.cinema_llm._compact_response_preview:
+    name: _compact_response_preview
+    module: src.nexu.cinema_llm
+    line: 237
+    cyclomatic_complexity: 2
+    calls_out: 3
+    calls_in: 2
+  scripts.ci-cinema-smoke.print:
+    name: print
+    module: scripts.ci-cinema-smoke
+    line: 82
+    cyclomatic_complexity: 0
+    calls_out: 0
+    calls_in: 94
+  src.nexu.cinema_llm._lookup:
+    name: _lookup
+    module: src.nexu.cinema_llm
+    line: 157
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 7
+  src.nexu.cinema_project_imports._same_origin:
+    name: _same_origin
+    module: src.nexu.cinema_project_imports
+    line: 235
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 1
+  src.nexu.cinema_project_imports._charset_from_content_type:
+    name: _charset_from_content_type
+    module: src.nexu.cinema_project_imports
+    line: 186
+    cyclomatic_complexity: 3
+    calls_out: 4
+    calls_in: 2
+  examples.web_app_calculator.cinema.nexu_hooks.goal_contract_lines:
+    name: goal_contract_lines
+    module: examples.web_app_calculator.cinema.nexu_hooks
+    line: 111
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 0
+  src.nexu.cinema_history._copy_checkpoint_files:
+    name: _copy_checkpoint_files
+    module: src.nexu.cinema_history
+    line: 49
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 1
+  src.nexu.cinema_policy.refresh_cinema_policy_snapshot:
+    name: refresh_cinema_policy_snapshot
+    module: src.nexu.cinema_policy
+    line: 372
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 2
+  src.nexu.cinema_project_imports._read_text_for_markpact:
+    name: _read_text_for_markpact
+    module: src.nexu.cinema_project_imports
+    line: 447
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 1
+  src.nexu.cinema_llm.call_cinema_text_llm:
+    name: call_cinema_text_llm
+    module: src.nexu.cinema_llm
+    line: 242
+    cyclomatic_complexity: 9
+    calls_out: 9
+    calls_in: 3
+  src.nexu.cinema_policy.ensure_http_option_previews_from_stage0:
+    name: ensure_http_option_previews_from_stage0
+    module: src.nexu.cinema_policy
+    line: 235
+    cyclomatic_complexity: 3
+    calls_out: 5
+    calls_in: 2
+  src.vico.diff.diff_capsule:
+    name: diff_capsule
+    module: src.vico.diff
+    line: 12
+    cyclomatic_complexity: 12
+    calls_out: 14
+    calls_in: 9
+  src.nexu.cinema_llm._as_plain_data:
+    name: _as_plain_data
+    module: src.nexu.cinema_llm
+    line: 144
+    cyclomatic_complexity: 5
+    calls_out: 4
+    calls_in: 4
+  src.nexu.cinema_scripts.write_cinema_inject_files:
+    name: write_cinema_inject_files
+    module: src.nexu.cinema_scripts
+    line: 694
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 4
+  src.nexu.cinema_goal_contracts._detect_engineering_trait:
+    name: _detect_engineering_trait
+    module: src.nexu.cinema_goal_contracts
+    line: 223
+    cyclomatic_complexity: 4
+    calls_out: 3
+    calls_in: 1
+  src.nexu.intract_adapter.check_intract_policy:
+    name: check_intract_policy
+    module: src.nexu.intract_adapter
+    line: 90
+    cyclomatic_complexity: 7
+    calls_out: 11
+    calls_in: 1
+  src.nexu.cinema_project_imports._delete_active_project_fallback:
+    name: _delete_active_project_fallback
+    module: src.nexu.cinema_project_imports
+    line: 1172
+    cyclomatic_complexity: 5
+    calls_out: 2
+    calls_in: 1
+  src.nexu.cinema_projects._resolve_root_for_project_source:
+    name: _resolve_root_for_project_source
+    module: src.nexu.cinema_projects
+    line: 570
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 1
+  src.nexu.cinema_project_imports.restore_http_import_stages_if_needed:
+    name: restore_http_import_stages_if_needed
+    module: src.nexu.cinema_project_imports
+    line: 109
+    cyclomatic_complexity: 8
+    calls_out: 11
+    calls_in: 1
+  src.nexu.cinema_policy.append_goal_ledger_entry:
+    name: append_goal_ledger_entry
+    module: src.nexu.cinema_policy
+    line: 692
+    cyclomatic_complexity: 7
+    calls_out: 13
+    calls_in: 2
+  examples.web_app_calculator.cinema.nexu_hooks.start_service:
+    name: start_service
+    module: examples.web_app_calculator.cinema.nexu_hooks
+    line: 324
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 0
+  src.nexu.cinema_projects.delete_example_project:
+    name: delete_example_project
+    module: src.nexu.cinema_projects
+    line: 224
+    cyclomatic_complexity: 14
+    calls_out: 17
+    calls_in: 1
+  examples.web_app_calculator.cinema.server._ensure_intract_on_path:
+    name: _ensure_intract_on_path
+    module: examples.web_app_calculator.cinema.server
+    line: 675
+    cyclomatic_complexity: 5
+    calls_out: 5
+    calls_in: 1
+  src.nexu.cinema_project_imports.http_stage_matches_import:
+    name: http_stage_matches_import
+    module: src.nexu.cinema_project_imports
+    line: 77
+    cyclomatic_complexity: 10
+    calls_out: 15
+    calls_in: 2
+  src.nexu.cinema_goal_contracts._detect_api_trait:
+    name: _detect_api_trait
+    module: src.nexu.cinema_goal_contracts
+    line: 181
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 1
+  src.nexu.plan.build_iteration_plan:
+    name: build_iteration_plan
+    module: src.nexu.plan
+    line: 35
+    cyclomatic_complexity: 7
+    calls_out: 15
+    calls_in: 4
+  src.nexu.cinema_project_imports._infer_workspace_context:
+    name: _infer_workspace_context
+    module: src.nexu.cinema_project_imports
+    line: 899
+    cyclomatic_complexity: 4
+    calls_out: 6
+    calls_in: 2
+  examples.web_app_calculator.cinema.nexu_hooks.import_project_from_http:
+    name: import_project_from_http
+    module: examples.web_app_calculator.cinema.nexu_hooks
+    line: 244
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 0
+  src.nexu.cinema_server._litellm_available:
+    name: _litellm_available
+    module: src.nexu.cinema_server
+    line: 47
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 1
+  src.nexu.bundle.build_capsule_bundle:
+    name: build_capsule_bundle
+    module: src.nexu.bundle
+    line: 24
+    cyclomatic_complexity: 3
+    calls_out: 15
+    calls_in: 2
+  examples.web_app_calculator.cinema.server._litellm_available:
+    name: _litellm_available
+    module: examples.web_app_calculator.cinema.server
+    line: 264
+    cyclomatic_complexity: 2
+    calls_out: 1
+    calls_in: 3
+  src.nexu.cinema_policy.merge_ui_constraint_lists:
+    name: merge_ui_constraint_lists
+    module: src.nexu.cinema_policy
+    line: 166
+    cyclomatic_complexity: 13
+    calls_out: 12
+    calls_in: 2
+  src.nexu.cinema_publish.publish_project_service:
+    name: publish_project_service
+    module: src.nexu.cinema_publish
+    line: 312
+    cyclomatic_complexity: 6
+    calls_out: 16
+    calls_in: 1
+  src.nexu.export_prompt.export_iteration_prompt:
+    name: export_iteration_prompt
+    module: src.nexu.export_prompt
+    line: 58
+    cyclomatic_complexity: 3
+    calls_out: 18
+    calls_in: 4
+  src.nexu.cinema_policy.append_iteration_ledger_entry:
+    name: append_iteration_ledger_entry
+    module: src.nexu.cinema_policy
+    line: 773
+    cyclomatic_complexity: 3
+    calls_out: 7
+    calls_in: 1
+  src.nexu.cinema_projects.is_example_project_id:
+    name: is_example_project_id
+    module: src.nexu.cinema_projects
+    line: 176
+    cyclomatic_complexity: 2
+    calls_out: 1
+    calls_in: 1
+  examples.mcp_patch_demo.server.broadcast:
+    name: broadcast
+    module: examples.mcp_patch_demo.server
+    line: 73
+    cyclomatic_complexity: 2
+    calls_out: 3
+    calls_in: 4
+  src.nexu.cli.capsule_bundle:
+    name: capsule_bundle
+    module: src.nexu.cli
+    line: 327
+    cyclomatic_complexity: 1
+    calls_out: 9
+    calls_in: 0
+  src.nexu.cli.capsule_promote:
+    name: capsule_promote
+    module: src.nexu.cli
+    line: 340
+    cyclomatic_complexity: 3
+    calls_out: 14
+    calls_in: 0
+  examples.mcp_patch_demo.server.data:
+    name: data
+    module: examples.mcp_patch_demo.server
+    line: 47
+    cyclomatic_complexity: 4
+    calls_out: 6
+    calls_in: 0
+  src.nexu.cli.capsule_export_prompt:
+    name: capsule_export_prompt
+    module: src.nexu.cli
+    line: 173
+    cyclomatic_complexity: 1
+    calls_out: 8
+    calls_in: 0
+  src.nexu.cinema_policy._replace_html_title:
+    name: _replace_html_title
+    module: src.nexu.cinema_policy
+    line: 306
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 2
+  examples.web_app_calculator.cinema.server._ensure_api_key_env:
+    name: _ensure_api_key_env
+    module: examples.web_app_calculator.cinema.server
+    line: 446
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 4
+  src.nexu.cinema_goal_contracts._build_detail_text:
+    name: _build_detail_text
+    module: src.nexu.cinema_goal_contracts
+    line: 109
+    cyclomatic_complexity: 5
+    calls_out: 5
+    calls_in: 1
+  src.nexu.cli.capsule_report:
+    name: capsule_report
+    module: src.nexu.cli
+    line: 266
+    cyclomatic_complexity: 1
+    calls_out: 10
+    calls_in: 0
+  src.nexu.cinema_project_imports._iter_project_files:
+    name: _iter_project_files
+    module: src.nexu.cinema_project_imports
+    line: 421
+    cyclomatic_complexity: 5
+    calls_out: 6
+    calls_in: 3
+  examples.web_app_calculator.cinema.server._llm_status_payload:
+    name: _llm_status_payload
+    module: examples.web_app_calculator.cinema.server
+    line: 274
+    cyclomatic_complexity: 3
+    calls_out: 25
+    calls_in: 1
+  src.nexu.intract_adapter._finding_for_result:
+    name: _finding_for_result
+    module: src.nexu.intract_adapter
+    line: 32
+    cyclomatic_complexity: 9
+    calls_out: 16
+    calls_in: 1
+  src.nexu.cinema_projects._find_example_project:
+    name: _find_example_project
+    module: src.nexu.cinema_projects
+    line: 548
+    cyclomatic_complexity: 3
+    calls_out: 1
+    calls_in: 1
+  src.nexu.cinema._render_cinema_template:
+    name: _render_cinema_template
+    module: src.nexu.cinema
+    line: 31
+    cyclomatic_complexity: 2
+    calls_out: 5
+    calls_in: 4
+  src.nexu.cinema_policy.stage_files_are_distinct:
+    name: stage_files_are_distinct
+    module: src.nexu.cinema_policy
+    line: 212
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 1
+  examples.web_app_calculator.cinema.server._update_constraints:
+    name: _update_constraints
+    module: examples.web_app_calculator.cinema.server
+    line: 657
+    cyclomatic_complexity: 4
+    calls_out: 2
+    calls_in: 4
+  src.nexu.cinema_projects._write_seed_variants:
+    name: _write_seed_variants
+    module: src.nexu.cinema_projects
+    line: 529
+    cyclomatic_complexity: 2
+    calls_out: 12
+    calls_in: 1
+  src.nexu.cinema_policy.append_policy_ledger_entry:
+    name: append_policy_ledger_entry
+    module: src.nexu.cinema_policy
+    line: 635
+    cyclomatic_complexity: 3
+    calls_out: 9
+    calls_in: 3
+  src.nexu.cinema_llm._cached_config:
+    name: _cached_config
+    module: src.nexu.cinema_llm
+    line: 19
+    cyclomatic_complexity: 4
+    calls_out: 4
+    calls_in: 3
+  src.nexu.fast_delivery.options.store_options_cache:
+    name: store_options_cache
+    module: src.nexu.fast_delivery.options
+    line: 83
+    cyclomatic_complexity: 3
+    calls_out: 4
+    calls_in: 1
+  src.nexu.promote.build_promotion_plan:
+    name: build_promotion_plan
+    module: src.nexu.promote
+    line: 30
+    cyclomatic_complexity: 6
+    calls_out: 16
+    calls_in: 3
+  src.nexu.cinema_project_imports.normalize_imported_project_id:
+    name: normalize_imported_project_id
+    module: src.nexu.cinema_project_imports
+    line: 935
+    cyclomatic_complexity: 2
+    calls_out: 3
+    calls_in: 5
+  src.nexu.cinema_history.ensure_initial_checkpoint:
+    name: ensure_initial_checkpoint
+    module: src.nexu.cinema_history
+    line: 201
+    cyclomatic_complexity: 3
+    calls_out: 4
+    calls_in: 1
+  src.nexu.files.matches_any:
+    name: matches_any
+    module: src.nexu.files
+    line: 28
+    cyclomatic_complexity: 3
+    calls_out: 4
+    calls_in: 2
+  src.nexu.cinema_goal_contracts._detect_minimal_trait:
+    name: _detect_minimal_trait
+    module: src.nexu.cinema_goal_contracts
+    line: 143
+    cyclomatic_complexity: 4
+    calls_out: 3
+    calls_in: 1
+  src.nexu.cinema_projects._active_project_meta:
+    name: _active_project_meta
+    module: src.nexu.cinema_projects
+    line: 552
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 1
+  examples.web_app_calculator.cinema.server._compact_llm_error:
+    name: _compact_llm_error
+    module: examples.web_app_calculator.cinema.server
+    line: 591
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 7
+  src.nexu.cinema_llm.looks_like_html_document:
+    name: looks_like_html_document
+    module: src.nexu.cinema_llm
+    line: 81
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 2
+  src.nexu.cinema_history.list_history_checkpoints:
+    name: list_history_checkpoints
+    module: src.nexu.cinema_history
+    line: 137
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 1
+  src.nexu.cinema_llm._response_shape:
+    name: _response_shape
+    module: src.nexu.cinema_llm
+    line: 164
+    cyclomatic_complexity: 2
+    calls_out: 3
+    calls_in: 2
+  src.nexu.cli.init:
+    name: init
+    module: src.nexu.cli
+    line: 52
+    cyclomatic_complexity: 3
+    calls_out: 7
+    calls_in: 0
+  examples.web_app_calculator.cinema.server._append_policy_entry_legacy:
+    name: _append_policy_entry_legacy
+    module: examples.web_app_calculator.cinema.server
+    line: 779
+    cyclomatic_complexity: 3
+    calls_out: 12
+    calls_in: 1
+  src.nexu.cinema_history.restore_history_checkpoint:
+    name: restore_history_checkpoint
+    module: src.nexu.cinema_history
+    line: 141
+    cyclomatic_complexity: 8
+    calls_out: 18
+    calls_in: 1
+  examples.web_app_calculator.cinema.server._list_llm_traces:
+    name: _list_llm_traces
+    module: examples.web_app_calculator.cinema.server
+    line: 372
+    cyclomatic_complexity: 6
+    calls_out: 6
+    calls_in: 1
+  src.nexu.cinema_project_imports._verify_delete_paths:
+    name: _verify_delete_paths
+    module: src.nexu.cinema_project_imports
+    line: 1132
+    cyclomatic_complexity: 5
+    calls_out: 5
+    calls_in: 1
+  src.nexu.cinema_project_imports.imported_project_llm_log:
+    name: imported_project_llm_log
+    module: src.nexu.cinema_project_imports
+    line: 1104
+    cyclomatic_complexity: 8
+    calls_out: 14
+    calls_in: 1
+  src.nexu.cinema_publish.start_published_service:
+    name: start_published_service
+    module: src.nexu.cinema_publish
+    line: 405
+    cyclomatic_complexity: 15
+    calls_out: 20
+    calls_in: 2
+  src.nexu.cinema_policy._ledger_entry_matches_scope:
+    name: _ledger_entry_matches_scope
+    module: src.nexu.cinema_policy
+    line: 64
+    cyclomatic_complexity: 5
+    calls_out: 7
+    calls_in: 1
+  src.nexu.cli.capsule_iterate:
+    name: capsule_iterate
+    module: src.nexu.cli
+    line: 141
+    cyclomatic_complexity: 2
+    calls_out: 14
+    calls_in: 0
+  src.nexu.llm.call_litellm_review:
+    name: call_litellm_review
+    module: src.nexu.llm
+    line: 156
+    cyclomatic_complexity: 2
+    calls_out: 3
+    calls_in: 1
+  src.nexu.cinema_policy.cinema_dir_for:
+    name: cinema_dir_for
+    module: src.nexu.cinema_policy
+    line: 470
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 5
+  src.nexu.cinema_llm.call_cinema_html_llm:
+    name: call_cinema_html_llm
+    module: src.nexu.cinema_llm
+    line: 298
+    cyclomatic_complexity: 12
+    calls_out: 8
+    calls_in: 1
+  src.nexu.cinema_html_validate.prepare_cinema_html_document:
+    name: prepare_cinema_html_document
+    module: src.nexu.cinema_html_validate
+    line: 168
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 3
+  src.nexu.cinema_projects.load_active_project:
+    name: load_active_project
+    module: src.nexu.cinema_projects
+    line: 712
+    cyclomatic_complexity: 4
+    calls_out: 4
+    calls_in: 10
+  examples.web_app_calculator.cinema.server._resolve_model:
+    name: _resolve_model
+    module: examples.web_app_calculator.cinema.server
+    line: 244
+    cyclomatic_complexity: 4
+    calls_out: 4
+    calls_in: 8
+  src.nexu.cinema_server._open_browser:
+    name: _open_browser
+    module: src.nexu.cinema_server
+    line: 109
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 1
+  src.vico.models.read_yaml:
+    name: read_yaml
+    module: src.vico.models
+    line: 149
+    cyclomatic_complexity: 3
+    calls_out: 4
+    calls_in: 5
+  examples.web_app_calculator.cinema.nexu_hooks.delete_imported:
+    name: delete_imported
+    module: examples.web_app_calculator.cinema.nexu_hooks
+    line: 249
+    cyclomatic_complexity: 1
+    calls_out: 4
+    calls_in: 0
+  src.nexu.cinema_policy.apply_ledger_from_cinema:
+    name: apply_ledger_from_cinema
+    module: src.nexu.cinema_policy
+    line: 510
+    cyclomatic_complexity: 6
+    calls_out: 15
+    calls_in: 2
+  examples.web_app_calculator.cinema.server._compact_markpact_for_llm:
+    name: _compact_markpact_for_llm
+    module: examples.web_app_calculator.cinema.server
+    line: 500
+    cyclomatic_complexity: 3
+    calls_out: 10
+    calls_in: 1
+  src.nexu.cinema_project_imports.import_http_project:
+    name: import_http_project
+    module: src.nexu.cinema_project_imports
+    line: 705
+    cyclomatic_complexity: 12
+    calls_out: 21
+    calls_in: 1
+  src.nexu.cinema_project_imports.read_imported_markpact:
+    name: read_imported_markpact
+    module: src.nexu.cinema_project_imports
+    line: 1073
+    cyclomatic_complexity: 9
+    calls_out: 17
+    calls_in: 1
+  src.nexu.cinema_project_imports._fetch_http_stylesheets:
+    name: _fetch_http_stylesheets
+    module: src.nexu.cinema_project_imports
+    line: 253
+    cyclomatic_complexity: 6
+    calls_out: 11
+    calls_in: 0
+  examples.web_app_calculator.cinema.nexu_hooks.active_project:
+    name: active_project
+    module: examples.web_app_calculator.cinema.nexu_hooks
+    line: 284
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 0
+  src.nexu.cinema_project_imports._clear_active_project:
+    name: _clear_active_project
+    module: src.nexu.cinema_project_imports
+    line: 1166
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 1
+  examples.web_app_calculator.cinema.server._extract_html_document:
+    name: _extract_html_document
+    module: examples.web_app_calculator.cinema.server
+    line: 466
+    cyclomatic_complexity: 3
+    calls_out: 7
+    calls_in: 0
+  src.nexu.cinema_markpact.markpact_download_filename:
+    name: markpact_download_filename
+    module: src.nexu.cinema_markpact
+    line: 213
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 1
+  src.nexu.cinema_projects._project_widgets:
+    name: _project_widgets
+    module: src.nexu.cinema_projects
+    line: 277
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 1
+  examples.web_app_calculator.cinema.server._apply_entry_constraints:
+    name: _apply_entry_constraints
+    module: examples.web_app_calculator.cinema.server
+    line: 616
+    cyclomatic_complexity: 7
+    calls_out: 6
+    calls_in: 1
+  src.nexu.cinema_http_preprocess.prepare_http_preview_html:
+    name: prepare_http_preview_html
+    module: src.nexu.cinema_http_preprocess
+    line: 373
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 1
+  examples.web_app_calculator.cinema.server._llm_network_allowed:
+    name: _llm_network_allowed
+    module: examples.web_app_calculator.cinema.server
+    line: 254
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 3
+  src.nexu.cinema_project_imports._ensure_project_meta_fields:
+    name: _ensure_project_meta_fields
+    module: src.nexu.cinema_project_imports
+    line: 1003
+    cyclomatic_complexity: 5
+    calls_out: 6
+    calls_in: 2
+  src.nexu.cinema_policy.verify_capsule_workspace:
+    name: verify_capsule_workspace
+    module: src.nexu.cinema_policy
+    line: 889
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 1
+  examples.web_app_calculator.cinema.server._llm_communication_contract_block:
+    name: _llm_communication_contract_block
+    module: examples.web_app_calculator.cinema.server
+    line: 173
+    cyclomatic_complexity: 2
+    calls_out: 1
+    calls_in: 1
+  examples.web_app_calculator.cinema.server._load_env_file:
+    name: _load_env_file
+    module: examples.web_app_calculator.cinema.server
+    line: 221
+    cyclomatic_complexity: 11
+    calls_out: 11
+    calls_in: 1
+  src.nexu.promote.apply_promotion_plan:
+    name: apply_promotion_plan
+    module: src.nexu.promote
+    line: 79
+    cyclomatic_complexity: 4
+    calls_out: 8
+    calls_in: 3
+  examples.web_app_calculator.cinema.nexu_hooks.imported_markpact:
+    name: imported_markpact
+    module: examples.web_app_calculator.cinema.nexu_hooks
+    line: 273
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 0
+  src.nexu.fast_delivery.context.compact_html_for_llm:
+    name: compact_html_for_llm
+    module: src.nexu.fast_delivery.context
+    line: 10
+    cyclomatic_complexity: 3
+    calls_out: 6
+    calls_in: 1
+  src.nexu.cinema._contract_to_public_dict:
+    name: _contract_to_public_dict
+    module: src.nexu.cinema
+    line: 44
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 2
+  src.nexu.cinema_policy._build_constraint_result:
+    name: _build_constraint_result
+    module: src.nexu.cinema_policy
+    line: 126
+    cyclomatic_complexity: 5
+    calls_out: 4
+    calls_in: 1
+  src.nexu.cinema_baseline_contracts.ensure_capsule_intract_yaml:
+    name: ensure_capsule_intract_yaml
+    module: src.nexu.cinema_baseline_contracts
+    line: 135
+    cyclomatic_complexity: 9
+    calls_out: 25
+    calls_in: 1
+  src.nexu.llm.call_litellm_json:
+    name: call_litellm_json
+    module: src.nexu.llm
+    line: 79
+    cyclomatic_complexity: 8
+    calls_out: 13
+    calls_in: 2
+  examples.web_app_calculator.cinema.nexu_hooks.imported_llm_log:
+    name: imported_llm_log
+    module: examples.web_app_calculator.cinema.nexu_hooks
+    line: 278
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 0
+  examples.web_app_calculator.cinema.nexu_hooks.propose_llm:
+    name: propose_llm
+    module: examples.web_app_calculator.cinema.nexu_hooks
+    line: 66
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 0
+  src.nexu.cinema_projects._catalog_filters:
+    name: _catalog_filters
+    module: src.nexu.cinema_projects
+    line: 196
+    cyclomatic_complexity: 14
+    calls_out: 12
+    calls_in: 1
+  examples.web_app_calculator.cinema.nexu_hooks.activate_project:
+    name: activate_project
+    module: examples.web_app_calculator.cinema.nexu_hooks
+    line: 210
+    cyclomatic_complexity: 2
+    calls_out: 6
+    calls_in: 0
+  src.nexu.cinema_projects._project_catalog_entry:
+    name: _project_catalog_entry
+    module: src.nexu.cinema_projects
+    line: 180
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 1
+  src.nexu.cinema_projects._apply_preprocess_meta:
+    name: _apply_preprocess_meta
+    module: src.nexu.cinema_projects
+    line: 611
+    cyclomatic_complexity: 3
+    calls_out: 5
+    calls_in: 1
+  src.nexu.cli.mcp_serve:
+    name: mcp_serve
+    module: src.nexu.cli
+    line: 370
+    cyclomatic_complexity: 2
+    calls_out: 6
+    calls_in: 0
+  src.nexu.cinema.write_intract_policy_files:
+    name: write_intract_policy_files
+    module: src.nexu.cinema
+    line: 121
+    cyclomatic_complexity: 2
+    calls_out: 5
+    calls_in: 2
+  src.nexu.cinema_llm.normalize_html_document:
+    name: normalize_html_document
+    module: src.nexu.cinema_llm
+    line: 86
+    cyclomatic_complexity: 5
+    calls_out: 15
+    calls_in: 3
+  src.nexu.cinema_project_imports._project_dir:
+    name: _project_dir
+    module: src.nexu.cinema_project_imports
+    line: 141
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 16
+  src.nexu.config.load_config:
+    name: load_config
+    module: src.nexu.config
+    line: 113
+    cyclomatic_complexity: 14
+    calls_out: 76
+    calls_in: 6
+  examples.web_app_calculator.cinema.server._propose_llm_for_stage:
+    name: _propose_llm_for_stage
+    module: examples.web_app_calculator.cinema.server
+    line: 824
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 1
+  examples.web_app_calculator.run.main:
+    name: main
+    module: examples.web_app_calculator.run
+    line: 14
+    cyclomatic_complexity: 2
+    calls_out: 23
+    calls_in: 0
+  src.nexu.cinema_project_imports._imports_root:
+    name: _imports_root
+    module: src.nexu.cinema_project_imports
+    line: 135
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 3
+  src.vico.drift.check_source_drift:
+    name: check_source_drift
+    module: src.vico.drift
+    line: 11
+    cyclomatic_complexity: 7
+    calls_out: 10
+    calls_in: 5
+  src.nexu.cinema_policy._intract_manifest_path:
+    name: _intract_manifest_path
+    module: src.nexu.cinema_policy
+    line: 31
+    cyclomatic_complexity: 4
+    calls_out: 4
+    calls_in: 4
+  examples.scientific_calculator_demo2.main:
+    name: main
+    module: examples.scientific_calculator_demo2
+    line: 18
+    cyclomatic_complexity: 2
+    calls_out: 17
+    calls_in: 0
+  examples.web_app_calculator.cinema.server._merge_ui_constraints:
+    name: _merge_ui_constraints
+    module: examples.web_app_calculator.cinema.server
+    line: 664
+    cyclomatic_complexity: 5
+    calls_out: 8
+    calls_in: 1
+  src.nexu.cinema_policy.policy_ledger_path:
+    name: policy_ledger_path
+    module: src.nexu.cinema_policy
+    line: 478
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 3
+  src.nexu.cinema_projects._init_project_activation:
+    name: _init_project_activation
+    module: src.nexu.cinema_projects
+    line: 649
+    cyclomatic_complexity: 3
+    calls_out: 4
+    calls_in: 1
+  src.nexu.cinema_scripts.finalize_cinema_html:
+    name: finalize_cinema_html
+    module: src.nexu.cinema_scripts
+    line: 676
+    cyclomatic_complexity: 6
+    calls_out: 6
+    calls_in: 8
+  examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler.do_GET:
+    name: do_GET
+    module: examples.web_app_calculator.cinema.server
+    line: 1073
+    cyclomatic_complexity: 37
+    calls_out: 189
+    calls_in: 0
+  src.nexu.paths.ensure_project_dirs:
+    name: ensure_project_dirs
+    module: src.nexu.paths
+    line: 26
+    cyclomatic_complexity: 2
+    calls_out: 7
+    calls_in: 3
+  src.vico.hashing.sha256_file:
+    name: sha256_file
+    module: src.vico.hashing
+    line: 7
+    cyclomatic_complexity: 2
+    calls_out: 6
+    calls_in: 4
+  src.nexu.cinema.generate_cinema_player:
+    name: generate_cinema_player
+    module: src.nexu.cinema
+    line: 132
+    cyclomatic_complexity: 1
+    calls_out: 18
+    calls_in: 1
+  src.nexu.cinema_project_imports._with_workspace_meta_defaults:
+    name: _with_workspace_meta_defaults
+    module: src.nexu.cinema_project_imports
+    line: 958
+    cyclomatic_complexity: 7
+    calls_out: 2
+    calls_in: 1
+  src.nexu.cinema_project_imports.list_imported_projects:
+    name: list_imported_projects
+    module: src.nexu.cinema_project_imports
+    line: 1255
+    cyclomatic_complexity: 6
+    calls_out: 10
+    calls_in: 1
+  src.nexu.cli.capsule_runtime:
+    name: capsule_runtime
+    module: src.nexu.cli
+    line: 254
+    cyclomatic_complexity: 1
+    calls_out: 9
+    calls_in: 0
+  src.nexu.cinema_llm.parse_batch_alt_options:
+    name: parse_batch_alt_options
+    module: src.nexu.cinema_llm
+    line: 111
+    cyclomatic_complexity: 9
+    calls_out: 14
+    calls_in: 1
+  src.nexu.cinema_projects.deleted_project_ids:
+    name: deleted_project_ids
+    module: src.nexu.cinema_projects
+    line: 150
+    cyclomatic_complexity: 7
+    calls_out: 12
+    calls_in: 4
+  src.nexu.cinema_goal_contracts._detect_chemical_trait:
+    name: _detect_chemical_trait
+    module: src.nexu.cinema_goal_contracts
+    line: 128
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 1
+  src.nexu.intract_adapter._sibling_intract_src:
+    name: _sibling_intract_src
+    module: src.nexu.intract_adapter
+    line: 11
+    cyclomatic_complexity: 4
+    calls_out: 3
+    calls_in: 1
+  examples.web_app_calculator.cinema.nexu_hooks.export_markpact_readme:
+    name: export_markpact_readme
+    module: examples.web_app_calculator.cinema.nexu_hooks
+    line: 288
+    cyclomatic_complexity: 2
+    calls_out: 5
+    calls_in: 0
+  src.nexu.cinema_llm._extract_content:
+    name: _extract_content
+    module: src.nexu.cinema_llm
+    line: 188
+    cyclomatic_complexity: 12
+    calls_out: 21
+    calls_in: 1
+  src.nexu.journal.append_journal:
+    name: append_journal
+    module: src.nexu.journal
+    line: 25
+    cyclomatic_complexity: 2
+    calls_out: 6
+    calls_in: 8
+  src.nexu.cinema_policy.validate_intract_artifact:
+    name: validate_intract_artifact
+    module: src.nexu.cinema_policy
+    line: 864
+    cyclomatic_complexity: 8
+    calls_out: 5
+    calls_in: 1
+  src.nexu.cinema_llm._strip_rich_console_artifacts:
+    name: _strip_rich_console_artifacts
+    module: src.nexu.cinema_llm
+    line: 56
+    cyclomatic_complexity: 7
+    calls_out: 14
+    calls_in: 2
+  examples.mcp_patch_demo.server.dslCommand:
+    name: dslCommand
+    module: examples.mcp_patch_demo.server
+    line: 48
+    cyclomatic_complexity: 4
+    calls_out: 6
+    calls_in: 0
+  src.nexu.cinema_project_imports._source_stats:
+    name: _source_stats
+    module: src.nexu.cinema_project_imports
+    line: 912
+    cyclomatic_complexity: 4
+    calls_out: 3
+    calls_in: 2
+  src.nexu.cinema_projects.list_project_catalog:
+    name: list_project_catalog
+    module: src.nexu.cinema_projects
+    line: 211
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 1
+  src.nexu.fast_delivery.options.read_cached_options:
+    name: read_cached_options
+    module: src.nexu.fast_delivery.options
+    line: 34
+    cyclomatic_complexity: 11
+    calls_out: 17
+    calls_in: 1
+  src.nexu.cinema_projects.mark_project_deleted:
+    name: mark_project_deleted
+    module: src.nexu.cinema_projects
+    line: 170
+    cyclomatic_complexity: 1
+    calls_out: 6
+    calls_in: 1
+  src.nexu.cinema_policy.propose_ui_delta_contract_dicts:
+    name: propose_ui_delta_contract_dicts
+    module: src.nexu.cinema_policy
+    line: 568
+    cyclomatic_complexity: 5
+    calls_out: 5
+    calls_in: 2
+  src.nexu.cli.capsule_create:
+    name: capsule_create
+    module: src.nexu.cli
+    line: 79
+    cyclomatic_complexity: 1
+    calls_out: 15
+    calls_in: 0
+  src.nexu.cinema_project_imports._inject_base_href:
+    name: _inject_base_href
+    module: src.nexu.cinema_project_imports
+    line: 344
+    cyclomatic_complexity: 4
+    calls_out: 5
+    calls_in: 1
+  src.nexu.intract_adapter._policy_findings:
+    name: _policy_findings
+    module: src.nexu.intract_adapter
+    line: 69
+    cyclomatic_complexity: 3
+    calls_out: 4
+    calls_in: 1
+  examples.web_app_calculator.cinema.server._read_llm_trace:
+    name: _read_llm_trace
+    module: examples.web_app_calculator.cinema.server
+    line: 440
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 1
+  examples.run_examples.main:
+    name: main
+    module: examples.run_examples
+    line: 73
+    cyclomatic_complexity: 2
+    calls_out: 1
+    calls_in: 0
+  src.nexu.cinema_server._try_spawn_on_port:
+    name: _try_spawn_on_port
+    module: src.nexu.cinema_server
+    line: 57
+    cyclomatic_complexity: 2
+    calls_out: 5
+    calls_in: 2
+  src.nexu.cli.capsule_journal:
+    name: capsule_journal
+    module: src.nexu.cli
+    line: 279
+    cyclomatic_complexity: 2
+    calls_out: 17
+    calls_in: 0
+  src.nexu.cinema_project_imports.delete_imported_project:
+    name: delete_imported_project
+    module: src.nexu.cinema_project_imports
+    line: 1192
+    cyclomatic_complexity: 7
+    calls_out: 12
+    calls_in: 2
+  examples.web_app_calculator.cinema.nexu_hooks.sync_option_previews:
+    name: sync_option_previews
+    module: examples.web_app_calculator.cinema.nexu_hooks
+    line: 150
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 0
+  src.nexu.cinema_project_imports._fetch_http_body:
+    name: _fetch_http_body
+    module: src.nexu.cinema_project_imports
+    line: 213
+    cyclomatic_complexity: 7
+    calls_out: 16
+    calls_in: 1
+  examples.web_app_calculator.cinema.server._normalize_proposals_for_ledger:
+    name: _normalize_proposals_for_ledger
+    module: examples.web_app_calculator.cinema.server
+    line: 764
+    cyclomatic_complexity: 3
+    calls_out: 9
+    calls_in: 1
+  src.nexu.cinema_policy._process_keep_delete_entries:
+    name: _process_keep_delete_entries
+    module: src.nexu.cinema_policy
+    line: 100
+    cyclomatic_complexity: 7
+    calls_out: 6
+    calls_in: 1
+  examples.realtime_lane_nexu_sync.simulate_realtime_sync:
+    name: simulate_realtime_sync
+    module: examples.realtime_lane_nexu_sync
+    line: 14
+    cyclomatic_complexity: 2
+    calls_out: 10
+    calls_in: 0
+  examples.web_app_calculator.cinema.nexu_hooks.patch_option_previews:
+    name: patch_option_previews
+    module: examples.web_app_calculator.cinema.nexu_hooks
+    line: 161
+    cyclomatic_complexity: 11
+    calls_out: 14
+    calls_in: 0
   examples.web_app_calculator.cinema.server._path_segments:
     name: _path_segments
     module: examples.web_app_calculator.cinema.server
@@ -96,18 +1531,130 @@ nodes:
     cyclomatic_complexity: 3
     calls_out: 4
     calls_in: 2
-  src.nexu.cinema_traces.list_llm_traces:
-    name: list_llm_traces
-    module: src.nexu.cinema_traces
-    line: 148
+  src.nexu.intract_adapter._ensure_intract_on_path:
+    name: _ensure_intract_on_path
+    module: src.nexu.intract_adapter
+    line: 21
+    cyclomatic_complexity: 3
+    calls_out: 4
+    calls_in: 1
+  src.nexu.cinema_project_imports._find_http_index_path:
+    name: _find_http_index_path
+    module: src.nexu.cinema_project_imports
+    line: 362
+    cyclomatic_complexity: 6
+    calls_out: 5
+    calls_in: 1
+  src.nexu.cinema_policy.promote_applies_spatial_deletes:
+    name: promote_applies_spatial_deletes
+    module: src.nexu.cinema_policy
+    line: 58
+    cyclomatic_complexity: 2
+    calls_out: 3
+    calls_in: 1
+  src.nexu.cinema_goal_contracts._slug:
+    name: _slug
+    module: src.nexu.cinema_goal_contracts
+    line: 36
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 2
+  src.nexu.cinema_project_imports._extract_stylesheet_hrefs:
+    name: _extract_stylesheet_hrefs
+    module: src.nexu.cinema_project_imports
+    line: 241
+    cyclomatic_complexity: 5
+    calls_out: 8
+    calls_in: 1
+  src.nexu.cinema_projects._resolve_source_cinema:
+    name: _resolve_source_cinema
+    module: src.nexu.cinema_projects
+    line: 267
+    cyclomatic_complexity: 5
+    calls_out: 2
+    calls_in: 1
+  examples.web_app_calculator.cinema.server._read_trace_index:
+    name: _read_trace_index
+    module: examples.web_app_calculator.cinema.server
+    line: 336
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 0
+  src.nexu.cinema_projects._write_active_project_meta:
+    name: _write_active_project_meta
+    module: src.nexu.cinema_projects
+    line: 563
     cyclomatic_complexity: 1
     calls_out: 2
     calls_in: 2
-  examples.run_examples.main:
-    name: main
-    module: examples.run_examples
-    line: 73
+  src.nexu.cinema_project_imports._build_markpact_migration:
+    name: _build_markpact_migration
+    module: src.nexu.cinema_project_imports
+    line: 457
+    cyclomatic_complexity: 8
+    calls_out: 14
+    calls_in: 1
+  src.nexu.cinema_baseline_contracts._contract:
+    name: _contract
+    module: src.nexu.cinema_baseline_contracts
+    line: 12
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 8
+  src.nexu.cinema_policy.load_goal_contract_lines:
+    name: load_goal_contract_lines
+    module: src.nexu.cinema_policy
+    line: 744
+    cyclomatic_complexity: 12
+    calls_out: 14
+    calls_in: 1
+  examples.web_app_calculator.cinema.nexu_hooks.effective_ui_constraints:
+    name: effective_ui_constraints
+    module: examples.web_app_calculator.cinema.nexu_hooks
+    line: 139
     cyclomatic_complexity: 2
+    calls_out: 3
+    calls_in: 0
+  examples.scientific_calculator_demo2.print_code:
+    name: print_code
+    module: examples.scientific_calculator_demo2
+    line: 13
+    cyclomatic_complexity: 1
+    calls_out: 6
+    calls_in: 3
+  src.vico.models.utc_now:
+    name: utc_now
+    module: src.vico.models
+    line: 11
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 16
+  src.nexu.cinema_project_imports._safe_extract_zip:
+    name: _safe_extract_zip
+    module: src.nexu.cinema_project_imports
+    line: 168
+    cyclomatic_complexity: 6
+    calls_out: 15
+    calls_in: 1
+  src.nexu.cinema_http_preprocess.http_patch_llm_rules:
+    name: http_patch_llm_rules
+    module: src.nexu.cinema_http_preprocess
+    line: 640
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 1
+  examples.web_app_calculator.cinema.server._propose_cinema_contracts:
+    name: _propose_cinema_contracts
+    module: examples.web_app_calculator.cinema.server
+    line: 690
+    cyclomatic_complexity: 5
+    calls_out: 4
+    calls_in: 1
+  examples.web_app_calculator.cinema.server._trace_slug:
+    name: _trace_slug
+    module: examples.web_app_calculator.cinema.server
+    line: 330
+    cyclomatic_complexity: 1
     calls_out: 1
     calls_in: 0
   examples.web_app_calculator.cinema.server._store_options_cache:
@@ -117,33 +1664,89 @@ nodes:
     cyclomatic_complexity: 1
     calls_out: 1
     calls_in: 6
-  examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler.do_GET:
-    name: do_GET
-    module: examples.web_app_calculator.cinema.server
-    line: 1073
-    cyclomatic_complexity: 37
-    calls_out: 189
-    calls_in: 0
-  src.vico.freeze.freeze_project:
-    name: freeze_project
-    module: src.vico.freeze
-    line: 12
+  examples.mcp_patch_demo.server.presetName:
+    name: presetName
+    module: examples.mcp_patch_demo.server
+    line: 51
     cyclomatic_complexity: 2
-    calls_out: 12
-    calls_in: 6
-  src.nexu.export_prompt._cinema_policy_ledger_block:
-    name: _cinema_policy_ledger_block
-    module: src.nexu.export_prompt
-    line: 16
-    cyclomatic_complexity: 12
-    calls_out: 13
+    calls_out: 3
+    calls_in: 0
+  src.nexu.cinema_project_imports._validate_git_url:
+    name: _validate_git_url
+    module: src.nexu.cinema_project_imports
+    line: 154
+    cyclomatic_complexity: 5
+    calls_out: 5
     calls_in: 1
-  examples.web_app_calculator.cinema.server._normalize_proposals_for_ledger:
-    name: _normalize_proposals_for_ledger
-    module: examples.web_app_calculator.cinema.server
-    line: 764
-    cyclomatic_complexity: 3
-    calls_out: 9
+  src.nexu.llm._extract_content:
+    name: _extract_content
+    module: src.nexu.llm
+    line: 50
+    cyclomatic_complexity: 4
+    calls_out: 5
+    calls_in: 1
+  src.nexu.cinema_policy.load_policy_snapshot:
+    name: load_policy_snapshot
+    module: src.nexu.cinema_policy
+    line: 482
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 1
+  src.nexu.cli.capsule_review:
+    name: capsule_review
+    module: src.nexu.cli
+    line: 311
+    cyclomatic_complexity: 1
+    calls_out: 13
+    calls_in: 0
+  src.nexu.cinema_llm.compact_llm_error:
+    name: compact_llm_error
+    module: src.nexu.cinema_llm
+    line: 221
+    cyclomatic_complexity: 5
+    calls_out: 11
+    calls_in: 3
+  src.nexu.cinema_goal_contracts._resolve_baseline_anchor:
+    name: _resolve_baseline_anchor
+    module: src.nexu.cinema_goal_contracts
+    line: 92
+    cyclomatic_complexity: 5
+    calls_out: 0
+    calls_in: 1
+  src.nexu.files.rel:
+    name: rel
+    module: src.nexu.files
+    line: 24
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 12
+  src.nexu.report.build_capsule_report:
+    name: build_capsule_report
+    module: src.nexu.report
+    line: 35
+    cyclomatic_complexity: 1
+    calls_out: 32
+    calls_in: 2
+  src.nexu.cinema_policy.option_previews_are_distinct:
+    name: option_previews_are_distinct
+    module: src.nexu.cinema_policy
+    line: 206
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 2
+  src.nexu.config._load_env_file:
+    name: _load_env_file
+    module: src.nexu.config
+    line: 66
+    cyclomatic_complexity: 10
+    calls_out: 11
+    calls_in: 1
+  src.nexu.cinema_goal_contracts._detect_expanded_trait:
+    name: _detect_expanded_trait
+    module: src.nexu.cinema_goal_contracts
+    line: 162
+    cyclomatic_complexity: 4
+    calls_out: 3
     calls_in: 1
   src.nexu.iterate.iterate_capsule:
     name: iterate_capsule
@@ -152,153 +1755,69 @@ nodes:
     cyclomatic_complexity: 7
     calls_out: 14
     calls_in: 7
-  examples.web_app_calculator.cinema.nexu_hooks.import_project_from_git:
-    name: import_project_from_git
-    module: examples.web_app_calculator.cinema.nexu_hooks
-    line: 234
-    cyclomatic_complexity: 2
-    calls_out: 3
-    calls_in: 0
-  src.nexu.cinema_scope.scope_meta_for_project:
-    name: scope_meta_for_project
-    module: src.nexu.cinema_scope
-    line: 196
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 3
-  src.nexu.cinema_llm._as_plain_data:
-    name: _as_plain_data
-    module: src.nexu.cinema_llm
-    line: 144
-    cyclomatic_complexity: 5
-    calls_out: 4
-    calls_in: 4
-  src.nexu.cinema_policy.merge_ui_constraint_lists:
-    name: merge_ui_constraint_lists
-    module: src.nexu.cinema_policy
-    line: 166
-    cyclomatic_complexity: 13
-    calls_out: 12
-    calls_in: 2
-  src.nexu.cinema_project_imports.import_http_project:
-    name: import_http_project
-    module: src.nexu.cinema_project_imports
-    line: 705
-    cyclomatic_complexity: 12
-    calls_out: 21
-    calls_in: 1
-  examples.web_app_calculator.cinema.nexu_hooks.sync_option_previews:
-    name: sync_option_previews
-    module: examples.web_app_calculator.cinema.nexu_hooks
-    line: 150
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 0
-  src.nexu.cinema_html_validate.prepare_cinema_html_document:
-    name: prepare_cinema_html_document
-    module: src.nexu.cinema_html_validate
-    line: 168
-    cyclomatic_complexity: 2
-    calls_out: 2
-    calls_in: 3
-  examples.web_app_calculator.cinema.nexu_hooks.delete_imported:
-    name: delete_imported
-    module: examples.web_app_calculator.cinema.nexu_hooks
-    line: 249
-    cyclomatic_complexity: 1
-    calls_out: 4
-    calls_in: 0
-  src.nexu.cinema_options_cache.options_cache_key:
-    name: options_cache_key
-    module: src.nexu.cinema_options_cache
-    line: 25
-    cyclomatic_complexity: 7
-    calls_out: 16
-    calls_in: 2
-  src.nexu.cinema_policy.manifest_paths_from_snapshot:
-    name: manifest_paths_from_snapshot
-    module: src.nexu.cinema_policy
-    line: 489
-    cyclomatic_complexity: 3
-    calls_out: 10
-    calls_in: 0
-  src.nexu.cli.capsule_drift:
-    name: capsule_drift
-    module: src.nexu.cli
-    line: 201
-    cyclomatic_complexity: 2
-    calls_out: 10
-    calls_in: 0
-  examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler.do_DELETE:
-    name: do_DELETE
-    module: examples.web_app_calculator.cinema.server
-    line: 2998
-    cyclomatic_complexity: 9
-    calls_out: 23
-    calls_in: 0
-  src.nexu.files.matches_any:
-    name: matches_any
-    module: src.nexu.files
-    line: 28
-    cyclomatic_complexity: 3
-    calls_out: 4
-    calls_in: 2
-  examples.web_app_calculator.cinema.server._load_cinema_ui_profile:
-    name: _load_cinema_ui_profile
-    module: examples.web_app_calculator.cinema.server
-    line: 66
-    cyclomatic_complexity: 7
-    calls_out: 10
-    calls_in: 2
-  src.nexu.cinema_policy._html_files_distinct:
-    name: _html_files_distinct
-    module: src.nexu.cinema_policy
+  src.nexu.cinema_goal_contracts._detect_dashboard_trait:
+    name: _detect_dashboard_trait
+    module: src.nexu.cinema_goal_contracts
     line: 202
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 1
+  src.nexu.cinema_markpact.build_markpact_readme:
+    name: build_markpact_readme
+    module: src.nexu.cinema_markpact
+    line: 113
+    cyclomatic_complexity: 11
+    calls_out: 21
+    calls_in: 2
+  src.nexu.cinema_history._load_index:
+    name: _load_index
+    module: src.nexu.cinema_history
+    line: 32
+    cyclomatic_complexity: 3
+    calls_out: 5
+    calls_in: 3
+  src.nexu.cinema._start_cinema_server:
+    name: _start_cinema_server
+    module: src.nexu.cinema
+    line: 185
+    cyclomatic_complexity: 2
+    calls_out: 3
+    calls_in: 1
+  src.nexu.cinema_history.ledger_archive_for_display:
+    name: ledger_archive_for_display
+    module: src.nexu.cinema_history
+    line: 220
+    cyclomatic_complexity: 5
+    calls_out: 16
+    calls_in: 1
+  src.nexu.paths.snapshots_dir:
+    name: snapshots_dir
+    module: src.nexu.paths
+    line: 14
     cyclomatic_complexity: 1
     calls_out: 1
     calls_in: 2
-  src.nexu.cinema_projects.find_nexu_repo_root:
-    name: find_nexu_repo_root
-    module: src.nexu.cinema_projects
-    line: 44
-    cyclomatic_complexity: 5
-    calls_out: 4
-    calls_in: 5
-  src.nexu.cinema_publish._port_open:
-    name: _port_open
-    module: src.nexu.cinema_publish
-    line: 72
-    cyclomatic_complexity: 2
-    calls_out: 1
-    calls_in: 1
-  src.nexu.export_prompt.export_iteration_prompt:
-    name: export_iteration_prompt
-    module: src.nexu.export_prompt
-    line: 58
-    cyclomatic_complexity: 3
-    calls_out: 18
-    calls_in: 4
-  src.nexu.cinema_project_imports.import_zip_project:
-    name: import_zip_project
+  src.nexu.cinema_project_imports.merged_projects_catalog:
+    name: merged_projects_catalog
     module: src.nexu.cinema_project_imports
-    line: 773
-    cyclomatic_complexity: 5
+    line: 1270
+    cyclomatic_complexity: 10
     calls_out: 13
     calls_in: 1
-  src.nexu.cinema_projects.delete_example_project:
-    name: delete_example_project
+  examples.web_app_pactown_ecosystem.run.main:
+    name: main
+    module: examples.web_app_pactown_ecosystem.run
+    line: 15
+    cyclomatic_complexity: 8
+    calls_out: 39
+    calls_in: 0
+  src.nexu.cinema_projects._sync_project_options:
+    name: _sync_project_options
     module: src.nexu.cinema_projects
-    line: 224
-    cyclomatic_complexity: 14
-    calls_out: 17
+    line: 599
+    cyclomatic_complexity: 5
+    calls_out: 5
     calls_in: 1
-  src.nexu.cinema_publish._load_registry:
-    name: _load_registry
-    module: src.nexu.cinema_publish
-    line: 33
-    cyclomatic_complexity: 3
-    calls_out: 6
-    calls_in: 6
   src.nexu.cinema_projects._seed_html_for_project:
     name: _seed_html_for_project
     module: src.nexu.cinema_projects
@@ -306,41 +1825,174 @@ nodes:
     cyclomatic_complexity: 9
     calls_out: 21
     calls_in: 3
-  src.nexu.cinema.sync_cinema_templates:
-    name: sync_cinema_templates
-    module: src.nexu.cinema
-    line: 111
-    cyclomatic_complexity: 1
+  src.nexu.cinema_policy._ledger_entry_matches_project:
+    name: _ledger_entry_matches_project
+    module: src.nexu.cinema_policy
+    line: 41
+    cyclomatic_complexity: 8
+    calls_out: 10
+    calls_in: 1
+  src.nexu.cinema_llm.has_terminal_artifacts:
+    name: has_terminal_artifacts
+    module: src.nexu.cinema_llm
+    line: 75
+    cyclomatic_complexity: 3
     calls_out: 4
     calls_in: 2
-  examples.web_app_calculator.cinema.nexu_hooks.start_service:
-    name: start_service
+  src.nexu.cinema_project_imports._apply_http_preprocess_fields:
+    name: _apply_http_preprocess_fields
+    module: src.nexu.cinema_project_imports
+    line: 560
+    cyclomatic_complexity: 9
+    calls_out: 9
+    calls_in: 1
+  src.nexu.cinema_project_imports._activate_delete_fallback:
+    name: _activate_delete_fallback
+    module: src.nexu.cinema_project_imports
+    line: 1144
+    cyclomatic_complexity: 3
+    calls_out: 5
+    calls_in: 1
+  src.nexu.cinema_history._ledger_snapshot:
+    name: _ledger_snapshot
+    module: src.nexu.cinema_history
+    line: 59
+    cyclomatic_complexity: 3
+    calls_out: 4
+    calls_in: 3
+  src.nexu.cinema_project_imports.activate_imported_project:
+    name: activate_imported_project
+    module: src.nexu.cinema_project_imports
+    line: 1280
+    cyclomatic_complexity: 4
+    calls_out: 6
+    calls_in: 1
+  examples.web_app_calculator.cinema.server._effective_markpact_mode:
+    name: _effective_markpact_mode
+    module: examples.web_app_calculator.cinema.server
+    line: 484
+    cyclomatic_complexity: 1
+    calls_out: 7
+    calls_in: 1
+  src.nexu.cinema_project_imports._project_title_from_id:
+    name: _project_title_from_id
+    module: src.nexu.cinema_project_imports
+    line: 815
+    cyclomatic_complexity: 3
+    calls_out: 6
+    calls_in: 1
+  src.nexu.cinema_project_imports._validate_http_url:
+    name: _validate_http_url
+    module: src.nexu.cinema_project_imports
+    line: 145
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 1
+  examples.web_app_calculator.cinema.nexu_hooks.import_project_from_zip:
+    name: import_project_from_zip
     module: examples.web_app_calculator.cinema.nexu_hooks
-    line: 324
+    line: 224
     cyclomatic_complexity: 1
     calls_out: 3
     calls_in: 0
-  src.nexu.cinema_publish._write_service_readme:
-    name: _write_service_readme
-    module: src.nexu.cinema_publish
-    line: 120
-    cyclomatic_complexity: 14
-    calls_out: 24
+  examples.web_app_calculator.cinema.server._effective_ui_constraints_from_ledger:
+    name: _effective_ui_constraints_from_ledger
+    module: examples.web_app_calculator.cinema.server
+    line: 627
+    cyclomatic_complexity: 13
+    calls_out: 12
     calls_in: 1
-  src.nexu.cinema_publish._http_ok:
-    name: _http_ok
-    module: src.nexu.cinema_publish
-    line: 80
-    cyclomatic_complexity: 2
-    calls_out: 1
-    calls_in: 1
-  src.nexu.cinema_projects._write_active_project_meta:
-    name: _write_active_project_meta
-    module: src.nexu.cinema_projects
-    line: 563
-    cyclomatic_complexity: 1
-    calls_out: 2
+  src.nexu.cinema_history._build_label:
+    name: _build_label
+    module: src.nexu.cinema_history
+    line: 67
+    cyclomatic_complexity: 4
+    calls_out: 7
     calls_in: 2
+  src.nexu.cinema_html.ensure_html_document_closure:
+    name: ensure_html_document_closure
+    module: src.nexu.cinema_html
+    line: 6
+    cyclomatic_complexity: 5
+    calls_out: 3
+    calls_in: 2
+  src.nexu.cinema_project_imports.import_git_project:
+    name: import_git_project
+    module: src.nexu.cinema_project_imports
+    line: 661
+    cyclomatic_complexity: 11
+    calls_out: 16
+    calls_in: 1
+  src.nexu.paths.capsule_dir:
+    name: capsule_dir
+    module: src.nexu.paths
+    line: 22
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 25
+  src.vico.freeze.freeze_project:
+    name: freeze_project
+    module: src.vico.freeze
+    line: 12
+    cyclomatic_complexity: 2
+    calls_out: 12
+    calls_in: 6
+  examples.web_app_calculator.cinema.nexu_hooks.verify_capsule:
+    name: verify_capsule
+    module: examples.web_app_calculator.cinema.nexu_hooks
+    line: 55
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 7
+  src.nexu.cli.capsule_diff:
+    name: capsule_diff
+    module: src.nexu.cli
+    line: 185
+    cyclomatic_complexity: 1
+    calls_out: 19
+    calls_in: 0
+  src.nexu.runtime._collect_fixtures:
+    name: _collect_fixtures
+    module: src.nexu.runtime
+    line: 30
+    cyclomatic_complexity: 5
+    calls_out: 7
+    calls_in: 1
+  src.nexu.cinema_policy._html_files_distinct:
+    name: _html_files_distinct
+    module: src.nexu.cinema_policy
+    line: 202
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 2
+  src.nexu.capsule.load_capsule:
+    name: load_capsule
+    module: src.nexu.capsule
+    line: 118
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 11
+  src.nexu.capsule.create_capsule:
+    name: create_capsule
+    module: src.nexu.capsule
+    line: 38
+    cyclomatic_complexity: 8
+    calls_out: 24
+    calls_in: 7
+  src.nexu.cinema_policy.load_effective_ui_constraints:
+    name: load_effective_ui_constraints
+    module: src.nexu.cinema_policy
+    line: 391
+    cyclomatic_complexity: 14
+    calls_out: 15
+    calls_in: 6
+  src.nexu.cinema_project_imports.reject_import_stage_replacement:
+    name: reject_import_stage_replacement
+    module: src.nexu.cinema_project_imports
+    line: 95
+    cyclomatic_complexity: 7
+    calls_out: 7
+    calls_in: 1
   src.nexu.cinema_projects._bootstrap_goal_from_project:
     name: _bootstrap_goal_from_project
     module: src.nexu.cinema_projects
@@ -348,75 +2000,47 @@ nodes:
     cyclomatic_complexity: 4
     calls_out: 6
     calls_in: 1
-  src.nexu.config.load_env_files:
-    name: load_env_files
-    module: src.nexu.config
-    line: 83
-    cyclomatic_complexity: 3
+  examples.web_app_calculator.cinema.nexu_hooks.import_project_from_git:
+    name: import_project_from_git
+    module: examples.web_app_calculator.cinema.nexu_hooks
+    line: 234
+    cyclomatic_complexity: 2
     calls_out: 3
-    calls_in: 4
-  src.nexu.cinema_goal_contracts._detect_chemical_trait:
-    name: _detect_chemical_trait
-    module: src.nexu.cinema_goal_contracts
-    line: 128
+    calls_in: 0
+  src.nexu.cinema_llm_contracts.build_llm_contract_block:
+    name: build_llm_contract_block
+    module: src.nexu.cinema_llm_contracts
+    line: 173
     cyclomatic_complexity: 2
     calls_out: 2
     calls_in: 1
-  examples.scientific_calculator_demo2.print_code:
-    name: print_code
-    module: examples.scientific_calculator_demo2
-    line: 13
-    cyclomatic_complexity: 1
-    calls_out: 6
-    calls_in: 3
-  src.nexu.cinema_history._refresh_policy_snapshot:
-    name: _refresh_policy_snapshot
-    module: src.nexu.cinema_history
-    line: 195
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 1
-  src.nexu.cinema_projects._find_example_project:
-    name: _find_example_project
-    module: src.nexu.cinema_projects
-    line: 548
-    cyclomatic_complexity: 3
-    calls_out: 1
-    calls_in: 1
-  examples.web_app_calculator.cinema.server._ensure_api_key_env:
-    name: _ensure_api_key_env
-    module: examples.web_app_calculator.cinema.server
-    line: 446
-    cyclomatic_complexity: 3
-    calls_out: 3
-    calls_in: 4
-  src.nexu.cinema_history.history_dir:
-    name: history_dir
-    module: src.nexu.cinema_history
-    line: 24
-    cyclomatic_complexity: 1
-    calls_out: 0
-    calls_in: 4
-  examples.web_app_calculator.cinema.server._llm_prompt_rules:
-    name: _llm_prompt_rules
-    module: examples.web_app_calculator.cinema.server
-    line: 121
-    cyclomatic_complexity: 4
-    calls_out: 5
-    calls_in: 1
-  src.nexu.cinema._render_cinema_template:
-    name: _render_cinema_template
-    module: src.nexu.cinema
-    line: 31
+  src.nexu.blueprint.build_blueprint:
+    name: build_blueprint
+    module: src.nexu.blueprint
+    line: 11
+    cyclomatic_complexity: 7
+    calls_out: 8
+    calls_in: 8
+  src.nexu.orchestrate.build_capsule_orchestration:
+    name: build_capsule_orchestration
+    module: src.nexu.orchestrate
+    line: 144
     cyclomatic_complexity: 2
-    calls_out: 5
-    calls_in: 4
-  src.nexu.cinema_goal_contracts._detect_api_trait:
-    name: _detect_api_trait
-    module: src.nexu.cinema_goal_contracts
-    line: 181
-    cyclomatic_complexity: 3
-    calls_out: 3
+    calls_out: 28
+    calls_in: 2
+  src.nexu.cli._relative_to_root:
+    name: _relative_to_root
+    module: src.nexu.cli
+    line: 47
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 10
+  src.nexu.runtime._read_fixture:
+    name: _read_fixture
+    module: src.nexu.runtime
+    line: 18
+    cyclomatic_complexity: 5
+    calls_out: 6
     calls_in: 1
   src.nexu.cinema_policy.sync_option_previews_from_workspace:
     name: sync_option_previews_from_workspace
@@ -425,6 +2049,104 @@ nodes:
     cyclomatic_complexity: 4
     calls_out: 5
     calls_in: 1
+  examples.web_app_calculator.cinema.nexu_hooks.projects_catalog:
+    name: projects_catalog
+    module: examples.web_app_calculator.cinema.nexu_hooks
+    line: 205
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 0
+  src.nexu.cinema.build_intract_policy_snapshot:
+    name: build_intract_policy_snapshot
+    module: src.nexu.cinema
+    line: 63
+    cyclomatic_complexity: 11
+    calls_out: 32
+    calls_in: 4
+  src.nexu.cinema_server.start_cinema_player_server:
+    name: start_cinema_player_server
+    module: src.nexu.cinema_server
+    line: 127
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 1
+  src.nexu.cli.capsule_verify:
+    name: capsule_verify
+    module: src.nexu.cli
+    line: 215
+    cyclomatic_complexity: 4
+    calls_out: 10
+    calls_in: 0
+  examples.web_app_dashboard.run.main:
+    name: main
+    module: examples.web_app_dashboard.run
+    line: 16
+    cyclomatic_complexity: 2
+    calls_out: 35
+    calls_in: 0
+  src.nexu.cinema_project_imports._compile_meta_fields:
+    name: _compile_meta_fields
+    module: src.nexu.cinema_project_imports
+    line: 979
+    cyclomatic_complexity: 8
+    calls_out: 17
+    calls_in: 1
+  examples.web_app_calculator.cinema.server._load_cinema_ui_profile:
+    name: _load_cinema_ui_profile
+    module: examples.web_app_calculator.cinema.server
+    line: 66
+    cyclomatic_complexity: 7
+    calls_out: 10
+    calls_in: 2
+  src.nexu.cli.capsule_drift:
+    name: capsule_drift
+    module: src.nexu.cli
+    line: 201
+    cyclomatic_complexity: 2
+    calls_out: 10
+    calls_in: 0
+  src.nexu.fast_delivery.context.effective_markpact_mode:
+    name: effective_markpact_mode
+    module: src.nexu.fast_delivery.context
+    line: 19
+    cyclomatic_complexity: 8
+    calls_out: 7
+    calls_in: 1
+  src.nexu.cinema_project_imports._finish_import:
+    name: _finish_import
+    module: src.nexu.cinema_project_imports
+    line: 832
+    cyclomatic_complexity: 10
+    calls_out: 29
+    calls_in: 3
+  src.nexu.review._markdown_review_prompt:
+    name: _markdown_review_prompt
+    module: src.nexu.review
+    line: 20
+    cyclomatic_complexity: 1
+    calls_out: 6
+    calls_in: 1
+  src.nexu.cinema_project_imports._refresh_http_preprocess_if_needed:
+    name: _refresh_http_preprocess_if_needed
+    module: src.nexu.cinema_project_imports
+    line: 578
+    cyclomatic_complexity: 6
+    calls_out: 13
+    calls_in: 1
+  src.nexu.cinema_server._available_port:
+    name: _available_port
+    module: src.nexu.cinema_server
+    line: 73
+    cyclomatic_complexity: 4
+    calls_out: 8
+    calls_in: 1
+  src.nexu.paths.project_root:
+    name: project_root
+    module: src.nexu.paths
+    line: 6
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 29
   src.nexu.cinema_policy.policy_snapshot_path:
     name: policy_snapshot_path
     module: src.nexu.cinema_policy
@@ -432,110 +2154,19 @@ nodes:
     cyclomatic_complexity: 1
     calls_out: 1
     calls_in: 1
-  src.nexu.cinema_llm.compact_llm_error:
-    name: compact_llm_error
+  src.nexu.cinema_llm._litellm_completion:
+    name: _litellm_completion
     module: src.nexu.cinema_llm
-    line: 221
-    cyclomatic_complexity: 5
-    calls_out: 11
-    calls_in: 3
-  src.nexu.cinema_publish._allocate_service_port:
-    name: _allocate_service_port
-    module: src.nexu.cinema_publish
-    line: 234
-    cyclomatic_complexity: 11
-    calls_out: 11
-    calls_in: 1
-  examples.realtime_lane_nexu_sync.simulate_realtime_sync:
-    name: simulate_realtime_sync
-    module: examples.realtime_lane_nexu_sync
-    line: 14
+    line: 31
     cyclomatic_complexity: 2
-    calls_out: 10
-    calls_in: 0
-  src.nexu.capsule.load_capsule:
-    name: load_capsule
-    module: src.nexu.capsule
-    line: 118
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 11
-  src.nexu.cinema_traces.read_llm_trace:
-    name: read_llm_trace
-    module: src.nexu.cinema_traces
-    line: 154
-    cyclomatic_complexity: 2
-    calls_out: 5
-    calls_in: 1
-  examples.web_app_calculator.cinema.nexu_hooks.validate_artifact:
-    name: validate_artifact
-    module: examples.web_app_calculator.cinema.nexu_hooks
-    line: 115
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 0
-  src.nexu.cinema_projects.load_active_project:
-    name: load_active_project
-    module: src.nexu.cinema_projects
-    line: 712
-    cyclomatic_complexity: 4
-    calls_out: 4
-    calls_in: 10
-  examples.web_app_calculator.cinema.server._effective_ui_constraints_from_ledger:
-    name: _effective_ui_constraints_from_ledger
-    module: examples.web_app_calculator.cinema.server
-    line: 627
-    cyclomatic_complexity: 13
-    calls_out: 12
-    calls_in: 1
-  src.nexu.promote.apply_promotion_plan:
-    name: apply_promotion_plan
-    module: src.nexu.promote
-    line: 79
-    cyclomatic_complexity: 4
-    calls_out: 8
-    calls_in: 3
-  src.nexu.cinema_projects._resolve_source_cinema:
-    name: _resolve_source_cinema
-    module: src.nexu.cinema_projects
-    line: 267
-    cyclomatic_complexity: 5
-    calls_out: 2
-    calls_in: 1
-  src.nexu.cinema_goal_contracts._slug:
-    name: _slug
-    module: src.nexu.cinema_goal_contracts
-    line: 36
-    cyclomatic_complexity: 2
-    calls_out: 4
+    calls_out: 0
     calls_in: 2
-  examples.web_app_calculator.cinema.server._read_trace_index:
-    name: _read_trace_index
-    module: examples.web_app_calculator.cinema.server
-    line: 336
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 0
-  src.nexu.cli.capsule_export_prompt:
-    name: capsule_export_prompt
-    module: src.nexu.cli
-    line: 173
-    cyclomatic_complexity: 1
-    calls_out: 8
-    calls_in: 0
-  src.nexu.cinema_publish._spawn_http_server:
-    name: _spawn_http_server
-    module: src.nexu.cinema_publish
-    line: 381
-    cyclomatic_complexity: 1
-    calls_out: 5
-    calls_in: 1
-  src.nexu.cinema_publish._wait_for_service_running:
-    name: _wait_for_service_running
-    module: src.nexu.cinema_publish
-    line: 395
-    cyclomatic_complexity: 3
-    calls_out: 6
+  src.nexu.cinema_policy.refresh_imported_policy_snapshot:
+    name: refresh_imported_policy_snapshot
+    module: src.nexu.cinema_policy
+    line: 252
+    cyclomatic_complexity: 5
+    calls_out: 13
     calls_in: 1
   src.nexu.intract_adapter._result_status:
     name: _result_status
@@ -544,52 +2175,409 @@ nodes:
     cyclomatic_complexity: 1
     calls_out: 3
     calls_in: 1
-  src.nexu.files.collect_files:
-    name: collect_files
-    module: src.nexu.files
-    line: 36
-    cyclomatic_complexity: 8
-    calls_out: 8
-    calls_in: 6
-  src.nexu.cli.capsule_diff:
-    name: capsule_diff
-    module: src.nexu.cli
-    line: 185
-    cyclomatic_complexity: 1
+  src.nexu.cinema_history.save_history_checkpoint:
+    name: save_history_checkpoint
+    module: src.nexu.cinema_history
+    line: 86
+    cyclomatic_complexity: 4
     calls_out: 19
-    calls_in: 0
-  src.nexu.paths.capsule_dir:
-    name: capsule_dir
-    module: src.nexu.paths
-    line: 22
+    calls_in: 2
+  src.nexu.cinema_traces.list_llm_traces:
+    name: list_llm_traces
+    module: src.nexu.cinema_traces
+    line: 148
     cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 25
-  src.nexu.cinema_server._litellm_available:
-    name: _litellm_available
-    module: src.nexu.cinema_server
-    line: 47
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 1
-  src.nexu.cinema._contract_to_public_dict:
-    name: _contract_to_public_dict
-    module: src.nexu.cinema
-    line: 44
+    calls_out: 2
+    calls_in: 2
+  src.nexu.cinema_history.history_index_path:
+    name: history_index_path
+    module: src.nexu.cinema_history
+    line: 28
     cyclomatic_complexity: 1
     calls_out: 1
     calls_in: 2
-  examples.web_app_pactown_ecosystem.run.main:
-    name: main
-    module: examples.web_app_pactown_ecosystem.run
-    line: 15
-    cyclomatic_complexity: 8
-    calls_out: 39
+  src.nexu.review.build_review_packet:
+    name: build_review_packet
+    module: src.nexu.review
+    line: 70
+    cyclomatic_complexity: 5
+    calls_out: 24
+    calls_in: 2
+  examples.web_app_calculator.cinema.server._append_policy_entry:
+    name: _append_policy_entry
+    module: examples.web_app_calculator.cinema.server
+    line: 840
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 1
+  src.nexu.cinema_baseline_contracts.merge_calculator_baselines:
+    name: merge_calculator_baselines
+    module: src.nexu.cinema_baseline_contracts
+    line: 120
+    cyclomatic_complexity: 5
+    calls_out: 5
+    calls_in: 1
+  src.nexu.cinema_project_imports._source_url_from_meta:
+    name: _source_url_from_meta
+    module: src.nexu.cinema_project_imports
+    line: 926
+    cyclomatic_complexity: 6
+    calls_out: 9
+    calls_in: 5
+  src.nexu.cinema_policy.cinema_model_label:
+    name: cinema_model_label
+    module: src.nexu.cinema_policy
+    line: 462
+    cyclomatic_complexity: 2
+    calls_out: 3
     calls_in: 0
-  examples.web_app_calculator.cinema.nexu_hooks.restore_history:
-    name: restore_history
+  examples.web_app_calculator.cinema.nexu_hooks.append_goal_policy_entry:
+    name: append_goal_policy_entry
     module: examples.web_app_calculator.cinema.nexu_hooks
+    line: 91
+    cyclomatic_complexity: 11
+    calls_out: 19
+    calls_in: 0
+  examples.web_app_calculator.cinema.nexu_hooks.apply_manifest_from_ledger:
+    name: apply_manifest_from_ledger
+    module: examples.web_app_calculator.cinema.nexu_hooks
+    line: 51
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 0
+  src.nexu.cinema_project_imports._stage_html:
+    name: _stage_html
+    module: src.nexu.cinema_project_imports
+    line: 502
+    cyclomatic_complexity: 5
+    calls_out: 9
+    calls_in: 2
+  src.nexu.cinema_project_imports._catalog_entry_from_meta:
+    name: _catalog_entry_from_meta
+    module: src.nexu.cinema_project_imports
+    line: 1023
+    cyclomatic_complexity: 7
+    calls_out: 22
+    calls_in: 1
+  src.nexu.cinema_projects.activate_example_project:
+    name: activate_example_project
+    module: src.nexu.cinema_projects
+    line: 663
+    cyclomatic_complexity: 2
+    calls_out: 13
+    calls_in: 3
+  examples.web_app_calculator.cinema.nexu_hooks.append_policy_entry:
+    name: append_policy_entry
+    module: examples.web_app_calculator.cinema.nexu_hooks
+    line: 70
+    cyclomatic_complexity: 6
+    calls_out: 14
+    calls_in: 0
+  src.nexu.cinema_traces.read_trace_index:
+    name: read_trace_index
+    module: src.nexu.cinema_traces
+    line: 53
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 3
+  src.nexu.cinema_policy.reset_cinema_policy_ledger:
+    name: reset_cinema_policy_ledger
+    module: src.nexu.cinema_policy
+    line: 366
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 2
+  src.nexu.cinema_policy.normalize_manifest_target:
+    name: normalize_manifest_target
+    module: src.nexu.cinema_policy
+    line: 455
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 1
+  src.nexu.mcp_server.run_mcp_stdio:
+    name: run_mcp_stdio
+    module: src.nexu.mcp_server
+    line: 375
+    cyclomatic_complexity: 6
+    calls_out: 7
+    calls_in: 1
+  src.nexu.cinema_llm._strip_markdown_fences:
+    name: _strip_markdown_fences
+    module: src.nexu.cinema_llm
+    line: 38
+    cyclomatic_complexity: 8
+    calls_out: 11
+    calls_in: 1
+  examples.web_app_calculator.cinema.server._llm_prompt_rules:
+    name: _llm_prompt_rules
+    module: examples.web_app_calculator.cinema.server
+    line: 121
+    cyclomatic_complexity: 4
+    calls_out: 5
+    calls_in: 1
+  src.nexu.cinema_policy.effective_ui_constraints_from_ledger:
+    name: effective_ui_constraints_from_ledger
+    module: src.nexu.cinema_policy
     line: 133
+    cyclomatic_complexity: 4
+    calls_out: 4
+    calls_in: 2
+  src.nexu.cinema.sync_cinema_templates:
+    name: sync_cinema_templates
+    module: src.nexu.cinema
+    line: 111
+    cyclomatic_complexity: 1
+    calls_out: 4
+    calls_in: 3
+  src.nexu.cli.capsule_status_command:
+    name: capsule_status_command
+    module: src.nexu.cli
+    line: 120
+    cyclomatic_complexity: 3
+    calls_out: 17
+    calls_in: 0
+  examples.nexu_markpact_exporter.main:
+    name: main
+    module: examples.nexu_markpact_exporter
+    line: 17
+    cyclomatic_complexity: 3
+    calls_out: 22
+    calls_in: 0
+  src.vico.models.write_yaml:
+    name: write_yaml
+    module: src.vico.models
+    line: 143
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 22
+  src.nexu.cinema_project_imports.delete_project:
+    name: delete_project
+    module: src.nexu.cinema_project_imports
+    line: 1227
+    cyclomatic_complexity: 3
+    calls_out: 6
+    calls_in: 1
+  src.nexu.cinema_policy._resolve_ledger_path:
+    name: _resolve_ledger_path
+    module: src.nexu.cinema_policy
+    line: 624
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 2
+  src.nexu.cinema_goal_contracts._hints_text:
+    name: _hints_text
+    module: src.nexu.cinema_goal_contracts
+    line: 12
+    cyclomatic_complexity: 3
+    calls_out: 6
+    calls_in: 1
+  src.nexu.cinema_project_imports.is_deletable_imported_id:
+    name: is_deletable_imported_id
+    module: src.nexu.cinema_project_imports
+    line: 941
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 6
+  src.nexu.cli.capsule_plan:
+    name: capsule_plan
+    module: src.nexu.cli
+    line: 237
+    cyclomatic_complexity: 2
+    calls_out: 12
+    calls_in: 0
+  src.nexu.cinema_publish.list_published_services:
+    name: list_published_services
+    module: src.nexu.cinema_publish
+    line: 112
+    cyclomatic_complexity: 3
+    calls_out: 6
+    calls_in: 1
+  src.nexu.cinema_project_imports._import_kind_from_id:
+    name: _import_kind_from_id
+    module: src.nexu.cinema_project_imports
+    line: 805
+    cyclomatic_complexity: 4
+    calls_out: 3
+    calls_in: 4
+  src.nexu.cinema_policy.ensure_option_previews_from_stages:
+    name: ensure_option_previews_from_stages
+    module: src.nexu.cinema_policy
+    line: 218
+    cyclomatic_complexity: 3
+    calls_out: 5
+    calls_in: 3
+  src.nexu.cinema_publish.stop_published_service:
+    name: stop_published_service
+    module: src.nexu.cinema_publish
+    line: 445
+    cyclomatic_complexity: 9
+    calls_out: 11
+    calls_in: 2
+  src.nexu.cinema_traces.read_llm_trace:
+    name: read_llm_trace
+    module: src.nexu.cinema_traces
+    line: 154
+    cyclomatic_complexity: 2
+    calls_out: 5
+    calls_in: 1
+  src.nexu.cinema_policy._process_proposed_contracts:
+    name: _process_proposed_contracts
+    module: src.nexu.cinema_policy
+    line: 112
+    cyclomatic_complexity: 8
+    calls_out: 3
+    calls_in: 1
+  src.nexu.cinema_policy._process_ledger_entry:
+    name: _process_ledger_entry
+    module: src.nexu.cinema_policy
+    line: 75
+    cyclomatic_complexity: 6
+    calls_out: 6
+    calls_in: 1
+  src.nexu.llm.offline_review_from_status:
+    name: offline_review_from_status
+    module: src.nexu.llm
+    line: 135
+    cyclomatic_complexity: 4
+    calls_out: 0
+    calls_in: 1
+  src.nexu.cinema._cinema_template_text:
+    name: _cinema_template_text
+    module: src.nexu.cinema
+    line: 27
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 3
+  examples.web_app_calculator.cinema.nexu_hooks.publish_service:
+    name: publish_service
+    module: examples.web_app_calculator.cinema.nexu_hooks
+    line: 310
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 0
+  examples.web_app_calculator.cinema.server._try_read_options_cache:
+    name: _try_read_options_cache
+    module: examples.web_app_calculator.cinema.server
+    line: 514
+    cyclomatic_complexity: 2
+    calls_out: 3
+    calls_in: 1
+  src.nexu.cinema_policy.propose_llm_for_stage:
+    name: propose_llm_for_stage
+    module: src.nexu.cinema_policy
+    line: 817
+    cyclomatic_complexity: 8
+    calls_out: 14
+    calls_in: 1
+  src.nexu.cinema_projects._copy_cinema_files:
+    name: _copy_cinema_files
+    module: src.nexu.cinema_projects
+    line: 508
+    cyclomatic_complexity: 4
+    calls_out: 6
+    calls_in: 1
+  src.nexu.cinema_history._refresh_policy_snapshot:
+    name: _refresh_policy_snapshot
+    module: src.nexu.cinema_history
+    line: 195
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 1
+  examples.web_app_calculator.cinema.server._delete_imported_project:
+    name: _delete_imported_project
+    module: examples.web_app_calculator.cinema.server
+    line: 408
+    cyclomatic_complexity: 2
+    calls_out: 1
+    calls_in: 1
+  src.nexu.cinema_history.history_dir:
+    name: history_dir
+    module: src.nexu.cinema_history
+    line: 24
+    cyclomatic_complexity: 1
+    calls_out: 0
+    calls_in: 4
+  src.nexu.cinema_project_imports._slug:
+    name: _slug
+    module: src.nexu.cinema_project_imports
+    line: 130
+    cyclomatic_complexity: 2
+    calls_out: 3
+    calls_in: 3
+  examples.web_app_calculator.cinema.server._write_llm_trace:
+    name: _write_llm_trace
+    module: examples.web_app_calculator.cinema.server
+    line: 342
+    cyclomatic_complexity: 3
+    calls_out: 6
+    calls_in: 22
+  src.nexu.cinema_scope.load_cinema_ui_profile:
+    name: load_cinema_ui_profile
+    module: src.nexu.cinema_scope
+    line: 203
+    cyclomatic_complexity: 10
+    calls_out: 15
+    calls_in: 1
+  src.nexu.cinema_http_preprocess.ensure_http_preprocess_artifacts:
+    name: ensure_http_preprocess_artifacts
+    module: src.nexu.cinema_http_preprocess
+    line: 456
+    cyclomatic_complexity: 4
+    calls_out: 3
+    calls_in: 1
+  src.vico.status.capsule_status:
+    name: capsule_status
+    module: src.vico.status
+    line: 11
+    cyclomatic_complexity: 3
+    calls_out: 10
+    calls_in: 3
+  src.vico.git.current_git_sha:
+    name: current_git_sha
+    module: src.vico.git
+    line: 7
+    cyclomatic_complexity: 4
+    calls_out: 3
+    calls_in: 2
+  examples.web_app_calculator.cinema.nexu_hooks.delete_workspace_project:
+    name: delete_workspace_project
+    module: examples.web_app_calculator.cinema.nexu_hooks
+    line: 261
+    cyclomatic_complexity: 1
+    calls_out: 4
+    calls_in: 0
+  examples.mcp_patch_demo.server.presetDsl:
+    name: presetDsl
+    module: examples.mcp_patch_demo.server
+    line: 52
+    cyclomatic_complexity: 2
+    calls_out: 3
+    calls_in: 0
+  src.nexu.cinema_project_imports._filter_traces_for_project:
+    name: _filter_traces_for_project
+    module: src.nexu.cinema_project_imports
+    line: 1053
+    cyclomatic_complexity: 11
+    calls_out: 8
+    calls_in: 1
+  src.nexu.cinema_policy._proposal_kind_and_element:
+    name: _proposal_kind_and_element
+    module: src.nexu.cinema_policy
+    line: 653
+    cyclomatic_complexity: 12
+    calls_out: 8
+    calls_in: 2
+  examples.web_app_calculator.cinema.server._proposal_delta_text:
+    name: _proposal_delta_text
+    module: examples.web_app_calculator.cinema.server
+    line: 753
+    cyclomatic_complexity: 5
+    calls_out: 4
+    calls_in: 1
+  src.nexu.cinema_llm.extract_html_document:
+    name: extract_html_document
+    module: src.nexu.cinema_llm
+    line: 104
     cyclomatic_complexity: 1
     calls_out: 1
     calls_in: 0
@@ -600,734 +2588,6 @@ nodes:
     cyclomatic_complexity: 1
     calls_out: 4
     calls_in: 0
-  src.vico.models.write_yaml:
-    name: write_yaml
-    module: src.vico.models
-    line: 143
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 22
-  src.nexu.llm._extract_content:
-    name: _extract_content
-    module: src.nexu.llm
-    line: 50
-    cyclomatic_complexity: 4
-    calls_out: 5
-    calls_in: 1
-  src.nexu.cinema_history._ledger_snapshot:
-    name: _ledger_snapshot
-    module: src.nexu.cinema_history
-    line: 59
-    cyclomatic_complexity: 3
-    calls_out: 4
-    calls_in: 3
-  src.nexu.capsule.save_capsule:
-    name: save_capsule
-    module: src.nexu.capsule
-    line: 123
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 1
-  examples.mcp_patch_demo.server.presetName:
-    name: presetName
-    module: examples.mcp_patch_demo.server
-    line: 51
-    cyclomatic_complexity: 2
-    calls_out: 3
-    calls_in: 0
-  examples.web_app_calculator.cinema.server._litellm_available:
-    name: _litellm_available
-    module: examples.web_app_calculator.cinema.server
-    line: 264
-    cyclomatic_complexity: 2
-    calls_out: 1
-    calls_in: 2
-  examples.web_app_calculator.cinema.server._apply_entry_constraints:
-    name: _apply_entry_constraints
-    module: examples.web_app_calculator.cinema.server
-    line: 616
-    cyclomatic_complexity: 7
-    calls_out: 6
-    calls_in: 1
-  src.nexu.fast_delivery.context.effective_markpact_mode:
-    name: effective_markpact_mode
-    module: src.nexu.fast_delivery.context
-    line: 19
-    cyclomatic_complexity: 8
-    calls_out: 7
-    calls_in: 1
-  src.nexu.cli.capsule_orchestrate:
-    name: capsule_orchestrate
-    module: src.nexu.cli
-    line: 294
-    cyclomatic_complexity: 1
-    calls_out: 14
-    calls_in: 0
-  src.nexu.cinema_policy.ensure_option_previews_from_stages:
-    name: ensure_option_previews_from_stages
-    module: src.nexu.cinema_policy
-    line: 218
-    cyclomatic_complexity: 3
-    calls_out: 5
-    calls_in: 3
-  src.nexu.cinema_policy._process_proposed_contracts:
-    name: _process_proposed_contracts
-    module: src.nexu.cinema_policy
-    line: 112
-    cyclomatic_complexity: 8
-    calls_out: 3
-    calls_in: 1
-  examples.web_app_calculator.cinema.server._effective_markpact_mode:
-    name: _effective_markpact_mode
-    module: examples.web_app_calculator.cinema.server
-    line: 484
-    cyclomatic_complexity: 1
-    calls_out: 7
-    calls_in: 1
-  src.nexu.llm._strip_fences:
-    name: _strip_fences
-    module: src.nexu.llm
-    line: 65
-    cyclomatic_complexity: 7
-    calls_out: 9
-    calls_in: 1
-  src.nexu.review.build_review_packet:
-    name: build_review_packet
-    module: src.nexu.review
-    line: 70
-    cyclomatic_complexity: 5
-    calls_out: 24
-    calls_in: 2
-  src.nexu.cinema_policy.refresh_cinema_policy_snapshot:
-    name: refresh_cinema_policy_snapshot
-    module: src.nexu.cinema_policy
-    line: 372
-    cyclomatic_complexity: 2
-    calls_out: 4
-    calls_in: 2
-  examples.web_app_calculator.cinema.server._propose_llm_for_stage:
-    name: _propose_llm_for_stage
-    module: examples.web_app_calculator.cinema.server
-    line: 824
-    cyclomatic_complexity: 2
-    calls_out: 2
-    calls_in: 1
-  src.nexu.cinema_history.save_history_checkpoint:
-    name: save_history_checkpoint
-    module: src.nexu.cinema_history
-    line: 86
-    cyclomatic_complexity: 4
-    calls_out: 19
-    calls_in: 2
-  src.nexu.cinema_history.ledger_archive_for_display:
-    name: ledger_archive_for_display
-    module: src.nexu.cinema_history
-    line: 220
-    cyclomatic_complexity: 5
-    calls_out: 16
-    calls_in: 1
-  src.nexu.cinema_projects._apply_preprocess_meta:
-    name: _apply_preprocess_meta
-    module: src.nexu.cinema_projects
-    line: 611
-    cyclomatic_complexity: 3
-    calls_out: 5
-    calls_in: 1
-  src.nexu.cinema_llm.looks_like_html_document:
-    name: looks_like_html_document
-    module: src.nexu.cinema_llm
-    line: 81
-    cyclomatic_complexity: 3
-    calls_out: 3
-    calls_in: 2
-  src.nexu.cinema_policy._intract_manifest_path:
-    name: _intract_manifest_path
-    module: src.nexu.cinema_policy
-    line: 31
-    cyclomatic_complexity: 4
-    calls_out: 4
-    calls_in: 4
-  src.nexu.cinema_policy.load_effective_ui_constraints:
-    name: load_effective_ui_constraints
-    module: src.nexu.cinema_policy
-    line: 391
-    cyclomatic_complexity: 14
-    calls_out: 15
-    calls_in: 6
-  src.nexu.cinema_policy.cinema_model_label:
-    name: cinema_model_label
-    module: src.nexu.cinema_policy
-    line: 462
-    cyclomatic_complexity: 2
-    calls_out: 3
-    calls_in: 0
-  examples.web_app_calculator.cinema.server._proposal_kind_and_element:
-    name: _proposal_kind_and_element
-    module: examples.web_app_calculator.cinema.server
-    line: 735
-    cyclomatic_complexity: 12
-    calls_out: 8
-    calls_in: 2
-  src.nexu.cinema_traces.redact_secrets:
-    name: redact_secrets
-    module: src.nexu.cinema_traces
-    line: 20
-    cyclomatic_complexity: 9
-    calls_out: 9
-    calls_in: 3
-  src.nexu.cinema_policy.effective_ui_constraints_from_ledger:
-    name: effective_ui_constraints_from_ledger
-    module: src.nexu.cinema_policy
-    line: 133
-    cyclomatic_complexity: 4
-    calls_out: 4
-    calls_in: 2
-  src.nexu.cinema_policy.append_goal_ledger_entry:
-    name: append_goal_ledger_entry
-    module: src.nexu.cinema_policy
-    line: 692
-    cyclomatic_complexity: 7
-    calls_out: 13
-    calls_in: 2
-  src.nexu.cinema_projects.deleted_project_ids:
-    name: deleted_project_ids
-    module: src.nexu.cinema_projects
-    line: 150
-    cyclomatic_complexity: 7
-    calls_out: 12
-    calls_in: 4
-  examples.web_app_calculator.cinema.nexu_hooks.imported_markpact:
-    name: imported_markpact
-    module: examples.web_app_calculator.cinema.nexu_hooks
-    line: 273
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 0
-  src.nexu.cinema_history.restore_history_checkpoint:
-    name: restore_history_checkpoint
-    module: src.nexu.cinema_history
-    line: 141
-    cyclomatic_complexity: 8
-    calls_out: 18
-    calls_in: 1
-  examples.mcp_patch_demo.server.presetDsl:
-    name: presetDsl
-    module: examples.mcp_patch_demo.server
-    line: 52
-    cyclomatic_complexity: 2
-    calls_out: 3
-    calls_in: 0
-  src.nexu.cinema_baseline_contracts.calculator_baseline_contracts:
-    name: calculator_baseline_contracts
-    module: src.nexu.cinema_baseline_contracts
-    line: 56
-    cyclomatic_complexity: 1
-    calls_out: 7
-    calls_in: 2
-  examples.web_app_calculator.cinema.server._update_constraints:
-    name: _update_constraints
-    module: examples.web_app_calculator.cinema.server
-    line: 657
-    cyclomatic_complexity: 4
-    calls_out: 2
-    calls_in: 4
-  src.nexu.cinema_projects.is_example_project_id:
-    name: is_example_project_id
-    module: src.nexu.cinema_projects
-    line: 176
-    cyclomatic_complexity: 2
-    calls_out: 1
-    calls_in: 1
-  src.nexu.cinema_server.start_cinema_player_server:
-    name: start_cinema_player_server
-    module: src.nexu.cinema_server
-    line: 127
-    cyclomatic_complexity: 2
-    calls_out: 4
-    calls_in: 1
-  src.nexu.cli.capsule_bundle:
-    name: capsule_bundle
-    module: src.nexu.cli
-    line: 327
-    cyclomatic_complexity: 1
-    calls_out: 9
-    calls_in: 0
-  src.nexu.cinema_projects.mark_project_deleted:
-    name: mark_project_deleted
-    module: src.nexu.cinema_projects
-    line: 170
-    cyclomatic_complexity: 1
-    calls_out: 6
-    calls_in: 1
-  src.nexu.cinema_llm.call_cinema_html_llm:
-    name: call_cinema_html_llm
-    module: src.nexu.cinema_llm
-    line: 298
-    cyclomatic_complexity: 12
-    calls_out: 8
-    calls_in: 1
-  src.nexu.cinema.build_intract_policy_snapshot:
-    name: build_intract_policy_snapshot
-    module: src.nexu.cinema
-    line: 63
-    cyclomatic_complexity: 11
-    calls_out: 32
-    calls_in: 4
-  examples.web_app_calculator.cinema.nexu_hooks.stop_service:
-    name: stop_service
-    module: examples.web_app_calculator.cinema.nexu_hooks
-    line: 329
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 0
-  src.vico.drift.check_source_drift:
-    name: check_source_drift
-    module: src.vico.drift
-    line: 11
-    cyclomatic_complexity: 7
-    calls_out: 10
-    calls_in: 5
-  src.nexu.cinema_markpact.build_markpact_readme:
-    name: build_markpact_readme
-    module: src.nexu.cinema_markpact
-    line: 113
-    cyclomatic_complexity: 11
-    calls_out: 21
-    calls_in: 2
-  src.nexu.intract_adapter._ensure_intract_on_path:
-    name: _ensure_intract_on_path
-    module: src.nexu.intract_adapter
-    line: 21
-    cyclomatic_complexity: 3
-    calls_out: 4
-    calls_in: 1
-  src.nexu.bundle._should_include:
-    name: _should_include
-    module: src.nexu.bundle
-    line: 13
-    cyclomatic_complexity: 5
-    calls_out: 4
-    calls_in: 1
-  src.nexu.cinema_projects._sync_project_options:
-    name: _sync_project_options
-    module: src.nexu.cinema_projects
-    line: 599
-    cyclomatic_complexity: 5
-    calls_out: 5
-    calls_in: 1
-  src.nexu.cinema_project_imports.import_git_project:
-    name: import_git_project
-    module: src.nexu.cinema_project_imports
-    line: 661
-    cyclomatic_complexity: 11
-    calls_out: 16
-    calls_in: 1
-  src.nexu.cinema_options_cache.goal_slug:
-    name: goal_slug
-    module: src.nexu.cinema_options_cache
-    line: 16
-    cyclomatic_complexity: 4
-    calls_out: 5
-    calls_in: 2
-  examples.mcp_patch_demo.server.data:
-    name: data
-    module: examples.mcp_patch_demo.server
-    line: 47
-    cyclomatic_complexity: 4
-    calls_out: 6
-    calls_in: 0
-  src.nexu.config.load_config:
-    name: load_config
-    module: src.nexu.config
-    line: 113
-    cyclomatic_complexity: 14
-    calls_out: 76
-    calls_in: 5
-  src.nexu.cinema_policy._ledger_entry_matches_scope:
-    name: _ledger_entry_matches_scope
-    module: src.nexu.cinema_policy
-    line: 64
-    cyclomatic_complexity: 5
-    calls_out: 7
-    calls_in: 1
-  src.nexu.fast_delivery.options.store_options_cache:
-    name: store_options_cache
-    module: src.nexu.fast_delivery.options
-    line: 83
-    cyclomatic_complexity: 3
-    calls_out: 4
-    calls_in: 1
-  src.nexu.cinema_http_preprocess.preprocess_cinema_seed:
-    name: preprocess_cinema_seed
-    module: src.nexu.cinema_http_preprocess
-    line: 423
-    cyclomatic_complexity: 3
-    calls_out: 3
-    calls_in: 1
-  examples.web_app_calculator.cinema.nexu_hooks.active_project:
-    name: active_project
-    module: examples.web_app_calculator.cinema.nexu_hooks
-    line: 284
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 0
-  src.nexu.cinema_publish._register_service:
-    name: _register_service
-    module: src.nexu.cinema_publish
-    line: 285
-    cyclomatic_complexity: 4
-    calls_out: 6
-    calls_in: 1
-  src.nexu.cli.capsule_promote:
-    name: capsule_promote
-    module: src.nexu.cli
-    line: 340
-    cyclomatic_complexity: 3
-    calls_out: 14
-    calls_in: 0
-  examples.web_app_calculator.cinema.server._read_llm_trace:
-    name: _read_llm_trace
-    module: examples.web_app_calculator.cinema.server
-    line: 440
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 1
-  src.nexu.llm.offline_review_from_status:
-    name: offline_review_from_status
-    module: src.nexu.llm
-    line: 135
-    cyclomatic_complexity: 4
-    calls_out: 0
-    calls_in: 1
-  src.nexu.cinema_goal_contracts._detect_minimal_trait:
-    name: _detect_minimal_trait
-    module: src.nexu.cinema_goal_contracts
-    line: 143
-    cyclomatic_complexity: 4
-    calls_out: 3
-    calls_in: 1
-  examples.web_app_calculator.cinema.nexu_hooks.goal_contract_lines:
-    name: goal_contract_lines
-    module: examples.web_app_calculator.cinema.nexu_hooks
-    line: 111
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 0
-  examples.web_app_calculator.cinema.server._llm_network_allowed:
-    name: _llm_network_allowed
-    module: examples.web_app_calculator.cinema.server
-    line: 254
-    cyclomatic_complexity: 2
-    calls_out: 2
-    calls_in: 3
-  src.nexu.orchestrate.offline_orchestration_from_context:
-    name: offline_orchestration_from_context
-    module: src.nexu.orchestrate
-    line: 91
-    cyclomatic_complexity: 13
-    calls_out: 22
-    calls_in: 1
-  src.nexu.cinema_scripts.repair_cinema_html_files:
-    name: repair_cinema_html_files
-    module: src.nexu.cinema_scripts
-    line: 700
-    cyclomatic_complexity: 5
-    calls_out: 8
-    calls_in: 1
-  src.nexu.cinema_llm._strip_markdown_fences:
-    name: _strip_markdown_fences
-    module: src.nexu.cinema_llm
-    line: 38
-    cyclomatic_complexity: 8
-    calls_out: 11
-    calls_in: 1
-  src.nexu.cinema_llm.parse_batch_alt_options:
-    name: parse_batch_alt_options
-    module: src.nexu.cinema_llm
-    line: 111
-    cyclomatic_complexity: 9
-    calls_out: 14
-    calls_in: 1
-  examples.web_app_calculator.cinema.nexu_hooks.services_catalog:
-    name: services_catalog
-    module: examples.web_app_calculator.cinema.nexu_hooks
-    line: 305
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 0
-  src.nexu.cli.capsule_report:
-    name: capsule_report
-    module: src.nexu.cli
-    line: 266
-    cyclomatic_complexity: 1
-    calls_out: 10
-    calls_in: 0
-  examples.web_app_calculator.cinema.server._trace_slug:
-    name: _trace_slug
-    module: examples.web_app_calculator.cinema.server
-    line: 330
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 0
-  src.nexu.capsule.create_capsule:
-    name: create_capsule
-    module: src.nexu.capsule
-    line: 38
-    cyclomatic_complexity: 8
-    calls_out: 24
-    calls_in: 7
-  src.nexu.cinema._cinema_template_text:
-    name: _cinema_template_text
-    module: src.nexu.cinema
-    line: 27
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 3
-  src.nexu.cli.capsule_review:
-    name: capsule_review
-    module: src.nexu.cli
-    line: 311
-    cyclomatic_complexity: 1
-    calls_out: 13
-    calls_in: 0
-  src.nexu.cinema_publish._prepare_service_directory:
-    name: _prepare_service_directory
-    module: src.nexu.cinema_publish
-    line: 196
-    cyclomatic_complexity: 1
-    calls_out: 4
-    calls_in: 1
-  src.nexu.cinema_publish._pick_port:
-    name: _pick_port
-    module: src.nexu.cinema_publish
-    line: 59
-    cyclomatic_complexity: 4
-    calls_out: 2
-    calls_in: 2
-  scripts.ci-cinema-smoke.print:
-    name: print
-    module: scripts.ci-cinema-smoke
-    line: 82
-    cyclomatic_complexity: 0
-    calls_out: 0
-    calls_in: 94
-  src.nexu.intract_adapter.check_intract_policy:
-    name: check_intract_policy
-    module: src.nexu.intract_adapter
-    line: 90
-    cyclomatic_complexity: 7
-    calls_out: 11
-    calls_in: 1
-  src.nexu.cinema_goal_contracts._resolve_baseline_anchor:
-    name: _resolve_baseline_anchor
-    module: src.nexu.cinema_goal_contracts
-    line: 92
-    cyclomatic_complexity: 5
-    calls_out: 0
-    calls_in: 1
-  src.nexu.cinema_baseline_contracts._contract:
-    name: _contract
-    module: src.nexu.cinema_baseline_contracts
-    line: 12
-    cyclomatic_complexity: 3
-    calls_out: 2
-    calls_in: 8
-  src.nexu.cli.freeze:
-    name: freeze
-    module: src.nexu.cli
-    line: 64
-    cyclomatic_complexity: 2
-    calls_out: 10
-    calls_in: 0
-  src.nexu.cinema_project_imports.delete_imported_project:
-    name: delete_imported_project
-    module: src.nexu.cinema_project_imports
-    line: 1192
-    cyclomatic_complexity: 7
-    calls_out: 12
-    calls_in: 2
-  src.vico.models.read_yaml:
-    name: read_yaml
-    module: src.vico.models
-    line: 149
-    cyclomatic_complexity: 3
-    calls_out: 4
-    calls_in: 5
-  src.nexu.journal.append_journal:
-    name: append_journal
-    module: src.nexu.journal
-    line: 25
-    cyclomatic_complexity: 2
-    calls_out: 6
-    calls_in: 8
-  src.nexu.cinema_policy.cinema_dir_for:
-    name: cinema_dir_for
-    module: src.nexu.cinema_policy
-    line: 470
-    cyclomatic_complexity: 1
-    calls_out: 2
-    calls_in: 4
-  src.nexu.cinema_policy.reset_cinema_policy_ledger:
-    name: reset_cinema_policy_ledger
-    module: src.nexu.cinema_policy
-    line: 366
-    cyclomatic_complexity: 1
-    calls_out: 2
-    calls_in: 2
-  examples.web_app_calculator.cinema.server._try_read_options_cache:
-    name: _try_read_options_cache
-    module: examples.web_app_calculator.cinema.server
-    line: 514
-    cyclomatic_complexity: 2
-    calls_out: 3
-    calls_in: 1
-  src.nexu.cinema_policy.validate_intract_artifact:
-    name: validate_intract_artifact
-    module: src.nexu.cinema_policy
-    line: 864
-    cyclomatic_complexity: 8
-    calls_out: 5
-    calls_in: 1
-  src.nexu.cli.capsule_list:
-    name: capsule_list
-    module: src.nexu.cli
-    line: 106
-    cyclomatic_complexity: 3
-    calls_out: 8
-    calls_in: 0
-  src.nexu.cinema_markpact._get_app_title:
-    name: _get_app_title
-    module: src.nexu.cinema_markpact
-    line: 98
-    cyclomatic_complexity: 3
-    calls_out: 3
-    calls_in: 1
-  src.nexu.cinema_server._available_port:
-    name: _available_port
-    module: src.nexu.cinema_server
-    line: 73
-    cyclomatic_complexity: 4
-    calls_out: 8
-    calls_in: 1
-  src.nexu.cinema_policy.verify_capsule_workspace:
-    name: verify_capsule_workspace
-    module: src.nexu.cinema_policy
-    line: 889
-    cyclomatic_complexity: 2
-    calls_out: 4
-    calls_in: 1
-  src.nexu.runtime._read_fixture:
-    name: _read_fixture
-    module: src.nexu.runtime
-    line: 18
-    cyclomatic_complexity: 5
-    calls_out: 6
-    calls_in: 1
-  src.nexu.cinema_llm_contracts.build_llm_contract_block:
-    name: build_llm_contract_block
-    module: src.nexu.cinema_llm_contracts
-    line: 173
-    cyclomatic_complexity: 2
-    calls_out: 2
-    calls_in: 1
-  src.vico.models.FrozenSnapshot.from_dict:
-    name: from_dict
-    module: src.vico.models
-    line: 34
-    cyclomatic_complexity: 2
-    calls_out: 6
-    calls_in: 0
-  src.nexu.orchestrate.build_orchestration_context:
-    name: build_orchestration_context
-    module: src.nexu.orchestrate
-    line: 41
-    cyclomatic_complexity: 2
-    calls_out: 11
-    calls_in: 1
-  src.nexu.cinema_llm._strip_rich_console_artifacts:
-    name: _strip_rich_console_artifacts
-    module: src.nexu.cinema_llm
-    line: 56
-    cyclomatic_complexity: 7
-    calls_out: 14
-    calls_in: 2
-  src.nexu.cinema_projects._copy_or_seed_project_files:
-    name: _copy_or_seed_project_files
-    module: src.nexu.cinema_projects
-    line: 578
-    cyclomatic_complexity: 3
-    calls_out: 2
-    calls_in: 1
-  src.nexu.cinema_policy._resolve_ledger_path:
-    name: _resolve_ledger_path
-    module: src.nexu.cinema_policy
-    line: 624
-    cyclomatic_complexity: 2
-    calls_out: 2
-    calls_in: 2
-  src.nexu.capsule.list_capsules:
-    name: list_capsules
-    module: src.nexu.capsule
-    line: 111
-    cyclomatic_complexity: 4
-    calls_out: 5
-    calls_in: 3
-  examples.web_app_dashboard.run.main:
-    name: main
-    module: examples.web_app_dashboard.run
-    line: 16
-    cyclomatic_complexity: 2
-    calls_out: 35
-    calls_in: 0
-  src.nexu.cinema_traces.text_metrics:
-    name: text_metrics
-    module: src.nexu.cinema_traces
-    line: 43
-    cyclomatic_complexity: 3
-    calls_out: 6
-    calls_in: 3
-  src.nexu.orchestrate._render_orchestration_markdown:
-    name: _render_orchestration_markdown
-    module: src.nexu.orchestrate
-    line: 200
-    cyclomatic_complexity: 9
-    calls_out: 22
-    calls_in: 1
-  src.nexu.cinema_policy.propose_ui_delta_contract_dicts:
-    name: propose_ui_delta_contract_dicts
-    module: src.nexu.cinema_policy
-    line: 568
-    cyclomatic_complexity: 5
-    calls_out: 5
-    calls_in: 2
-  src.nexu.fast_delivery.context.compact_markpact_for_llm:
-    name: compact_markpact_for_llm
-    module: src.nexu.fast_delivery.context
-    line: 42
-    cyclomatic_complexity: 9
-    calls_out: 12
-    calls_in: 1
-  examples.web_app_calculator.cinema.server._llm_communication_contract_block:
-    name: _llm_communication_contract_block
-    module: examples.web_app_calculator.cinema.server
-    line: 173
-    cyclomatic_complexity: 2
-    calls_out: 1
-    calls_in: 1
-  src.nexu.cinema_llm._lookup:
-    name: _lookup
-    module: src.nexu.cinema_llm
-    line: 157
-    cyclomatic_complexity: 2
-    calls_out: 4
-    calls_in: 7
-  src.nexu.cinema_policy._replace_html_title:
-    name: _replace_html_title
-    module: src.nexu.cinema_policy
-    line: 306
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 2
   src.nexu.cinema_policy.normalize_proposals_for_ledger:
     name: normalize_proposals_for_ledger
     module: src.nexu.cinema_policy
@@ -1335,1202 +2595,12 @@ nodes:
     cyclomatic_complexity: 6
     calls_out: 11
     calls_in: 2
-  src.nexu.cinema_goal_contracts.propose_goal_extension_contracts:
-    name: propose_goal_extension_contracts
-    module: src.nexu.cinema_goal_contracts
-    line: 264
-    cyclomatic_complexity: 15
-    calls_out: 17
-    calls_in: 1
-  src.nexu.cinema_options_cache.write_options_cache:
-    name: write_options_cache
-    module: src.nexu.cinema_options_cache
-    line: 77
-    cyclomatic_complexity: 5
-    calls_out: 14
-    calls_in: 1
-  examples.web_app_calculator.cinema.server._ensure_intract_on_path:
-    name: _ensure_intract_on_path
+  examples.web_app_calculator.cinema.server._strip_markdown_fences:
+    name: _strip_markdown_fences
     module: examples.web_app_calculator.cinema.server
-    line: 675
-    cyclomatic_complexity: 5
-    calls_out: 5
-    calls_in: 1
-  src.nexu.cinema_policy._ledger_entry_matches_project:
-    name: _ledger_entry_matches_project
-    module: src.nexu.cinema_policy
-    line: 41
-    cyclomatic_complexity: 8
-    calls_out: 10
-    calls_in: 1
-  src.nexu.cinema_history._load_index:
-    name: _load_index
-    module: src.nexu.cinema_history
-    line: 32
-    cyclomatic_complexity: 3
-    calls_out: 5
-    calls_in: 3
-  src.nexu.cinema_policy.policy_ledger_path:
-    name: policy_ledger_path
-    module: src.nexu.cinema_policy
-    line: 478
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 3
-  src.nexu.cinema_goal_contracts._collect_trait_proposals:
-    name: _collect_trait_proposals
-    module: src.nexu.cinema_goal_contracts
-    line: 245
-    cyclomatic_complexity: 3
-    calls_out: 6
-    calls_in: 1
-  examples.web_app_calculator.cinema.server._delete_imported_project:
-    name: _delete_imported_project
-    module: examples.web_app_calculator.cinema.server
-    line: 408
-    cyclomatic_complexity: 2
-    calls_out: 1
-    calls_in: 1
-  src.nexu.plan._contract_summary:
-    name: _contract_summary
-    module: src.nexu.plan
-    line: 27
-    cyclomatic_complexity: 9
-    calls_out: 3
-    calls_in: 1
-  src.nexu.cinema_policy.propose_llm_for_stage:
-    name: propose_llm_for_stage
-    module: src.nexu.cinema_policy
-    line: 817
-    cyclomatic_complexity: 8
-    calls_out: 14
-    calls_in: 1
-  examples.web_app_calculator.cinema.nexu_hooks.imported_llm_log:
-    name: imported_llm_log
-    module: examples.web_app_calculator.cinema.nexu_hooks
-    line: 278
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 0
-  src.nexu.cinema_markpact._escape_markdown_fence:
-    name: _escape_markdown_fence
-    module: src.nexu.cinema_markpact
-    line: 22
-    cyclomatic_complexity: 2
-    calls_out: 1
-    calls_in: 3
-  src.nexu.cinema_history.ensure_initial_checkpoint:
-    name: ensure_initial_checkpoint
-    module: src.nexu.cinema_history
-    line: 201
-    cyclomatic_complexity: 3
-    calls_out: 4
-    calls_in: 1
-  src.nexu.fast_delivery.context.compact_html_for_llm:
-    name: compact_html_for_llm
-    module: src.nexu.fast_delivery.context
-    line: 10
-    cyclomatic_complexity: 3
-    calls_out: 6
-    calls_in: 1
-  src.nexu.cinema_project_imports.activate_imported_project:
-    name: activate_imported_project
-    module: src.nexu.cinema_project_imports
-    line: 1280
-    cyclomatic_complexity: 4
-    calls_out: 6
-    calls_in: 1
-  examples.web_app_calculator.cinema.nexu_hooks.import_project_from_http:
-    name: import_project_from_http
-    module: examples.web_app_calculator.cinema.nexu_hooks
-    line: 244
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 0
-  src.nexu.paths.ensure_project_dirs:
-    name: ensure_project_dirs
-    module: src.nexu.paths
-    line: 26
-    cyclomatic_complexity: 2
-    calls_out: 7
-    calls_in: 3
-  examples.web_app_calculator.cinema.server._compact_html_for_llm:
-    name: _compact_html_for_llm
-    module: examples.web_app_calculator.cinema.server
-    line: 477
-    cyclomatic_complexity: 1
-    calls_out: 4
-    calls_in: 2
-  src.nexu.cinema_project_imports.delete_project:
-    name: delete_project
-    module: src.nexu.cinema_project_imports
-    line: 1227
-    cyclomatic_complexity: 3
-    calls_out: 6
-    calls_in: 1
-  src.nexu.cinema_publish._service_alive:
-    name: _service_alive
-    module: src.nexu.cinema_publish
-    line: 88
+    line: 454
     cyclomatic_complexity: 6
     calls_out: 8
-    calls_in: 2
-  src.vico.git.current_git_sha:
-    name: current_git_sha
-    module: src.vico.git
-    line: 7
-    cyclomatic_complexity: 4
-    calls_out: 3
-    calls_in: 2
-  examples.web_app_calculator.cinema.nexu_hooks.save_history:
-    name: save_history
-    module: examples.web_app_calculator.cinema.nexu_hooks
-    line: 119
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 0
-  src.nexu.blueprint.build_blueprint:
-    name: build_blueprint
-    module: src.nexu.blueprint
-    line: 11
-    cyclomatic_complexity: 7
-    calls_out: 8
-    calls_in: 8
-  src.nexu.cinema_policy.load_policy_snapshot:
-    name: load_policy_snapshot
-    module: src.nexu.cinema_policy
-    line: 482
-    cyclomatic_complexity: 2
-    calls_out: 4
-    calls_in: 1
-  examples.mcp_patch_demo.server.broadcast:
-    name: broadcast
-    module: examples.mcp_patch_demo.server
-    line: 73
-    cyclomatic_complexity: 2
-    calls_out: 3
-    calls_in: 4
-  src.nexu.cli.capsule_verify:
-    name: capsule_verify
-    module: src.nexu.cli
-    line: 215
-    cyclomatic_complexity: 4
-    calls_out: 10
-    calls_in: 0
-  src.nexu.fast_delivery.options.read_cached_options:
-    name: read_cached_options
-    module: src.nexu.fast_delivery.options
-    line: 34
-    cyclomatic_complexity: 11
-    calls_out: 17
-    calls_in: 1
-  examples.scientific_calculator_demo2.main:
-    name: main
-    module: examples.scientific_calculator_demo2
-    line: 18
-    cyclomatic_complexity: 2
-    calls_out: 17
-    calls_in: 0
-  examples.web_app_calculator.cinema.server._compact_markpact_for_llm:
-    name: _compact_markpact_for_llm
-    module: examples.web_app_calculator.cinema.server
-    line: 500
-    cyclomatic_complexity: 3
-    calls_out: 10
-    calls_in: 1
-  src.vico.hashing.sha256_file:
-    name: sha256_file
-    module: src.vico.hashing
-    line: 7
-    cyclomatic_complexity: 2
-    calls_out: 6
-    calls_in: 4
-  src.nexu.cinema_policy.normalize_manifest_target:
-    name: normalize_manifest_target
-    module: src.nexu.cinema_policy
-    line: 455
-    cyclomatic_complexity: 3
-    calls_out: 2
-    calls_in: 1
-  src.nexu.cinema_traces.write_llm_trace:
-    name: write_llm_trace
-    module: src.nexu.cinema_traces
-    line: 61
-    cyclomatic_complexity: 8
-    calls_out: 18
-    calls_in: 1
-  src.nexu.cinema_projects._init_project_activation:
-    name: _init_project_activation
-    module: src.nexu.cinema_projects
-    line: 649
-    cyclomatic_complexity: 3
-    calls_out: 4
-    calls_in: 1
-  src.nexu.cinema_goal_contracts._detect_expanded_trait:
-    name: _detect_expanded_trait
-    module: src.nexu.cinema_goal_contracts
-    line: 162
-    cyclomatic_complexity: 4
-    calls_out: 3
-    calls_in: 1
-  src.nexu.cinema_scope.load_cinema_ui_profile:
-    name: load_cinema_ui_profile
-    module: src.nexu.cinema_scope
-    line: 203
-    cyclomatic_complexity: 10
-    calls_out: 15
-    calls_in: 1
-  src.nexu.config._load_env_file:
-    name: _load_env_file
-    module: src.nexu.config
-    line: 66
-    cyclomatic_complexity: 10
-    calls_out: 11
-    calls_in: 1
-  src.nexu.journal.read_journal:
-    name: read_journal
-    module: src.nexu.journal
-    line: 14
-    cyclomatic_complexity: 5
-    calls_out: 6
-    calls_in: 3
-  src.nexu.paths.nexu_dir:
-    name: nexu_dir
-    module: src.nexu.paths
-    line: 10
-    cyclomatic_complexity: 1
-    calls_out: 0
-    calls_in: 7
-  src.nexu.cinema_policy._build_constraint_result:
-    name: _build_constraint_result
-    module: src.nexu.cinema_policy
-    line: 126
-    cyclomatic_complexity: 5
-    calls_out: 4
-    calls_in: 1
-  src.nexu.promote._promotion_map:
-    name: _promotion_map
-    module: src.nexu.promote
-    line: 14
-    cyclomatic_complexity: 2
-    calls_out: 4
-    calls_in: 1
-  src.nexu.cli.capsule_create:
-    name: capsule_create
-    module: src.nexu.cli
-    line: 79
-    cyclomatic_complexity: 1
-    calls_out: 15
-    calls_in: 0
-  src.nexu.bundle.build_capsule_bundle:
-    name: build_capsule_bundle
-    module: src.nexu.bundle
-    line: 24
-    cyclomatic_complexity: 3
-    calls_out: 15
-    calls_in: 2
-  examples.web_app_calculator.cinema.nexu_hooks.apply_spatial_patch:
-    name: apply_spatial_patch
-    module: examples.web_app_calculator.cinema.nexu_hooks
-    line: 59
-    cyclomatic_complexity: 2
-    calls_out: 2
-    calls_in: 0
-  examples.web_app_calculator.run.main:
-    name: main
-    module: examples.web_app_calculator.run
-    line: 14
-    cyclomatic_complexity: 2
-    calls_out: 23
-    calls_in: 0
-  src.nexu.cinema_goal_contracts.is_chemical_goal:
-    name: is_chemical_goal
-    module: src.nexu.cinema_goal_contracts
-    line: 16
-    cyclomatic_complexity: 2
-    calls_out: 2
-    calls_in: 2
-  src.nexu.report.build_capsule_report:
-    name: build_capsule_report
-    module: src.nexu.report
-    line: 35
-    cyclomatic_complexity: 1
-    calls_out: 32
-    calls_in: 2
-  examples.web_app_calculator.cinema.nexu_hooks.patch_option_previews:
-    name: patch_option_previews
-    module: examples.web_app_calculator.cinema.nexu_hooks
-    line: 161
-    cyclomatic_complexity: 11
-    calls_out: 14
-    calls_in: 0
-  examples.web_app_calculator.cinema.server._append_policy_entry_legacy:
-    name: _append_policy_entry_legacy
-    module: examples.web_app_calculator.cinema.server
-    line: 779
-    cyclomatic_complexity: 3
-    calls_out: 12
-    calls_in: 1
-  examples.web_app_calculator.cinema.server._llm_status_payload:
-    name: _llm_status_payload
-    module: examples.web_app_calculator.cinema.server
-    line: 274
-    cyclomatic_complexity: 3
-    calls_out: 25
-    calls_in: 1
-  src.nexu.cinema_publish._refresh_service_status:
-    name: _refresh_service_status
-    module: src.nexu.cinema_publish
-    line: 104
-    cyclomatic_complexity: 3
-    calls_out: 1
-    calls_in: 3
-  examples.web_app_calculator.cinema.nexu_hooks.activate_project:
-    name: activate_project
-    module: examples.web_app_calculator.cinema.nexu_hooks
-    line: 210
-    cyclomatic_complexity: 2
-    calls_out: 6
-    calls_in: 0
-  examples.web_app_calculator.cinema.nexu_hooks.delete_workspace_project:
-    name: delete_workspace_project
-    module: examples.web_app_calculator.cinema.nexu_hooks
-    line: 261
-    cyclomatic_complexity: 1
-    calls_out: 4
-    calls_in: 0
-  src.nexu.cinema_policy.option_previews_are_distinct:
-    name: option_previews_are_distinct
-    module: src.nexu.cinema_policy
-    line: 206
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 2
-  src.nexu.cinema_publish._generate_markpact_export:
-    name: _generate_markpact_export
-    module: src.nexu.cinema_publish
-    line: 211
-    cyclomatic_complexity: 1
-    calls_out: 5
-    calls_in: 1
-  src.nexu.cinema_publish.list_published_services:
-    name: list_published_services
-    module: src.nexu.cinema_publish
-    line: 112
-    cyclomatic_complexity: 3
-    calls_out: 6
-    calls_in: 1
-  src.nexu.cinema_http_preprocess.http_patch_llm_rules:
-    name: http_patch_llm_rules
-    module: src.nexu.cinema_http_preprocess
-    line: 606
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 1
-  src.nexu.cinema_policy.enforce_deletes_on_option_previews:
-    name: enforce_deletes_on_option_previews
-    module: src.nexu.cinema_policy
-    line: 342
-    cyclomatic_complexity: 3
-    calls_out: 5
-    calls_in: 1
-  src.nexu.cinema_server._render_server_script:
-    name: _render_server_script
-    module: src.nexu.cinema_server
-    line: 19
-    cyclomatic_complexity: 1
-    calls_out: 31
-    calls_in: 1
-  src.nexu.cinema_server._open_browser:
-    name: _open_browser
-    module: src.nexu.cinema_server
-    line: 109
-    cyclomatic_complexity: 3
-    calls_out: 2
-    calls_in: 1
-  src.nexu.cinema_projects._project_catalog_entry:
-    name: _project_catalog_entry
-    module: src.nexu.cinema_projects
-    line: 180
-    cyclomatic_complexity: 2
-    calls_out: 2
-    calls_in: 1
-  src.nexu.cinema_llm.extract_html_document:
-    name: extract_html_document
-    module: src.nexu.cinema_llm
-    line: 104
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 0
-  src.nexu.cinema_policy.apply_ledger_from_cinema:
-    name: apply_ledger_from_cinema
-    module: src.nexu.cinema_policy
-    line: 510
-    cyclomatic_complexity: 6
-    calls_out: 15
-    calls_in: 2
-  src.nexu.cinema_projects._active_project_meta:
-    name: _active_project_meta
-    module: src.nexu.cinema_projects
-    line: 552
-    cyclomatic_complexity: 1
-    calls_out: 2
-    calls_in: 1
-  src.nexu.cinema_projects._project_widgets:
-    name: _project_widgets
-    module: src.nexu.cinema_projects
-    line: 277
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 1
-  src.nexu.cinema_publish.services_root:
-    name: services_root
-    module: src.nexu.cinema_publish
-    line: 25
-    cyclomatic_complexity: 1
-    calls_out: 0
-    calls_in: 4
-  examples.web_app_calculator.cinema.nexu_hooks.import_project_from_zip:
-    name: import_project_from_zip
-    module: examples.web_app_calculator.cinema.nexu_hooks
-    line: 224
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 0
-  src.nexu.cinema_policy._process_ledger_entry:
-    name: _process_ledger_entry
-    module: src.nexu.cinema_policy
-    line: 75
-    cyclomatic_complexity: 6
-    calls_out: 6
-    calls_in: 1
-  src.nexu.cinema_goal_contracts._detect_engineering_trait:
-    name: _detect_engineering_trait
-    module: src.nexu.cinema_goal_contracts
-    line: 223
-    cyclomatic_complexity: 4
-    calls_out: 3
-    calls_in: 1
-  examples.web_app_calculator.cinema.server._parse_imported_project_route:
-    name: _parse_imported_project_route
-    module: examples.web_app_calculator.cinema.server
-    line: 399
-    cyclomatic_complexity: 5
-    calls_out: 2
-    calls_in: 1
-  src.nexu.runtime.build_capsule_runtime:
-    name: build_capsule_runtime
-    module: src.nexu.runtime
-    line: 111
-    cyclomatic_complexity: 3
-    calls_out: 16
-    calls_in: 7
-  src.nexu.cinema_llm._cached_config:
-    name: _cached_config
-    module: src.nexu.cinema_llm
-    line: 19
-    cyclomatic_complexity: 4
-    calls_out: 4
-    calls_in: 3
-  src.nexu.llm.call_litellm_review:
-    name: call_litellm_review
-    module: src.nexu.llm
-    line: 156
-    cyclomatic_complexity: 2
-    calls_out: 3
-    calls_in: 1
-  src.nexu.cinema.write_intract_policy_files:
-    name: write_intract_policy_files
-    module: src.nexu.cinema
-    line: 121
-    cyclomatic_complexity: 2
-    calls_out: 5
-    calls_in: 2
-  src.nexu.cinema_goal_contracts._hints_text:
-    name: _hints_text
-    module: src.nexu.cinema_goal_contracts
-    line: 12
-    cyclomatic_complexity: 3
-    calls_out: 6
-    calls_in: 1
-  examples.scientific_calculator_demo.main:
-    name: main
-    module: examples.scientific_calculator_demo
-    line: 17
-    cyclomatic_complexity: 2
-    calls_out: 23
-    calls_in: 0
-  src.nexu.promote.build_promotion_plan:
-    name: build_promotion_plan
-    module: src.nexu.promote
-    line: 30
-    cyclomatic_complexity: 6
-    calls_out: 16
-    calls_in: 3
-  src.nexu.cinema_projects.list_project_catalog:
-    name: list_project_catalog
-    module: src.nexu.cinema_projects
-    line: 211
-    cyclomatic_complexity: 3
-    calls_out: 3
-    calls_in: 1
-  src.nexu.cinema_policy.append_iteration_ledger_entry:
-    name: append_iteration_ledger_entry
-    module: src.nexu.cinema_policy
-    line: 773
-    cyclomatic_complexity: 3
-    calls_out: 7
-    calls_in: 1
-  src.nexu.cinema_scripts.finalize_cinema_html:
-    name: finalize_cinema_html
-    module: src.nexu.cinema_scripts
-    line: 676
-    cyclomatic_complexity: 6
-    calls_out: 6
-    calls_in: 8
-  examples.mcp_patch_demo.server.dslCommand:
-    name: dslCommand
-    module: examples.mcp_patch_demo.server
-    line: 48
-    cyclomatic_complexity: 4
-    calls_out: 6
-    calls_in: 0
-  examples.web_app_calculator.cinema.nexu_hooks.append_goal_policy_entry:
-    name: append_goal_policy_entry
-    module: examples.web_app_calculator.cinema.nexu_hooks
-    line: 91
-    cyclomatic_complexity: 11
-    calls_out: 19
-    calls_in: 0
-  src.nexu.paths.snapshots_dir:
-    name: snapshots_dir
-    module: src.nexu.paths
-    line: 14
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 2
-  examples.web_app_calculator.cinema.server._proposal_delta_text:
-    name: _proposal_delta_text
-    module: examples.web_app_calculator.cinema.server
-    line: 753
-    cyclomatic_complexity: 5
-    calls_out: 4
-    calls_in: 1
-  examples.web_app_calculator.cinema.nexu_hooks.apply_manifest_from_ledger:
-    name: apply_manifest_from_ledger
-    module: examples.web_app_calculator.cinema.nexu_hooks
-    line: 51
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 0
-  src.nexu.intract_adapter._finding_for_result:
-    name: _finding_for_result
-    module: src.nexu.intract_adapter
-    line: 32
-    cyclomatic_complexity: 9
-    calls_out: 16
-    calls_in: 1
-  src.nexu.cinema_policy.load_goal_contract_lines:
-    name: load_goal_contract_lines
-    module: src.nexu.cinema_policy
-    line: 744
-    cyclomatic_complexity: 12
-    calls_out: 14
-    calls_in: 1
-  src.nexu.orchestrate.build_orchestration_prompt:
-    name: build_orchestration_prompt
-    module: src.nexu.orchestrate
-    line: 62
-    cyclomatic_complexity: 1
-    calls_out: 2
-    calls_in: 1
-  src.nexu.cinema_server.start_persistent_http_server:
-    name: start_persistent_http_server
-    module: src.nexu.cinema_server
-    line: 88
-    cyclomatic_complexity: 2
-    calls_out: 7
-    calls_in: 1
-  src.nexu.cinema_llm._litellm_completion:
-    name: _litellm_completion
-    module: src.nexu.cinema_llm
-    line: 31
-    cyclomatic_complexity: 2
-    calls_out: 0
-    calls_in: 2
-  src.nexu.cinema_llm._extract_content:
-    name: _extract_content
-    module: src.nexu.cinema_llm
-    line: 188
-    cyclomatic_complexity: 12
-    calls_out: 21
-    calls_in: 1
-  src.nexu.cinema_project_imports.merged_projects_catalog:
-    name: merged_projects_catalog
-    module: src.nexu.cinema_project_imports
-    line: 1270
-    cyclomatic_complexity: 10
-    calls_out: 13
-    calls_in: 1
-  src.nexu.cinema_baseline_contracts.merge_calculator_baselines:
-    name: merge_calculator_baselines
-    module: src.nexu.cinema_baseline_contracts
-    line: 120
-    cyclomatic_complexity: 5
-    calls_out: 5
-    calls_in: 1
-  src.nexu.cinema_goal_contracts._goal_contract_dict:
-    name: _goal_contract_dict
-    module: src.nexu.cinema_goal_contracts
-    line: 41
-    cyclomatic_complexity: 6
-    calls_out: 15
-    calls_in: 8
-  src.nexu.cinema_history.list_history_checkpoints:
-    name: list_history_checkpoints
-    module: src.nexu.cinema_history
-    line: 137
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 1
-  src.nexu.paths.capsules_dir:
-    name: capsules_dir
-    module: src.nexu.paths
-    line: 18
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 3
-  examples.web_app_calculator.cinema.nexu_hooks.propose_llm:
-    name: propose_llm
-    module: examples.web_app_calculator.cinema.nexu_hooks
-    line: 66
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 0
-  src.nexu.cinema_publish._registry_path:
-    name: _registry_path
-    module: src.nexu.cinema_publish
-    line: 29
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 2
-  examples.web_app_calculator.cinema.server._write_llm_trace:
-    name: _write_llm_trace
-    module: examples.web_app_calculator.cinema.server
-    line: 342
-    cyclomatic_complexity: 3
-    calls_out: 6
-    calls_in: 22
-  src.nexu.cinema_projects._write_seed_variants:
-    name: _write_seed_variants
-    module: src.nexu.cinema_projects
-    line: 529
-    cyclomatic_complexity: 2
-    calls_out: 12
-    calls_in: 1
-  src.nexu.cinema_policy._proposal_kind_and_element:
-    name: _proposal_kind_and_element
-    module: src.nexu.cinema_policy
-    line: 653
-    cyclomatic_complexity: 12
-    calls_out: 8
-    calls_in: 2
-  src.nexu.cinema_html.ensure_html_document_closure:
-    name: ensure_html_document_closure
-    module: src.nexu.cinema_html
-    line: 6
-    cyclomatic_complexity: 5
-    calls_out: 3
-    calls_in: 2
-  src.nexu.orchestrate.build_capsule_orchestration:
-    name: build_capsule_orchestration
-    module: src.nexu.orchestrate
-    line: 144
-    cyclomatic_complexity: 2
-    calls_out: 28
-    calls_in: 2
-  examples.web_app_calculator.cinema.server._merge_ui_constraints:
-    name: _merge_ui_constraints
-    module: examples.web_app_calculator.cinema.server
-    line: 664
-    cyclomatic_complexity: 5
-    calls_out: 8
-    calls_in: 1
-  src.nexu.cinema_scripts.write_cinema_inject_files:
-    name: write_cinema_inject_files
-    module: src.nexu.cinema_scripts
-    line: 694
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 4
-  src.nexu.cinema_publish.stop_published_service:
-    name: stop_published_service
-    module: src.nexu.cinema_publish
-    line: 445
-    cyclomatic_complexity: 9
-    calls_out: 11
-    calls_in: 2
-  src.nexu.cinema_baseline_contracts.ensure_capsule_intract_yaml:
-    name: ensure_capsule_intract_yaml
-    module: src.nexu.cinema_baseline_contracts
-    line: 135
-    cyclomatic_complexity: 9
-    calls_out: 25
-    calls_in: 1
-  src.nexu.cinema_project_imports.read_imported_markpact:
-    name: read_imported_markpact
-    module: src.nexu.cinema_project_imports
-    line: 1073
-    cyclomatic_complexity: 9
-    calls_out: 17
-    calls_in: 1
-  src.nexu.cinema_publish._handle_existing_service:
-    name: _handle_existing_service
-    module: src.nexu.cinema_publish
-    line: 299
-    cyclomatic_complexity: 7
-    calls_out: 8
-    calls_in: 1
-  src.nexu.cinema_policy.promote_applies_spatial_deletes:
-    name: promote_applies_spatial_deletes
-    module: src.nexu.cinema_policy
-    line: 58
-    cyclomatic_complexity: 2
-    calls_out: 3
-    calls_in: 1
-  src.nexu.cinema_history._copy_checkpoint_files:
-    name: _copy_checkpoint_files
-    module: src.nexu.cinema_history
-    line: 49
-    cyclomatic_complexity: 3
-    calls_out: 3
-    calls_in: 1
-  src.nexu.init_project.init_project:
-    name: init_project
-    module: src.nexu.init_project
-    line: 9
-    cyclomatic_complexity: 3
-    calls_out: 7
-    calls_in: 6
-  src.nexu.cinema_publish.start_published_service:
-    name: start_published_service
-    module: src.nexu.cinema_publish
-    line: 405
-    cyclomatic_complexity: 15
-    calls_out: 20
-    calls_in: 2
-  src.nexu.cinema_goal_contracts._detect_dashboard_trait:
-    name: _detect_dashboard_trait
-    module: src.nexu.cinema_goal_contracts
-    line: 202
-    cyclomatic_complexity: 3
-    calls_out: 3
-    calls_in: 1
-  src.nexu.cinema_policy.ensure_intract_on_path:
-    name: ensure_intract_on_path
-    module: src.nexu.cinema_policy
-    line: 554
-    cyclomatic_complexity: 5
-    calls_out: 5
-    calls_in: 4
-  src.nexu.cinema_baseline_contracts.is_calculator_capsule:
-    name: is_calculator_capsule
-    module: src.nexu.cinema_baseline_contracts
-    line: 107
-    cyclomatic_complexity: 5
-    calls_out: 5
-    calls_in: 3
-  src.nexu.cinema_llm._compact_response_preview:
-    name: _compact_response_preview
-    module: src.nexu.cinema_llm
-    line: 237
-    cyclomatic_complexity: 2
-    calls_out: 3
-    calls_in: 2
-  src.nexu.cinema_publish._create_service_entry:
-    name: _create_service_entry
-    module: src.nexu.cinema_publish
-    line: 259
-    cyclomatic_complexity: 3
-    calls_out: 2
-    calls_in: 1
-  src.nexu.intract_adapter._sibling_intract_src:
-    name: _sibling_intract_src
-    module: src.nexu.intract_adapter
-    line: 11
-    cyclomatic_complexity: 4
-    calls_out: 3
-    calls_in: 1
-  examples.web_app_calculator.cinema.server._extract_html_document:
-    name: _extract_html_document
-    module: examples.web_app_calculator.cinema.server
-    line: 466
-    cyclomatic_complexity: 3
-    calls_out: 7
-    calls_in: 0
-  src.nexu.plan.build_iteration_plan:
-    name: build_iteration_plan
-    module: src.nexu.plan
-    line: 35
-    cyclomatic_complexity: 7
-    calls_out: 15
-    calls_in: 4
-  examples.web_app_calculator.cinema.server._compact_llm_error:
-    name: _compact_llm_error
-    module: examples.web_app_calculator.cinema.server
-    line: 591
-    cyclomatic_complexity: 2
-    calls_out: 4
-    calls_in: 7
-  src.nexu.cli.capsule_iterate:
-    name: capsule_iterate
-    module: src.nexu.cli
-    line: 141
-    cyclomatic_complexity: 2
-    calls_out: 14
-    calls_in: 0
-  src.nexu.paths.project_root:
-    name: project_root
-    module: src.nexu.paths
-    line: 6
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 29
-  src.vico.models.utc_now:
-    name: utc_now
-    module: src.vico.models
-    line: 11
-    cyclomatic_complexity: 1
-    calls_out: 2
-    calls_in: 16
-  examples.web_app_calculator.cinema.server._load_all_env:
-    name: _load_all_env
-    module: examples.web_app_calculator.cinema.server
-    line: 239
-    cyclomatic_complexity: 3
-    calls_out: 3
-    calls_in: 2
-  src.nexu.intract_adapter._policy_findings:
-    name: _policy_findings
-    module: src.nexu.intract_adapter
-    line: 69
-    cyclomatic_complexity: 3
-    calls_out: 4
-    calls_in: 1
-  src.nexu.cinema_publish.publish_project_service:
-    name: publish_project_service
-    module: src.nexu.cinema_publish
-    line: 312
-    cyclomatic_complexity: 6
-    calls_out: 16
-    calls_in: 1
-  examples.web_app_calculator.cinema.server._resolve_model:
-    name: _resolve_model
-    module: examples.web_app_calculator.cinema.server
-    line: 244
-    cyclomatic_complexity: 4
-    calls_out: 4
-    calls_in: 8
-  examples.web_app_calculator.cinema.nexu_hooks.projects_catalog:
-    name: projects_catalog
-    module: examples.web_app_calculator.cinema.nexu_hooks
-    line: 205
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 0
-  examples.web_app_calculator.cinema.server._append_policy_entry:
-    name: _append_policy_entry
-    module: examples.web_app_calculator.cinema.server
-    line: 840
-    cyclomatic_complexity: 2
-    calls_out: 2
-    calls_in: 1
-  src.nexu.cli.capsule_blueprint:
-    name: capsule_blueprint
-    module: src.nexu.cli
-    line: 159
-    cyclomatic_complexity: 2
-    calls_out: 8
-    calls_in: 0
-  src.nexu.review._markdown_review_prompt:
-    name: _markdown_review_prompt
-    module: src.nexu.review
-    line: 20
-    cyclomatic_complexity: 1
-    calls_out: 6
-    calls_in: 1
-  src.nexu.cinema_llm.call_cinema_text_llm:
-    name: call_cinema_text_llm
-    module: src.nexu.cinema_llm
-    line: 242
-    cyclomatic_complexity: 9
-    calls_out: 9
-    calls_in: 3
-  src.nexu.cinema_policy.append_policy_ledger_entry:
-    name: append_policy_ledger_entry
-    module: src.nexu.cinema_policy
-    line: 635
-    cyclomatic_complexity: 3
-    calls_out: 9
-    calls_in: 3
-  examples.nexu_markpact_exporter.main:
-    name: main
-    module: examples.nexu_markpact_exporter
-    line: 17
-    cyclomatic_complexity: 3
-    calls_out: 22
-    calls_in: 0
-  examples.web_app_calculator.cinema.server._propose_cinema_contracts:
-    name: _propose_cinema_contracts
-    module: examples.web_app_calculator.cinema.server
-    line: 690
-    cyclomatic_complexity: 5
-    calls_out: 4
-    calls_in: 1
-  src.nexu.cinema_options_cache._digest:
-    name: _digest
-    module: src.nexu.cinema_options_cache
-    line: 21
-    cyclomatic_complexity: 2
-    calls_out: 4
-    calls_in: 2
-  src.nexu.orchestrate._contract_dicts:
-    name: _contract_dicts
-    module: src.nexu.orchestrate
-    line: 21
-    cyclomatic_complexity: 2
-    calls_out: 0
-    calls_in: 1
-  examples.web_app_calculator.cinema.server._load_policy_payload:
-    name: _load_policy_payload
-    module: examples.web_app_calculator.cinema.server
-    line: 601
-    cyclomatic_complexity: 4
-    calls_out: 8
-    calls_in: 2
-  src.nexu.llm.call_litellm_json:
-    name: call_litellm_json
-    module: src.nexu.llm
-    line: 79
-    cyclomatic_complexity: 8
-    calls_out: 13
-    calls_in: 2
-  src.nexu.cli.capsule_plan:
-    name: capsule_plan
-    module: src.nexu.cli
-    line: 237
-    cyclomatic_complexity: 2
-    calls_out: 12
-    calls_in: 0
-  src.vico.status.capsule_status:
-    name: capsule_status
-    module: src.vico.status
-    line: 11
-    cyclomatic_complexity: 3
-    calls_out: 10
-    calls_in: 3
-  src.nexu.cinema_llm.has_terminal_artifacts:
-    name: has_terminal_artifacts
-    module: src.nexu.cinema_llm
-    line: 75
-    cyclomatic_complexity: 3
-    calls_out: 4
-    calls_in: 2
-  src.nexu.cinema_markpact._get_baseline_block:
-    name: _get_baseline_block
-    module: src.nexu.cinema_markpact
-    line: 105
-    cyclomatic_complexity: 6
-    calls_out: 4
-    calls_in: 1
-  src.nexu.cinema_history._build_label:
-    name: _build_label
-    module: src.nexu.cinema_history
-    line: 67
-    cyclomatic_complexity: 4
-    calls_out: 7
-    calls_in: 2
-  examples.web_app_calculator.cinema.nexu_hooks.publish_service:
-    name: publish_service
-    module: examples.web_app_calculator.cinema.nexu_hooks
-    line: 310
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 0
-  src.nexu.cli._print_yaml:
-    name: _print_yaml
-    module: src.nexu.cli
-    line: 41
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 2
-  examples.run_examples.run_example:
-    name: run_example
-    module: examples.run_examples
-    line: 34
-    cyclomatic_complexity: 2
-    calls_out: 26
-    calls_in: 1
-  examples.web_app_calculator.cinema.nexu_hooks.effective_ui_constraints:
-    name: effective_ui_constraints
-    module: examples.web_app_calculator.cinema.nexu_hooks
-    line: 139
-    cyclomatic_complexity: 2
-    calls_out: 3
-    calls_in: 0
-  src.nexu.cli._relative_to_root:
-    name: _relative_to_root
-    module: src.nexu.cli
-    line: 47
-    cyclomatic_complexity: 1
-    calls_out: 2
-    calls_in: 10
-  src.nexu.cinema_projects._copy_cinema_files:
-    name: _copy_cinema_files
-    module: src.nexu.cinema_projects
-    line: 508
-    cyclomatic_complexity: 4
-    calls_out: 6
-    calls_in: 1
-  examples.web_app_calculator.cinema.server._load_env_file:
-    name: _load_env_file
-    module: examples.web_app_calculator.cinema.server
-    line: 221
-    cyclomatic_complexity: 11
-    calls_out: 11
-    calls_in: 1
-  src.nexu.cli.mcp_serve:
-    name: mcp_serve
-    module: src.nexu.cli
-    line: 370
-    cyclomatic_complexity: 2
-    calls_out: 6
-    calls_in: 0
-  src.nexu.cinema_goal_contracts._build_detail_text:
-    name: _build_detail_text
-    module: src.nexu.cinema_goal_contracts
-    line: 109
-    cyclomatic_complexity: 5
-    calls_out: 5
-    calls_in: 1
-  examples.web_app_calculator.cinema.nexu_hooks.verify_capsule:
-    name: verify_capsule
-    module: examples.web_app_calculator.cinema.nexu_hooks
-    line: 55
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 7
-  src.nexu.runtime._collect_fixtures:
-    name: _collect_fixtures
-    module: src.nexu.runtime
-    line: 30
-    cyclomatic_complexity: 5
-    calls_out: 7
-    calls_in: 1
-  examples.web_app_calculator.cinema.nexu_hooks.append_policy_entry:
-    name: append_policy_entry
-    module: examples.web_app_calculator.cinema.nexu_hooks
-    line: 70
-    cyclomatic_complexity: 6
-    calls_out: 14
-    calls_in: 0
-  src.nexu.cinema_history.history_index_path:
-    name: history_index_path
-    module: src.nexu.cinema_history
-    line: 28
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 2
-  src.nexu.cinema_policy.ensure_http_option_previews_from_stage0:
-    name: ensure_http_option_previews_from_stage0
-    module: src.nexu.cinema_policy
-    line: 235
-    cyclomatic_complexity: 3
-    calls_out: 5
-    calls_in: 2
-  src.nexu.cinema_projects._catalog_filters:
-    name: _catalog_filters
-    module: src.nexu.cinema_projects
-    line: 196
-    cyclomatic_complexity: 14
-    calls_out: 12
-    calls_in: 1
-  src.nexu.cinema_traces.read_trace_index:
-    name: read_trace_index
-    module: src.nexu.cinema_traces
-    line: 53
-    cyclomatic_complexity: 3
-    calls_out: 3
-    calls_in: 3
-  src.nexu.cinema_server._try_spawn_on_port:
-    name: _try_spawn_on_port
-    module: src.nexu.cinema_server
-    line: 57
-    cyclomatic_complexity: 2
-    calls_out: 5
-    calls_in: 2
-  src.nexu.mcp_server.run_mcp_stdio:
-    name: run_mcp_stdio
-    module: src.nexu.mcp_server
-    line: 375
-    cyclomatic_complexity: 6
-    calls_out: 7
-    calls_in: 1
-  src.nexu.cinema_llm.normalize_html_document:
-    name: normalize_html_document
-    module: src.nexu.cinema_llm
-    line: 86
-    cyclomatic_complexity: 5
-    calls_out: 15
-    calls_in: 3
-  src.nexu.cinema_policy._process_keep_delete_entries:
-    name: _process_keep_delete_entries
-    module: src.nexu.cinema_policy
-    line: 100
-    cyclomatic_complexity: 7
-    calls_out: 6
-    calls_in: 1
-  src.nexu.cinema_publish._save_registry:
-    name: _save_registry
-    module: src.nexu.cinema_publish
-    line: 44
-    cyclomatic_complexity: 1
-    calls_out: 5
-    calls_in: 4
-  src.nexu.cinema_history._write_index:
-    name: _write_index
-    module: src.nexu.cinema_history
-    line: 40
-    cyclomatic_complexity: 1
-    calls_out: 5
-    calls_in: 1
-  src.nexu.cinema._start_cinema_server:
-    name: _start_cinema_server
-    module: src.nexu.cinema
-    line: 185
-    cyclomatic_complexity: 2
-    calls_out: 3
-    calls_in: 1
-  src.nexu.files.rel:
-    name: rel
-    module: src.nexu.files
-    line: 24
-    cyclomatic_complexity: 1
-    calls_out: 2
-    calls_in: 12
-  examples.web_app_calculator.cinema.nexu_hooks.export_markpact_readme:
-    name: export_markpact_readme
-    module: examples.web_app_calculator.cinema.nexu_hooks
-    line: 288
-    cyclomatic_complexity: 2
-    calls_out: 5
-    calls_in: 0
-  examples.web_app_calculator.cinema.server._list_llm_traces:
-    name: _list_llm_traces
-    module: examples.web_app_calculator.cinema.server
-    line: 372
-    cyclomatic_complexity: 6
-    calls_out: 6
     calls_in: 1
   src.nexu.cinema.write_cinema_nexu_hooks:
     name: write_cinema_nexu_hooks
@@ -2539,41 +2609,55 @@ nodes:
     cyclomatic_complexity: 1
     calls_out: 8
     calls_in: 2
-  src.nexu.cinema_llm._response_shape:
-    name: _response_shape
-    module: src.nexu.cinema_llm
-    line: 164
-    cyclomatic_complexity: 2
+  examples.web_app_calculator.cinema.server._load_policy_payload:
+    name: _load_policy_payload
+    module: examples.web_app_calculator.cinema.server
+    line: 601
+    cyclomatic_complexity: 4
+    calls_out: 8
+    calls_in: 2
+  src.nexu.cinema_policy.manifest_paths_from_snapshot:
+    name: manifest_paths_from_snapshot
+    module: src.nexu.cinema_policy
+    line: 489
+    cyclomatic_complexity: 3
+    calls_out: 10
+    calls_in: 0
+  src.nexu.cli._print_yaml:
+    name: _print_yaml
+    module: src.nexu.cli
+    line: 41
+    cyclomatic_complexity: 1
     calls_out: 3
     calls_in: 2
-  src.nexu.cinema_projects._resolve_root_for_project_source:
-    name: _resolve_root_for_project_source
-    module: src.nexu.cinema_projects
-    line: 570
-    cyclomatic_complexity: 3
-    calls_out: 2
-    calls_in: 1
-  src.nexu.cli.capsule_runtime:
-    name: capsule_runtime
+  src.nexu.cli.freeze:
+    name: freeze
     module: src.nexu.cli
-    line: 254
-    cyclomatic_complexity: 1
-    calls_out: 9
+    line: 64
+    cyclomatic_complexity: 2
+    calls_out: 10
     calls_in: 0
-  src.nexu.cinema_policy.stage_files_are_distinct:
-    name: stage_files_are_distinct
-    module: src.nexu.cinema_policy
-    line: 212
-    cyclomatic_complexity: 1
+  src.nexu.files.is_text_file:
+    name: is_text_file
+    module: src.nexu.files
+    line: 32
+    cyclomatic_complexity: 2
     calls_out: 1
     calls_in: 1
-  src.nexu.cinema_markpact.markpact_download_filename:
-    name: markpact_download_filename
-    module: src.nexu.cinema_markpact
-    line: 213
+  src.nexu.cli.capsule_blueprint:
+    name: capsule_blueprint
+    module: src.nexu.cli
+    line: 159
     cyclomatic_complexity: 2
-    calls_out: 2
-    calls_in: 1
+    calls_out: 8
+    calls_in: 0
+  src.nexu.cinema_server._render_server_script:
+    name: _render_server_script
+    module: src.nexu.cinema_server
+    line: 19
+    cyclomatic_complexity: 1
+    calls_out: 31
+    calls_in: 2
 edges:
 - caller: examples.nexu_markpact_exporter.main
   callee: scripts.ci-cinema-smoke.print
@@ -3451,6 +3535,267 @@ edges:
 - caller: src.vico.drift.check_source_drift
   callee: src.nexu.paths.capsule_dir
   call_type: resolved
+- caller: src.nexu.cinema_project_imports.reject_import_stage_replacement
+  callee: src.nexu.cinema_project_imports.http_stage_matches_import
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.reject_import_stage_replacement
+  callee: src.nexu.cinema_project_imports._import_kind_from_id
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.restore_http_import_stages_if_needed
+  callee: src.nexu.cinema_project_imports._build_http_preview_stage0
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.restore_http_import_stages_if_needed
+  callee: src.nexu.cinema_policy.ensure_http_option_previews_from_stage0
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.restore_http_import_stages_if_needed
+  callee: src.nexu.cinema_project_imports.http_stage_matches_import
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._project_dir
+  callee: src.nexu.cinema_project_imports._imports_root
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._decode_http_bytes
+  callee: src.nexu.cinema_project_imports._charset_from_content_type
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._fetch_http_body
+  callee: src.nexu.cinema_project_imports._validate_http_url
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._fetch_http_body
+  callee: src.nexu.cinema_project_imports._charset_from_content_type
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._fetch_http_stylesheets
+  callee: src.nexu.cinema_project_imports._extract_stylesheet_hrefs
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._fetch_http_stylesheets
+  callee: src.nexu.cinema_project_imports._same_origin
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._fetch_http_stylesheets
+  callee: src.nexu.cinema_project_imports._fetch_http_body
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._build_http_preview_stage0
+  callee: src.nexu.cinema_project_imports._find_http_index_path
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._build_http_preview_stage0
+  callee: src.nexu.cinema_project_imports._load_http_fetch_meta
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._build_http_preview_stage0
+  callee: src.nexu.cinema_project_imports._rewrite_local_asset_refs
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._build_http_preview_stage0
+  callee: src.nexu.cinema_project_imports._inject_base_href
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._build_http_preview_stage0
+  callee: src.nexu.cinema_http_preprocess.prepare_http_preview_html
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._build_markpact_migration
+  callee: src.nexu.cinema_project_imports._iter_project_files
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._build_markpact_migration
+  callee: src.nexu.cinema_project_imports._read_text_for_markpact
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._refresh_http_preprocess_if_needed
+  callee: src.nexu.cinema_project_imports._load_http_fetch_meta
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._refresh_http_preprocess_if_needed
+  callee: src.nexu.cinema_http_preprocess.ensure_http_preprocess_artifacts
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._refresh_http_preprocess_if_needed
+  callee: src.nexu.cinema_project_imports._apply_http_preprocess_fields
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._refresh_http_preprocess_if_needed
+  callee: src.nexu.cinema_project_imports._project_dir
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._activate_imported
+  callee: src.nexu.cinema_policy.reset_cinema_policy_ledger
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._activate_imported
+  callee: src.nexu.cinema_scripts.write_cinema_inject_files
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._activate_imported
+  callee: src.nexu.cinema_policy.refresh_imported_policy_snapshot
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._activate_imported
+  callee: src.nexu.cinema_project_imports._refresh_http_preprocess_if_needed
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._activate_imported
+  callee: src.nexu.cinema_project_imports._build_http_preview_stage0
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._activate_imported
+  callee: src.nexu.cinema_project_imports._stage_html
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.import_git_project
+  callee: src.nexu.cinema_project_imports._validate_git_url
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.import_git_project
+  callee: src.nexu.cinema_project_imports._project_dir
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.import_git_project
+  callee: src.nexu.cinema_project_imports._finish_import
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.import_git_project
+  callee: src.nexu.cinema_project_imports._slug
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.import_http_project
+  callee: src.nexu.cinema_project_imports._project_dir
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.import_http_project
+  callee: src.nexu.cinema_project_imports._finish_import
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.import_zip_project
+  callee: src.nexu.cinema_project_imports._project_dir
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.import_zip_project
+  callee: src.nexu.cinema_project_imports._finish_import
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.import_zip_project
+  callee: src.nexu.cinema_project_imports._slug
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.import_zip_project
+  callee: src.nexu.cinema_project_imports._safe_extract_zip
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._finish_import
+  callee: src.nexu.cinema_project_imports._project_title_from_id
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._finish_import
+  callee: src.nexu.cinema_project_imports._maybe_organize_import_source
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._finish_import
+  callee: src.nexu.cinema_project_imports._iter_project_files
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._finish_import
+  callee: src.nexu.cinema_project_imports._source_stats
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._finish_import
+  callee: src.nexu.cinema_project_imports._build_markpact_migration
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._finish_import
+  callee: src.nexu.cinema_project_imports._infer_workspace_context
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._finish_import
+  callee: src.nexu.cinema_project_imports._activate_imported
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._source_stats
+  callee: src.nexu.cinema_project_imports._iter_project_files
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.is_deletable_imported_id
+  callee: src.nexu.cinema_project_imports.normalize_imported_project_id
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._resolve_markpact_path
+  callee: src.nexu.cinema_project_imports._project_dir
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._compile_meta_fields
+  callee: src.nexu.cinema_project_imports._source_stats
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._compile_meta_fields
+  callee: src.nexu.cinema_project_imports._infer_workspace_context
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._compile_meta_fields
+  callee: src.nexu.cinema_project_imports._resolve_markpact_path
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._compile_meta_fields
+  callee: src.nexu.cinema_project_imports._with_workspace_meta_defaults
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._compile_meta_fields
+  callee: src.nexu.cinema_project_imports._source_url_from_meta
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._ensure_project_meta_fields
+  callee: src.nexu.cinema_project_imports._compile_meta_fields
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._ensure_project_meta_fields
+  callee: src.nexu.cinema_project_imports._project_dir
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._catalog_entry_from_meta
+  callee: src.nexu.cinema_project_imports.is_deletable_imported_id
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._catalog_entry_from_meta
+  callee: src.nexu.cinema_project_imports._source_url_from_meta
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.read_imported_markpact
+  callee: src.nexu.cinema_project_imports.normalize_imported_project_id
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.read_imported_markpact
+  callee: src.nexu.cinema_project_imports._ensure_project_meta_fields
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.read_imported_markpact
+  callee: src.nexu.cinema_project_imports.is_deletable_imported_id
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.read_imported_markpact
+  callee: src.nexu.cinema_project_imports._project_dir
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.imported_project_llm_log
+  callee: src.nexu.cinema_project_imports.normalize_imported_project_id
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.imported_project_llm_log
+  callee: src.nexu.cinema_project_imports._filter_traces_for_project
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.imported_project_llm_log
+  callee: src.nexu.cinema_project_imports.is_deletable_imported_id
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.imported_project_llm_log
+  callee: src.nexu.cinema_project_imports._project_dir
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._activate_delete_fallback
+  callee: src.nexu.cinema_projects.activate_example_project
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._delete_active_project_fallback
+  callee: src.nexu.cinema_project_imports._clear_active_project
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports._delete_active_project_fallback
+  callee: src.nexu.cinema_project_imports._activate_delete_fallback
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.delete_imported_project
+  callee: src.nexu.cinema_project_imports.normalize_imported_project_id
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.delete_imported_project
+  callee: src.nexu.cinema_project_imports._project_dir
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.delete_imported_project
+  callee: src.nexu.cinema_project_imports._verify_delete_paths
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.delete_imported_project
+  callee: src.nexu.cinema_project_imports.is_deletable_imported_id
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.delete_imported_project
+  callee: src.nexu.cinema_projects.load_active_project
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.delete_imported_project
+  callee: src.nexu.cinema_project_imports._delete_active_project_fallback
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.delete_project
+  callee: src.nexu.cinema_project_imports.normalize_imported_project_id
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.delete_project
+  callee: src.nexu.cinema_projects.delete_example_project
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.delete_project
+  callee: src.nexu.cinema_project_imports.is_deletable_imported_id
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.delete_project
+  callee: src.nexu.cinema_project_imports.delete_imported_project
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.delete_project
+  callee: src.nexu.cinema_project_imports._project_dir
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.list_imported_projects
+  callee: src.nexu.cinema_project_imports._imports_root
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.list_imported_projects
+  callee: src.nexu.cinema_project_imports._ensure_project_meta_fields
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.list_imported_projects
+  callee: src.nexu.cinema_project_imports._catalog_entry_from_meta
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.merged_projects_catalog
+  callee: src.nexu.cinema_projects.list_project_catalog
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.merged_projects_catalog
+  callee: src.nexu.cinema_project_imports.list_imported_projects
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.activate_imported_project
+  callee: src.nexu.cinema_project_imports._activate_imported
+  call_type: resolved
+- caller: src.nexu.cinema_project_imports.activate_imported_project
+  callee: src.nexu.cinema_project_imports._project_dir
+  call_type: resolved
 - caller: src.nexu.cinema_projects.mark_project_deleted
   callee: src.nexu.cinema_projects.deleted_project_ids
   call_type: resolved
@@ -3814,267 +4159,6 @@ edges:
 - caller: src.nexu.cinema_policy.validate_intract_artifact
   callee: src.nexu.cinema_policy.ensure_intract_on_path
   call_type: resolved
-- caller: src.nexu.cinema_policy.verify_capsule_workspace
-  callee: examples.web_app_calculator.cinema.nexu_hooks.verify_capsule
-  call_type: resolved
-- caller: src.nexu.cinema_policy.verify_capsule_workspace
-  callee: src.nexu.paths.project_root
-  call_type: resolved
-- caller: src.nexu.export_prompt.export_iteration_prompt
-  callee: src.nexu.capsule.load_capsule
-  call_type: resolved
-- caller: src.nexu.export_prompt.export_iteration_prompt
-  callee: src.nexu.paths.capsule_dir
-  call_type: resolved
-- caller: src.nexu.export_prompt.export_iteration_prompt
-  callee: src.nexu.blueprint.build_blueprint
-  call_type: resolved
-- caller: src.nexu.export_prompt.export_iteration_prompt
-  callee: src.vico.diff.diff_capsule
-  call_type: resolved
-- caller: src.nexu.export_prompt.export_iteration_prompt
-  callee: src.nexu.export_prompt._cinema_policy_ledger_block
-  call_type: resolved
-- caller: src.nexu.cinema_baseline_contracts.calculator_baseline_contracts
-  callee: src.nexu.cinema_baseline_contracts._contract
-  call_type: resolved
-- caller: src.nexu.cinema_baseline_contracts.is_calculator_capsule
-  callee: src.nexu.paths.capsule_dir
-  call_type: resolved
-- caller: src.nexu.cinema_baseline_contracts.merge_calculator_baselines
-  callee: src.nexu.cinema_baseline_contracts.calculator_baseline_contracts
-  call_type: resolved
-- caller: src.nexu.cinema_baseline_contracts.merge_calculator_baselines
-  callee: src.nexu.cinema_baseline_contracts.is_calculator_capsule
-  call_type: resolved
-- caller: src.nexu.cinema_baseline_contracts.ensure_capsule_intract_yaml
-  callee: src.nexu.paths.capsule_dir
-  call_type: resolved
-- caller: src.nexu.cinema_baseline_contracts.ensure_capsule_intract_yaml
-  callee: src.nexu.cinema_baseline_contracts.calculator_baseline_contracts
-  call_type: resolved
-- caller: src.nexu.cinema_baseline_contracts.ensure_capsule_intract_yaml
-  callee: src.nexu.cinema_baseline_contracts.is_calculator_capsule
-  call_type: resolved
-- caller: src.nexu.cinema_markpact.build_markpact_readme
-  callee: src.nexu.cinema_markpact._get_app_title
-  call_type: resolved
-- caller: src.nexu.cinema_markpact.build_markpact_readme
-  callee: src.nexu.cinema_markpact._escape_markdown_fence
-  call_type: resolved
-- caller: src.nexu.cinema_markpact.build_markpact_readme
-  callee: src.nexu.cinema_markpact._get_baseline_block
-  call_type: resolved
-- caller: src.nexu.paths.snapshots_dir
-  callee: src.nexu.paths.nexu_dir
-  call_type: resolved
-- caller: src.nexu.paths.capsules_dir
-  callee: src.nexu.paths.nexu_dir
-  call_type: resolved
-- caller: src.nexu.paths.capsule_dir
-  callee: src.nexu.paths.capsules_dir
-  call_type: resolved
-- caller: src.nexu.paths.ensure_project_dirs
-  callee: src.nexu.paths.nexu_dir
-  call_type: resolved
-- caller: src.nexu.paths.ensure_project_dirs
-  callee: src.nexu.paths.snapshots_dir
-  call_type: resolved
-- caller: src.nexu.paths.ensure_project_dirs
-  callee: src.nexu.paths.capsules_dir
-  call_type: resolved
-- caller: src.nexu.promote._promotion_map
-  callee: src.nexu.files.rel
-  call_type: resolved
-- caller: src.nexu.promote.build_promotion_plan
-  callee: src.nexu.capsule.load_capsule
-  call_type: resolved
-- caller: src.nexu.promote.build_promotion_plan
-  callee: src.nexu.paths.capsule_dir
-  call_type: resolved
-- caller: src.nexu.promote.build_promotion_plan
-  callee: src.nexu.files.collect_files
-  call_type: resolved
-- caller: src.nexu.promote.build_promotion_plan
-  callee: examples.web_app_calculator.cinema.nexu_hooks.verify_capsule
-  call_type: resolved
-- caller: src.nexu.promote.build_promotion_plan
-  callee: src.vico.drift.check_source_drift
-  call_type: resolved
-- caller: src.nexu.promote.build_promotion_plan
-  callee: src.vico.diff.diff_capsule
-  call_type: resolved
-- caller: src.nexu.promote.build_promotion_plan
-  callee: src.vico.models.write_yaml
-  call_type: resolved
-- caller: src.nexu.promote.build_promotion_plan
-  callee: src.vico.models.utc_now
-  call_type: resolved
-- caller: src.nexu.promote.build_promotion_plan
-  callee: src.nexu.promote._promotion_map
-  call_type: resolved
-- caller: src.nexu.promote.apply_promotion_plan
-  callee: src.nexu.paths.capsule_dir
-  call_type: resolved
-- caller: src.nexu.orchestrate.build_orchestration_context
-  callee: src.nexu.capsule.load_capsule
-  call_type: resolved
-- caller: src.nexu.orchestrate.build_orchestration_context
-  callee: src.nexu.paths.capsule_dir
-  call_type: resolved
-- caller: src.nexu.orchestrate.build_orchestration_context
-  callee: src.nexu.plan.build_iteration_plan
-  call_type: resolved
-- caller: src.nexu.orchestrate.build_orchestration_context
-  callee: src.nexu.blueprint.build_blueprint
-  call_type: resolved
-- caller: src.nexu.orchestrate.build_orchestration_context
-  callee: examples.web_app_calculator.cinema.nexu_hooks.verify_capsule
-  call_type: resolved
-- caller: src.nexu.orchestrate.build_orchestration_context
-  callee: src.vico.diff.diff_capsule
-  call_type: resolved
-- caller: src.nexu.orchestrate.build_orchestration_context
-  callee: src.nexu.orchestrate._contract_dicts
-  call_type: resolved
-- caller: src.nexu.orchestrate.offline_orchestration_from_context
-  callee: src.vico.models.utc_now
-  call_type: resolved
-- caller: src.nexu.orchestrate.build_capsule_orchestration
-  callee: src.nexu.config.load_config
-  call_type: resolved
-- caller: src.nexu.orchestrate.build_capsule_orchestration
-  callee: src.nexu.paths.capsule_dir
-  call_type: resolved
-- caller: src.nexu.orchestrate.build_capsule_orchestration
-  callee: src.nexu.orchestrate.build_orchestration_context
-  call_type: resolved
-- caller: src.nexu.orchestrate.build_capsule_orchestration
-  callee: src.nexu.orchestrate.build_orchestration_prompt
-  call_type: resolved
-- caller: src.nexu.orchestrate.build_capsule_orchestration
-  callee: src.vico.models.write_yaml
-  call_type: resolved
-- caller: src.nexu.orchestrate.build_capsule_orchestration
-  callee: src.nexu.orchestrate._render_orchestration_markdown
-  call_type: resolved
-- caller: src.vico.models.FrozenSnapshot.from_dict
-  callee: src.vico.models.utc_now
-  call_type: resolved
-- caller: src.nexu.cinema_options_cache.options_cache_key
-  callee: src.nexu.cinema_options_cache._digest
-  call_type: resolved
-- caller: src.nexu.cinema_options_cache.options_cache_key
-  callee: src.nexu.cinema_options_cache.goal_slug
-  call_type: resolved
-- caller: src.nexu.cinema_options_cache.write_options_cache
-  callee: src.nexu.cinema_options_cache.goal_slug
-  call_type: resolved
-- caller: src.nexu.cinema_publish._registry_path
-  callee: src.nexu.cinema_publish.services_root
-  call_type: resolved
-- caller: src.nexu.cinema_publish._load_registry
-  callee: src.nexu.cinema_publish._registry_path
-  call_type: resolved
-- caller: src.nexu.cinema_publish._save_registry
-  callee: src.nexu.cinema_publish.services_root
-  call_type: resolved
-- caller: src.nexu.cinema_publish._save_registry
-  callee: src.nexu.cinema_publish._registry_path
-  call_type: resolved
-- caller: src.nexu.cinema_publish._service_alive
-  callee: src.nexu.cinema_publish._port_open
-  call_type: resolved
-- caller: src.nexu.cinema_publish._service_alive
-  callee: src.nexu.cinema_publish._http_ok
-  call_type: resolved
-- caller: src.nexu.cinema_publish._refresh_service_status
-  callee: src.nexu.cinema_publish._service_alive
-  call_type: resolved
-- caller: src.nexu.cinema_publish.list_published_services
-  callee: src.nexu.cinema_publish._load_registry
-  call_type: resolved
-- caller: src.nexu.cinema_publish.list_published_services
-  callee: src.nexu.cinema_publish._save_registry
-  call_type: resolved
-- caller: src.nexu.cinema_publish.list_published_services
-  callee: src.nexu.cinema_publish._refresh_service_status
-  call_type: resolved
-- caller: src.nexu.cinema_publish._write_service_readme
-  callee: src.nexu.cinema_markpact._escape_markdown_fence
-  call_type: resolved
-- caller: src.nexu.cinema_publish._prepare_service_directory
-  callee: src.nexu.cinema_publish.services_root
-  call_type: resolved
-- caller: src.nexu.cinema_publish._generate_markpact_export
-  callee: src.nexu.cinema.build_intract_policy_snapshot
-  call_type: resolved
-- caller: src.nexu.cinema_publish._generate_markpact_export
-  callee: src.nexu.cinema_markpact.build_markpact_readme
-  call_type: resolved
-- caller: src.nexu.cinema_publish._generate_markpact_export
-  callee: src.nexu.cinema_policy.load_effective_ui_constraints
-  call_type: resolved
-- caller: src.nexu.cinema_publish._allocate_service_port
-  callee: src.nexu.cinema_publish._load_registry
-  call_type: resolved
-- caller: src.nexu.cinema_publish._allocate_service_port
-  callee: src.nexu.cinema_publish._pick_port
-  call_type: resolved
-- caller: src.nexu.cinema_publish._register_service
-  callee: src.nexu.cinema_publish._load_registry
-  call_type: resolved
-- caller: src.nexu.cinema_publish._register_service
-  callee: src.nexu.cinema_publish._save_registry
-  call_type: resolved
-- caller: src.nexu.cinema_publish._handle_existing_service
-  callee: src.nexu.cinema_publish._load_registry
-  call_type: resolved
-- caller: src.nexu.cinema_publish._handle_existing_service
-  callee: src.nexu.cinema_publish._service_alive
-  call_type: resolved
-- caller: src.nexu.cinema_publish._handle_existing_service
-  callee: src.nexu.cinema_publish.stop_published_service
-  call_type: resolved
-- caller: src.nexu.cinema_publish.publish_project_service
-  callee: src.nexu.cinema_publish._slug_service_id
-  call_type: resolved
-- caller: src.nexu.cinema_publish.publish_project_service
-  callee: src.nexu.cinema_publish._prepare_service_directory
-  call_type: resolved
-- caller: src.nexu.cinema_publish.publish_project_service
-  callee: src.nexu.cinema.build_intract_policy_snapshot
-  call_type: resolved
-- caller: src.nexu.cinema_publish.publish_project_service
-  callee: src.nexu.cinema_publish._generate_markpact_export
-  call_type: resolved
-- caller: src.nexu.cinema_publish.publish_project_service
-  callee: src.nexu.cinema_publish._allocate_service_port
-  call_type: resolved
-- caller: src.nexu.cinema_publish.publish_project_service
-  callee: src.nexu.cinema_policy.load_effective_ui_constraints
-  call_type: resolved
-- caller: src.nexu.cinema_publish.publish_project_service
-  callee: src.nexu.cinema_publish._write_service_readme
-  call_type: resolved
-- caller: src.nexu.cinema_publish.publish_project_service
-  callee: src.nexu.cinema_publish._handle_existing_service
-  call_type: resolved
-- caller: src.nexu.cinema_publish.publish_project_service
-  callee: src.nexu.cinema_publish._create_service_entry
-  call_type: resolved
-- caller: src.nexu.cinema_publish._wait_for_service_running
-  callee: src.nexu.cinema_publish._refresh_service_status
-  call_type: resolved
-- caller: src.nexu.cinema_publish.start_published_service
-  callee: src.nexu.cinema_publish._load_registry
-  call_type: resolved
-- caller: src.nexu.cinema_publish.start_published_service
-  callee: src.nexu.cinema_publish._refresh_service_status
-  call_type: resolved
-- caller: src.nexu.cinema_publish.start_published_service
-  callee: src.nexu.cinema_publish._spawn_http_server
-  call_type: resolved
 modules:
   examples.mcp_patch_demo.server:
   - examples.mcp_patch_demo.server.broadcast
@@ -4198,9 +4282,7 @@ modules:
   - src.nexu.cinema.write_intract_policy_files
   src.nexu.cinema_baseline_contracts:
   - src.nexu.cinema_baseline_contracts._contract
-  - src.nexu.cinema_baseline_contracts.calculator_baseline_contracts
   - src.nexu.cinema_baseline_contracts.ensure_capsule_intract_yaml
-  - src.nexu.cinema_baseline_contracts.is_calculator_capsule
   - src.nexu.cinema_baseline_contracts.merge_calculator_baselines
   src.nexu.cinema_goal_contracts:
   - src.nexu.cinema_goal_contracts._build_detail_text
@@ -4236,7 +4318,9 @@ modules:
   src.nexu.cinema_html_validate:
   - src.nexu.cinema_html_validate.prepare_cinema_html_document
   src.nexu.cinema_http_preprocess:
+  - src.nexu.cinema_http_preprocess.ensure_http_preprocess_artifacts
   - src.nexu.cinema_http_preprocess.http_patch_llm_rules
+  - src.nexu.cinema_http_preprocess.prepare_http_preview_html
   - src.nexu.cinema_http_preprocess.preprocess_cinema_seed
   src.nexu.cinema_llm:
   - src.nexu.cinema_llm._as_plain_data
@@ -4259,16 +4343,8 @@ modules:
   src.nexu.cinema_llm_contracts:
   - src.nexu.cinema_llm_contracts.build_llm_contract_block
   src.nexu.cinema_markpact:
-  - src.nexu.cinema_markpact._escape_markdown_fence
-  - src.nexu.cinema_markpact._get_app_title
-  - src.nexu.cinema_markpact._get_baseline_block
   - src.nexu.cinema_markpact.build_markpact_readme
   - src.nexu.cinema_markpact.markpact_download_filename
-  src.nexu.cinema_options_cache:
-  - src.nexu.cinema_options_cache._digest
-  - src.nexu.cinema_options_cache.goal_slug
-  - src.nexu.cinema_options_cache.options_cache_key
-  - src.nexu.cinema_options_cache.write_options_cache
   src.nexu.cinema_policy:
   - src.nexu.cinema_policy._build_constraint_result
   - src.nexu.cinema_policy._html_files_distinct
@@ -4306,21 +4382,69 @@ modules:
   - src.nexu.cinema_policy.propose_llm_for_stage
   - src.nexu.cinema_policy.propose_ui_delta_contract_dicts
   - src.nexu.cinema_policy.refresh_cinema_policy_snapshot
+  - src.nexu.cinema_policy.refresh_imported_policy_snapshot
   - src.nexu.cinema_policy.reset_cinema_policy_ledger
   - src.nexu.cinema_policy.stage_files_are_distinct
   - src.nexu.cinema_policy.sync_option_previews_from_workspace
   - src.nexu.cinema_policy.validate_intract_artifact
   - src.nexu.cinema_policy.verify_capsule_workspace
   src.nexu.cinema_project_imports:
+  - src.nexu.cinema_project_imports._activate_delete_fallback
+  - src.nexu.cinema_project_imports._activate_imported
+  - src.nexu.cinema_project_imports._apply_http_preprocess_fields
+  - src.nexu.cinema_project_imports._build_http_preview_stage0
+  - src.nexu.cinema_project_imports._build_markpact_migration
+  - src.nexu.cinema_project_imports._catalog_entry_from_meta
+  - src.nexu.cinema_project_imports._charset_from_content_type
+  - src.nexu.cinema_project_imports._clear_active_project
+  - src.nexu.cinema_project_imports._compile_meta_fields
+  - src.nexu.cinema_project_imports._decode_http_bytes
+  - src.nexu.cinema_project_imports._delete_active_project_fallback
+  - src.nexu.cinema_project_imports._ensure_project_meta_fields
+  - src.nexu.cinema_project_imports._extract_stylesheet_hrefs
+  - src.nexu.cinema_project_imports._fetch_http_body
+  - src.nexu.cinema_project_imports._fetch_http_stylesheets
+  - src.nexu.cinema_project_imports._filter_traces_for_project
+  - src.nexu.cinema_project_imports._find_http_index_path
+  - src.nexu.cinema_project_imports._finish_import
+  - src.nexu.cinema_project_imports._import_kind_from_id
+  - src.nexu.cinema_project_imports._imports_root
+  - src.nexu.cinema_project_imports._infer_workspace_context
+  - src.nexu.cinema_project_imports._inject_base_href
+  - src.nexu.cinema_project_imports._iter_project_files
+  - src.nexu.cinema_project_imports._load_http_fetch_meta
+  - src.nexu.cinema_project_imports._maybe_organize_import_source
+  - src.nexu.cinema_project_imports._project_dir
+  - src.nexu.cinema_project_imports._project_title_from_id
+  - src.nexu.cinema_project_imports._read_text_for_markpact
+  - src.nexu.cinema_project_imports._refresh_http_preprocess_if_needed
+  - src.nexu.cinema_project_imports._resolve_markpact_path
+  - src.nexu.cinema_project_imports._rewrite_local_asset_refs
+  - src.nexu.cinema_project_imports._safe_extract_zip
+  - src.nexu.cinema_project_imports._same_origin
+  - src.nexu.cinema_project_imports._slug
+  - src.nexu.cinema_project_imports._source_stats
+  - src.nexu.cinema_project_imports._source_url_from_meta
+  - src.nexu.cinema_project_imports._stage_html
+  - src.nexu.cinema_project_imports._validate_git_url
+  - src.nexu.cinema_project_imports._validate_http_url
+  - src.nexu.cinema_project_imports._verify_delete_paths
+  - src.nexu.cinema_project_imports._with_workspace_meta_defaults
   - src.nexu.cinema_project_imports.activate_imported_project
   - src.nexu.cinema_project_imports.delete_imported_project
   - src.nexu.cinema_project_imports.delete_project
+  - src.nexu.cinema_project_imports.http_stage_matches_import
   - src.nexu.cinema_project_imports.import_git_project
   - src.nexu.cinema_project_imports.import_http_project
   - src.nexu.cinema_project_imports.import_zip_project
   - src.nexu.cinema_project_imports.imported_project_llm_log
+  - src.nexu.cinema_project_imports.is_deletable_imported_id
+  - src.nexu.cinema_project_imports.list_imported_projects
   - src.nexu.cinema_project_imports.merged_projects_catalog
+  - src.nexu.cinema_project_imports.normalize_imported_project_id
   - src.nexu.cinema_project_imports.read_imported_markpact
+  - src.nexu.cinema_project_imports.reject_import_stage_replacement
+  - src.nexu.cinema_project_imports.restore_http_import_stages_if_needed
   src.nexu.cinema_projects:
   - src.nexu.cinema_projects._active_project_meta
   - src.nexu.cinema_projects._apply_preprocess_meta
@@ -4347,27 +4471,8 @@ modules:
   - src.nexu.cinema_projects.load_active_project
   - src.nexu.cinema_projects.mark_project_deleted
   src.nexu.cinema_publish:
-  - src.nexu.cinema_publish._allocate_service_port
-  - src.nexu.cinema_publish._create_service_entry
-  - src.nexu.cinema_publish._generate_markpact_export
-  - src.nexu.cinema_publish._handle_existing_service
-  - src.nexu.cinema_publish._http_ok
-  - src.nexu.cinema_publish._load_registry
-  - src.nexu.cinema_publish._pick_port
-  - src.nexu.cinema_publish._port_open
-  - src.nexu.cinema_publish._prepare_service_directory
-  - src.nexu.cinema_publish._refresh_service_status
-  - src.nexu.cinema_publish._register_service
-  - src.nexu.cinema_publish._registry_path
-  - src.nexu.cinema_publish._save_registry
-  - src.nexu.cinema_publish._service_alive
-  - src.nexu.cinema_publish._slug_service_id
-  - src.nexu.cinema_publish._spawn_http_server
-  - src.nexu.cinema_publish._wait_for_service_running
-  - src.nexu.cinema_publish._write_service_readme
   - src.nexu.cinema_publish.list_published_services
   - src.nexu.cinema_publish.publish_project_service
-  - src.nexu.cinema_publish.services_root
   - src.nexu.cinema_publish.start_published_service
   - src.nexu.cinema_publish.stop_published_service
   src.nexu.cinema_scope:
@@ -4421,7 +4526,6 @@ modules:
   - src.nexu.config.load_config
   - src.nexu.config.load_env_files
   src.nexu.export_prompt:
-  - src.nexu.export_prompt._cinema_policy_ledger_block
   - src.nexu.export_prompt.export_iteration_prompt
   src.nexu.fast_delivery.context:
   - src.nexu.fast_delivery.context.compact_html_for_llm
@@ -4458,24 +4562,16 @@ modules:
   src.nexu.mcp_server:
   - src.nexu.mcp_server.run_mcp_stdio
   src.nexu.orchestrate:
-  - src.nexu.orchestrate._contract_dicts
-  - src.nexu.orchestrate._render_orchestration_markdown
   - src.nexu.orchestrate.build_capsule_orchestration
-  - src.nexu.orchestrate.build_orchestration_context
-  - src.nexu.orchestrate.build_orchestration_prompt
-  - src.nexu.orchestrate.offline_orchestration_from_context
   src.nexu.paths:
   - src.nexu.paths.capsule_dir
-  - src.nexu.paths.capsules_dir
   - src.nexu.paths.ensure_project_dirs
-  - src.nexu.paths.nexu_dir
   - src.nexu.paths.project_root
   - src.nexu.paths.snapshots_dir
   src.nexu.plan:
   - src.nexu.plan._contract_summary
   - src.nexu.plan.build_iteration_plan
   src.nexu.promote:
-  - src.nexu.promote._promotion_map
   - src.nexu.promote.apply_promotion_plan
   - src.nexu.promote.build_promotion_plan
   src.nexu.report:
@@ -4498,13 +4594,13 @@ modules:
   src.vico.hashing:
   - src.vico.hashing.sha256_file
   src.vico.models:
-  - src.vico.models.FrozenSnapshot.from_dict
   - src.vico.models.read_yaml
   - src.vico.models.utc_now
   - src.vico.models.write_yaml
   src.vico.status:
   - src.vico.status.capsule_status
 entry_points:
+- deploy.docker.cinema_serve.main
 - examples.backend_service.app.users.list_users
 - examples.frontend_view.src.menu_icons.preview_menu_icons
 - examples.mcp_patch_demo.server.WebSocket

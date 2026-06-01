@@ -1,11 +1,12 @@
-# nexu | 121f 23075L | python:115,shell:3,javascript:2,less:1 | 2026-06-01
-# stats: 833 func | 19 cls | 121 mod | CC̄=4.7 | critical:82 | cycles:0
-# alerts[5]: CC test_cinema_player_template_is_externalized=76; CC test_render_server_script_embeds_runtime_context=74; CC test_import_http_project_fetches_and_migrates=28; CC test_import_zip_project_creates_markpact_migration_and_options=22; CC test_projects_import_zip_endpoint=19
+# nexu | 122f 23212L | python:116,shell:3,javascript:2,less:1 | 2026-06-01
+# stats: 835 func | 19 cls | 122 mod | CC̄=4.7 | critical:82 | cycles:0
+# alerts[5]: CC test_cinema_player_template_is_externalized=79; CC test_render_server_script_embeds_runtime_context=74; CC test_import_http_project_fetches_and_migrates=35; CC test_import_zip_project_creates_markpact_migration_and_options=22; CC test_projects_import_zip_endpoint=19
 # hotspots[5]: test_projects_import_zip_endpoint fan=33; test_iterate_dashboard_kinds_colors_prefers_offline_before_llm fan=32; test_iterate_colors_scope_uses_offline_path fan=31; test_iterate_colors_scope_uses_llm_patch_when_available fan=30; test_iterate_functions_scope_skips_offline_fast_path fan=29
 # evolution: baseline
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[121]:
+M[122]:
   app.doql.less,153
+  deploy/docker/cinema_serve.py,54
   examples/backend_service/app/users.py,9
   examples/frontend_view/src/menu_icons.py,25
   examples/mcp_patch_demo/server.js,88
@@ -106,13 +107,13 @@ M[121]:
   tests/test_cinema_offline_options.py,318
   tests/test_cinema_options_cache.py,65
   tests/test_cinema_policy.py,290
-  tests/test_cinema_project_imports.py,699
+  tests/test_cinema_project_imports.py,779
   tests/test_cinema_project_ir.py,23
   tests/test_cinema_projects.py,206
   tests/test_cinema_publish.py,99
   tests/test_cinema_scope.py,592
   tests/test_cinema_scripts.py,67
-  tests/test_cinema_server.py,1015
+  tests/test_cinema_server.py,1018
   tests/test_cinema_spatial_patch.py,30
   tests/test_cinema_traces.py,112
   tests/test_cinema_ui_patch.py,156
@@ -127,6 +128,9 @@ M[121]:
   tests/test_verify_intract.py,29
   tree.sh,2
 D:
+  deploy/docker/cinema_serve.py:
+    e: main
+    main()
   examples/backend_service/app/users.py:
     e: list_users
     list_users(filters;users)
@@ -1045,7 +1049,7 @@ D:
     test_ensure_option_previews_from_stages(tmp_path)
     test_propose_ui_delta_and_validate(tmp_path)
   tests/test_cinema_project_imports.py:
-    e: test_import_zip_project_creates_markpact_migration_and_options,test_merged_projects_catalog_includes_imported,test_delete_project_hides_demo_from_workspace_catalog,test_import_zip_with_index_html_organizes_source,test_import_zip_without_index_html_skips_organize,test_activate_imported_project_reloads_stages,test_validate_urls_reject_file_scheme,test_safe_extract_zip_rejects_unsafe_paths,test_import_http_project_fetches_and_migrates,test_activate_http_import_regenerates_preview_stage0,test_activate_http_import_regenerates_preprocess_when_missing,test_activate_http_import_empty_subtitle_not_goal,test_activate_zip_import_does_not_require_user_goal,test_activate_imported_project_resets_calculator_ledger,test_import_http_project_requires_network_flag,test_import_git_project_requires_network_flag,test_is_deletable_imported_id,test_delete_imported_http_domain_id_with_dot,test_delete_imported_project_removes_directory,test_read_imported_markpact_returns_markdown,test_http_stage_matches_import_rejects_calculator_pollution,test_http_stage_matches_import_ignores_nexu_shield_selectors,test_restore_http_import_stages_if_needed_rebuilds_from_seed,test_activate_http_import_after_calculator_pollution
+    e: test_import_zip_project_creates_markpact_migration_and_options,test_merged_projects_catalog_includes_imported,test_delete_project_hides_demo_from_workspace_catalog,test_import_zip_with_index_html_organizes_source,test_import_zip_without_index_html_skips_organize,test_activate_imported_project_reloads_stages,test_validate_urls_reject_file_scheme,test_safe_extract_zip_rejects_unsafe_paths,test_import_http_project_fetches_and_migrates,test_import_http_project_uses_rendered_dom_snapshot,test_activate_http_import_regenerates_preview_stage0,test_activate_http_import_regenerates_preprocess_when_missing,test_activate_http_import_empty_subtitle_not_goal,test_activate_zip_import_does_not_require_user_goal,test_activate_imported_project_resets_calculator_ledger,test_import_http_project_requires_network_flag,test_import_git_project_requires_network_flag,test_is_deletable_imported_id,test_delete_imported_http_domain_id_with_dot,test_delete_imported_project_removes_directory,test_read_imported_markpact_returns_markdown,test_http_stage_matches_import_rejects_calculator_pollution,test_http_stage_matches_import_ignores_nexu_shield_selectors,test_restore_http_import_stages_if_needed_rebuilds_from_seed,test_activate_http_import_after_calculator_pollution
     test_import_zip_project_creates_markpact_migration_and_options(tmp_path)
     test_merged_projects_catalog_includes_imported(tmp_path)
     test_delete_project_hides_demo_from_workspace_catalog(tmp_path)
@@ -1055,6 +1059,7 @@ D:
     test_validate_urls_reject_file_scheme()
     test_safe_extract_zip_rejects_unsafe_paths(tmp_path)
     test_import_http_project_fetches_and_migrates(tmp_path)
+    test_import_http_project_uses_rendered_dom_snapshot(tmp_path)
     test_activate_http_import_regenerates_preview_stage0(tmp_path)
     test_activate_http_import_regenerates_preprocess_when_missing(tmp_path)
     test_activate_http_import_empty_subtitle_not_goal(tmp_path)

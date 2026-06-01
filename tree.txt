@@ -1,6 +1,10 @@
 .
 ├── app.doql.less
 ├── CHANGELOG.md
+├── deploy
+│   └── docker
+│       ├── cinema_serve.py
+│       └── Dockerfile
 ├── examples
 │   ├── backend_service
 │   │   ├── app
@@ -265,4 +269,4 @@
 ├── uv.lock
 └── VERSION
 
-53 directories, 213 files
+55 directories, 215 files

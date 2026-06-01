@@ -17,7 +17,7 @@ SUMD - Structured Unified Markdown Descriptor for AI-aware project refactorizati
 ## Metadata
 
 - **name**: `nexu`
-- **version**: `0.5.31`
+- **version**: `0.5.32`
 - **python_requires**: `>=3.10`
 - **license**: Apache-2.0
 - **ai_model**: `openrouter/qwen/qwen3-coder-next`
@@ -37,11 +37,11 @@ SUMD (description) → DOQL/source (code) → taskfile (automation) → testql (
 
 app {
   name: nexu;
-  version: 0.5.31;
+  version: 0.5.32;
 }
 
 dependencies {
-  runtime: "pyyaml>=6.0, typer>=0.12.0, rich>=13.0, litellm>=1.0, repatch @ file:///home/tom/github/semcod/repatch";
+  runtime: "pyyaml>=6.0, typer>=0.12.0, rich>=13.0, litellm>=1.0, repatch[web] @ file:///home/tom/github/semcod/repatch";
   dev: "pytest>=7.0, ruff>=0.4, mypy>=1.8, goal>=2.1.0, costs>=0.1.20, pfix>=0.1.60";
 }
 
@@ -228,7 +228,7 @@ pyyaml>=6.0
 typer>=0.12.0
 rich>=13.0
 litellm>=1.0
-repatch @ file:///home/tom/github/semcod/repatch
+repatch[web] @ file:///home/tom/github/semcod/repatch
 ```
 
 ### Development
@@ -244,7 +244,7 @@ pfix>=0.1.60
 
 ## Call Graph
 
-*367 nodes · 500 edges · 61 modules · CC̄=4.5*
+*379 nodes · 500 edges · 60 modules · CC̄=4.5*
 
 ### Hubs (by degree)
 
@@ -252,17 +252,17 @@ pfix>=0.1.60
 |----------|----|----|-----|-------|
 | `do_GET` *(in examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler)* | 37 ⚠ | 0 | 189 | **189** |
 | `print` *(in scripts.ci-cinema-smoke)* | 0 | 94 | 0 | **94** |
-| `load_config` *(in src.nexu.config)* | 14 ⚠ | 5 | 76 | **81** |
+| `load_config` *(in src.nexu.config)* | 14 ⚠ | 6 | 76 | **82** |
 | `main` *(in examples.web_app_pactown_ecosystem.run)* | 8 | 0 | 39 | **39** |
 | `main` *(in examples.web_app_event_monitor.run)* | 13 ⚠ | 0 | 37 | **37** |
 | `build_intract_policy_snapshot` *(in src.nexu.cinema)* | 11 ⚠ | 4 | 32 | **36** |
 | `main` *(in examples.web_app_dashboard.run)* | 2 | 0 | 35 | **35** |
-| `build_capsule_report` *(in src.nexu.report)* | 1 | 2 | 32 | **34** |
+| `_activate_imported` *(in src.nexu.cinema_project_imports)* | 11 ⚠ | 2 | 32 | **34** |
 
 ```toon markpact:analysis path=project/calls.toon.yaml
 # code2llm call graph | /home/tom/github/semcod/nexu
-# generated in 0.17s
-# nodes: 367 | edges: 500 | modules: 61
+# generated in 0.24s
+# nodes: 379 | edges: 500 | modules: 60
 # CC̄=4.5
 
 HUBS[20]:
@@ -271,7 +271,7 @@ HUBS[20]:
   scripts.ci-cinema-smoke.print
     CC=0  in:94  out:0  total:94
   src.nexu.config.load_config
-    CC=14  in:5  out:76  total:81
+    CC=14  in:6  out:76  total:82
   examples.web_app_pactown_ecosystem.run.main
     CC=8  in:0  out:39  total:39
   examples.web_app_event_monitor.run.main
@@ -280,10 +280,14 @@ HUBS[20]:
     CC=11  in:4  out:32  total:36
   examples.web_app_dashboard.run.main
     CC=2  in:0  out:35  total:35
+  src.nexu.cinema_project_imports._activate_imported
+    CC=11  in:2  out:32  total:34
   src.nexu.report.build_capsule_report
     CC=1  in:2  out:32  total:34
   src.nexu.cinema_server._render_server_script
-    CC=1  in:1  out:31  total:32
+    CC=1  in:2  out:31  total:33
+  src.nexu.cinema_project_imports._finish_import
+    CC=10  in:3  out:29  total:32
   src.nexu.paths.project_root
     CC=1  in:29  out:3  total:32
   src.nexu.capsule.create_capsule
@@ -294,18 +298,14 @@ HUBS[20]:
     CC=3  in:22  out:6  total:28
   examples.run_examples.run_example
     CC=2  in:1  out:26  total:27
-  src.nexu.paths.capsule_dir
-    CC=1  in:25  out:1  total:26
-  src.nexu.review.build_review_packet
-    CC=5  in:2  out:24  total:26
+  src.nexu.cinema_project_imports._build_http_preview_stage0
+    CC=14  in:2  out:25  total:27
   examples.web_app_calculator.cinema.server._llm_status_payload
     CC=3  in:1  out:25  total:26
   src.nexu.cinema_baseline_contracts.ensure_capsule_intract_yaml
     CC=9  in:1  out:25  total:26
-  src.nexu.cinema_publish._write_service_readme
-    CC=14  in:1  out:24  total:25
-  src.vico.models.write_yaml
-    CC=1  in:22  out:3  total:25
+  src.nexu.paths.capsule_dir
+    CC=1  in:25  out:1  total:26
 
 MODULES:
   examples.mcp_patch_demo.server  [5 funcs]
@@ -378,11 +378,9 @@ MODULES:
     sync_cinema_templates  CC=1  out:4
     write_cinema_nexu_hooks  CC=1  out:8
     write_intract_policy_files  CC=2  out:5
-  src.nexu.cinema_baseline_contracts  [5 funcs]
+  src.nexu.cinema_baseline_contracts  [3 funcs]
     _contract  CC=3  out:2
-    calculator_baseline_contracts  CC=1  out:7
     ensure_capsule_intract_yaml  CC=9  out:25
-    is_calculator_capsule  CC=5  out:5
     merge_calculator_baselines  CC=5  out:5
   src.nexu.cinema_goal_contracts  [14 funcs]
     _build_detail_text  CC=5  out:5
@@ -410,8 +408,10 @@ MODULES:
     ensure_html_document_closure  CC=5  out:3
   src.nexu.cinema_html_validate  [1 funcs]
     prepare_cinema_html_document  CC=2  out:2
-  src.nexu.cinema_http_preprocess  [2 funcs]
+  src.nexu.cinema_http_preprocess  [4 funcs]
+    ensure_http_preprocess_artifacts  CC=4  out:3
     http_patch_llm_rules  CC=1  out:1
+    prepare_http_preview_html  CC=1  out:2
     preprocess_cinema_seed  CC=3  out:3
   src.nexu.cinema_llm  [17 funcs]
     _as_plain_data  CC=5  out:4
@@ -426,18 +426,10 @@ MODULES:
     call_cinema_html_llm  CC=12  out:8
   src.nexu.cinema_llm_contracts  [1 funcs]
     build_llm_contract_block  CC=2  out:2
-  src.nexu.cinema_markpact  [5 funcs]
-    _escape_markdown_fence  CC=2  out:1
-    _get_app_title  CC=3  out:3
-    _get_baseline_block  CC=6  out:4
+  src.nexu.cinema_markpact  [2 funcs]
     build_markpact_readme  CC=11  out:21
     markpact_download_filename  CC=2  out:2
-  src.nexu.cinema_options_cache  [4 funcs]
-    _digest  CC=2  out:4
-    goal_slug  CC=4  out:5
-    options_cache_key  CC=7  out:16
-    write_options_cache  CC=5  out:14
-  src.nexu.cinema_policy  [41 funcs]
+  src.nexu.cinema_policy  [42 funcs]
     _build_constraint_result  CC=5  out:4
     _html_files_distinct  CC=1  out:1
     _intract_manifest_path  CC=4  out:4
@@ -448,16 +440,17 @@ MODULES:
     _process_proposed_contracts  CC=8  out:3
     _proposal_kind_and_element  CC=12  out:8
     _replace_html_title  CC=1  out:1
-  src.nexu.cinema_project_imports  [9 funcs]
-    activate_imported_project  CC=4  out:6
-    delete_imported_project  CC=7  out:12
-    delete_project  CC=3  out:6
-    import_git_project  CC=11  out:16
-    import_http_project  CC=12  out:21
-    import_zip_project  CC=5  out:13
-    imported_project_llm_log  CC=8  out:14
-    merged_projects_catalog  CC=10  out:13
-    read_imported_markpact  CC=9  out:17
+  src.nexu.cinema_project_imports  [56 funcs]
+    _activate_delete_fallback  CC=3  out:5
+    _activate_imported  CC=11  out:32
+    _apply_http_preprocess_fields  CC=9  out:9
+    _build_http_preview_stage0  CC=14  out:25
+    _build_markpact_migration  CC=8  out:14
+    _catalog_entry_from_meta  CC=7  out:22
+    _charset_from_content_type  CC=3  out:4
+    _clear_active_project  CC=2  out:2
+    _compile_meta_fields  CC=8  out:17
+    _decode_http_bytes  CC=4  out:3
   src.nexu.cinema_projects  [24 funcs]
     _active_project_meta  CC=1  out:2
     _apply_preprocess_meta  CC=3  out:5
@@ -469,17 +462,11 @@ MODULES:
     _init_project_activation  CC=3  out:4
     _project_catalog_entry  CC=2  out:2
     _project_widgets  CC=1  out:1
-  src.nexu.cinema_publish  [23 funcs]
-    _allocate_service_port  CC=11  out:11
-    _create_service_entry  CC=3  out:2
-    _generate_markpact_export  CC=1  out:5
-    _handle_existing_service  CC=7  out:8
-    _http_ok  CC=2  out:1
-    _load_registry  CC=3  out:6
-    _pick_port  CC=4  out:2
-    _port_open  CC=2  out:1
-    _prepare_service_directory  CC=1  out:4
-    _refresh_service_status  CC=3  out:1
+  src.nexu.cinema_publish  [4 funcs]
+    list_published_services  CC=3  out:6
+    publish_project_service  CC=6  out:16
+    start_published_service  CC=15  out:20
+    stop_published_service  CC=9  out:11
   src.nexu.cinema_scope  [2 funcs]
     load_cinema_ui_profile  CC=10  out:15
     scope_meta_for_project  CC=1  out:3
@@ -518,8 +505,7 @@ MODULES:
     _load_env_file  CC=10  out:11
     load_config  CC=14  out:76
     load_env_files  CC=3  out:3
-  src.nexu.export_prompt  [2 funcs]
-    _cinema_policy_ledger_block  CC=12  out:13
+  src.nexu.export_prompt  [1 funcs]
     export_iteration_prompt  CC=3  out:18
   src.nexu.fast_delivery.context  [3 funcs]
     compact_html_for_llm  CC=3  out:6
@@ -555,25 +541,17 @@ MODULES:
     offline_review_from_status  CC=4  out:0
   src.nexu.mcp_server  [1 funcs]
     run_mcp_stdio  CC=6  out:7
-  src.nexu.orchestrate  [6 funcs]
-    _contract_dicts  CC=2  out:0
-    _render_orchestration_markdown  CC=9  out:22
+  src.nexu.orchestrate  [1 funcs]
     build_capsule_orchestration  CC=2  out:28
-    build_orchestration_context  CC=2  out:11
-    build_orchestration_prompt  CC=1  out:2
-    offline_orchestration_from_context  CC=13  out:22
-  src.nexu.paths  [6 funcs]
+  src.nexu.paths  [4 funcs]
     capsule_dir  CC=1  out:1
-    capsules_dir  CC=1  out:1
     ensure_project_dirs  CC=2  out:7
-    nexu_dir  CC=1  out:0
     project_root  CC=1  out:3
     snapshots_dir  CC=1  out:1
   src.nexu.plan  [2 funcs]
     _contract_summary  CC=9  out:3
     build_iteration_plan  CC=7  out:15
-  src.nexu.promote  [3 funcs]
-    _promotion_map  CC=2  out:4
+  src.nexu.promote  [2 funcs]
     apply_promotion_plan  CC=4  out:8
     build_promotion_plan  CC=6  out:16
   src.nexu.report  [1 funcs]
@@ -595,8 +573,7 @@ MODULES:
     current_git_sha  CC=4  out:3
   src.vico.hashing  [1 funcs]
     sha256_file  CC=2  out:6
-  src.vico.models  [4 funcs]
-    from_dict  CC=2  out:6
+  src.vico.models  [3 funcs]
     read_yaml  CC=3  out:4
     utc_now  CC=1  out:2
     write_yaml  CC=1  out:3
@@ -672,8 +649,8 @@ EDGES:
 
 ```toon markpact:analysis path=project/calls.toon.yaml
 # code2llm call graph | /home/tom/github/semcod/nexu
-# generated in 0.17s
-# nodes: 367 | edges: 500 | modules: 61
+# generated in 0.24s
+# nodes: 379 | edges: 500 | modules: 60
 # CC̄=4.5
 
 HUBS[20]:
@@ -682,7 +659,7 @@ HUBS[20]:
   scripts.ci-cinema-smoke.print
     CC=0  in:94  out:0  total:94
   src.nexu.config.load_config
-    CC=14  in:5  out:76  total:81
+    CC=14  in:6  out:76  total:82
   examples.web_app_pactown_ecosystem.run.main
     CC=8  in:0  out:39  total:39
   examples.web_app_event_monitor.run.main
@@ -691,10 +668,14 @@ HUBS[20]:
     CC=11  in:4  out:32  total:36
   examples.web_app_dashboard.run.main
     CC=2  in:0  out:35  total:35
+  src.nexu.cinema_project_imports._activate_imported
+    CC=11  in:2  out:32  total:34
   src.nexu.report.build_capsule_report
     CC=1  in:2  out:32  total:34
   src.nexu.cinema_server._render_server_script
-    CC=1  in:1  out:31  total:32
+    CC=1  in:2  out:31  total:33
+  src.nexu.cinema_project_imports._finish_import
+    CC=10  in:3  out:29  total:32
   src.nexu.paths.project_root
     CC=1  in:29  out:3  total:32
   src.nexu.capsule.create_capsule
@@ -705,18 +686,14 @@ HUBS[20]:
     CC=3  in:22  out:6  total:28
   examples.run_examples.run_example
     CC=2  in:1  out:26  total:27
-  src.nexu.paths.capsule_dir
-    CC=1  in:25  out:1  total:26
-  src.nexu.review.build_review_packet
-    CC=5  in:2  out:24  total:26
+  src.nexu.cinema_project_imports._build_http_preview_stage0
+    CC=14  in:2  out:25  total:27
   examples.web_app_calculator.cinema.server._llm_status_payload
     CC=3  in:1  out:25  total:26
   src.nexu.cinema_baseline_contracts.ensure_capsule_intract_yaml
     CC=9  in:1  out:25  total:26
-  src.nexu.cinema_publish._write_service_readme
-    CC=14  in:1  out:24  total:25
-  src.vico.models.write_yaml
-    CC=1  in:22  out:3  total:25
+  src.nexu.paths.capsule_dir
+    CC=1  in:25  out:1  total:26
 
 MODULES:
   examples.mcp_patch_demo.server  [5 funcs]
@@ -789,11 +766,9 @@ MODULES:
     sync_cinema_templates  CC=1  out:4
     write_cinema_nexu_hooks  CC=1  out:8
     write_intract_policy_files  CC=2  out:5
-  src.nexu.cinema_baseline_contracts  [5 funcs]
+  src.nexu.cinema_baseline_contracts  [3 funcs]
     _contract  CC=3  out:2
-    calculator_baseline_contracts  CC=1  out:7
     ensure_capsule_intract_yaml  CC=9  out:25
-    is_calculator_capsule  CC=5  out:5
     merge_calculator_baselines  CC=5  out:5
   src.nexu.cinema_goal_contracts  [14 funcs]
     _build_detail_text  CC=5  out:5
@@ -821,8 +796,10 @@ MODULES:
     ensure_html_document_closure  CC=5  out:3
   src.nexu.cinema_html_validate  [1 funcs]
     prepare_cinema_html_document  CC=2  out:2
-  src.nexu.cinema_http_preprocess  [2 funcs]
+  src.nexu.cinema_http_preprocess  [4 funcs]
+    ensure_http_preprocess_artifacts  CC=4  out:3
     http_patch_llm_rules  CC=1  out:1
+    prepare_http_preview_html  CC=1  out:2
     preprocess_cinema_seed  CC=3  out:3
   src.nexu.cinema_llm  [17 funcs]
     _as_plain_data  CC=5  out:4
@@ -837,18 +814,10 @@ MODULES:
     call_cinema_html_llm  CC=12  out:8
   src.nexu.cinema_llm_contracts  [1 funcs]
     build_llm_contract_block  CC=2  out:2
-  src.nexu.cinema_markpact  [5 funcs]
-    _escape_markdown_fence  CC=2  out:1
-    _get_app_title  CC=3  out:3
-    _get_baseline_block  CC=6  out:4
+  src.nexu.cinema_markpact  [2 funcs]
     build_markpact_readme  CC=11  out:21
     markpact_download_filename  CC=2  out:2
-  src.nexu.cinema_options_cache  [4 funcs]
-    _digest  CC=2  out:4
-    goal_slug  CC=4  out:5
-    options_cache_key  CC=7  out:16
-    write_options_cache  CC=5  out:14
-  src.nexu.cinema_policy  [41 funcs]
+  src.nexu.cinema_policy  [42 funcs]
     _build_constraint_result  CC=5  out:4
     _html_files_distinct  CC=1  out:1
     _intract_manifest_path  CC=4  out:4
@@ -859,16 +828,17 @@ MODULES:
     _process_proposed_contracts  CC=8  out:3
     _proposal_kind_and_element  CC=12  out:8
     _replace_html_title  CC=1  out:1
-  src.nexu.cinema_project_imports  [9 funcs]
-    activate_imported_project  CC=4  out:6
-    delete_imported_project  CC=7  out:12
-    delete_project  CC=3  out:6
-    import_git_project  CC=11  out:16
-    import_http_project  CC=12  out:21
-    import_zip_project  CC=5  out:13
-    imported_project_llm_log  CC=8  out:14
-    merged_projects_catalog  CC=10  out:13
-    read_imported_markpact  CC=9  out:17
+  src.nexu.cinema_project_imports  [56 funcs]
+    _activate_delete_fallback  CC=3  out:5
+    _activate_imported  CC=11  out:32
+    _apply_http_preprocess_fields  CC=9  out:9
+    _build_http_preview_stage0  CC=14  out:25
+    _build_markpact_migration  CC=8  out:14
+    _catalog_entry_from_meta  CC=7  out:22
+    _charset_from_content_type  CC=3  out:4
+    _clear_active_project  CC=2  out:2
+    _compile_meta_fields  CC=8  out:17
+    _decode_http_bytes  CC=4  out:3
   src.nexu.cinema_projects  [24 funcs]
     _active_project_meta  CC=1  out:2
     _apply_preprocess_meta  CC=3  out:5
@@ -880,17 +850,11 @@ MODULES:
     _init_project_activation  CC=3  out:4
     _project_catalog_entry  CC=2  out:2
     _project_widgets  CC=1  out:1
-  src.nexu.cinema_publish  [23 funcs]
-    _allocate_service_port  CC=11  out:11
-    _create_service_entry  CC=3  out:2
-    _generate_markpact_export  CC=1  out:5
-    _handle_existing_service  CC=7  out:8
-    _http_ok  CC=2  out:1
-    _load_registry  CC=3  out:6
-    _pick_port  CC=4  out:2
-    _port_open  CC=2  out:1
-    _prepare_service_directory  CC=1  out:4
-    _refresh_service_status  CC=3  out:1
+  src.nexu.cinema_publish  [4 funcs]
+    list_published_services  CC=3  out:6
+    publish_project_service  CC=6  out:16
+    start_published_service  CC=15  out:20
+    stop_published_service  CC=9  out:11
   src.nexu.cinema_scope  [2 funcs]
     load_cinema_ui_profile  CC=10  out:15
     scope_meta_for_project  CC=1  out:3
@@ -929,8 +893,7 @@ MODULES:
     _load_env_file  CC=10  out:11
     load_config  CC=14  out:76
     load_env_files  CC=3  out:3
-  src.nexu.export_prompt  [2 funcs]
-    _cinema_policy_ledger_block  CC=12  out:13
+  src.nexu.export_prompt  [1 funcs]
     export_iteration_prompt  CC=3  out:18
   src.nexu.fast_delivery.context  [3 funcs]
     compact_html_for_llm  CC=3  out:6
@@ -966,25 +929,17 @@ MODULES:
     offline_review_from_status  CC=4  out:0
   src.nexu.mcp_server  [1 funcs]
     run_mcp_stdio  CC=6  out:7
-  src.nexu.orchestrate  [6 funcs]
-    _contract_dicts  CC=2  out:0
-    _render_orchestration_markdown  CC=9  out:22
+  src.nexu.orchestrate  [1 funcs]
     build_capsule_orchestration  CC=2  out:28
-    build_orchestration_context  CC=2  out:11
-    build_orchestration_prompt  CC=1  out:2
-    offline_orchestration_from_context  CC=13  out:22
-  src.nexu.paths  [6 funcs]
+  src.nexu.paths  [4 funcs]
     capsule_dir  CC=1  out:1
-    capsules_dir  CC=1  out:1
     ensure_project_dirs  CC=2  out:7
-    nexu_dir  CC=1  out:0
     project_root  CC=1  out:3
     snapshots_dir  CC=1  out:1
   src.nexu.plan  [2 funcs]
     _contract_summary  CC=9  out:3
     build_iteration_plan  CC=7  out:15
-  src.nexu.promote  [3 funcs]
-    _promotion_map  CC=2  out:4
+  src.nexu.promote  [2 funcs]
     apply_promotion_plan  CC=4  out:8
     build_promotion_plan  CC=6  out:16
   src.nexu.report  [1 funcs]
@@ -1006,8 +961,7 @@ MODULES:
     current_git_sha  CC=4  out:3
   src.vico.hashing  [1 funcs]
     sha256_file  CC=2  out:6
-  src.vico.models  [4 funcs]
-    from_dict  CC=2  out:6
+  src.vico.models  [3 funcs]
     read_yaml  CC=3  out:4
     utc_now  CC=1  out:2
     write_yaml  CC=1  out:3
@@ -1070,21 +1024,21 @@ EDGES:
 ### Code Analysis (`project/analysis.toon.yaml`)
 
 ```toon markpact:analysis path=project/analysis.toon.yaml
-# code2llm | 99f 17879L | python:77,yaml:9,json:3,txt:2,shell:2,javascript:2,yml:1,toml:1 | 2026-06-01
+# code2llm | 101f 18019L | python:78,yaml:9,json:3,txt:2,shell:2,javascript:2,yml:1,toml:1 | 2026-06-01
 # generated in 0.02s
-# CC̅=4.5 | critical:5/636 | dups:0 | cycles:0
+# CC̅=4.5 | critical:5/637 | dups:0 | cycles:0
 
 HEALTH[5]:
   🟡 CC    do_GET CC=37 (limit:15)
   🟡 CC    do_POST CC=258 (limit:15)
   🟡 CC    propose_goal_extension_contracts CC=15 (limit:15)
   🟡 CC    start_published_service CC=15 (limit:15)
-  🟡 CC    load_http_preprocess_artifacts CC=16 (limit:15)
+  🟡 CC    load_http_preprocess_artifacts CC=18 (limit:15)
 
 REFACTOR[1]:
   1. split 5 high-CC methods  (CC>15)
 
-PIPELINES[129]:
+PIPELINES[130]:
   [1] Src [main]: main → print
       PURITY: 100% pure
   [2] Src [main]: main → print
@@ -1188,7 +1142,7 @@ PIPELINES[129]:
 
 LAYERS:
   examples/                       CC̄=5.1    ←in:0  →out:60  !! split
-  │ !! server                    3039L  2C   71m  CC=258    ←0
+  │ !! server                    3039L  2C   71m  CC=258    ←1
   │ nexu_hooks                 331L  0C   29m  CC=11     ←7
   │ run                        118L  0C    1m  CC=2      ←0
   │ run                        110L  0C    1m  CC=2      ←0
@@ -1223,11 +1177,11 @@ LAYERS:
   │
   src/                            CC̄=4.5    ←in:0  →out:0
   │ !! cinema_project_imports    1290L  0C   60m  CC=14     ←2
-  │ !! cinema_policy              906L  0C   44m  CC=14     ←6
+  │ !! cinema_policy              906L  0C   44m  CC=14     ←7
   │ !! cinema_offline_options     901L  0C   32m  CC=13     ←1
   │ !! cinema_projects            720L  1C   25m  CC=14     ←4
   │ !! cinema_scripts             712L  0C    4m  CC=6      ←5
-  │ !! cinema_http_preprocess     628L  1C   29m  CC=16     ←4
+  │ !! cinema_http_preprocess     662L  1C   29m  CC=18     ←4
   │ !! cinema_publish             469L  0C   23m  CC=15     ←1
   │ mcp_server                 393L  0C   13m  CC=6      ←1
   │ cli                        379L  0C   23m  CC=4      ←0
@@ -1240,14 +1194,14 @@ LAYERS:
   │ cinema_markpact            215L  0C    7m  CC=14     ←2
   │ cinema_html_validate       205L  0C   13m  CC=12     ←3
   │ cinema_llm_contracts       196L  0C    7m  CC=9      ←1
-  │ cinema                     194L  0C    9m  CC=11     ←5
-  │ config                     191L  4C    6m  CC=14     ←5
+  │ cinema                     194L  0C    9m  CC=11     ←6
+  │ config                     191L  4C    6m  CC=14     ←6
   │ cinema_baseline_contracts   173L  0C    5m  CC=9      ←2
   │ cinema_traces              166L  0C    7m  CC=9      ←2
   │ llm                        165L  0C    5m  CC=8      ←2
   │ export_prompt              160L  0C    3m  CC=12     ←4
   │ review                     157L  0C    2m  CC=5      ←2
-  │ cinema_server              144L  0C    8m  CC=4      ←1
+  │ cinema_server              144L  0C    8m  CC=4      ←2
   │ intract_adapter            133L  0C    6m  CC=9      ←1
   │ runtime                    131L  0C    4m  CC=9      ←4
   │ cinema_options_cache       128L  0C    8m  CC=9      ←1
@@ -1280,6 +1234,10 @@ LAYERS:
   │ diff                         0L  0C    1m  CC=12     ←9
   │ __main__                     0L  0C    0m  CC=0.0    ←0
   │
+  deploy/                         CC̄=4.0    ←in:0  →out:0
+  │ cinema_serve                53L  0C    1m  CC=4      ←0
+  │ Dockerfile                  53L  0C    0m  CC=0.0    ←0
+  │
   scripts/                        CC̄=3.1    ←in:91  →out:0
   │ check-doc-links            114L  0C    8m  CC=12     ←0
   │ ci-cinema-smoke.sh          85L  0C    1m  CC=0.0    ←12
@@ -1309,27 +1267,28 @@ LAYERS:
      src/vico/status.py                        0L
 
 COUPLING:
-                                                                src.nexu         examples.web_app_calculator                             scripts                            src.vico                            examples  examples.web_app_pactown_ecosystem          examples.web_app_dashboard      examples.web_app_event_monitor
-                            src.nexu                                  ──                                   6                                   2                                  53                                 ←20                                                                      ←9                                      hub
-         examples.web_app_calculator                                  92                                  ──                                   4                                   1                                  ←1                                                                                                              hub
-                             scripts                                  ←2                                  ←4                                  ──                                                                     ←34                                 ←22                                 ←10                                 ←19  hub
-                            src.vico                                  12                                  ←1                                                                      ──                                  ←5                                                                      ←1                                      hub
-                            examples                                  20                                   1                                  34                                   5                                  ──                                                                                                              !! fan-out
-  examples.web_app_pactown_ecosystem                                                                                                          22                                                                                                          ──                                                                          !! fan-out
-          examples.web_app_dashboard                                   9                                                                      10                                   1                                                                                                          ──                                      !! fan-out
-      examples.web_app_event_monitor                                                                                                          19                                                                                                                                                                                  ──  !! fan-out
+                                                                src.nexu         examples.web_app_calculator                             scripts                            src.vico                            examples  examples.web_app_pactown_ecosystem          examples.web_app_dashboard      examples.web_app_event_monitor                       deploy.docker
+                            src.nexu                                  ──                                   6                                   2                                  53                                 ←20                                                                      ←9                                                                      ←5  hub
+         examples.web_app_calculator                                  90                                  ──                                   4                                   1                                  ←1                                                                                                                                              ←1  hub
+                             scripts                                  ←2                                  ←4                                  ──                                                                     ←34                                 ←22                                 ←10                                 ←19                                      hub
+                            src.vico                                  12                                  ←1                                                                      ──                                  ←5                                                                      ←1                                                                          hub
+                            examples                                  20                                   1                                  34                                   5                                  ──                                                                                                                                                  !! fan-out
+  examples.web_app_pactown_ecosystem                                                                                                          22                                                                                                          ──                                                                                                              !! fan-out
+          examples.web_app_dashboard                                   9                                                                      10                                   1                                                                                                          ──                                                                          !! fan-out
+      examples.web_app_event_monitor                                                                                                          19                                                                                                                                                                                  ──                                      !! fan-out
+                       deploy.docker                                   5                                   1                                                                                                                                                                                                                                                          ──
   CYCLES: none
+  HUB: examples.web_app_calculator/ (fan-in=8)
+  HUB: src.nexu/ (fan-in=136)
   HUB: scripts/ (fan-in=91)
   HUB: src.vico/ (fan-in=60)
-  HUB: src.nexu/ (fan-in=133)
-  HUB: examples.web_app_calculator/ (fan-in=7)
-  SMELL: examples.web_app_pactown_ecosystem/ fan-out=22 → split needed
-  SMELL: src.vico/ fan-out=12 → split needed
-  SMELL: examples/ fan-out=60 → split needed
-  SMELL: src.nexu/ fan-out=61 → split needed
   SMELL: examples.web_app_event_monitor/ fan-out=19 → split needed
-  SMELL: examples.web_app_calculator/ fan-out=97 → split needed
+  SMELL: examples.web_app_calculator/ fan-out=95 → split needed
+  SMELL: src.nexu/ fan-out=61 → split needed
   SMELL: examples.web_app_dashboard/ fan-out=20 → split needed
+  SMELL: examples.web_app_pactown_ecosystem/ fan-out=22 → split needed
+  SMELL: examples/ fan-out=60 → split needed
+  SMELL: src.vico/ fan-out=12 → split needed
 
 EXTERNAL:
   validation: run `vallm batch .` → validation.toon
@@ -1339,15 +1298,15 @@ EXTERNAL:
 ### Duplication (`project/duplication.toon.yaml`)
 
 ```toon markpact:analysis path=project/duplication.toon.yaml
-# redup/duplication | 9 groups | 78f 16520L | 2026-06-01
+# redup/duplication | 9 groups | 79f 16607L | 2026-06-01
 
 SUMMARY:
-  files_scanned: 78
-  total_lines:   16520
+  files_scanned: 79
+  total_lines:   16607
   dup_groups:    9
   dup_fragments: 25
   saved_lines:   157
-  scan_ms:       3131
+  scan_ms:       3077
 
 HOTSPOTS[7] (files with most duplication):
   examples/web_app_calculator/cinema/server.py  dup=46L  groups=2  frags=8  (0.3%)
@@ -1457,7 +1416,7 @@ METRICS-TARGET:
 ### Evolution / Churn (`project/evolution.toon.yaml`)
 
 ```toon markpact:analysis path=project/evolution.toon.yaml
-# code2llm/evolution | 494 func | 54f | 2026-06-01
+# code2llm/evolution | 495 func | 55f | 2026-06-01
 # generated in 0.00s
 
 NEXT[5] (ranked by impact):
@@ -1473,13 +1432,13 @@ NEXT[5] (ranked by impact):
       WHY: 901L, 0 classes, max CC=13
       EFFORT: ~4h  IMPACT: 11713
 
-  [4] !  SPLIT-FUNC      start_published_service  CC=15  fan=17
+  [4] !  SPLIT-FUNC      load_http_preprocess_artifacts  CC=18  fan=16
+      WHY: CC=18 exceeds 15
+      EFFORT: ~1h  IMPACT: 288
+
+  [5] !  SPLIT-FUNC      start_published_service  CC=15  fan=17
       WHY: CC=15 exceeds 15
       EFFORT: ~1h  IMPACT: 255
-
-  [5] !  SPLIT-FUNC      load_http_preprocess_artifacts  CC=16  fan=15
-      WHY: CC=16 exceeds 15
-      EFFORT: ~1h  IMPACT: 240
 
 
 RISKS[3]:
@@ -1489,7 +1448,7 @@ RISKS[3]:
 
 METRICS-TARGET:
   CC̄:          4.4 → ≤3.1
-  max-CC:      16 → ≤8
+  max-CC:      18 → ≤9
   god-modules: 7 → 0
   high-CC(≥15): 3 → ≤1
   hub-types:   0 → ≤0
