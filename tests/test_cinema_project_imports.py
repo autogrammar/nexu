@@ -183,10 +183,13 @@ def test_import_http_project_fetches_and_migrates(tmp_path: Path):
     body = (
         b"<!DOCTYPE html><html><head>"
         b'<link rel="stylesheet" href="/styles/main.css">'
-        b'</head><body><h1>Site</h1><img src="/img/hero.png" alt="Hero"></body></html>'
+        b'</head><body><h1>Site</h1><img src="/img/hero.png" '
+        b'srcset="/img/hero.png 1x, /img/hero@2x.png 2x" alt="Hero">'
+        b'<img data-src="/img/lazy.jpg" alt="Lazy"></body></html>'
     )
     css_body = b"body { color: navy; }"
     image_body = b"\x89PNG\r\n"
+    lazy_body = b"\xff\xd8\xff"
 
     class FakeResp:
         def __init__(self, payload: bytes, *, url: str, content_type: str):
@@ -221,6 +224,18 @@ def test_import_http_project_fetches_and_migrates(tmp_path: Path):
                 url="https://example.com/img/hero.png",
                 content_type="image/png",
             )
+        if target.endswith("/img/hero@2x.png"):
+            return FakeResp(
+                image_body,
+                url="https://example.com/img/hero@2x.png",
+                content_type="image/png",
+            )
+        if target.endswith("/img/lazy.jpg"):
+            return FakeResp(
+                lazy_body,
+                url="https://example.com/img/lazy.jpg",
+                content_type="image/jpeg",
+            )
         return FakeResp(
             body,
             url="https://example.com/demo",
@@ -241,15 +256,22 @@ def test_import_http_project_fetches_and_migrates(tmp_path: Path):
     assert meta["source"] == "https://example.com/demo"
     assert meta["import_kind"] == "http"
     assert meta["fetch_meta"]["final_url"] == "https://example.com/demo"
+    assert meta["fetch_meta"]["fetch_method"] == "urllib"
+    assert {item["kind"] for item in meta["fetch_meta"]["assets"]} == {"stylesheet", "image"}
+    assert len(meta["fetch_meta"]["images"]) == 3
     stage0 = (cinema / "stage0.html").read_text(encoding="utf-8")
     assert ">Site</h1>" in stage0
     assert '<base href="https://example.com/demo/">' in stage0
     assert f'imported_projects/{project_id}/source/assets/stylesheet-0.css' in stage0
     assert f'imported_projects/{project_id}/source/assets/image-0.png' in stage0
+    assert f'imported_projects/{project_id}/source/assets/image-1.png 2x' in stage0
+    assert f'imported_projects/{project_id}/source/assets/image-2.jpg' in stage0
     assert "nexu preview: block cross-origin fetch" in stage0
     assert "Markpact migration" not in stage0
     assert (project_dir / "source" / "assets" / "stylesheet-0.css").exists()
     assert (project_dir / "source" / "assets" / "image-0.png").exists()
+    assert (project_dir / "source" / "assets" / "image-1.png").exists()
+    assert (project_dir / "source" / "assets" / "image-2.jpg").exists()
     alt_a = (cinema / "alt_a.html").read_text(encoding="utf-8")
     assert ">Site</h1>" in alt_a
     assert "calc-body" not in alt_a
@@ -268,6 +290,64 @@ def test_import_http_project_fetches_and_migrates(tmp_path: Path):
     index_html = (project_dir / "source" / "index.html").read_text(encoding="utf-8")
     assert len(outline) < len(index_html)
     assert any(a.get("kind") == "visual_css" for a in meta.get("artifacts") or [])
+
+
+def test_import_http_project_uses_rendered_dom_snapshot(tmp_path: Path):
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    rendered = (
+        '<!DOCTYPE html><html><head><link rel="stylesheet" href="/app.css"></head>'
+        '<body><div id="root"><h1>Rendered dashboard</h1><img src="/hero.webp"></div></body></html>'
+    )
+
+    class FakeResp:
+        def __init__(self, payload: bytes, *, url: str, content_type: str):
+            self.headers = {"Content-Type": content_type}
+            self.url = url
+            self._payload = payload
+            self._done = False
+
+        def read(self, n=-1):
+            if self._done:
+                return b""
+            self._done = True
+            return self._payload if n == -1 else self._payload[: max(n, 0)]
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+    def fake_urlopen(req, timeout=0):
+        target = req.full_url
+        if target.endswith("/app.css"):
+            return FakeResp(b"#root{display:grid}", url=target, content_type="text/css")
+        if target.endswith("/hero.webp"):
+            return FakeResp(b"RIFFWEBP", url=target, content_type="image/webp")
+        raise AssertionError(f"base HTML should come from rendered DOM, got: {target}")
+
+    with (
+        patch(
+            "repatch.web_fetch._render_with_playwright",
+            return_value=(rendered, "https://example.com/app"),
+        ),
+        patch("repatch.web_fetch.urlopen", side_effect=fake_urlopen),
+    ):
+        result = import_http_project(cinema, "https://example.com/app", allow_network=True)
+
+    project_id = result["project"]["id"]
+    project_dir = cinema / "imported_projects" / project_id
+    meta = json.loads((project_dir / "project.json").read_text(encoding="utf-8"))
+    assert meta["fetch_meta"]["fetch_method"] == "playwright"
+    assert meta["fetch_meta"]["final_url"] == "https://example.com/app"
+    assert len(meta["fetch_meta"]["assets"]) == 2
+    index_html = (project_dir / "source" / "index.html").read_text(encoding="utf-8")
+    assert "Rendered dashboard</h1>" in index_html
+    stage0 = (cinema / "stage0.html").read_text(encoding="utf-8")
+    assert "Rendered dashboard</h1>" in stage0
+    assert f'imported_projects/{project_id}/source/assets/stylesheet-0.css' in stage0
+    assert f'imported_projects/{project_id}/source/assets/image-0.webp' in stage0
 
 
 def test_activate_http_import_regenerates_preview_stage0(tmp_path: Path):

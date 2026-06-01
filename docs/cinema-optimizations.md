@@ -178,6 +178,8 @@ Before HTTP preprocess (or Markpact migration for ZIP/git), `_maybe_organize_imp
 
 `project.json` → `organize` records `extracted_files`, `stripped_lazy_img_count`, and `tagged_targets_count` (via `repatch.organize_result_manifest`). HTTP imports still get `nexu-visual.css` / `nexu-outline.html` preprocess; ZIP/git with index HTML get organized source only (stage0 remains the Markpact migration shell until a web preview path exists). Pure code archives without `index.html` skip organize. Built-in catalog projects (calculator, dashboard) are unaffected — they never pass through `_finish_import`.
 
+**LLM patch context (2026-06):** `load_http_preprocess_artifacts` attaches the organize manifest, editable source paths (`source/index.html`, `nexu-visual.css`, `nexu-outline.html`, extracted files), and inline `nexu-extracted.css` / `nexu-extracted.js` content to the UI profile. `build_http_llm_context` includes this in `/iterate` and LLM CSS patch prompts so the model edits compact artifacts instead of full `stage0.html`.
+
 ## Policy ledger scoping + HTTP stage restore (2026-06)
 
 Shared capsules (e.g. `scientific_calc`) can hold both calculator and HTTP-import projects. Without filtering, KEEP/DELETE marks from a prior calculator session could bleed into an active HTTP import.

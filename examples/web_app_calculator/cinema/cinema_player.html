@@ -1,16 +1,230 @@
 <!DOCTYPE html>
-<html>
+<html data-theme="dark">
 <head>
+    <script>
+    (function () {
+        var k = 'nexu-cinema-theme', t = localStorage.getItem(k);
+        document.documentElement.setAttribute('data-theme', (t === 'warm' || t === 'light') ? t : 'dark');
+    })();
+    </script>
     <title>Nexu — Projects · Editor · Services</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
+        :root,
+        [data-theme="dark"] {
+            color-scheme: dark;
+            --nexu-bg-base: #05070c;
+            --nexu-bg-surface: #090d16;
+            --nexu-bg-elevated: rgba(15, 23, 42, 0.9);
+            --nexu-bg-card: rgba(30, 41, 59, 0.65);
+            --nexu-bg-muted: rgba(15, 23, 42, 0.6);
+            --nexu-bg-inset: rgba(0, 0, 0, 0.3);
+            --nexu-bg-panel-deep: #020617;
+            --nexu-text: #f1f5f9;
+            --nexu-text-title: #f8fafc;
+            --nexu-text-secondary: #94a3b8;
+            --nexu-text-muted: #64748b;
+            --nexu-text-body: #cbd5e1;
+            --nexu-border: rgba(255, 255, 255, 0.08);
+            --nexu-border-subtle: rgba(255, 255, 255, 0.05);
+            --nexu-border-strong: rgba(255, 255, 255, 0.12);
+            --nexu-accent: #38bdf8;
+            --nexu-accent-contrast: #0f172a;
+            --nexu-accent-soft: rgba(56, 189, 248, 0.2);
+            --nexu-accent-glow: rgba(56, 189, 248, 0.1);
+            --nexu-accent-border: rgba(56, 189, 248, 0.45);
+            --nexu-surface-gradient: radial-gradient(ellipse at top, rgba(56, 189, 248, 0.08), transparent 55%);
+            --nexu-bottom-panel: rgba(2, 6, 23, 0.95);
+            --nexu-policy-border: rgba(129, 140, 248, 0.35);
+            --nexu-hover-surface: rgba(255, 255, 255, 0.05);
+            --nexu-overlay: rgba(2, 6, 23, 0.72);
+            --nexu-shadow-card: 0 8px 24px rgba(0, 0, 0, 0.25);
+            --nexu-link: #7dd3fc;
+            --nexu-success: #2ed573;
+            --nexu-success-soft: rgba(46, 213, 115, 0.12);
+            --nexu-success-text: #86efac;
+            --nexu-success-solid: #22c55e;
+            --nexu-success-solid-hover: #4ade80;
+            --nexu-success-contrast: #052e16;
+            --nexu-danger: #ff4757;
+            --nexu-danger-soft: rgba(255, 71, 87, 0.15);
+            --nexu-danger-text: #fca5a5;
+            --nexu-danger-border: rgba(248, 113, 113, 0.45);
+            --nexu-warning: #fbbf24;
+            --nexu-warning-soft: rgba(251, 191, 36, 0.12);
+            --nexu-warning-text: #facc15;
+            --nexu-policy: #818cf8;
+            --nexu-policy-soft: rgba(129, 140, 248, 0.12);
+            --nexu-policy-text: #a5b4fc;
+            --nexu-policy-btn-text: #c7d2fe;
+            --nexu-btn-secondary: #334155;
+            --nexu-btn-disabled: #1e293b;
+            --nexu-input-bg: rgba(2, 6, 23, 0.85);
+            --nexu-modal-bg: #0f172a;
+            --nexu-code-bg: #0f172a;
+            --nexu-trace-bg: #020617;
+            --nexu-options-column-bg: rgba(2, 6, 23, 0.4);
+            --nexu-goal-btn: #d97706;
+            --nexu-goal-btn-hover: #b45309;
+            --nexu-hint-btn: #6366f1;
+            --nexu-hint-btn-hover: #4f46e5;
+            --nexu-primary-btn: #0ea5e9;
+            --nexu-primary-btn-hover: #0284c7;
+            --nexu-offline-bg: rgba(127, 29, 29, 0.92);
+            --nexu-offline-text: #fecaca;
+            --nexu-offline-border: rgba(248, 113, 113, 0.45);
+            --nexu-scrollbar-thumb: rgba(148, 163, 184, 0.35);
+        }
+        [data-theme="warm"] {
+            color-scheme: dark;
+            --nexu-bg-base: #1a1208;
+            --nexu-bg-surface: #241a0e;
+            --nexu-bg-elevated: rgba(42, 32, 22, 0.92);
+            --nexu-bg-card: rgba(52, 40, 28, 0.72);
+            --nexu-bg-muted: rgba(36, 26, 14, 0.72);
+            --nexu-bg-inset: rgba(0, 0, 0, 0.22);
+            --nexu-bg-panel-deep: #1a1208;
+            --nexu-text: #faf3e8;
+            --nexu-text-title: #fff7ed;
+            --nexu-text-secondary: #c4b59a;
+            --nexu-text-muted: #a89272;
+            --nexu-text-body: #e8dcc8;
+            --nexu-border: rgba(251, 191, 36, 0.14);
+            --nexu-border-subtle: rgba(251, 191, 36, 0.08);
+            --nexu-border-strong: rgba(251, 191, 36, 0.22);
+            --nexu-accent: #f59e0b;
+            --nexu-accent-contrast: #1a1208;
+            --nexu-accent-soft: rgba(245, 158, 11, 0.2);
+            --nexu-accent-glow: rgba(245, 158, 11, 0.15);
+            --nexu-accent-border: rgba(245, 158, 11, 0.45);
+            --nexu-surface-gradient: radial-gradient(ellipse at top, rgba(245, 158, 11, 0.1), transparent 55%);
+            --nexu-bottom-panel: rgba(26, 18, 8, 0.96);
+            --nexu-policy-border: rgba(217, 119, 6, 0.35);
+            --nexu-hover-surface: rgba(251, 191, 36, 0.08);
+            --nexu-overlay: rgba(12, 8, 4, 0.78);
+            --nexu-shadow-card: 0 8px 24px rgba(0, 0, 0, 0.35);
+            --nexu-link: #fbbf24;
+            --nexu-success: #4ade80;
+            --nexu-success-soft: rgba(74, 222, 128, 0.14);
+            --nexu-success-text: #86efac;
+            --nexu-success-solid: #22c55e;
+            --nexu-success-solid-hover: #4ade80;
+            --nexu-success-contrast: #1a1208;
+            --nexu-danger: #f87171;
+            --nexu-danger-soft: rgba(248, 113, 113, 0.18);
+            --nexu-danger-text: #fecaca;
+            --nexu-danger-border: rgba(248, 113, 113, 0.45);
+            --nexu-warning: #fbbf24;
+            --nexu-warning-soft: rgba(251, 191, 36, 0.16);
+            --nexu-warning-text: #fde68a;
+            --nexu-policy: #d97706;
+            --nexu-policy-soft: rgba(217, 119, 6, 0.14);
+            --nexu-policy-text: #fbbf24;
+            --nexu-policy-btn-text: #fde68a;
+            --nexu-btn-secondary: #3d2e1a;
+            --nexu-btn-disabled: #2a1f12;
+            --nexu-input-bg: rgba(12, 8, 4, 0.88);
+            --nexu-modal-bg: #241a0e;
+            --nexu-code-bg: #1a1208;
+            --nexu-trace-bg: #1a1208;
+            --nexu-options-column-bg: rgba(12, 8, 4, 0.45);
+            --nexu-goal-btn: #d97706;
+            --nexu-goal-btn-hover: #b45309;
+            --nexu-hint-btn: #b45309;
+            --nexu-hint-btn-hover: #92400e;
+            --nexu-primary-btn: #d97706;
+            --nexu-primary-btn-hover: #b45309;
+            --nexu-offline-bg: rgba(127, 29, 29, 0.9);
+            --nexu-offline-text: #fecaca;
+            --nexu-offline-border: rgba(248, 113, 113, 0.45);
+            --nexu-scrollbar-thumb: rgba(196, 181, 154, 0.35);
+        }
+        [data-theme="light"] {
+            color-scheme: light;
+            --nexu-bg-base: #f1f5f9;
+            --nexu-bg-surface: #ffffff;
+            --nexu-bg-elevated: rgba(255, 255, 255, 0.96);
+            --nexu-bg-card: rgba(248, 250, 252, 0.95);
+            --nexu-bg-muted: rgba(226, 232, 240, 0.82);
+            --nexu-bg-inset: rgba(15, 23, 42, 0.04);
+            --nexu-bg-panel-deep: #f8fafc;
+            --nexu-text: #0f172a;
+            --nexu-text-title: #020617;
+            --nexu-text-secondary: #475569;
+            --nexu-text-muted: #64748b;
+            --nexu-text-body: #334155;
+            --nexu-border: rgba(15, 23, 42, 0.1);
+            --nexu-border-subtle: rgba(15, 23, 42, 0.06);
+            --nexu-border-strong: rgba(15, 23, 42, 0.16);
+            --nexu-accent: #0284c7;
+            --nexu-accent-contrast: #f8fafc;
+            --nexu-accent-soft: rgba(2, 132, 199, 0.14);
+            --nexu-accent-glow: rgba(2, 132, 199, 0.12);
+            --nexu-accent-border: rgba(2, 132, 199, 0.4);
+            --nexu-surface-gradient: radial-gradient(ellipse at top, rgba(2, 132, 199, 0.06), transparent 55%);
+            --nexu-bottom-panel: rgba(241, 245, 249, 0.98);
+            --nexu-policy-border: rgba(99, 102, 241, 0.25);
+            --nexu-hover-surface: rgba(15, 23, 42, 0.05);
+            --nexu-overlay: rgba(15, 23, 42, 0.45);
+            --nexu-shadow-card: 0 8px 24px rgba(15, 23, 42, 0.12);
+            --nexu-link: #0369a1;
+            --nexu-success: #15803d;
+            --nexu-success-soft: rgba(22, 163, 74, 0.12);
+            --nexu-success-text: #166534;
+            --nexu-success-solid: #16a34a;
+            --nexu-success-solid-hover: #22c55e;
+            --nexu-success-contrast: #f0fdf4;
+            --nexu-danger: #dc2626;
+            --nexu-danger-soft: rgba(220, 38, 38, 0.1);
+            --nexu-danger-text: #b91c1c;
+            --nexu-danger-border: rgba(220, 38, 38, 0.35);
+            --nexu-warning: #ca8a04;
+            --nexu-warning-soft: rgba(202, 138, 4, 0.12);
+            --nexu-warning-text: #a16207;
+            --nexu-policy: #4f46e5;
+            --nexu-policy-soft: rgba(79, 70, 229, 0.1);
+            --nexu-policy-text: #4338ca;
+            --nexu-policy-btn-text: #3730a3;
+            --nexu-btn-secondary: #cbd5e1;
+            --nexu-btn-disabled: #e2e8f0;
+            --nexu-input-bg: #ffffff;
+            --nexu-modal-bg: #ffffff;
+            --nexu-code-bg: #f1f5f9;
+            --nexu-trace-bg: #f8fafc;
+            --nexu-options-column-bg: rgba(241, 245, 249, 0.85);
+            --nexu-goal-btn: #ca8a04;
+            --nexu-goal-btn-hover: #a16207;
+            --nexu-hint-btn: #4f46e5;
+            --nexu-hint-btn-hover: #4338ca;
+            --nexu-primary-btn: #0284c7;
+            --nexu-primary-btn-hover: #0369a1;
+            --nexu-offline-bg: rgba(254, 226, 226, 0.98);
+            --nexu-offline-text: #991b1b;
+            --nexu-offline-border: rgba(220, 38, 38, 0.35);
+            --nexu-scrollbar-thumb: rgba(100, 116, 139, 0.35);
+        }
+        :root {
+            --nexu-radius-sm: 6px;
+            --nexu-radius-md: 8px;
+            --nexu-radius-lg: 12px;
+            --nexu-control-height: 34px;
+        }
         * {
             box-sizing: border-box;
+            scrollbar-color: var(--nexu-scrollbar-thumb) var(--nexu-bg-base);
+        }
+        *::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        *::-webkit-scrollbar-thumb {
+            background: var(--nexu-scrollbar-thumb);
+            border-radius: 4px;
         }
         body {
             margin: 0;
-            background: #05070c;
-            color: #f1f5f9;
+            background: var(--nexu-bg-base);
+            color: var(--nexu-text);
             font-family: 'Outfit', sans-serif;
             display: flex;
             flex-direction: column;
@@ -18,9 +232,9 @@
             overflow: hidden;
         }
         .header {
-            background: rgba(15, 23, 42, 0.6);
+            background: var(--nexu-bg-muted);
             backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255,255,255,0.08);
+            border-bottom: 1px solid var(--nexu-border);
             padding: 12px 30px;
             display: flex;
             justify-content: space-between;
@@ -38,15 +252,15 @@
         .header h1 {
             margin: 0;
             font-size: 1.4rem;
-            color: #38bdf8;
+            color: var(--nexu-accent);
             font-weight: 600;
             white-space: nowrap;
         }
         .header-tabs {
             display: flex;
             gap: 4px;
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid rgba(255,255,255,0.08);
+            background: var(--nexu-bg-elevated);
+            border: 1px solid var(--nexu-border);
             border-radius: 8px;
             padding: 3px;
         }
@@ -55,21 +269,51 @@
             border: none;
             border-radius: 6px;
             background: transparent;
-            color: #94a3b8;
+            color: var(--nexu-text-secondary);
             font-size: 0.82rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.15s ease;
         }
-        .header-tab:hover:not(:disabled) { color: #e2e8f0; background: rgba(255,255,255,0.05); }
-        .header-tab.active { background: #38bdf8; color: #0f172a; }
+        .header-tab:hover:not(:disabled) { color: var(--nexu-text); background: var(--nexu-hover-surface); }
+        .header-tab.active { background: var(--nexu-accent); color: var(--nexu-accent-contrast); }
+        .header-theme {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+        .theme-picker-label {
+            font-size: 0.72rem;
+            color: var(--nexu-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .theme-chips {
+            display: flex;
+            gap: 4px;
+        }
+        .theme-chip {
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            min-height: var(--nexu-control-height);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .header-theme .filter-chips {
+            align-items: center;
+        }
         .header-tab:disabled { opacity: 0.35; cursor: not-allowed; }
         .projects-shell {
             flex: 1;
             min-height: 0;
             overflow: auto;
             padding: 24px 30px 32px;
-            background: radial-gradient(ellipse at top, rgba(56, 189, 248, 0.08), transparent 55%), #090d16;
+            background: var(--nexu-surface-gradient), var(--nexu-bg-surface);
         }
         .projects-toolbar {
             display: flex;
@@ -83,9 +327,9 @@
             min-width: 220px;
             padding: 10px 14px;
             border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.1);
-            background: rgba(15, 23, 42, 0.9);
-            color: #f1f5f9;
+            border: 1px solid var(--nexu-border-strong);
+            background: var(--nexu-bg-elevated);
+            color: var(--nexu-text);
             font-family: inherit;
             font-size: 0.9rem;
         }
@@ -96,18 +340,21 @@
         }
         .filter-chip {
             padding: 6px 12px;
+            min-height: var(--nexu-control-height);
+            display: inline-flex;
+            align-items: center;
             border-radius: 999px;
-            border: 1px solid rgba(255,255,255,0.12);
-            background: rgba(30, 41, 59, 0.8);
-            color: #cbd5e1;
+            border: 1px solid var(--nexu-border-strong);
+            background: var(--nexu-bg-card);
+            color: var(--nexu-text-body);
             font-size: 0.75rem;
             font-weight: 600;
             cursor: pointer;
         }
         .filter-chip.active {
-            background: rgba(56, 189, 248, 0.2);
-            border-color: #38bdf8;
-            color: #7dd3fc;
+            background: var(--nexu-accent-soft);
+            border-color: var(--nexu-accent);
+            color: var(--nexu-accent);
         }
         .projects-grid {
             display: grid;
@@ -118,8 +365,8 @@
             .projects-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
         .project-card {
-            background: rgba(30, 41, 59, 0.65);
-            border: 1px solid rgba(255,255,255,0.08);
+            background: var(--nexu-bg-card);
+            border: 1px solid var(--nexu-border);
             border-radius: 12px;
             padding: 16px;
             cursor: pointer;
@@ -131,12 +378,12 @@
         }
         .project-card:hover {
             transform: translateY(-2px);
-            border-color: rgba(56, 189, 248, 0.45);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+            border-color: var(--nexu-accent-border);
+            box-shadow: var(--nexu-shadow-card);
         }
         .project-card.selected {
-            border-color: #38bdf8;
-            box-shadow: 0 0 0 1px #38bdf8;
+            border-color: var(--nexu-accent);
+            box-shadow: 0 0 0 1px var(--nexu-accent);
         }
         .project-card-top {
             display: flex;
@@ -150,23 +397,23 @@
             font-size: 0.65rem;
             padding: 2px 8px;
             border-radius: 999px;
-            background: rgba(15, 23, 42, 0.9);
-            color: #94a3b8;
+            background: var(--nexu-bg-elevated);
+            color: var(--nexu-text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.04em;
         }
-        .project-title { font-size: 1rem; font-weight: 600; color: #f8fafc; margin: 0; }
-        .project-subtitle { font-size: 0.82rem; color: #94a3b8; margin: 0; line-height: 1.4; flex: 1; }
+        .project-title { font-size: 1rem; font-weight: 600; color: var(--nexu-text-title); margin: 0; }
+        .project-subtitle { font-size: 0.82rem; color: var(--nexu-text-secondary); margin: 0; line-height: 1.4; flex: 1; }
         .project-meta {
             display: grid;
             gap: 4px;
             font-size: 0.72rem;
-            color: #94a3b8;
+            color: var(--nexu-text-secondary);
             line-height: 1.35;
             word-break: break-word;
         }
-        .project-meta strong { color: #cbd5e1; font-weight: 600; }
-        .project-meta-url { color: #7dd3fc; }
+        .project-meta strong { color: var(--nexu-text-body); font-weight: 600; }
+        .project-meta-url { color: var(--nexu-link); }
         .project-card-actions {
             display: flex;
             flex-wrap: wrap;
@@ -177,27 +424,27 @@
             font-size: 0.68rem;
             padding: 4px 8px;
             border-radius: 6px;
-            border: 1px solid rgba(148, 163, 184, 0.35);
-            background: rgba(15, 23, 42, 0.85);
-            color: #cbd5e1;
+            border: 1px solid var(--nexu-border-strong);
+            background: var(--nexu-bg-elevated);
+            color: var(--nexu-text-body);
             cursor: pointer;
         }
         .project-card-actions .btn-project-action:hover {
-            border-color: #38bdf8;
-            color: #e2e8f0;
+            border-color: var(--nexu-accent);
+            color: var(--nexu-text);
         }
         .project-card-actions .btn-project-action.danger {
-            border-color: rgba(248, 113, 113, 0.45);
-            color: #fca5a5;
+            border-color: var(--nexu-danger-border);
+            color: var(--nexu-danger-text);
         }
         .project-card-actions .btn-project-action.danger:hover {
-            border-color: #f87171;
-            color: #fecaca;
+            border-color: var(--nexu-danger);
+            color: var(--nexu-danger-text);
         }
         .markpact-modal-backdrop {
             position: fixed;
             inset: 0;
-            background: rgba(2, 6, 23, 0.72);
+            background: var(--nexu-overlay);
             display: none;
             align-items: center;
             justify-content: center;
@@ -209,8 +456,8 @@
             width: min(920px, 100%);
             max-height: min(80vh, 900px);
             overflow: auto;
-            background: #0f172a;
-            border: 1px solid rgba(148, 163, 184, 0.35);
+            background: var(--nexu-code-bg);
+            border: 1px solid var(--nexu-border-strong);
             border-radius: 12px;
             padding: 18px 20px;
         }
@@ -221,9 +468,9 @@
             gap: 12px;
             margin-bottom: 12px;
         }
-        .markpact-modal header h3 { margin: 0; color: #f8fafc; }
+        .markpact-modal header h3 { margin: 0; color: var(--nexu-text-title); }
         .markpact-modal-md {
-            color: #cbd5e1;
+            color: var(--nexu-text-body);
             font-size: 0.85rem;
             line-height: 1.5;
             white-space: pre-wrap;
@@ -235,9 +482,9 @@
             margin-top: 10px;
             padding: 10px 12px;
             border-radius: 8px;
-            border: 1px solid rgba(148, 163, 184, 0.35);
-            background: rgba(15, 23, 42, 0.9);
-            color: #f8fafc;
+            border: 1px solid var(--nexu-border-strong);
+            background: var(--nexu-bg-elevated);
+            color: var(--nexu-text-title);
             font-family: inherit;
             font-size: 0.9rem;
             resize: vertical;
@@ -250,14 +497,14 @@
         }
         .goal-prompt-modal p {
             margin: 0;
-            color: #94a3b8;
+            color: var(--nexu-text-secondary);
             font-size: 0.85rem;
             line-height: 1.45;
         }
         .projects-empty {
             grid-column: 1 / -1;
             text-align: center;
-            color: #64748b;
+            color: var(--nexu-text-muted);
             padding: 48px 16px;
         }
         .projects-import {
@@ -270,8 +517,8 @@
             .projects-import { grid-template-columns: 1fr; }
         }
         .import-card {
-            background: rgba(15, 23, 42, 0.82);
-            border: 1px solid rgba(255,255,255,0.08);
+            background: var(--nexu-bg-elevated);
+            border: 1px solid var(--nexu-border);
             border-radius: 12px;
             padding: 16px;
             display: flex;
@@ -281,11 +528,11 @@
         .import-card h3 {
             margin: 0;
             font-size: 0.95rem;
-            color: #e2e8f0;
+            color: var(--nexu-text);
         }
         .import-card p {
             margin: 0;
-            color: #94a3b8;
+            color: var(--nexu-text-secondary);
             font-size: 0.78rem;
             line-height: 1.45;
         }
@@ -294,15 +541,15 @@
             width: 100%;
             padding: 9px 11px;
             border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.1);
-            background: rgba(2, 6, 23, 0.85);
-            color: #f1f5f9;
+            border: 1px solid var(--nexu-border-strong);
+            background: var(--nexu-input-bg);
+            color: var(--nexu-text);
             font-family: inherit;
             font-size: 0.82rem;
         }
         .import-card input[type="file"] {
             font-size: 0.78rem;
-            color: #cbd5e1;
+            color: var(--nexu-text-body);
         }
         .import-actions {
             display: flex;
@@ -314,8 +561,8 @@
             padding: 8px 12px;
             border-radius: 8px;
             border: 0;
-            background: #38bdf8;
-            color: #0f172a;
+            background: var(--nexu-accent);
+            color: var(--nexu-accent-contrast);
             font-weight: 700;
             font-size: 0.78rem;
             cursor: pointer;
@@ -324,12 +571,12 @@
         .import-status {
             min-height: 1.1rem;
             font-size: 0.75rem;
-            color: #94a3b8;
+            color: var(--nexu-text-secondary);
         }
-        .import-status.error { color: #f87171; }
-        .import-status.ok { color: #4ade80; }
+        .import-status.error { color: var(--nexu-danger); }
+        .import-status.ok { color: var(--nexu-success); }
         .import-status code {
-            color: #bae6fd;
+            color: var(--nexu-link);
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.72rem;
             word-break: break-all;
@@ -342,17 +589,17 @@
             margin-bottom: 14px;
         }
         .projects-workflow-step {
-            border: 1px solid rgba(56, 189, 248, 0.22);
+            border: 1px solid var(--nexu-accent-border);
             border-radius: 8px;
             padding: 9px 10px;
-            background: rgba(14, 165, 233, 0.06);
-            color: #cbd5e1;
+            background: var(--nexu-accent-glow);
+            color: var(--nexu-text-body);
             font-size: 0.74rem;
             line-height: 1.35;
         }
         .projects-workflow-step strong {
             display: block;
-            color: #38bdf8;
+            color: var(--nexu-accent);
             font-size: 0.78rem;
             margin-bottom: 2px;
         }
@@ -370,33 +617,33 @@
             margin-bottom: 20px;
             padding: 14px 18px;
             border-radius: 12px;
-            border: 1px solid rgba(56, 189, 248, 0.35);
-            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid var(--nexu-accent-border);
+            background: var(--nexu-bg-elevated);
         }
         .project-active-bar[hidden] { display: none !important; }
         .project-active-info { flex: 1; min-width: 200px; }
-        .project-active-title { margin: 0; font-size: 1rem; color: #f8fafc; font-weight: 600; }
-        .project-active-meta { margin: 4px 0 0; font-size: 0.8rem; color: #94a3b8; }
+        .project-active-title { margin: 0; font-size: 1rem; color: var(--nexu-text-title); font-weight: 600; }
+        .project-active-meta { margin: 4px 0 0; font-size: 0.8rem; color: var(--nexu-text-secondary); }
         .project-active-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
         .btn-publish {
-            background: #22c55e;
-            color: #052e16;
+            background: var(--nexu-success-solid);
+            color: var(--nexu-success-contrast);
             border: none;
             padding: 8px 16px;
-            border-radius: 6px;
+            border-radius: var(--nexu-radius-sm);
             cursor: pointer;
             font-weight: 600;
             font-size: 0.85rem;
             transition: all 0.2s;
         }
-        .btn-publish:hover { background: #4ade80; transform: scale(1.05); }
+        .btn-publish:hover { background: var(--nexu-success-solid-hover); transform: scale(1.05); }
         .btn-publish:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
         .services-shell {
             flex: 1;
             min-height: 0;
             overflow: auto;
             padding: 24px 30px 32px;
-            background: radial-gradient(ellipse at top, rgba(34, 197, 94, 0.06), transparent 55%), #090d16;
+            background: var(--nexu-surface-gradient), var(--nexu-bg-surface);
         }
         .services-shell[hidden] { display: none !important; }
         .llm-shell {
@@ -404,7 +651,7 @@
             min-height: 0;
             overflow: hidden;
             padding: 18px 22px 24px;
-            background: #080c14;
+            background: var(--nexu-bg-surface);
             display: grid;
             grid-template-columns: minmax(260px, 28vw) 1fr;
             gap: 14px;
@@ -413,9 +660,9 @@
         .llm-trace-list {
             min-height: 0;
             overflow: auto;
-            border: 1px solid rgba(255,255,255,0.08);
+            border: 1px solid var(--nexu-border);
             border-radius: 8px;
-            background: rgba(15, 23, 42, 0.78);
+            background: var(--nexu-bg-elevated);
         }
         .llm-trace-item {
             width: 100%;
@@ -423,18 +670,18 @@
             text-align: left;
             padding: 10px 12px;
             border: 0;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
+            border-bottom: 1px solid var(--nexu-border-subtle);
             background: transparent;
-            color: #dbeafe;
+            color: var(--nexu-text-body);
             cursor: pointer;
             font: inherit;
         }
         .llm-trace-item:hover,
-        .llm-trace-item.active { background: rgba(56, 189, 248, 0.12); }
+        .llm-trace-item.active { background: var(--nexu-accent-soft); }
         .llm-trace-item strong {
             display: block;
             font-size: 0.78rem;
-            color: #7dd3fc;
+            color: var(--nexu-link);
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -442,7 +689,7 @@
         .llm-trace-item span {
             display: block;
             margin-top: 4px;
-            color: #94a3b8;
+            color: var(--nexu-text-secondary);
             font-size: 0.68rem;
             line-height: 1.35;
         }
@@ -462,7 +709,7 @@
             margin: 0;
             flex: 1;
             min-width: 280px;
-            color: #94a3b8;
+            color: var(--nexu-text-secondary);
             font-size: 0.82rem;
         }
         .llm-trace-actions {
@@ -482,17 +729,17 @@
             gap: 8px;
         }
         .llm-stat-card {
-            border: 1px solid rgba(56, 189, 248, 0.16);
+            border: 1px solid var(--nexu-accent-border);
             border-radius: 6px;
-            background: rgba(15, 23, 42, 0.74);
+            background: var(--nexu-bg-elevated);
             padding: 8px 10px;
-            color: #cbd5e1;
+            color: var(--nexu-text-body);
             font-size: 0.72rem;
             line-height: 1.35;
         }
         .llm-stat-card strong {
             display: block;
-            color: #7dd3fc;
+            color: var(--nexu-link);
             font-size: 0.76rem;
             margin-bottom: 2px;
         }
@@ -500,26 +747,26 @@
             flex: 1;
             min-height: 0;
             overflow: auto;
-            border: 1px solid rgba(56, 189, 248, 0.18);
+            border: 1px solid var(--nexu-accent-border);
             border-radius: 8px;
             padding: 14px 16px;
-            background: #020617;
-            color: #dbeafe;
+            background: var(--nexu-trace-bg);
+            color: var(--nexu-text-body);
             font-size: 0.82rem;
             line-height: 1.55;
         }
         .llm-trace-md h1, .llm-trace-md h2, .llm-trace-md h3 {
-            color: #7dd3fc;
+            color: var(--nexu-link);
             margin: 0.8em 0 0.35em;
             font-size: 1rem;
         }
         .llm-trace-md h1 { font-size: 1.1rem; }
-        .llm-trace-md p, .llm-trace-md ul { margin: 0.45em 0; color: #cbd5e1; }
+        .llm-trace-md p, .llm-trace-md ul { margin: 0.45em 0; color: var(--nexu-text-body); }
         .llm-trace-md li { margin: 0.2em 0; }
         .llm-trace-md code {
             font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
             font-size: 0.76rem;
-            background: rgba(15, 23, 42, 0.9);
+            background: var(--nexu-bg-elevated);
             padding: 0.1em 0.35em;
             border-radius: 4px;
         }
@@ -528,8 +775,8 @@
             padding: 10px 12px;
             overflow: auto;
             border-radius: 6px;
-            background: #0f172a;
-            border: 1px solid rgba(255,255,255,0.08);
+            background: var(--nexu-code-bg);
+            border: 1px solid var(--nexu-border);
             white-space: pre-wrap;
             word-break: break-word;
             font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
@@ -544,6 +791,19 @@
             align-items: center;
             margin-bottom: 20px;
         }
+        .services-toolbar-hint {
+            margin: 0;
+            flex: 1;
+            color: var(--nexu-text-secondary);
+            font-size: 0.85rem;
+        }
+        .cinema-empty-hint {
+            color: var(--nexu-text-muted);
+            font-size: 0.85rem;
+            text-align: center;
+            margin-top: 40px;
+        }
+        .panel-header-accent { color: var(--nexu-accent); }
         .services-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -553,8 +813,8 @@
             .services-grid { grid-template-columns: 1fr; }
         }
         .service-card {
-            background: rgba(30, 41, 59, 0.65);
-            border: 1px solid rgba(255,255,255,0.08);
+            background: var(--nexu-bg-card);
+            border: 1px solid var(--nexu-border);
             border-radius: 12px;
             padding: 16px;
             display: flex;
@@ -567,26 +827,26 @@
             align-items: flex-start;
             gap: 8px;
         }
-        .service-title { margin: 0; font-size: 1rem; font-weight: 600; color: #f8fafc; }
-        .service-meta { font-size: 0.78rem; color: #94a3b8; margin: 0; line-height: 1.4; }
+        .service-title { margin: 0; font-size: 1rem; font-weight: 600; color: var(--nexu-text-title); }
+        .service-meta { font-size: 0.78rem; color: var(--nexu-text-secondary); margin: 0; line-height: 1.4; }
         .service-badges { display: flex; flex-wrap: wrap; gap: 6px; }
         .badge-publish {
             font-size: 0.65rem;
             padding: 2px 8px;
             border-radius: 999px;
-            background: rgba(34, 197, 94, 0.2);
-            color: #86efac;
+            background: var(--nexu-success-soft);
+            color: var(--nexu-success-text);
             text-transform: uppercase;
             letter-spacing: 0.04em;
             font-weight: 600;
         }
         .badge-status-running {
-            background: rgba(34, 197, 94, 0.25);
-            color: #4ade80;
+            background: var(--nexu-success-soft);
+            color: var(--nexu-success);
         }
         .badge-status-stopped {
-            background: rgba(148, 163, 184, 0.2);
-            color: #94a3b8;
+            background: var(--nexu-bg-muted);
+            color: var(--nexu-text-secondary);
         }
         .service-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
         .btn-service {
@@ -595,17 +855,17 @@
             font-size: 0.78rem;
             font-weight: 600;
             cursor: pointer;
-            border: 1px solid rgba(255,255,255,0.12);
-            background: rgba(30, 41, 59, 0.9);
-            color: #e2e8f0;
+            border: 1px solid var(--nexu-border-strong);
+            background: var(--nexu-bg-card);
+            color: var(--nexu-text);
         }
-        .btn-service:hover { border-color: #38bdf8; color: #7dd3fc; }
-        .btn-service-primary { background: #0ea5e9; color: #0f172a; border-color: transparent; }
-        .btn-service-primary:hover { background: #38bdf8; color: #0f172a; }
+        .btn-service:hover { border-color: var(--nexu-accent); color: var(--nexu-link); }
+        .btn-service-primary { background: var(--nexu-primary-btn); color: var(--nexu-accent-contrast); border-color: transparent; }
+        .btn-service-primary:hover { background: var(--nexu-accent); color: var(--nexu-accent-contrast); }
         .services-empty {
             grid-column: 1 / -1;
             text-align: center;
-            color: #64748b;
+            color: var(--nexu-text-muted);
             padding: 48px 16px;
         }
         .editor-app-shell {
@@ -625,32 +885,36 @@
         .llm-status-badge {
             max-width: 360px;
             padding: 7px 10px;
-            border: 1px solid rgba(56, 189, 248, 0.28);
+            border: 1px solid var(--nexu-accent-border);
             border-radius: 6px;
-            background: rgba(15, 23, 42, 0.72);
-            color: #cbd5e1;
+            background: var(--nexu-bg-elevated);
+            color: var(--nexu-text-body);
             font-size: 0.72rem;
             font-weight: 700;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
-        .llm-status-badge.ready { border-color: rgba(46, 213, 115, 0.45); color: #86efac; }
-        .llm-status-badge.warn { border-color: rgba(251, 191, 36, 0.45); color: #fbbf24; }
-        .llm-status-badge.error { border-color: rgba(255, 71, 87, 0.5); color: #ff8a9a; }
+        .llm-status-badge.ready { border-color: var(--nexu-success-text); color: var(--nexu-success-text); }
+        .llm-status-badge.warn { border-color: var(--nexu-warning); color: var(--nexu-warning); }
+        .llm-status-badge.error { border-color: var(--nexu-danger-border); color: var(--nexu-danger-text); }
         .btn {
             padding: 8px 14px;
-            border-radius: 6px;
+            min-height: var(--nexu-control-height);
+            border-radius: var(--nexu-radius-sm);
             font-weight: 600;
             cursor: pointer;
             border: none;
             transition: all 0.2s;
             font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
-        .btn-stage { background: #334155; color: #fff; }
-        .btn-stage.active { background: #38bdf8; color: #0f172a; }
-        .btn-action { background: #2ed573; color: #fff; }
-        .btn-action:disabled { background: #1e293b; color: #64748b; cursor: not-allowed; }
+        .btn-stage { background: var(--nexu-btn-secondary); color: var(--nexu-text-title); }
+        .btn-stage.active { background: var(--nexu-accent); color: var(--nexu-accent-contrast); }
+        .btn-action { background: var(--nexu-success); color: var(--nexu-accent-contrast); }
+        .btn-action:disabled { background: var(--nexu-btn-disabled); color: var(--nexu-text-muted); cursor: not-allowed; }
         
         .workspace-shell {
             flex: 1;
@@ -664,15 +928,15 @@
             flex: 1;
             min-height: 0;
             overflow: hidden;
-            background: #090d16;
+            background: var(--nexu-bg-surface);
         }
         .bottom-panels-row {
             flex: 0 0 18vh;
             min-height: 130px;
             max-height: 26vh;
             display: flex;
-            border-top: 1px solid rgba(129, 140, 248, 0.35);
-            background: rgba(2, 6, 23, 0.95);
+            border-top: 1px solid var(--nexu-policy-border);
+            background: var(--nexu-bottom-panel);
             min-width: 0;
         }
         .history-panel,
@@ -684,17 +948,17 @@
             overflow: hidden;
         }
         .history-panel {
-            border-right: 1px solid rgba(255,255,255,0.06);
+            border-right: 1px solid var(--nexu-border-subtle);
         }
         .bottom-panel-header {
             flex: 0 0 auto;
             padding: 6px 12px;
             font-size: 0.72rem;
             font-weight: 600;
-            color: #a5b4fc;
+            color: var(--nexu-policy-text);
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
+            border-bottom: 1px solid var(--nexu-border-subtle);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -710,32 +974,32 @@
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.66rem;
             line-height: 1.4;
-            color: #cbd5e1;
+            color: var(--nexu-text-body);
         }
         .history-entry {
             padding: 6px 8px;
             margin-bottom: 6px;
             border-radius: 6px;
-            background: rgba(56, 189, 248, 0.06);
-            border-left: 3px solid #38bdf8;
+            background: var(--nexu-accent-glow);
+            border-left: 3px solid var(--nexu-accent);
             cursor: pointer;
         }
-        .history-entry:hover { background: rgba(56, 189, 248, 0.12); }
-        .history-entry.selected { border-left-color: #2ed573; background: rgba(46, 213, 115, 0.08); }
-        .history-entry-label { color: #e2e8f0; font-weight: 600; font-size: 0.68rem; }
-        .history-entry-meta { color: #64748b; font-size: 0.62rem; margin-top: 2px; }
+        .history-entry:hover { background: var(--nexu-accent-soft); }
+        .history-entry.selected { border-left-color: var(--nexu-success); background: var(--nexu-success-soft); }
+        .history-entry-label { color: var(--nexu-text); font-weight: 600; font-size: 0.68rem; }
+        .history-entry-meta { color: var(--nexu-text-muted); font-size: 0.62rem; margin-top: 2px; }
         .btn-restore {
             margin-top: 4px;
-            background: rgba(46, 213, 115, 0.2);
-            color: #86efac;
-            border: 1px solid rgba(46, 213, 115, 0.4);
+            background: var(--nexu-success-soft);
+            color: var(--nexu-success-text);
+            border: 1px solid var(--nexu-success-text);
             border-radius: 4px;
             padding: 2px 8px;
             font-size: 0.62rem;
             font-weight: 600;
             cursor: pointer;
         }
-        .btn-restore:hover { background: rgba(46, 213, 115, 0.35); }
+        .btn-restore:hover { background: var(--nexu-success-soft); }
         .btn-restore:disabled { opacity: 0.45; cursor: not-allowed; }
         .intract-policy-panel {
             /* right column — contracts */
@@ -745,10 +1009,10 @@
             padding: 6px 16px;
             font-size: 0.72rem;
             font-weight: 600;
-            color: #a5b4fc;
+            color: var(--nexu-policy-text);
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
+            border-bottom: 1px solid var(--nexu-border-subtle);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -762,9 +1026,9 @@
             flex-wrap: wrap;
         }
         .btn-policy {
-            background: rgba(129, 140, 248, 0.2);
-            color: #c7d2fe;
-            border: 1px solid rgba(129, 140, 248, 0.35);
+            background: var(--nexu-policy-soft);
+            color: var(--nexu-policy-btn-text);
+            border: 1px solid var(--nexu-policy-border);
             border-radius: 4px;
             padding: 3px 8px;
             font-size: 0.62rem;
@@ -773,38 +1037,38 @@
             text-transform: none;
             letter-spacing: 0;
         }
-        .btn-policy:hover { background: rgba(129, 140, 248, 0.35); }
+        .btn-policy:hover { background: var(--nexu-policy-soft); }
         .btn-policy:disabled { opacity: 0.5; cursor: not-allowed; }
         .intract-policy-meta {
-            color: #64748b;
+            color: var(--nexu-text-muted);
             font-weight: 400;
             text-transform: none;
             letter-spacing: 0;
             font-size: 0.68rem;
         }
         .policy-section-title {
-            color: #818cf8;
+            color: var(--nexu-policy);
             font-weight: 600;
             margin: 8px 0 4px;
         }
         .policy-section-title:first-child { margin-top: 0; }
-        .policy-status-ok { color: #2ed573; }
-        .policy-status-miss { color: #ff6b81; }
+        .policy-status-ok { color: var(--nexu-success); }
+        .policy-status-miss { color: var(--nexu-danger); }
         .policy-contract-line {
             display: block;
             padding: 3px 0;
-            border-bottom: 1px dashed rgba(255,255,255,0.04);
+            border-bottom: 1px dashed var(--nexu-border-subtle);
             word-break: break-word;
         }
         .policy-ledger-entry {
             margin-bottom: 8px;
             padding: 6px 8px;
             border-radius: 6px;
-            background: rgba(129, 140, 248, 0.06);
-            border-left: 3px solid #818cf8;
+            background: var(--nexu-policy-soft);
+            border-left: 3px solid var(--nexu-policy);
         }
-        .policy-ledger-entry.skipped { border-left-color: #fbbf24; }
-        .policy-ledger-entry.evolved { border-left-color: #2ed573; }
+        .policy-ledger-entry.skipped { border-left-color: var(--nexu-warning); }
+        .policy-ledger-entry.evolved { border-left-color: var(--nexu-success); }
         
         /* Left Column: Active Workspace (Window 1) */
         .active-column {
@@ -821,17 +1085,17 @@
             flex-direction: column;
             gap: 12px;
             padding: 15px;
-            border-left: 1px solid rgba(255,255,255,0.08);
-            border-right: 1px solid rgba(255,255,255,0.08);
-            background: rgba(2, 6, 23, 0.4);
+            border-left: 1px solid var(--nexu-border);
+            border-right: 1px solid var(--nexu-border);
+            background: var(--nexu-options-column-bg);
             overflow: hidden;
             min-width: 0;
         }
 
         .scope-options-bar {
             flex: 0 0 auto;
-            border: 1px solid rgba(56, 189, 248, 0.24);
-            background: rgba(15, 23, 42, 0.82);
+            border: 1px solid var(--nexu-accent-border);
+            background: var(--nexu-bg-elevated);
             border-radius: 10px;
             padding: 10px;
             display: flex;
@@ -843,14 +1107,14 @@
             align-items: center;
             justify-content: space-between;
             gap: 8px;
-            color: #94a3b8;
+            color: var(--nexu-text-secondary);
             font-size: 0.72rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.04em;
         }
         .scope-options-active {
-            color: #38bdf8;
+            color: var(--nexu-accent);
             font-size: 0.68rem;
             text-transform: none;
             letter-spacing: 0;
@@ -863,9 +1127,9 @@
         }
         .scope-chip {
             min-width: 0;
-            border: 1px solid rgba(148, 163, 184, 0.22);
-            background: rgba(15, 23, 42, 0.95);
-            color: #cbd5e1;
+            border: 1px solid var(--nexu-border-strong);
+            background: var(--nexu-bg-elevated);
+            color: var(--nexu-text-body);
             border-radius: 6px;
             padding: 7px 8px;
             font-family: 'JetBrains Mono', monospace;
@@ -877,23 +1141,23 @@
             white-space: nowrap;
         }
         .scope-chip:hover {
-            border-color: rgba(56, 189, 248, 0.65);
-            color: #7dd3fc;
+            border-color: var(--nexu-accent-border);
+            color: var(--nexu-link);
         }
         .scope-chip.active {
-            border-color: #fbbf24;
-            background: rgba(251, 191, 36, 0.16);
-            color: #facc15;
+            border-color: var(--nexu-warning);
+            background: var(--nexu-warning-soft);
+            color: var(--nexu-warning-text);
         }
         .scope-options-help {
-            color: #64748b;
+            color: var(--nexu-text-muted);
             font-size: 0.7rem;
             line-height: 1.35;
         }
         
         .panel {
-            background: #020617;
-            border: 1px solid rgba(255,255,255,0.08);
+            background: var(--nexu-bg-panel-deep);
+            border: 1px solid var(--nexu-border);
             border-radius: 12px;
             display: flex;
             flex-direction: column;
@@ -905,8 +1169,8 @@
         /* Left main panel style */
         .active-panel {
             flex: 1;
-            border: 2px solid #38bdf8;
-            box-shadow: 0 0 20px rgba(56, 189, 248, 0.1);
+            border: 2px solid var(--nexu-accent);
+            box-shadow: 0 0 20px var(--nexu-accent-glow);
             cursor: default;
         }
         
@@ -918,20 +1182,20 @@
         }
         .option-panel:hover {
             flex: 2; /* dynamically grow while other panels shrink */
-            border-color: #818cf8;
-            box-shadow: 0 0 15px rgba(129, 140, 248, 0.2);
+            border-color: var(--nexu-policy);
+            box-shadow: 0 0 15px var(--nexu-policy-soft);
         }
         
         .panel-header {
-            background: rgba(15,23,42,0.8);
+            background: var(--nexu-bg-elevated);
             padding: 8px 12px;
             font-size: 0.75rem;
             font-weight: 600;
-            color: #94a3b8;
+            color: var(--nexu-text-secondary);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid var(--nexu-border-subtle);
             z-index: 200;
             gap: 8px;
         }
@@ -975,7 +1239,7 @@
         
         /* Right Column: Chat & Feedback Controls */
         .side-panel {
-            background: #05070c;
+            background: var(--nexu-bg-base);
             display: flex;
             flex-direction: column;
             padding: 15px;
@@ -984,20 +1248,20 @@
             min-width: 0;
         }
         .side-header {
-            color: #94a3b8;
+            color: var(--nexu-text-secondary);
             font-size: 0.75rem;
             margin-bottom: 12px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid var(--nexu-border-subtle);
             padding-bottom: 6px;
             font-family: 'JetBrains+Mono', monospace;
         }
         
         /* Interactive Chat & Action Logs */
         .chat-logs {
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.05);
+            background: var(--nexu-bg-inset);
+            border: 1px solid var(--nexu-border-subtle);
             border-radius: 8px;
             padding: 10px;
             font-size: 0.8rem;
@@ -1015,57 +1279,57 @@
             font-size: 0.8rem;
         }
         .chat-msg.user {
-            background: rgba(56, 189, 248, 0.1);
-            color: #38bdf8;
-            border-left: 3px solid #38bdf8;
+            background: var(--nexu-accent-glow);
+            color: var(--nexu-accent);
+            border-left: 3px solid var(--nexu-accent);
             align-self: flex-start;
         }
         .chat-msg.system {
-            background: rgba(46, 213, 115, 0.1);
-            color: #2ed573;
-            border-left: 3px solid #2ed573;
+            background: var(--nexu-success-soft);
+            color: var(--nexu-success);
+            border-left: 3px solid var(--nexu-success);
             align-self: flex-start;
         }
         .chat-msg.goal {
-            background: rgba(251, 191, 36, 0.12);
-            color: #fbbf24;
-            border-left: 3px solid #fbbf24;
+            background: var(--nexu-warning-soft);
+            color: var(--nexu-warning);
+            border-left: 3px solid var(--nexu-warning);
             align-self: flex-start;
         }
         .chat-msg.hint {
-            background: rgba(129, 140, 248, 0.12);
-            color: #a5b4fc;
-            border-left: 3px solid #818cf8;
+            background: var(--nexu-policy-soft);
+            color: var(--nexu-policy-text);
+            border-left: 3px solid var(--nexu-policy);
             align-self: flex-start;
         }
         .goal-input {
-            border-color: rgba(251, 191, 36, 0.35);
+            border-color: var(--nexu-warning);
         }
         .goal-input:focus {
-            border-color: #fbbf24;
+            border-color: var(--nexu-warning);
         }
         .element-hint-input {
-            border-color: rgba(129, 140, 248, 0.35);
+            border-color: var(--nexu-policy-border);
         }
         .element-hint-input:focus {
-            border-color: #818cf8;
+            border-color: var(--nexu-policy);
         }
         .btn-goal {
-            background: #d97706;
+            background: var(--nexu-goal-btn);
             margin-bottom: 14px;
         }
-        .btn-goal:hover { background: #b45309; }
+        .btn-goal:hover { background: var(--nexu-goal-btn-hover); }
         .btn-element-hint {
-            background: #6366f1;
+            background: var(--nexu-hint-btn);
             margin-bottom: 10px;
         }
-        .btn-element-hint:hover { background: #4f46e5; }
+        .btn-element-hint:hover { background: var(--nexu-hint-btn-hover); }
         .btn-element-hint:disabled {
             opacity: 0.45;
             cursor: not-allowed;
         }
-        .prompt-section-goal { color: #fbbf24; }
-        .prompt-section-hint { color: #a5b4fc; }
+        .prompt-section-goal { color: var(--nexu-warning); }
+        .prompt-section-hint { color: var(--nexu-policy-text); }
         
         .feedback-list {
             flex: 1;
@@ -1073,8 +1337,8 @@
             margin-bottom: 15px;
         }
         .feedback-item {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.05);
+            background: var(--nexu-hover-surface);
+            border: 1px solid var(--nexu-border-subtle);
             border-radius: 6px;
             padding: 8px 12px;
             margin-bottom: 8px;
@@ -1089,16 +1353,16 @@
             padding: 1px 5px;
             border-radius: 3px;
         }
-        .feedback-tag.keep { background: rgba(46, 213, 115, 0.15); color: #2ed573; }
-        .feedback-tag.redesign { background: rgba(255, 71, 87, 0.15); color: #ff4757; }
+        .feedback-tag.keep { background: var(--nexu-success-soft); color: var(--nexu-success); }
+        .feedback-tag.redesign { background: var(--nexu-danger-soft); color: var(--nexu-danger); }
         
         .prompt-box {
-            background: rgba(56, 189, 248, 0.05);
-            border: 1px solid rgba(56, 189, 248, 0.15);
+            background: var(--nexu-accent-glow);
+            border: 1px solid var(--nexu-accent-border);
             border-radius: 6px;
             padding: 10px;
             font-size: 0.8rem;
-            color: #38bdf8;
+            color: var(--nexu-accent);
             font-family: 'JetBrains+Mono', monospace;
             white-space: pre-wrap;
             max-height: 120px;
@@ -1108,10 +1372,10 @@
             width: 100%;
             min-height: 64px;
             resize: vertical;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.12);
+            background: var(--nexu-bg-inset);
+            border: 1px solid var(--nexu-border-strong);
             border-radius: 6px;
-            color: #e2e8f0;
+            color: var(--nexu-text);
             padding: 8px;
             font-size: 0.8rem;
             font-family: 'JetBrains+Mono', monospace;
@@ -1119,13 +1383,13 @@
         }
         .hint-input:focus {
             outline: none;
-            border-color: #38bdf8;
+            border-color: var(--nexu-accent);
         }
         .btn-hint {
             width: 100%;
             margin-bottom: 10px;
-            background: #0ea5e9;
-            color: #fff;
+            background: var(--nexu-primary-btn);
+            color: var(--nexu-text-title);
             border: none;
             border-radius: 6px;
             padding: 8px 10px;
@@ -1133,33 +1397,33 @@
             font-size: 0.82rem;
             cursor: pointer;
         }
-        .btn-hint:hover { background: #0284c7; }
+        .btn-hint:hover { background: var(--nexu-primary-btn-hover); }
         .btn-review {
             width: 100%;
             margin-bottom: 10px;
-            background: rgba(129, 140, 248, 0.25);
-            color: #c7d2fe;
-            border: 1px solid rgba(129, 140, 248, 0.45);
+            background: var(--nexu-policy-soft);
+            color: var(--nexu-policy-btn-text);
+            border: 1px solid var(--nexu-policy-border);
             border-radius: 6px;
             padding: 8px 10px;
             font-weight: 600;
             font-size: 0.82rem;
             cursor: pointer;
         }
-        .btn-review:hover { background: rgba(129, 140, 248, 0.4); }
-        .btn-review.active { background: #6366f1; color: #fff; border-color: #818cf8; }
+        .btn-review:hover { background: var(--nexu-policy-soft); }
+        .btn-review.active { background: var(--nexu-hint-btn); color: var(--nexu-text-title); border-color: var(--nexu-policy); }
         
         .promote-indicator {
-            color: #818cf8;
+            color: var(--nexu-policy);
             font-size: 0.7rem;
-            background: rgba(129, 140, 248, 0.1);
+            background: var(--nexu-policy-soft);
             padding: 2px 6px;
             border-radius: 4px;
             font-weight: normal;
         }
         .btn-copy {
-            background: #818cf8;
-            color: #fff;
+            background: var(--nexu-policy);
+            color: var(--nexu-text-title);
             padding: 8px 14px;
             border-radius: 6px;
             font-weight: 600;
@@ -1169,11 +1433,11 @@
             transition: all 0.2s;
             margin-left: 12px;
         }
-        .btn-copy:hover { background: #6366f1; transform: scale(1.05); }
-        .btn-copy.copied { background: #2ed573; }
+        .btn-copy:hover { background: var(--nexu-hint-btn); transform: scale(1.05); }
+        .btn-copy.copied { background: var(--nexu-success); }
         .btn-markpact {
-            background: #0ea5e9;
-            color: #0f172a;
+            background: var(--nexu-primary-btn);
+            color: var(--nexu-accent-contrast);
             border: none;
             padding: 8px 16px;
             border-radius: 6px;
@@ -1182,14 +1446,14 @@
             font-size: 0.85rem;
             transition: all 0.2s;
         }
-        .btn-markpact:hover { background: #38bdf8; transform: scale(1.05); }
+        .btn-markpact:hover { background: var(--nexu-accent); transform: scale(1.05); }
         .btn-markpact:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
         .toast-notification {
             position: fixed;
             top: 16px;
             right: 16px;
-            background: #2ed573;
-            color: #0f172a;
+            background: var(--nexu-success);
+            color: var(--nexu-accent-contrast);
             padding: 12px 20px;
             border-radius: 8px;
             font-weight: 600;
@@ -1208,28 +1472,28 @@
             display: flex;
             gap: 10px;
             padding: 10px 16px;
-            background: rgba(15, 23, 42, 0.85);
-            border-bottom: 1px solid rgba(255,255,255,0.06);
+            background: var(--nexu-bg-elevated);
+            border-bottom: 1px solid var(--nexu-border-subtle);
             align-items: stretch;
         }
         .wf-step {
             flex: 1;
             padding: 8px 12px;
             border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.08);
+            border: 1px solid var(--nexu-border);
             font-size: 0.78rem;
-            color: #94a3b8;
+            color: var(--nexu-text-secondary);
             line-height: 1.35;
         }
-        .wf-step strong { color: #e2e8f0; display: block; margin-bottom: 2px; font-size: 0.82rem; }
-        .wf-step.active { border-color: #38bdf8; background: rgba(56, 189, 248, 0.08); color: #cbd5e1; }
-        .wf-step.done { border-color: rgba(46, 213, 115, 0.35); color: #86efac; }
+        .wf-step strong { color: var(--nexu-text); display: block; margin-bottom: 2px; font-size: 0.82rem; }
+        .wf-step.active { border-color: var(--nexu-accent); background: var(--nexu-accent-glow); color: var(--nexu-text-body); }
+        .wf-step.done { border-color: var(--nexu-success-text); color: var(--nexu-success-text); }
         .workflow-hint {
             padding: 0 16px 10px;
             font-size: 0.8rem;
-            color: #64748b;
-            background: rgba(15, 23, 42, 0.85);
-            border-bottom: 1px solid rgba(255,255,255,0.04);
+            color: var(--nexu-text-muted);
+            background: var(--nexu-bg-elevated);
+            border-bottom: 1px solid var(--nexu-border-subtle);
         }
         .intract-policy-panel.collapsed .intract-policy-body,
         .intract-policy-panel.collapsed .intract-policy-actions,
@@ -1238,14 +1502,14 @@
         .server-offline-banner {
             flex-shrink: 0;
             padding: 10px 30px;
-            background: rgba(127, 29, 29, 0.92);
-            border-bottom: 1px solid rgba(248, 113, 113, 0.45);
-            color: #fecaca;
+            background: var(--nexu-offline-bg);
+            border-bottom: 1px solid var(--nexu-offline-border);
+            color: var(--nexu-offline-text);
             font-size: 0.85rem;
             line-height: 1.45;
         }
         .server-offline-banner code {
-            background: rgba(0, 0, 0, 0.25);
+            background: var(--nexu-bg-inset);
             padding: 2px 6px;
             border-radius: 4px;
             font-family: 'JetBrains Mono', monospace;
@@ -1284,6 +1548,14 @@
             <button class="btn btn-copy" id="copy-btn" onclick="copyStateToClipboard()">📋 Copy session</button>
             <button class="btn btn-markpact" id="markpact-btn-editor" onclick="downloadMarkpactExport()" title="Download README.md for Markpact shell">⬇ Markpact</button>
             <button class="btn btn-publish" id="publish-btn-editor" onclick="publishCurrentProject()" title="Deploy stage via Markpact to Services">🚀 Publish</button>
+        </div>
+        <div class="header-theme" role="group" aria-label="Theme">
+            <span class="theme-picker-label">Theme</span>
+            <div class="theme-chips filter-chips">
+                <button type="button" class="filter-chip theme-chip active" data-theme="dark" onclick="setCinemaTheme('dark')">Dark</button>
+                <button type="button" class="filter-chip theme-chip" data-theme="warm" onclick="setCinemaTheme('warm')">Warm</button>
+                <button type="button" class="filter-chip theme-chip" data-theme="light" onclick="setCinemaTheme('light')">Light</button>
+            </div>
         </div>
     </div>
 
@@ -1370,7 +1642,7 @@
 
     <div id="services-shell" class="services-shell" hidden>
         <div class="services-toolbar">
-            <p style="margin:0; flex:1; color:#94a3b8; font-size:0.85rem;">Services deployed from the Editor (Markpact). Start/stop local HTTP on ports 9200–9298.</p>
+            <p class="services-toolbar-hint">Services deployed from the Editor (Markpact). Start/stop local HTTP on ports 9200–9298.</p>
             <button type="button" class="btn btn-service" onclick="loadServicesCatalog()">↻ Refresh</button>
         </div>
         <div class="services-grid" id="services-grid">
@@ -1414,7 +1686,7 @@
         <!-- 1. Left Column: Active Workspace -->
         <div class="active-column">
             <div class="panel active-panel">
-                <div class="panel-header" style="color: #38bdf8;">
+                <div class="panel-header panel-header-accent">
                     <span>🔵 1. ACTIVE WORKSPACE</span>
                     <span id="workspace-hint" style="font-size: 0.65rem;">[Drag: left = keep · right = remove]</span>
                 </div>
@@ -1484,7 +1756,7 @@
             <div class="side-header">2. Mark workspace (drag)</div>
             <button type="button" class="btn-review" id="btn-review-mode" onclick="toggleElementReviewMode()">🖱️ Drag marking (default)</button>
             <div class="feedback-list" id="feedback-list">
-                <div style="color: #64748b; font-size: 0.85rem; text-align: center; margin-top: 40px;">
+                <div class="cinema-empty-hint">
                     Drag over controls: <strong>left mouse</strong> = keep (green), <strong>right mouse</strong> = remove (red). Box can cover many buttons at once.
                 </div>
             </div>
@@ -1566,6 +1838,31 @@
             { id: 'orientation', label: '#orientation', help: 'Layout direction, responsive framing, and screen organization.' },
         ];
         let currentFocusScope = 'functions';
+
+        const NEXU_THEME_KEY = 'nexu-cinema-theme';
+        const NEXU_THEMES = ['dark', 'warm', 'light'];
+
+        function applyCinemaTheme(theme) {
+            const t = NEXU_THEMES.includes(theme) ? theme : 'dark';
+            document.documentElement.setAttribute('data-theme', t);
+            try { localStorage.setItem(NEXU_THEME_KEY, t); } catch (_) {}
+            document.querySelectorAll('.theme-chip').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.theme === t);
+            });
+        }
+
+        function setCinemaTheme(theme) {
+            applyCinemaTheme(theme);
+        }
+
+        function initCinemaTheme() {
+            let saved = 'dark';
+            try {
+                const v = localStorage.getItem(NEXU_THEME_KEY);
+                if (NEXU_THEMES.includes(v)) saved = v;
+            } catch (_) {}
+            applyCinemaTheme(saved);
+        }
 
         function scopeAnnotationKey(scopeId) {
             return String(scopeId || currentFocusScope || 'functions').toLowerCase();
@@ -2293,6 +2590,9 @@
             if (llmShell) llmShell.hidden = tab !== 'llm';
             if (servicesShell) servicesShell.hidden = tab !== 'services';
             if (editorControls) editorControls.hidden = tab !== 'editor';
+            if (tab !== 'editor') {
+                closeGoalPromptModal();
+            }
             if (tab === 'projects') updateProjectActiveBar();
             if (tab === 'editor') {
                 refreshIntractPolicy();
@@ -2382,6 +2682,7 @@
             updatePromptBox();
             const openModal = () => showGoalPromptModal();
             if (mainTab !== 'editor') {
+                closeGoalPromptModal();
                 return;
             } else {
                 openModal();
@@ -3245,7 +3546,7 @@
                 html += '<div class="policy-section-title">Ledger archive (no HTML snapshot)</div>';
                 ledgerArchive.slice(0, 12).forEach(entry => {
                     const ts = (entry.timestamp || '').replace('T', ' ').slice(0, 19);
-                    html += '<div class="history-entry" style="border-left-color:#64748b;opacity:0.85;">';
+                    html += '<div class="history-entry" style="border-left-color:var(--nexu-text-muted);opacity:0.85;">';
                     html += `<div class="history-entry-label">${entry.label || entry.id}</div>`;
                     html += `<div class="history-entry-meta">${ts} · read-only</div>`;
                     html += '</div>';
@@ -3780,6 +4081,7 @@
         }
 
         function handleAnnotation(elementId, type, fragment) {
+            if (!String(elementId || '').trim()) return;
             if (pendingGoalOptions && !workspaceEngaged) {
                 logEvent('ANNOTATE_PRE_OPTIONS', { elementId: elementId, type: type });
             }
@@ -3898,7 +4200,7 @@
             list.innerHTML = '';
             
             if (annotations.length === 0) {
-                list.innerHTML = `<div style="color: #64748b; font-size: 0.85rem; text-align: center; margin-top: 40px;">No elements marked yet. Drag on the workspace: left = keep, right = ${scopeMarkLabel('DELETE')}.</div>`;
+                list.innerHTML = `<div class="cinema-empty-hint">No elements marked yet. Drag on the workspace: left = keep, right = ${scopeMarkLabel('DELETE')}.</div>`;
                 updatePromptBox();
                 updateElementHintButton();
                 return;
@@ -3907,7 +4209,7 @@
             annotations.forEach(a => {
                 const item = document.createElement('div');
                 item.className = 'feedback-item';
-                item.style.borderLeft = a.type === 'KEEP' ? '4px solid #2ed573' : '4px solid #ff4757';
+                item.style.borderLeft = a.type === 'KEEP' ? '4px solid var(--nexu-success)' : '4px solid var(--nexu-danger)';
                 
                 const label = document.createElement('span');
                 label.innerText = a.id;
@@ -4441,6 +4743,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            initCinemaTheme();
             switchMainTab(mainTab, { skipLog: true });
             attachIframeSyncHandlers();
             syncAllIframeVisuals(true);

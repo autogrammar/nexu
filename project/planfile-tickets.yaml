@@ -1,5 +1,4 @@
 source: code2llm
-# generated in 0.12s
 schema: code2llm.planfile_tickets.v1
 project_root: /home/tom/github/semcod/nexu
 tickets:
@@ -4409,5 +4408,85 @@ tickets:
   - src/nexu/cinema_project_imports.py
   dedupe_key: 'code2llm:smell:god_function:src/nexu/cinema_project_imports.py:1:God
     Module: src.nexu.cinema_project_imports'
+- signal: slow_test_warning
+  title: 'Address slow test: tests.test_cinema_server.test_iterate_dashboard_kinds_colors_prefers_offline_before_llm'
+  description: 'Test `tests.test_cinema_server.test_iterate_dashboard_kinds_colors_prefers_offline_before_llm`
+    took 4.80s to run.
+
+
+    Optimize its setup, mock slow external dependencies, or refactor its logic to
+    reduce overall test suite execution time.'
+  priority: medium
+  labels:
+  - llm-ready
+  - test-optimization
+  - slow-test
+  files:
+  - tests/test_cinema_server.py
+  dedupe_key: test-optimization:tests.test_cinema_server:test_iterate_dashboard_kinds_colors_prefers_offline_before_llm
+- signal: slow_test_warning
+  title: 'Address slow test: tests.test_cinema_server.test_iterate_colors_scope_uses_llm_patch_when_available'
+  description: 'Test `tests.test_cinema_server.test_iterate_colors_scope_uses_llm_patch_when_available`
+    took 2.43s to run.
+
+
+    Optimize its setup, mock slow external dependencies, or refactor its logic to
+    reduce overall test suite execution time.'
+  priority: medium
+  labels:
+  - llm-ready
+  - test-optimization
+  - slow-test
+  files:
+  - tests/test_cinema_server.py
+  dedupe_key: test-optimization:tests.test_cinema_server:test_iterate_colors_scope_uses_llm_patch_when_available
+- signal: slow_test_warning
+  title: 'Address slow test: tests.test_cinema_server.test_iterate_colors_without_stage0_skips_offline'
+  description: 'Test `tests.test_cinema_server.test_iterate_colors_without_stage0_skips_offline`
+    took 2.23s to run.
+
+
+    Optimize its setup, mock slow external dependencies, or refactor its logic to
+    reduce overall test suite execution time.'
+  priority: medium
+  labels:
+  - llm-ready
+  - test-optimization
+  - slow-test
+  files:
+  - tests/test_cinema_server.py
+  dedupe_key: test-optimization:tests.test_cinema_server:test_iterate_colors_without_stage0_skips_offline
+- signal: slow_test_warning
+  title: 'Address slow test: tests.test_cinema_server.test_iterate_functions_scope_skips_offline_fast_path'
+  description: 'Test `tests.test_cinema_server.test_iterate_functions_scope_skips_offline_fast_path`
+    took 2.21s to run.
+
+
+    Optimize its setup, mock slow external dependencies, or refactor its logic to
+    reduce overall test suite execution time.'
+  priority: medium
+  labels:
+  - llm-ready
+  - test-optimization
+  - slow-test
+  files:
+  - tests/test_cinema_server.py
+  dedupe_key: test-optimization:tests.test_cinema_server:test_iterate_functions_scope_skips_offline_fast_path
+- signal: slow_test_warning
+  title: 'Address slow test: tests.test_cinema_server.test_iterate_colors_scope_uses_offline_path'
+  description: 'Test `tests.test_cinema_server.test_iterate_colors_scope_uses_offline_path`
+    took 2.19s to run.
+
+
+    Optimize its setup, mock slow external dependencies, or refactor its logic to
+    reduce overall test suite execution time.'
+  priority: medium
+  labels:
+  - llm-ready
+  - test-optimization
+  - slow-test
+  files:
+  - tests/test_cinema_server.py
+  dedupe_key: test-optimization:tests.test_cinema_server:test_iterate_colors_scope_uses_offline_path
 applied: []
 skipped: []

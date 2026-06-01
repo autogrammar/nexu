@@ -88,7 +88,7 @@ After template changes: `make cinema-restart`.
 | **HTTP import wiring** | `_finish_import` calls `_maybe_organize_import_source` on `source/` **before** `preprocess_http_import` (HTTP only) so visual CSS extraction and outline build see organized HTML. ZIP and git imports run the same organize step when `source/index.html` exists; projects without index HTML (e.g. pure code zips) skip organize. Metadata is stored under `project.json` → `organize` (`extracted_files`, `stripped_lazy_img_count`, `tagged_targets_count`). |
 | **Still in nexu** | Preview shim, shield injection, stage0 assembly, and `nexu-visual.css` / `nexu-outline.html` artifact paths remain in `cinema_http_preprocess.py` / `cinema_project_imports.py`. |
 | **Empty-id marks vs ledger** | Shield iframe may still emit session marks with `id: ""` for unlabelled nodes; policy ledger drops empty keys (`cinema_policy._process_keep_delete_entries`), so `effectiveAnnotations` in session export excludes them while raw `annotations` may not. Shield now filters lazy placeholders and zero-size nodes; player ignores empty `elementId`. |
-| **Follow-up** | Patch-routing manifest beyond `organize` meta is not implemented yet. |
+| **Follow-up** | Organize manifest and extracted file paths are included in HTTP import LLM patch context (`load_http_preprocess_artifacts` + `build_http_llm_context`). |
 
 ---
 

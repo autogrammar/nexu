@@ -188,6 +188,9 @@ def test_cinema_player_template_is_externalized() -> None:
     assert "syncGoalFromLedger" in html
     assert "server-offline-banner" in html
     assert "updateServerOfflineBanner" in html
+    assert 'data-theme="dark"' in html
+    assert "setCinemaTheme" in html
+    assert "nexu-cinema-theme" in html
     assert 'id="projects-shell"' in html
     assert "importProjectZip" in html
     assert "importProjectGit" in html

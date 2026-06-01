@@ -553,6 +553,50 @@ def _load_project_meta(meta_path: Path) -> dict[str, Any] | None:
     return None
 
 
+def _load_organize_patch_context(
+    source_dir: Path,
+    organize: dict[str, Any],
+    *,
+    css_rel: str,
+    outline_rel: str,
+) -> dict[str, Any]:
+    """Attach organize manifest + extracted inline assets for LLM patch prompts."""
+    if not organize:
+        return {}
+    manifest = {
+        key: organize[key]
+        for key in (
+            "extracted_files",
+            "stripped_lazy_img_count",
+            "tagged_targets_count",
+            "styles_extracted",
+            "scripts_extracted",
+            "organized",
+        )
+        if key in organize
+    }
+    if not manifest:
+        return {}
+    ctx: dict[str, Any] = {"organize": manifest}
+    for field, fname in (("extracted_css", "nexu-extracted.css"), ("extracted_js", "nexu-extracted.js")):
+        content = _safe_read_under(source_dir, fname) or ""
+        if content.strip():
+            ctx[field] = content
+    paths: dict[str, str] = {
+        "index_html": "source/index.html",
+        "visual_css": css_rel,
+        "html_outline": outline_rel,
+    }
+    for item in manifest.get("extracted_files") or []:
+        name = str(item or "").strip()
+        if not name:
+            continue
+        rel = name if name.startswith("source/") else f"source/{name}"
+        paths[name.replace(".", "_")] = rel
+    ctx["source_paths"] = paths
+    return ctx
+
+
 def load_http_preprocess_artifacts(
     cinema_dir: Path | str,
     active: dict[str, Any] | None,
@@ -574,7 +618,13 @@ def load_http_preprocess_artifacts(
     outline_local = outline_rel[len("source/") :] if outline_rel.startswith("source/") else outline_rel
     visual_css = _safe_read_under(source_dir, css_local) or ""
     html_outline = _safe_read_under(source_dir, outline_local) or ""
-    if not visual_css and not html_outline:
+    organize_ctx = _load_organize_patch_context(
+        source_dir,
+        meta.get("organize") if isinstance(meta.get("organize"), dict) else {},
+        css_rel=css_rel,
+        outline_rel=outline_rel,
+    )
+    if not visual_css and not html_outline and not organize_ctx:
         return {}
     return {
         "llm_context_mode": str(meta.get("llm_context_mode") or "patch"),
@@ -583,24 +633,8 @@ def load_http_preprocess_artifacts(
         "visual_css_bytes": int(meta.get("visual_css_bytes") or len(visual_css.encode("utf-8"))),
         "outline_node_count": int(meta.get("outline_node_count") or 0),
         "visual_css_truncated": bool(meta.get("visual_css_truncated")),
+        **organize_ctx,
     }
-
-
-def build_http_llm_context(artifacts: dict[str, Any]) -> str:
-    """Combine visual CSS + HTML outline for compact LLM patch prompts."""
-    css = str(artifacts.get("visual_css") or "").strip()
-    outline = str(artifacts.get("html_outline") or "").strip()
-    if not css and not outline:
-        return ""
-    parts = [
-        "IMPORTED WEB PAGE (patch mode — change CSS property values and minimal HTML attributes only; "
-        "do not replace the entire document).",
-    ]
-    if css:
-        parts.append("Visual CSS (colors, shapes, layout tokens):\n```css\n" + css + "\n```")
-    if outline:
-        parts.append("HTML structure outline:\n```html\n" + outline + "\n```")
-    return "\n\n".join(parts)
 
 
 def http_patch_llm_rules() -> str:

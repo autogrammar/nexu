@@ -1,5 +1,5 @@
 % ── Project Metadata ─────────────────────────────────────
-project_metadata('nexu', '0.5.29', 'python').
+project_metadata('nexu', '0.5.31', 'python').
 
 % ── Project Files ────────────────────────────────────────
 project_file('app.doql.less', 153, 'less').
@@ -40,7 +40,7 @@ project_file('src/nexu/cinema_goal_contracts.py', 346, 'python').
 project_file('src/nexu/cinema_history.py', 245, 'python').
 project_file('src/nexu/cinema_html.py', 17, 'python').
 project_file('src/nexu/cinema_html_validate.py', 206, 'python').
-project_file('src/nexu/cinema_http_preprocess.py', 629, 'python').
+project_file('src/nexu/cinema_http_preprocess.py', 663, 'python').
 project_file('src/nexu/cinema_iterate.py', 67, 'python').
 project_file('src/nexu/cinema_llm.py', 333, 'python').
 project_file('src/nexu/cinema_llm_contracts.py', 197, 'python').
@@ -48,11 +48,11 @@ project_file('src/nexu/cinema_markpact.py', 216, 'python').
 project_file('src/nexu/cinema_offline_options.py', 902, 'python').
 project_file('src/nexu/cinema_options_cache.py', 129, 'python').
 project_file('src/nexu/cinema_policy.py', 907, 'python').
-project_file('src/nexu/cinema_project_imports.py', 1220, 'python').
+project_file('src/nexu/cinema_project_imports.py', 1291, 'python').
 project_file('src/nexu/cinema_projects.py', 721, 'python').
 project_file('src/nexu/cinema_publish.py', 470, 'python').
 project_file('src/nexu/cinema_scope.py', 254, 'python').
-project_file('src/nexu/cinema_scripts.py', 720, 'python').
+project_file('src/nexu/cinema_scripts.py', 713, 'python').
 project_file('src/nexu/cinema_server.py', 145, 'python').
 project_file('src/nexu/cinema_traces.py', 167, 'python').
 project_file('src/nexu/cli.py', 380, 'python').
@@ -94,7 +94,7 @@ project_file('tests/test_cinema_dom_patch.py', 96, 'python').
 project_file('tests/test_cinema_goal_contracts.py', 128, 'python').
 project_file('tests/test_cinema_history.py', 50, 'python').
 project_file('tests/test_cinema_html_validate.py', 115, 'python').
-project_file('tests/test_cinema_http_preprocess.py', 281, 'python').
+project_file('tests/test_cinema_http_preprocess.py', 344, 'python').
 project_file('tests/test_cinema_iterate.py', 89, 'python').
 project_file('tests/test_cinema_llm.py', 279, 'python').
 project_file('tests/test_cinema_llm_contracts.py', 61, 'python').
@@ -103,13 +103,13 @@ project_file('tests/test_cinema_markpact.py', 45, 'python').
 project_file('tests/test_cinema_offline_options.py', 318, 'python').
 project_file('tests/test_cinema_options_cache.py', 65, 'python').
 project_file('tests/test_cinema_policy.py', 290, 'python').
-project_file('tests/test_cinema_project_imports.py', 622, 'python').
+project_file('tests/test_cinema_project_imports.py', 699, 'python').
 project_file('tests/test_cinema_project_ir.py', 23, 'python').
 project_file('tests/test_cinema_projects.py', 206, 'python').
 project_file('tests/test_cinema_publish.py', 99, 'python').
-project_file('tests/test_cinema_scope.py', 591, 'python').
+project_file('tests/test_cinema_scope.py', 592, 'python').
 project_file('tests/test_cinema_scripts.py', 67, 'python').
-project_file('tests/test_cinema_server.py', 1013, 'python').
+project_file('tests/test_cinema_server.py', 1015, 'python').
 project_file('tests/test_cinema_spatial_patch.py', 30, 'python').
 project_file('tests/test_cinema_traces.py', 112, 'python').
 project_file('tests/test_cinema_ui_patch.py', 156, 'python').
@@ -334,8 +334,8 @@ python_function('src/nexu/cinema_http_preprocess.py', 'preprocess_http_import', 
 python_function('src/nexu/cinema_http_preprocess.py', '_project_meta_path', 2, 1, 0).
 python_function('src/nexu/cinema_http_preprocess.py', 'load_cinema_seed_preprocess_artifacts', 2, 12, 9).
 python_function('src/nexu/cinema_http_preprocess.py', '_load_project_meta', 1, 4, 4).
-python_function('src/nexu/cinema_http_preprocess.py', 'load_http_preprocess_artifacts', 2, 16, 12).
-python_function('src/nexu/cinema_http_preprocess.py', 'build_http_llm_context', 1, 7, 5).
+python_function('src/nexu/cinema_http_preprocess.py', '_load_organize_patch_context', 2, 13, 6).
+python_function('src/nexu/cinema_http_preprocess.py', 'load_http_preprocess_artifacts', 2, 18, 13).
 python_function('src/nexu/cinema_http_preprocess.py', 'http_patch_llm_rules', 0, 1, 1).
 python_function('src/nexu/cinema_iterate.py', 'build_iterate_response_payload', 0, 11, 6).
 python_function('src/nexu/cinema_llm.py', '_cached_config', 1, 4, 4).
@@ -471,10 +471,12 @@ python_function('src/nexu/cinema_project_imports.py', '_same_origin', 2, 2, 1).
 python_function('src/nexu/cinema_project_imports.py', '_extract_stylesheet_hrefs', 1, 5, 6).
 python_function('src/nexu/cinema_project_imports.py', '_fetch_http_stylesheets', 1, 6, 9).
 python_function('src/nexu/cinema_project_imports.py', '_rewrite_local_stylesheets', 1, 3, 6).
+python_function('src/nexu/cinema_project_imports.py', '_rewrite_local_asset_refs', 1, 6, 6).
+python_function('src/nexu/cinema_project_imports.py', '_fetch_meta_assets', 1, 8, 7).
 python_function('src/nexu/cinema_project_imports.py', '_inject_base_href', 2, 4, 2).
 python_function('src/nexu/cinema_project_imports.py', '_find_http_index_path', 1, 6, 4).
 python_function('src/nexu/cinema_project_imports.py', '_load_http_fetch_meta', 1, 4, 4).
-python_function('src/nexu/cinema_project_imports.py', '_build_http_preview_stage0', 1, 14, 16).
+python_function('src/nexu/cinema_project_imports.py', '_build_http_preview_stage0', 1, 14, 18).
 python_function('src/nexu/cinema_project_imports.py', '_iter_project_files', 1, 5, 6).
 python_function('src/nexu/cinema_project_imports.py', '_detect_run_notes', 1, 5, 2).
 python_function('src/nexu/cinema_project_imports.py', '_read_text_for_markpact', 1, 3, 2).
@@ -484,11 +486,12 @@ python_function('src/nexu/cinema_project_imports.py', '_apply_http_preprocess_fi
 python_function('src/nexu/cinema_project_imports.py', '_refresh_http_preprocess_if_needed', 2, 6, 10).
 python_function('src/nexu/cinema_project_imports.py', '_activate_imported', 2, 11, 19).
 python_function('src/nexu/cinema_project_imports.py', 'import_git_project', 2, 11, 13).
-python_function('src/nexu/cinema_project_imports.py', 'import_http_project', 2, 7, 17).
+python_function('src/nexu/cinema_project_imports.py', 'import_http_project', 2, 12, 17).
 python_function('src/nexu/cinema_project_imports.py', 'import_zip_project', 3, 5, 11).
 python_function('src/nexu/cinema_project_imports.py', '_import_kind_from_id', 1, 4, 1).
 python_function('src/nexu/cinema_project_imports.py', '_project_title_from_id', 1, 3, 4).
-python_function('src/nexu/cinema_project_imports.py', '_finish_import', 1, 8, 20).
+python_function('src/nexu/cinema_project_imports.py', '_maybe_organize_import_source', 2, 3, 2).
+python_function('src/nexu/cinema_project_imports.py', '_finish_import', 1, 10, 21).
 python_function('src/nexu/cinema_project_imports.py', '_infer_workspace_context', 1, 4, 5).
 python_function('src/nexu/cinema_project_imports.py', '_source_stats', 1, 4, 3).
 python_function('src/nexu/cinema_project_imports.py', '_source_url_from_meta', 1, 6, 4).
@@ -749,6 +752,8 @@ python_function('tests/test_cinema_http_preprocess.py', 'test_http_preprocess_ar
 python_function('tests/test_cinema_http_preprocess.py', 'test_ensure_http_preprocess_artifacts_skips_when_present', 1, 2, 4).
 python_function('tests/test_cinema_http_preprocess.py', 'test_ensure_http_preprocess_artifacts_regenerates_when_missing', 1, 4, 6).
 python_function('tests/test_cinema_http_preprocess.py', 'test_build_http_llm_context_combines_css_and_outline', 0, 4, 2).
+python_function('tests/test_cinema_http_preprocess.py', 'test_build_http_llm_context_includes_organize_manifest', 0, 6, 2).
+python_function('tests/test_cinema_http_preprocess.py', 'test_load_http_preprocess_artifacts_includes_organize', 1, 5, 6).
 python_function('tests/test_cinema_http_preprocess.py', 'test_load_cinema_ui_profile_includes_http_preprocess', 1, 5, 5).
 python_function('tests/test_cinema_http_preprocess.py', 'test_extract_visual_css_rejects_paths_outside_source_dir', 1, 2, 3).
 python_function('tests/test_cinema_http_preprocess.py', 'test_sanitize_http_preview_strips_external_and_fetch_scripts', 0, 8, 1).
@@ -834,10 +839,12 @@ python_function('tests/test_cinema_policy.py', 'test_propose_ui_delta_and_valida
 python_function('tests/test_cinema_project_imports.py', 'test_import_zip_project_creates_markpact_migration_and_options', 1, 22, 12).
 python_function('tests/test_cinema_project_imports.py', 'test_merged_projects_catalog_includes_imported', 1, 4, 11).
 python_function('tests/test_cinema_project_imports.py', 'test_delete_project_hides_demo_from_workspace_catalog', 1, 4, 3).
+python_function('tests/test_cinema_project_imports.py', 'test_import_zip_with_index_html_organizes_source', 1, 8, 12).
+python_function('tests/test_cinema_project_imports.py', 'test_import_zip_without_index_html_skips_organize', 1, 2, 9).
 python_function('tests/test_cinema_project_imports.py', 'test_activate_imported_project_reloads_stages', 1, 3, 10).
 python_function('tests/test_cinema_project_imports.py', 'test_validate_urls_reject_file_scheme', 0, 3, 2).
 python_function('tests/test_cinema_project_imports.py', 'test_safe_extract_zip_rejects_unsafe_paths', 1, 1, 5).
-python_function('tests/test_cinema_project_imports.py', 'test_import_http_project_fetches_and_migrates', 1, 23, 15).
+python_function('tests/test_cinema_project_imports.py', 'test_import_http_project_fetches_and_migrates', 1, 28, 14).
 python_function('tests/test_cinema_project_imports.py', 'test_activate_http_import_regenerates_preview_stage0', 1, 17, 11).
 python_function('tests/test_cinema_project_imports.py', 'test_activate_http_import_regenerates_preprocess_when_missing', 1, 14, 16).
 python_function('tests/test_cinema_project_imports.py', 'test_activate_http_import_empty_subtitle_not_goal', 1, 7, 10).
@@ -894,12 +901,12 @@ python_function('tests/test_cinema_scripts.py', 'test_finalize_marks_web_gui_com
 python_function('tests/test_cinema_scripts.py', 'test_inject_cinema_shield_preserves_existing_scripts', 0, 4, 3).
 python_function('tests/test_cinema_scripts.py', 'test_inject_cinema_shield_posts_compact_marked_fragment', 0, 4, 1).
 python_function('tests/test_cinema_scripts.py', 'test_inject_cinema_shield_skips_lazy_placeholder_imgs', 0, 5, 1).
-python_function('tests/test_cinema_scripts.py', 'test_inject_cinema_shield_derives_img_id_from_wp_class', 0, 3, 1).
+python_function('tests/test_cinema_scripts.py', 'test_inject_cinema_shield_requires_meaningful_image_alt', 0, 3, 1).
 python_function('tests/test_cinema_server.py', 'test_render_server_script_embeds_runtime_context', 0, 74, 5).
 python_function('tests/test_cinema_server.py', 'test_render_server_script_embeds_openrouter_model', 0, 3, 4).
 python_function('tests/test_cinema_server.py', 'test_write_cinema_nexu_hooks_uses_template', 1, 5, 3).
 python_function('tests/test_cinema_server.py', 'test_render_stage_template_injects_runtime_scripts', 0, 4, 1).
-python_function('tests/test_cinema_server.py', 'test_cinema_player_template_is_externalized', 0, 74, 1).
+python_function('tests/test_cinema_server.py', 'test_cinema_player_template_is_externalized', 0, 76, 1).
 python_function('tests/test_cinema_server.py', 'test_render_server_script_embeds_project_import_routes', 0, 17, 4).
 python_function('tests/test_cinema_server.py', 'test_write_cinema_nexu_hooks_includes_import_helpers', 1, 6, 3).
 python_function('tests/test_cinema_server.py', '_free_port', 0, 1, 4).

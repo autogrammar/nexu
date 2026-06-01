@@ -14,6 +14,7 @@ from nexu.cinema_http_preprocess import (
     extract_visual_css,
     http_preprocess_artifacts_present,
     load_cinema_seed_preprocess_artifacts,
+    load_http_preprocess_artifacts,
     prepare_http_preview_html,
     preprocess_cinema_seed,
     preprocess_http_import,
@@ -184,6 +185,68 @@ def test_build_http_llm_context_combines_css_and_outline() -> None:
     assert "patch mode" in ctx.lower()
     assert "```css" in ctx
     assert "```html" in ctx
+
+
+def test_build_http_llm_context_includes_organize_manifest() -> None:
+    ctx = build_http_llm_context(
+        {
+            "visual_css": "body { color: red; }",
+            "html_outline": "<body></body>",
+            "organize": {
+                "extracted_files": ["nexu-extracted.css"],
+                "tagged_targets_count": 3,
+                "stripped_lazy_img_count": 1,
+            },
+            "extracted_css": ".hero { padding: 1rem; }",
+            "source_paths": {
+                "index_html": "source/index.html",
+                "visual_css": "source/nexu-visual.css",
+                "nexu-extracted_css": "source/nexu-extracted.css",
+            },
+        }
+    )
+    assert "organize manifest" in ctx.lower()
+    assert "nexu-extracted.css" in ctx
+    assert "data-nexu-target" in ctx
+    assert ".hero { padding: 1rem; }" in ctx
+    assert "source/index.html" in ctx
+
+
+def test_load_http_preprocess_artifacts_includes_organize(tmp_path: Path) -> None:
+    cinema = tmp_path / "cinema"
+    project_id = "http-example.com"
+    project_dir = cinema / "imported_projects" / project_id
+    source = project_dir / "source"
+    source.mkdir(parents=True)
+    (source / "index.html").write_text(SAMPLE_HTML, encoding="utf-8")
+    (source / "nexu-extracted.css").write_text(".inline { color: blue; }", encoding="utf-8")
+    preprocess_http_import(source)
+    (project_dir / "project.json").write_text(
+        json.dumps(
+            {
+                "id": project_id,
+                "visual_css_path": "source/nexu-visual.css",
+                "html_outline_path": "source/nexu-outline.html",
+                "llm_context_mode": "patch",
+                "visual_css_bytes": 42,
+                "outline_node_count": 7,
+                "organize": {
+                    "extracted_files": ["nexu-extracted.css"],
+                    "tagged_targets_count": 2,
+                    "stripped_lazy_img_count": 0,
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    artifacts = load_http_preprocess_artifacts(cinema, {"id": project_id, "kind": "imported"})
+
+    assert artifacts["organize"]["tagged_targets_count"] == 2
+    assert ".inline { color: blue; }" in artifacts["extracted_css"]
+    assert artifacts["source_paths"]["index_html"] == "source/index.html"
+    ctx = build_http_llm_context(artifacts)
+    assert "Extracted inline CSS" in ctx
 
 
 def test_load_cinema_ui_profile_includes_http_preprocess(tmp_path: Path) -> None:

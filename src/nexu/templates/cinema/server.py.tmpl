@@ -20,6 +20,7 @@ mimetypes.add_type("application/javascript; charset=utf-8", ".js")
 mimetypes.add_type("text/css; charset=utf-8", ".css")
 
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8080
+BIND_HOST = os.environ.get("CINEMA_BIND_HOST", "127.0.0.1")
 DIRECTORY = Path(__file__).parent.absolute()
 LOG_CSV = DIRECTORY / "log.csv"
 POLICY_SNAPSHOT_PATH = DIRECTORY / "intract_policy.json"
@@ -3035,5 +3036,5 @@ class ThreadingHTTPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     daemon_threads = True
 
 
-with ThreadingHTTPServer(('127.0.0.1', PORT), CustomHTTPRequestHandler) as httpd:
+with ThreadingHTTPServer((BIND_HOST, PORT), CustomHTTPRequestHandler) as httpd:
     httpd.serve_forever()
