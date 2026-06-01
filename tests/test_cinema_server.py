@@ -221,6 +221,9 @@ def test_cinema_player_template_is_externalized() -> None:
     assert "onclick='event.stopPropagation(); deleteProject(${idJson})'" in html
     assert "function deleteImportedProject(projectId)" in html
     assert "/projects/delete" in html
+    assert "const urlLabel = url.startsWith('http') ? new URL(url).host : url;" in html
+    assert "stage S${s.stage ?? 0} · ${urlLabel}" in html
+    assert "stage S${s.stage ?? 0} · port ${s.port" not in html
     assert "function promptForRequiredGoalOnEditor" in html
     assert (
         "const requestedTab = ['projects', 'editor', 'llm', 'services'].includes(bootTab)"

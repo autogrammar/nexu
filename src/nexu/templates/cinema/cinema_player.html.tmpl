@@ -2962,13 +2962,14 @@
                 const statusClass = running ? 'badge-status-running' : 'badge-status-stopped';
                 const statusLabel = running ? 'running' : 'stopped';
                 const url = s.public_url || s.url || ('/services/view/' + encodeURIComponent(s.id || '') + '/');
+                const urlLabel = url.startsWith('http') ? new URL(url).host : url;
                 const sid = (s.id || '').replace(/'/g, "\\'");
                 return `
                 <article class="service-card" data-id="${s.id}">
                     <div class="service-card-top">
                         <div>
                             <h3 class="service-title">${s.title || s.id}</h3>
-                            <p class="service-meta">${s.project_id || ''} · stage S${s.stage ?? 0} · port ${s.port || '—'}</p>
+                            <p class="service-meta">${s.project_id || ''} · stage S${s.stage ?? 0} · ${urlLabel}</p>
                         </div>
                         <div class="service-badges">
                             <span class="badge-publish">publish</span>
