@@ -1,46 +1,58 @@
-# code2llm/evolution | 261 func | 39f | 2026-05-31
+# code2llm/evolution | 449 func | 54f | 2026-06-01
 # generated in 0.00s
 
-NEXT[7] (ranked by impact):
-  [1] !! SPLIT           src/nexu/cinema_policy.py
-      WHY: 655L, 0 classes, max CC=13
-      EFFORT: ~4h  IMPACT: 8515
+NEXT[10] (ranked by impact):
+  [1] !! SPLIT           src/nexu/cinema_offline_options.py
+      WHY: 799L, 0 classes, max CC=37
+      EFFORT: ~4h  IMPACT: 29563
 
-  [2] !! SPLIT           src/nexu/cinema_offline_options.py
-      WHY: 520L, 0 classes, max CC=16
-      EFFORT: ~4h  IMPACT: 8320
+  [2] !! SPLIT           src/nexu/cinema_project_imports.py
+      WHY: 1034L, 0 classes, max CC=20
+      EFFORT: ~4h  IMPACT: 20680
 
-  [3] !! SPLIT           src/nexu/cinema_scripts.py
-      WHY: 622L, 0 classes, max CC=6
-      EFFORT: ~4h  IMPACT: 3732
+  [3] !! SPLIT           src/nexu/cinema_policy.py
+      WHY: 861L, 0 classes, max CC=13
+      EFFORT: ~4h  IMPACT: 11193
 
-  [4] !  SPLIT-FUNC      start_published_service  CC=17  fan=22
+  [4] !! SPLIT-FUNC      write_goal_options_offline  CC=37  fan=29
+      WHY: CC=37 exceeds 15
+      EFFORT: ~1h  IMPACT: 1073
+
+  [5] !  SPLIT-FUNC      activate_example_project  CC=18  fan=21
+      WHY: CC=18 exceeds 15
+      EFFORT: ~1h  IMPACT: 378
+
+  [6] !  SPLIT-FUNC      start_published_service  CC=17  fan=22
       WHY: CC=17 exceeds 15
       EFFORT: ~1h  IMPACT: 374
 
-  [5] !  SPLIT-FUNC      activate_example_project  CC=16  fan=21
-      WHY: CC=16 exceeds 15
-      EFFORT: ~1h  IMPACT: 336
+  [7] !! SPLIT-FUNC      propose_goal_extension_contracts  CC=37  fan=10
+      WHY: CC=37 exceeds 15
+      EFFORT: ~1h  IMPACT: 370
 
-  [6] !  SPLIT-FUNC      build_markpact_readme  CC=18  fan=17
+  [8] !  SPLIT-FUNC      build_markpact_readme  CC=18  fan=18
+      WHY: CC=18 exceeds 15
+      EFFORT: ~1h  IMPACT: 324
+
+  [9] !  SPLIT-FUNC      load_http_preprocess_artifacts  CC=18  fan=17
       WHY: CC=18 exceeds 15
       EFFORT: ~1h  IMPACT: 306
 
-  [7] !  SPLIT-FUNC      write_goal_options_offline  CC=16  fan=16
+  [10] !  SPLIT-FUNC      delete_imported_project  CC=16  fan=17
       WHY: CC=16 exceeds 15
-      EFFORT: ~1h  IMPACT: 256
+      EFFORT: ~1h  IMPACT: 272
 
 
 RISKS[3]:
-  ⚠ Splitting src/nexu/cinema_policy.py may break 33 import paths
-  ⚠ Splitting src/nexu/cinema_scripts.py may break 5 import paths
-  ⚠ Splitting src/nexu/cinema_offline_options.py may break 19 import paths
+  ⚠ Splitting src/nexu/cinema_project_imports.py may break 45 import paths
+  ⚠ Splitting src/nexu/cinema_policy.py may break 40 import paths
+  ⚠ Splitting src/nexu/cinema_offline_options.py may break 26 import paths
 
 METRICS-TARGET:
-  CC̄:          3.9 → ≤2.7
-  max-CC:      18 → ≤9
-  god-modules: 4 → 0
-  high-CC(≥15): 4 → ≤2
+  CC̄:          4.8 → ≤3.4
+  max-CC:      37 → ≤18
+  god-modules: 8 → 0
+  high-CC(≥15): 12 → ≤6
   hub-types:   0 → ≤0
 
 PATTERNS (language parser shared logic):
@@ -68,4 +80,4 @@ PATTERNS (language parser shared logic):
     - Standardized FunctionInfo/ClassInfo models
 
 HISTORY:
-  prev CC̄=3.8 → now CC̄=3.9
+  prev CC̄=4.7 → now CC̄=4.8

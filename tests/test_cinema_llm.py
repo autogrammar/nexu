@@ -44,7 +44,53 @@ def test_normalize_html_document_closes_partial_html() -> None:
     assert html.lower().endswith("</html>")
 
 
-def test_parse_batch_alt_options_flexible_markers() -> None:
+def test_call_cinema_html_llm_rejects_invalid_structure(monkeypatch, tmp_path: Path) -> None:
+    (tmp_path / "nexu.yaml").write_text(
+        "version: nexu.v1\nllm:\n  allow_network_calls: true\n  provider: openrouter\n"
+        "  model: test/model\n  api_key_env: TEST_CINEMA_KEY\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("TEST_CINEMA_KEY", "secret")
+
+    def fake_completion(**kwargs):
+        return {"choices": [{"message": {"content": "<html><body>no controls</body></html>"}}]}
+
+    monkeypatch.setattr("nexu.cinema_llm._litellm_completion", lambda: fake_completion)
+    html, err = call_cinema_html_llm("evolve this", tmp_path, ui_type="calculator")
+    assert html is None
+    assert err
+    assert "structure validation" in err
+
+
+def test_parse_batch_alt_options_skips_invalid_calculator_html() -> None:
+    batch = (
+        "<!-- NEXU_ALT_A -->\n"
+        "<html><head></head><body><div id='screen' class='btn'>A</div></body></html>\n"
+        "<!-- NEXU_ALT_B -->\n"
+        "<html><body>B</body></html>\n"
+        "<!-- NEXU_ALT_C -->\n"
+        "<!DOCTYPE html><html><head></head><body><div id='screen' class='btn'>C</div></body></html>"
+    )
+    parsed = parse_batch_alt_options(batch, ui_type="calculator")
+    assert parsed == {}
+
+
+def test_parse_batch_alt_options_repairs_missing_head() -> None:
+    batch = (
+        "<!-- NEXU_ALT_A -->\n"
+        "<html><body><div id='screen' class='btn'>A</div></body></html>\n"
+        "<!-- NEXU_ALT_B -->\n"
+        "<html><body><div id='screen' class='btn'>B</div></body></html>\n"
+        "<!-- NEXU_ALT_C -->\n"
+        "<html><body><div id='screen' class='btn'>C</div></body></html>"
+    )
+    parsed = parse_batch_alt_options(batch, ui_type="calculator")
+    assert set(parsed.keys()) == {"alt_a.html", "alt_b.html", "alt_c.html"}
+    for html in parsed.values():
+        assert "<head>" in html.lower()
+
+
+def test_parse_batch_alt_options_flexible_markers_web() -> None:
     batch = (
         "<!-- NEXU_ALT_A -->\n"
         "<html><body>A</body></html>\n"
@@ -53,7 +99,7 @@ def test_parse_batch_alt_options_flexible_markers() -> None:
         "<!-- NEXU_ALT_C -->\n"
         "<!DOCTYPE html><html><body>C</body></html>"
     )
-    parsed = parse_batch_alt_options(batch)
+    parsed = parse_batch_alt_options(batch, ui_type="web")
     assert set(parsed.keys()) == {"alt_a.html", "alt_b.html", "alt_c.html"}
     assert "A" in parsed["alt_a.html"]
     assert "B" in parsed["alt_b.html"]
@@ -69,13 +115,24 @@ def test_call_cinema_html_llm_accepts_html_without_doctype(monkeypatch, tmp_path
     monkeypatch.setenv("TEST_CINEMA_KEY", "secret")
 
     def fake_completion(**kwargs):
-        return {"choices": [{"message": {"content": "<html><body>no doctype</body></html>"}}]}
+        return {
+            "choices": [
+                {
+                    "message": {
+                        "content": (
+                            "<html><body><div id='screen' class='btn'>no doctype</div></body></html>"
+                        ),
+                    }
+                }
+            ]
+        }
 
     monkeypatch.setattr("nexu.cinema_llm._litellm_completion", lambda: fake_completion)
-    html, err = call_cinema_html_llm("evolve this", tmp_path)
+    html, err = call_cinema_html_llm("evolve this", tmp_path, ui_type="calculator")
     assert err is None
     assert html and "no doctype" in html
     assert html.startswith("<!DOCTYPE html>")
+    assert "<head>" in html.lower()
 
 
 def test_has_terminal_artifacts_detects_box_drawing() -> None:

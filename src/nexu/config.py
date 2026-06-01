@@ -34,9 +34,13 @@ class CinemaConfig:
     markpact_context_chars: int = 4000
     markpact_context_mode: str = "summary"  # summary | full | off
     html_context_chars: int = 8000
-    max_tokens: int = 4096
+    max_tokens: int = 20480
     option_generation_mode: str = "batch"  # batch | parallel
     llm_trace_keep: int = 80
+    force_llm: bool = False
+    fast_scope_options: bool = True
+    llm_patch_options: bool = True
+    options_cache: bool = True
 
 
 @dataclass
@@ -131,17 +135,52 @@ def load_config(root: Path) -> nexuConfig:
     )
     review = ReviewConfig(
         require_human_approval=bool(review_data.get("require_human_approval", True)),
-        fail_on=_as_list(review_data.get("fail_on"), _as_list(verification_data.get("fail_on"), ["fail"])),
-        warn_on=_as_list(review_data.get("warn_on"), _as_list(verification_data.get("warn_on"), ["partial", "warn"])),
+        fail_on=_as_list(
+            review_data.get("fail_on"),
+            _as_list(verification_data.get("fail_on"), ["fail"]),
+        ),
+        warn_on=_as_list(
+            review_data.get("warn_on"),
+            _as_list(verification_data.get("warn_on"), ["partial", "warn"]),
+        ),
         evidence_required=bool(review_data.get("evidence_required", True)),
     )
+    force_llm_env = os.getenv("CINEMA_FORCE_LLM", "").strip().lower()
+    force_llm = force_llm_env in {"1", "true", "yes", "on"} or bool(
+        cinema_data.get("force_llm", False)
+    )
+    fast_scope_env = os.getenv("CINEMA_FAST_SCOPE_OPTIONS", "").strip().lower()
+    if fast_scope_env in {"0", "false", "no", "off"}:
+        fast_scope_options = False
+    elif fast_scope_env in {"1", "true", "yes", "on"}:
+        fast_scope_options = True
+    else:
+        fast_scope_options = bool(cinema_data.get("fast_scope_options", True))
+    llm_patch_env = os.getenv("CINEMA_LLM_PATCH_OPTIONS", "").strip().lower()
+    if llm_patch_env in {"0", "false", "no", "off"}:
+        llm_patch_options = False
+    elif llm_patch_env in {"1", "true", "yes", "on"}:
+        llm_patch_options = True
+    else:
+        llm_patch_options = bool(cinema_data.get("llm_patch_options", True))
+    options_cache_env = os.getenv("CINEMA_OPTIONS_CACHE", "").strip().lower()
+    if options_cache_env in {"0", "false", "no", "off"}:
+        options_cache = False
+    elif options_cache_env in {"1", "true", "yes", "on"}:
+        options_cache = True
+    else:
+        options_cache = bool(cinema_data.get("options_cache", True))
     cinema = CinemaConfig(
         markpact_context_chars=int(cinema_data.get("markpact_context_chars", 4000)),
         markpact_context_mode=_cinema_mode(cinema_data.get("markpact_context_mode"), "summary"),
         html_context_chars=int(cinema_data.get("html_context_chars", 8000)),
-        max_tokens=int(cinema_data.get("max_tokens", 4096)),
+        max_tokens=int(cinema_data.get("max_tokens", 20480)),
         option_generation_mode=str(cinema_data.get("option_generation_mode", "batch")),
         llm_trace_keep=int(cinema_data.get("llm_trace_keep", 80)),
+        force_llm=force_llm,
+        fast_scope_options=fast_scope_options,
+        llm_patch_options=llm_patch_options,
+        options_cache=options_cache,
     )
     return nexuConfig(
         version=str(data.get("version", "nexu.v1")),

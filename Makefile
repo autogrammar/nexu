@@ -23,7 +23,41 @@ quality-redup:
 	redup scan src --format toon --min-lines 8
 
 quality: test docs-links quality-intract quality-redup
-	ruff check src/nexu/cinema.py src/nexu/cinema_server.py src/nexu/cinema_baseline_contracts.py src/nexu/cinema_goal_contracts.py src/nexu/cinema_llm_contracts.py src/nexu/cinema_markpact.py src/nexu/cinema_project_imports.py src/nexu/cinema_projects.py src/nexu/cinema_scripts.py src/nexu/cinema_publish.py src/nexu/cinema_offline_options.py src/nexu/intract.py src/nexu/verify.py src/nexu/intract_adapter.py tests/test_cinema_server.py tests/test_cinema_baseline_contracts.py tests/test_cinema_goal_contracts.py tests/test_cinema_llm_contracts.py tests/test_cinema_markpact.py tests/test_cinema_project_imports.py tests/test_cinema_projects.py tests/test_cinema_scripts.py tests/test_cinema_publish.py tests/test_cinema_offline_options.py
+	ruff check \
+		src/nexu/cinema.py \
+		src/nexu/cinema_server.py \
+		src/nexu/cinema_baseline_contracts.py \
+		src/nexu/cinema_goal_contracts.py \
+		src/nexu/cinema_html.py \
+		src/nexu/cinema_html_validate.py \
+		src/nexu/cinema_llm_contracts.py \
+		src/nexu/cinema_markpact.py \
+		src/nexu/cinema_project_imports.py \
+		src/nexu/cinema_projects.py \
+		src/nexu/cinema_scripts.py \
+		src/nexu/cinema_publish.py \
+		src/nexu/cinema_offline_options.py \
+		src/nexu/cinema_options_cache.py \
+		src/nexu/cinema_ui_patch.py \
+		src/nexu/fast_delivery/__init__.py \
+		src/nexu/fast_delivery/context.py \
+		src/nexu/fast_delivery/options.py \
+		src/nexu/fast_delivery/router.py \
+		src/nexu/intract.py \
+		src/nexu/verify.py \
+		src/nexu/intract_adapter.py \
+		tests/test_cinema_server.py \
+		tests/test_cinema_baseline_contracts.py \
+		tests/test_cinema_goal_contracts.py \
+		tests/test_cinema_markpact.py \
+		tests/test_cinema_project_imports.py \
+		tests/test_cinema_projects.py \
+		tests/test_cinema_scripts.py \
+		tests/test_cinema_publish.py \
+		tests/test_cinema_offline_options.py \
+		tests/test_cinema_options_cache.py \
+		tests/test_cinema_ui_patch.py \
+		tests/test_fast_delivery.py
 
 quality-strict:
 	pytest -q

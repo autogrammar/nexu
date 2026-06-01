@@ -1,18 +1,20 @@
-"""Deprecated deterministic Cinema option previews.
+"""Deterministic Cinema option previews for scope-fast `/iterate` and tests.
 
-Live Cinema no longer calls this module for project activation or `/iterate`.
-It remains only for legacy tests, archived examples, and explicit migration paths.
+When `/iterate` runs in goal_options mode with a visual focus_scope, the live
+server calls write_goal_options_offline (plus cinema_scope.inject_scope_style)
+instead of batch LLM HTML generation.
 """
 
 from __future__ import annotations
 
-import json
 from html import escape
 from importlib.resources import files
 from pathlib import Path
 from string import Template
 
 from .cinema_goal_contracts import goal_traits_from_contract_lines, is_chemical_goal
+from .cinema_projects import load_active_project
+from .cinema_scope import DASHBOARD_KINDS, ui_type_for_kind
 from .cinema_scripts import apply_spatial_deletes_to_html, finalize_cinema_html
 
 _TRIGGERS = frozenset({"sin", "cos", "tan", "log", "ln"})
@@ -264,40 +266,44 @@ def _chemical_shell(
 </html>"""
 
 
-def _cinema_is_calculator(cinema_dir: Path) -> bool:
-    active = _active_project_meta(cinema_dir)
+def _active_project_meta(cinema_dir: Path) -> dict[str, str]:
+    data = load_active_project(cinema_dir) or {}
+    return {str(k): str(v) for k, v in data.items() if isinstance(v, str)}
+
+
+def _active_is_imported(cinema_dir: Path) -> bool:
+    active = load_active_project(cinema_dir) or {}
     kind = str(active.get("kind") or "").lower()
-    if kind in ("dashboard", "monitor", "ecosystem", "api", "mcp", "frontend", "slice"):
+    if kind == "imported":
+        return True
+    project_id = str(active.get("id") or "")
+    return project_id.startswith(("http-", "git-", "zip-"))
+
+
+def _cinema_is_calculator(cinema_dir: Path) -> bool:
+    active = load_active_project(cinema_dir) or {}
+    kind = str(active.get("kind") or "").lower()
+    if kind in DASHBOARD_KINDS or kind == "imported":
+        return False
+    project_id = str(active.get("id") or "")
+    if project_id.startswith(("http-", "git-", "zip-")):
         return False
     if kind == "calculator":
         return True
-    path = cinema_dir / "stage0.html"
-    if path.is_file():
-        text = path.read_text(encoding="utf-8").lower()
-        return (
-            "btn-eq" in text
-            or "simple calc" in text
-            or "scientific calculator" in text
-            or "chemical calculator" in text
-        )
-    return False
-
-
-def _has_stage0(cinema_dir: Path) -> bool:
-    return (cinema_dir / "stage0.html").is_file()
-
-
-def _active_project_meta(cinema_dir: Path) -> dict[str, str]:
-    path = cinema_dir / "active_project.json"
-    if not path.exists():
-        return {}
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return {}
-    if not isinstance(data, dict):
-        return {}
-    return {str(k): str(v) for k, v in data.items() if isinstance(v, str)}
+    stage0 = cinema_dir / "stage0.html"
+    html_hint = ""
+    if stage0.is_file():
+        try:
+            html_hint = stage0.read_text(encoding="utf-8")
+        except OSError:
+            html_hint = ""
+    if ui_type_for_kind(kind, html_hint=html_hint) == "calculator":
+        return True
+    lowered = html_hint.lower()
+    return any(
+        marker in lowered
+        for marker in ("simple calc", "scientific calculator", "chemical calculator")
+    )
 
 
 def _project_option_label(meta: dict[str, str], variant: str) -> str:
@@ -357,13 +363,29 @@ def _write_project_options_from_stages(
     meta = _active_project_meta(cinema_dir)
     kind = str(meta.get("kind") or "").lower()
     scope = normalize_focus_scope(focus_scope, kind)
-    ui_type = ui_type_for_kind(kind)
+    stage0 = cinema_dir / "stage0.html"
+    html_hint = ""
+    if stage0.is_file():
+        try:
+            html_hint = stage0.read_text(encoding="utf-8")
+        except OSError:
+            html_hint = ""
+    ui_type = ui_type_for_kind(kind, html_hint=html_hint)
     variant_specs = scope_option_variants(scope, ui_type)
-    stage_map = [
-        ("stage0.html", "a"),
-        ("stage1.html", "b"),
-        ("stage2.html", "c"),
-    ]
+    project_id = str(meta.get("id") or "")
+    is_http = project_id.startswith("http-") or str(meta.get("import_kind") or "") == "http"
+    if is_http:
+        stage_map = [
+            ("stage0.html", "a"),
+            ("stage0.html", "b"),
+            ("stage0.html", "c"),
+        ]
+    else:
+        stage_map = [
+            ("stage0.html", "a"),
+            ("stage1.html", "b"),
+            ("stage2.html", "c"),
+        ]
     labels: list[str] = []
     for (alt_name, label, _note), (stage_name, variant) in zip(
         variant_specs, stage_map, strict=True
@@ -693,13 +715,15 @@ def write_goal_options_offline(
         not use_calculator
         and not use_chemical
         and active_kind
-        in ("dashboard", "monitor", "ecosystem", "api", "frontend", "slice", "mcp")
+        in ("dashboard", "monitor", "ecosystem", "api", "frontend", "slice", "mcp", "imported")
     )
     use_project_stages = (
-        (use_dashboard or (not use_calculator and not use_chemical))
-        and _has_stage0(cinema_dir)
+        (use_dashboard or active_kind == "imported" or (not use_calculator and not use_chemical))
+        and (cinema_dir / "stage0.html").is_file()
     )
-    use_scientific = use_policy or (use_calculator and not use_chemical)
+    use_scientific = (
+        use_calculator or (use_policy and not _active_is_imported(cinema_dir))
+    ) and not use_chemical
     raw_scope = (focus_scope or "").strip().lower()
     labels: list[str] = []
     if use_project_stages:

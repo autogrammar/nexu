@@ -8,13 +8,13 @@ Evolution in scope: functions
 
 ## AI Cost Tracking
 
-![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.5.20-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
-![AI Cost](https://img.shields.io/badge/AI%20Cost-$4.33-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-11.6h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
+![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.5.21-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
+![AI Cost](https://img.shields.io/badge/AI%20Cost-$4.40-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-11.7h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
 
-- 🤖 **LLM usage:** $4.3303 (27 commits)
-- 👤 **Human dev:** ~$1160 (11.6h @ $100/h, 30min dedup)
+- 🤖 **LLM usage:** $4.4037 (28 commits)
+- 👤 **Human dev:** ~$1170 (11.7h @ $100/h, 30min dedup)
 
-Generated on 2026-05-31 using [openrouter/qwen/qwen3-coder-next](https://openrouter.ai/qwen/qwen3-coder-next)
+Generated on 2026-06-01 using [openrouter/qwen/qwen3-coder-next](https://openrouter.ai/qwen/qwen3-coder-next)
 
 ---
 
@@ -241,6 +241,20 @@ without restarting the server:
    In the activation response, `goal_bootstrap.status` is `requires_llm` (goal contracts are ready,
    option generation is deferred to the LLM iteration step).
 3. Mark elements on the **workspace** frame (drag or review mode), then iterate or promote.
+
+**Import your own project:** on the **Projects** tab use **Upload ZIP**, **Git URL**, or
+**HTTP website**. Each import is converted to a Markpact migration README locally, seeded
+into stage0–2, and appears in the project catalog. **HTTP imports** show the fetched page
+in stage0 (with a `<base href>` to the live site and optional local CSS); stage1–2 remain
+the Markpact migration workspace. Re-select the project in the catalog to refresh stage0
+from stored source without re-fetching. Refine in the Editor, then use
+**⬇ Markpact** or **🚀 Publish** to deploy. HTTP import requires
+`llm.allow_network_calls: true` in workspace `nexu.yaml`.
+
+**Scope routing:** visual scopes (`#colors`, `#shapes`, `#display`, `#orientation`, calculator
+`#keypad`) refresh Options A–C via the offline fast path or cache when possible. `#functions`
+always uses the LLM — enable network calls and an API key in workspace `nexu.yaml` for that
+scope.
 
 The Intract panel shows **Active example (Cinema UI)** separately from the frozen capsule
 baseline (`calc.*` contracts stay tied to the workspace capsule).

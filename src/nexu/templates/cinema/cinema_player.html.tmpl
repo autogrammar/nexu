@@ -157,11 +157,210 @@
         }
         .project-title { font-size: 1rem; font-weight: 600; color: #f8fafc; margin: 0; }
         .project-subtitle { font-size: 0.82rem; color: #94a3b8; margin: 0; line-height: 1.4; flex: 1; }
+        .project-meta {
+            display: grid;
+            gap: 4px;
+            font-size: 0.72rem;
+            color: #94a3b8;
+            line-height: 1.35;
+            word-break: break-word;
+        }
+        .project-meta strong { color: #cbd5e1; font-weight: 600; }
+        .project-meta-url { color: #7dd3fc; }
+        .project-card-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 4px;
+        }
+        .project-card-actions .btn-project-action {
+            font-size: 0.68rem;
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            background: rgba(15, 23, 42, 0.85);
+            color: #cbd5e1;
+            cursor: pointer;
+        }
+        .project-card-actions .btn-project-action:hover {
+            border-color: #38bdf8;
+            color: #e2e8f0;
+        }
+        .project-card-actions .btn-project-action.danger {
+            border-color: rgba(248, 113, 113, 0.45);
+            color: #fca5a5;
+        }
+        .project-card-actions .btn-project-action.danger:hover {
+            border-color: #f87171;
+            color: #fecaca;
+        }
+        .markpact-modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.72);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 12000;
+            padding: 24px;
+        }
+        .markpact-modal-backdrop.open { display: flex; }
+        .markpact-modal {
+            width: min(920px, 100%);
+            max-height: min(80vh, 900px);
+            overflow: auto;
+            background: #0f172a;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            border-radius: 12px;
+            padding: 18px 20px;
+        }
+        .markpact-modal header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .markpact-modal header h3 { margin: 0; color: #f8fafc; }
+        .markpact-modal-md {
+            color: #cbd5e1;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .goal-prompt-modal textarea {
+            width: 100%;
+            min-height: 110px;
+            margin-top: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            background: rgba(15, 23, 42, 0.9);
+            color: #f8fafc;
+            font-family: inherit;
+            font-size: 0.9rem;
+            resize: vertical;
+        }
+        .goal-prompt-modal .goal-prompt-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .goal-prompt-modal p {
+            margin: 0;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            line-height: 1.45;
+        }
         .projects-empty {
             grid-column: 1 / -1;
             text-align: center;
             color: #64748b;
             padding: 48px 16px;
+        }
+        .projects-import {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+        @media (max-width: 1100px) {
+            .projects-import { grid-template-columns: 1fr; }
+        }
+        .import-card {
+            background: rgba(15, 23, 42, 0.82);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .import-card h3 {
+            margin: 0;
+            font-size: 0.95rem;
+            color: #e2e8f0;
+        }
+        .import-card p {
+            margin: 0;
+            color: #94a3b8;
+            font-size: 0.78rem;
+            line-height: 1.45;
+        }
+        .import-card input[type="url"],
+        .import-card input[type="text"] {
+            width: 100%;
+            padding: 9px 11px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(2, 6, 23, 0.85);
+            color: #f1f5f9;
+            font-family: inherit;
+            font-size: 0.82rem;
+        }
+        .import-card input[type="file"] {
+            font-size: 0.78rem;
+            color: #cbd5e1;
+        }
+        .import-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .btn-import {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 0;
+            background: #38bdf8;
+            color: #0f172a;
+            font-weight: 700;
+            font-size: 0.78rem;
+            cursor: pointer;
+        }
+        .btn-import:disabled { opacity: 0.45; cursor: not-allowed; }
+        .import-status {
+            min-height: 1.1rem;
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+        .import-status.error { color: #f87171; }
+        .import-status.ok { color: #4ade80; }
+        .import-status code {
+            color: #bae6fd;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            word-break: break-all;
+        }
+        .projects-workflow {
+            display: grid;
+            grid-column: 1 / -1;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .projects-workflow-step {
+            border: 1px solid rgba(56, 189, 248, 0.22);
+            border-radius: 8px;
+            padding: 9px 10px;
+            background: rgba(14, 165, 233, 0.06);
+            color: #cbd5e1;
+            font-size: 0.74rem;
+            line-height: 1.35;
+        }
+        .projects-workflow-step strong {
+            display: block;
+            color: #38bdf8;
+            font-size: 0.78rem;
+            margin-bottom: 2px;
+        }
+        @media (max-width: 1100px) {
+            .projects-workflow { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 640px) {
+            .projects-workflow { grid-template-columns: 1fr; }
         }
         .project-active-bar {
             display: flex;
@@ -257,12 +456,45 @@
             display: flex;
             gap: 10px;
             align-items: center;
+            flex-wrap: wrap;
         }
         .llm-trace-toolbar p {
             margin: 0;
             flex: 1;
+            min-width: 280px;
             color: #94a3b8;
             font-size: 0.82rem;
+        }
+        .llm-trace-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .llm-trace-actions .btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .llm-trace-stats {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(150px, 1fr));
+            gap: 8px;
+        }
+        .llm-stat-card {
+            border: 1px solid rgba(56, 189, 248, 0.16);
+            border-radius: 6px;
+            background: rgba(15, 23, 42, 0.74);
+            padding: 8px 10px;
+            color: #cbd5e1;
+            font-size: 0.72rem;
+            line-height: 1.35;
+        }
+        .llm-stat-card strong {
+            display: block;
+            color: #7dd3fc;
+            font-size: 0.76rem;
+            margin-bottom: 2px;
         }
         .llm-trace-md {
             flex: 1;
@@ -720,6 +952,18 @@
         .option-panel:hover .panel-body {
             transform: scale(1.08);
         }
+
+        /* Option A/B/C: full-width miniature preview at 30% scale */
+        .option-panel .panel-body {
+            transform-origin: top center;
+        }
+        .option-panel iframe {
+            width: calc(100% / 0.3);
+            height: calc(100% / 0.3);
+            transform: scale(0.3);
+            transform-origin: top left;
+            pointer-events: none;
+        }
         
         iframe {
             width: 100%;
@@ -1056,6 +1300,42 @@
                 <button type="button" class="btn btn-service" onclick="switchMainTab('services')">Services →</button>
             </div>
         </div>
+        <section class="projects-import" aria-label="Import project">
+            <div class="projects-workflow" aria-label="Import workflow">
+                <div class="projects-workflow-step"><strong>1. Import</strong>ZIP, Git URL albo HTTP website.</div>
+                <div class="projects-workflow-step"><strong>2. Markpact</strong>Nexu zapisuje lokalny README.markpact.md.</div>
+                <div class="projects-workflow-step"><strong>3. Editor</strong>Projekt działa lokalnie w pętli ABC.</div>
+                <div class="projects-workflow-step"><strong>4. Publish</strong>Aktualny stage można opublikować do Services.</div>
+            </div>
+            <article class="import-card">
+                <h3>📦 Upload ZIP</h3>
+                <p>Spakuj projekt lokalnie i zaimportuj do Nexu. Najpierw konwersja do Markpact.</p>
+                <input type="file" id="import-zip-file" accept=".zip,application/zip">
+                <div class="import-actions">
+                    <button type="button" class="btn-import" id="import-zip-btn" onclick="importProjectZip()">Importuj ZIP</button>
+                </div>
+                <div class="import-status" id="import-zip-status"></div>
+            </article>
+            <article class="import-card">
+                <h3>🔗 Git URL</h3>
+                <p>Płytki klon repozytorium (depth 1). Opcjonalna gałąź.</p>
+                <input type="url" id="import-git-url" placeholder="https://github.com/org/repo.git">
+                <input type="text" id="import-git-branch" placeholder="branch (opcjonalnie)">
+                <div class="import-actions">
+                    <button type="button" class="btn-import" id="import-git-btn" onclick="importProjectGit()">Importuj Git</button>
+                </div>
+                <div class="import-status" id="import-git-status"></div>
+            </article>
+            <article class="import-card">
+                <h3>🌐 HTTP website</h3>
+                <p>Pobierz stronę WWW i zamień na kontrakt Markpact (wymaga allow_network_calls).</p>
+                <input type="url" id="import-http-url" placeholder="https://example.com">
+                <div class="import-actions">
+                    <button type="button" class="btn-import" id="import-http-btn" onclick="importProjectHttp()">Importuj HTTP</button>
+                </div>
+                <div class="import-status" id="import-http-status"></div>
+            </article>
+        </section>
         <div class="projects-toolbar">
             <input type="search" id="projects-search" class="projects-search" placeholder="Filter examples…" oninput="renderProjectsGrid()">
             <div class="filter-chips" id="domain-filters"></div>
@@ -1063,6 +1343,28 @@
         </div>
         <div class="projects-grid" id="projects-grid">
             <div class="projects-empty">Loading example projects…</div>
+        </div>
+        <div class="markpact-modal-backdrop" id="markpact-modal-backdrop" onclick="if (event.target === this) closeMarkpactModal()">
+            <div class="markpact-modal" role="dialog" aria-labelledby="markpact-modal-title">
+                <header>
+                    <h3 id="markpact-modal-title">Kontrakt Markpact</h3>
+                    <button type="button" class="btn btn-service" onclick="closeMarkpactModal()">Zamknij</button>
+                </header>
+                <div class="markpact-modal-md" id="markpact-modal-md">Ładowanie…</div>
+            </div>
+        </div>
+        <div class="markpact-modal-backdrop" id="goal-prompt-modal-backdrop">
+            <div class="markpact-modal goal-prompt-modal" role="dialog" aria-labelledby="goal-prompt-modal-title">
+                <header>
+                    <h3 id="goal-prompt-modal-title">Cel projektu</h3>
+                </header>
+                <p>Co chcesz zmienić na tej stronie? Opisz cel migracji lub ulepszenia UI.</p>
+                <textarea id="goal-prompt-input" placeholder="np. nowa nawigacja, kolory marki, uproszczenie formularza…"></textarea>
+                <div class="goal-prompt-actions">
+                    <button type="button" class="btn btn-service" onclick="closeGoalPromptModal()">Anuluj</button>
+                    <button type="button" class="btn btn-action" onclick="confirmGoalPromptModal()">Zapisz cel</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1083,7 +1385,17 @@
         <div class="llm-trace-view">
             <div class="llm-trace-toolbar">
                 <p>Prompt and response markdown exchanged between Nexu and the configured LLM.</p>
-                <button type="button" class="btn btn-service" onclick="loadLlmTraces()">↻ Refresh</button>
+                <div class="llm-trace-actions">
+                    <button type="button" class="btn btn-service" onclick="copyLlmRequest()" id="llm-copy-request" disabled>📋 Copy request</button>
+                    <button type="button" class="btn btn-service" onclick="downloadLlmRequest()" id="llm-download-request" disabled>⬇ Request.md</button>
+                    <button type="button" class="btn btn-service" onclick="downloadLlmTrace()" id="llm-download-trace" disabled>⬇ Trace.md</button>
+                    <button type="button" class="btn btn-service" onclick="loadLlmTraces()">↻ Refresh</button>
+                </div>
+                <div class="llm-trace-stats" id="llm-trace-stats">
+                    <div class="llm-stat-card"><strong>Request</strong>0 tokens · 0 B</div>
+                    <div class="llm-stat-card"><strong>Response</strong>0 tokens · 0 B</div>
+                    <div class="llm-stat-card"><strong>Total</strong>0 tokens · 0 B</div>
+                </div>
             </div>
             <div class="llm-trace-md" id="llm-trace-md">Run Refresh Options A–C to capture the next LLM exchange.</div>
         </div>
@@ -1230,6 +1542,7 @@
         let elementHints = [];
         let lastTouchedElementIds = [];
         let pendingGoalOptions = false;
+        let requireGoalPrompt = false;
         let workspaceEngaged = false;
         let intractPolicyData = null;
         let historyCheckpoints = [];
@@ -1296,6 +1609,140 @@
 
         let pendingLogEvents = [];
 
+        const NEXU_API_ERROR_MAX = 5;
+        const sessionDiagnostics = {
+            projects_catalog: null,
+            last_projects_action: null,
+            delete_flow: null,
+            last_api_errors: [],
+            cinema_runtime: null,
+        };
+
+        function pushSessionApiError(entry) {
+            const row = {
+                url: String(entry.url || ''),
+                status: Number(entry.status || 0),
+                message: String(entry.message || '').slice(0, 500),
+                timestamp: entry.timestamp || new Date().toISOString(),
+            };
+            if (/api[_-]?key|authorization|bearer|token=/i.test(row.message)) {
+                row.message = '[redacted]';
+            }
+            sessionDiagnostics.last_api_errors.push(row);
+            while (sessionDiagnostics.last_api_errors.length > NEXU_API_ERROR_MAX) {
+                sessionDiagnostics.last_api_errors.shift();
+            }
+        }
+
+        function recordProjectsCatalog(data) {
+            const projects = Array.isArray(data.projects) ? data.projects : [];
+            sessionDiagnostics.projects_catalog = {
+                fetched_at: new Date().toISOString(),
+                item_count: projects.length,
+                imported: projects.filter(p => p.imported).map(p => ({
+                    id: p.id,
+                    deletable: !!p.deletable,
+                    import_kind: p.import_kind || null,
+                    path_hint: p.path_hint || null,
+                    source_url: p.source_url || null,
+                })),
+            };
+        }
+
+        function recordProjectsAction(action, projectId, details) {
+            const d = details || {};
+            sessionDiagnostics.last_projects_action = {
+                action: action,
+                project_id: projectId || null,
+                timestamp: new Date().toISOString(),
+                request_url: d.requestUrl || null,
+                method: d.method || null,
+                status: d.status != null ? d.status : null,
+                response_body: d.responseBody != null ? String(d.responseBody).slice(0, 800) : null,
+                error: d.error || null,
+            };
+        }
+
+        function snapshotCatalogEntry(projectId) {
+            const p = projectCatalog.find(x => x.id === projectId);
+            if (!p) return null;
+            return {
+                id: p.id,
+                deletable: !!p.deletable,
+                imported: !!p.imported,
+                import_kind: p.import_kind || null,
+                path_hint: p.path_hint || null,
+                source_url: p.source_url || null,
+            };
+        }
+
+        function buildSessionDiagnostics() {
+            const proj = activeProjectRecord();
+            const runtime = sessionDiagnostics.cinema_runtime || {};
+            return {
+                main_tab: mainTab,
+                projects_tab: {
+                    selected_domain_filter: selectedDomainFilter,
+                    selected_kind_filter: selectedKindFilter,
+                    search_query: (document.getElementById('projects-search')?.value || '').trim(),
+                    visible_count: projectCatalog.filter(projectMatchesFilters).length,
+                    catalog_loaded: !!sessionDiagnostics.projects_catalog,
+                },
+                projects_catalog: sessionDiagnostics.projects_catalog,
+                last_projects_action: sessionDiagnostics.last_projects_action,
+                delete_flow: sessionDiagnostics.delete_flow,
+                active_project: {
+                    id: activeProjectId,
+                    is_imported: !!(proj && proj.imported),
+                    in_catalog: projectCatalog.some(p => p.id === activeProjectId),
+                    catalog_entry: snapshotCatalogEntry(activeProjectId),
+                },
+                last_api_errors: sessionDiagnostics.last_api_errors.slice(),
+                cinema_runtime: {
+                    cinema_root: runtime.cinema_root || null,
+                    capsule: runtime.capsule || null,
+                    workspace_root: runtime.workspace_root || null,
+                    template_synced_hint: runtime.template_synced_hint || null,
+                    cinema_player_mtime: runtime.cinema_player_mtime || null,
+                },
+                cinema_server_online: cinemaServerOnline,
+            };
+        }
+
+        (function installNexuFetchDiagnostics() {
+            const nativeFetch = window.fetch.bind(window);
+            window.fetch = function nexuFetch(input, init) {
+                const url = typeof input === 'string' ? input : (input && input.url) || '';
+                const method = ((init && init.method) || (input && input.method) || 'GET').toUpperCase();
+                const track = url.startsWith('/') || (url && url.indexOf(location.origin) === 0);
+                return nativeFetch(input, init).then(async res => {
+                    if (track && !res.ok) {
+                        let body = '';
+                        try {
+                            body = (await res.clone().text()).slice(0, 500);
+                        } catch (_) {}
+                        pushSessionApiError({
+                            url: url,
+                            method: method,
+                            status: res.status,
+                            message: body || res.statusText,
+                        });
+                    }
+                    return res;
+                }).catch(err => {
+                    if (track) {
+                        pushSessionApiError({
+                            url: url,
+                            method: method,
+                            status: 0,
+                            message: err.message,
+                        });
+                    }
+                    throw err;
+                });
+            };
+        })();
+
         function postLogEvent(action, payload) {
             fetch('/log', {
                 method: 'POST',
@@ -1358,6 +1805,9 @@
         }
 
         let selectedLlmTraceId = '';
+        let llmProjectFilter = '';
+        let currentLlmTraceMarkdown = '';
+        let currentLlmTraceFilename = 'llm-trace.md';
 
         function escapeHtml(text) {
             return String(text || '')
@@ -1390,9 +1840,89 @@
             }).join('');
         }
 
+        function textMetrics(text) {
+            const value = String(text || '');
+            return {
+                chars: value.length,
+                bytes: new Blob([value]).size,
+                tokens: value ? Math.max(1, Math.ceil(value.length / 4)) : 0
+            };
+        }
+
+        function formatBytes(bytes) {
+            const n = Number(bytes || 0);
+            if (n >= 1024 * 1024) return (n / (1024 * 1024)).toFixed(2) + ' MB';
+            if (n >= 1024) return (n / 1024).toFixed(1) + ' KB';
+            return n + ' B';
+        }
+
+        function formatCount(n) {
+            return Number(n || 0).toLocaleString('en-US');
+        }
+
+        function extractTraceSection(markdown, heading) {
+            const src = String(markdown || '');
+            const start = src.indexOf(heading);
+            if (start < 0) return '';
+            const afterHeading = src.slice(start + heading.length);
+            const fenceStart = afterHeading.indexOf('```');
+            if (fenceStart < 0) return afterHeading.trim();
+            const contentStart = afterHeading.indexOf('\n', fenceStart);
+            if (contentStart < 0) return '';
+            const afterFence = afterHeading.slice(contentStart + 1);
+            const fenceEnd = afterFence.indexOf('```');
+            return (fenceEnd >= 0 ? afterFence.slice(0, fenceEnd) : afterFence).trim();
+        }
+
+        function currentLlmRequestText() {
+            return extractTraceSection(currentLlmTraceMarkdown, '## Prompt sent to LLM');
+        }
+
+        function currentLlmResponseText() {
+            return extractTraceSection(currentLlmTraceMarkdown, '## Response received from LLM');
+        }
+
+        function renderLlmTraceStats(markdown, apiMetrics) {
+            const requestText = currentLlmRequestText();
+            const responseText = currentLlmResponseText();
+            const req = {
+                chars: apiMetrics?.prompt_chars ?? textMetrics(requestText).chars,
+                bytes: apiMetrics?.prompt_bytes ?? textMetrics(requestText).bytes,
+                tokens: apiMetrics?.prompt_tokens_est ?? textMetrics(requestText).tokens
+            };
+            const res = {
+                chars: apiMetrics?.output_chars ?? textMetrics(responseText).chars,
+                bytes: apiMetrics?.output_bytes ?? textMetrics(responseText).bytes,
+                tokens: apiMetrics?.output_tokens_est ?? textMetrics(responseText).tokens
+            };
+            const total = {
+                chars: apiMetrics?.total_chars ?? (Number(req.chars || 0) + Number(res.chars || 0)),
+                bytes: apiMetrics?.total_bytes ?? (Number(req.bytes || 0) + Number(res.bytes || 0)),
+                tokens: apiMetrics?.total_tokens_est ?? (Number(req.tokens || 0) + Number(res.tokens || 0))
+            };
+            const full = textMetrics(markdown || '');
+            const stats = document.getElementById('llm-trace-stats');
+            if (!stats) return;
+            stats.innerHTML = `
+                <div class="llm-stat-card"><strong>Request</strong>${formatCount(req.tokens)} tokens est · ${formatBytes(req.bytes)}<br>${formatCount(req.chars)} chars</div>
+                <div class="llm-stat-card"><strong>Response</strong>${formatCount(res.tokens)} tokens est · ${formatBytes(res.bytes)}<br>${formatCount(res.chars)} chars</div>
+                <div class="llm-stat-card"><strong>Total / file</strong>${formatCount(total.tokens)} tokens est · ${formatBytes(total.bytes)}<br>trace file ${formatBytes(full.bytes)}</div>
+            `;
+        }
+
+        function setLlmTraceActionsEnabled(enabled) {
+            ['llm-copy-request', 'llm-download-request', 'llm-download-trace'].forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) btn.disabled = !enabled;
+            });
+        }
+
         function setLlmTraceMarkdown(text) {
             const out = document.getElementById('llm-trace-md');
             if (!out) return;
+            currentLlmTraceMarkdown = String(text || '');
+            setLlmTraceActionsEnabled(Boolean(currentLlmRequestText()));
+            renderLlmTraceStats(currentLlmTraceMarkdown, null);
             if (!text) {
                 out.textContent = '(empty trace)';
                 return;
@@ -1400,12 +1930,17 @@
             out.innerHTML = renderTraceMarkdown(text);
         }
 
-        function loadLlmTraces() {
+        function loadLlmTraces(projectId) {
             const list = document.getElementById('llm-trace-list');
             if (list) {
                 list.innerHTML = '<div class="services-empty">Loading LLM traces…</div>';
             }
-            fetch('/llm/traces')
+            if (projectId) {
+                llmProjectFilter = projectId;
+            }
+            const filter = projectId || llmProjectFilter || '';
+            const query = filter ? ('?project=' + encodeURIComponent(filter)) : '';
+            fetch('/llm/traces' + query)
                 .then(res => {
                     if (!res.ok) throw new Error('HTTP ' + res.status);
                     return res.json();
@@ -1415,6 +1950,10 @@
                     renderLlmTraceList(traces);
                     if (traces.length && !selectedLlmTraceId) {
                         loadLlmTrace(traces[0].id);
+                    } else if (!traces.length) {
+                        setLlmTraceMarkdown(filter
+                            ? ('Brak śladów LLM dla projektu ' + filter + '. Uruchom iterację w Edytorze.')
+                            : 'Run Refresh Options A–C to capture the next LLM exchange.');
                     }
                 })
                 .catch(err => {
@@ -1435,9 +1974,13 @@
                 const active = t.id === selectedLlmTraceId ? ' active' : '';
                 const status = t.status === 'error' ? 'error' : 'ok';
                 const ms = t.duration_ms != null ? `${t.duration_ms} ms` : '? ms';
-                const size = `${t.prompt_chars || 0} → ${t.output_chars || 0} chars`;
+                const reqTokens = t.prompt_tokens_est || Math.ceil((t.prompt_chars || 0) / 4);
+                const outTokens = t.output_tokens_est || Math.ceil((t.output_chars || 0) / 4);
+                const reqBytes = t.prompt_bytes || t.prompt_chars || 0;
+                const outBytes = t.output_bytes || t.output_chars || 0;
+                const size = `${formatCount(reqTokens)} → ${formatCount(outTokens)} tok · ${formatBytes(reqBytes)} → ${formatBytes(outBytes)}`;
                 return `
-                    <button type="button" class="llm-trace-item${active}" onclick="loadLlmTrace('${t.id}')">
+                    <button type="button" class="llm-trace-item${active}" onclick='loadLlmTrace(${JSON.stringify(t.id)})'>
                         <strong>${t.label || t.id}</strong>
                         <span>${status} · ${ms}<br>${size}<br>${t.model || ''}</span>
                     </button>
@@ -1454,12 +1997,51 @@
                     return res.json();
                 })
                 .then(data => {
+                    currentLlmTraceFilename = data.filename || (traceId + '.md');
                     setLlmTraceMarkdown(data.markdown || data.error || '(empty trace)');
+                    renderLlmTraceStats(data.markdown || '', data.markdown_metrics ? null : data);
                     loadLlmTraces();
                 })
                 .catch(err => {
                     setLlmTraceMarkdown('Could not load trace: ' + err.message);
                 });
+        }
+
+        function downloadTextFile(filename, text, mime) {
+            const blob = new Blob([text], { type: mime || 'text/markdown;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+        }
+
+        function llmRequestFilename() {
+            return currentLlmTraceFilename.replace(/\.md$/i, '') + '.request.md';
+        }
+
+        function copyLlmRequest() {
+            const request = currentLlmRequestText();
+            if (!request) return;
+            navigator.clipboard.writeText(request)
+                .then(() => addChatLog('system', '📋 <strong>LLM request copied to clipboard.</strong>'))
+                .catch(err => addChatLog('system', '❌ <strong>Copy failed: ' + err.message + '</strong>'));
+        }
+
+        function downloadLlmRequest() {
+            const request = currentLlmRequestText();
+            if (!request) return;
+            downloadTextFile(llmRequestFilename(), request + '\n', 'text/markdown;charset=utf-8');
+            addChatLog('system', `⬇ <strong>LLM request downloaded:</strong> ${llmRequestFilename()}`);
+        }
+
+        function downloadLlmTrace() {
+            if (!currentLlmTraceMarkdown) return;
+            downloadTextFile(currentLlmTraceFilename, currentLlmTraceMarkdown, 'text/markdown;charset=utf-8');
+            addChatLog('system', `⬇ <strong>LLM trace downloaded:</strong> ${currentLlmTraceFilename}`);
         }
 
         function calcEnabledForProject() {
@@ -1572,6 +2154,9 @@
                 updateProjectActiveBar();
                 const tab = bootTab === 'projects' || bootTab === 'services' ? bootTab : 'editor';
                 switchMainTab(tab, { skipLog: true });
+                if (activeProjectRequiresGoal()) {
+                    maybePromptForImportedGoal();
+                }
             };
             const activateBootProject = () => {
                 if (!bootProjectId) return Promise.resolve(null);
@@ -1581,11 +2166,25 @@
                 .then(() => fetch('/projects/active').then(res => res.ok ? res.json() : null))
                 .then(data => {
                     const serverId = data && data.active && data.active.id ? data.active.id : null;
+                    const needsGoalPrompt = (id) => {
+                        const proj = projectCatalog.find(p => p.id === id);
+                        return !!(proj && proj.imported && proj.import_kind === 'http');
+                    };
                     if (bootProjectId && bootProjectId !== serverId) {
                         return activateBootProject().then(() => finishBoot(bootProjectId));
                     }
-                    if (serverId) finishBoot(serverId);
-                    else if (bootProjectId) return activateBootProject().then(() => finishBoot(bootProjectId));
+                    if (serverId) {
+                        if (needsGoalPrompt(serverId)) {
+                            return activateProject(serverId, { skipEditorSwitch: true, quiet: true })
+                                .then(() => finishBoot(serverId))
+                                .catch(() => finishBoot(serverId));
+                        }
+                        finishBoot(serverId);
+                        return;
+                    }
+                    if (bootProjectId) {
+                        return activateBootProject().then(() => finishBoot(bootProjectId));
+                    }
                 });
         }).catch(() => {});
 
@@ -1626,12 +2225,86 @@
             return projectCatalog.find(p => p.id === activeProjectId) || null;
         }
 
+        function isPlaceholderGoal(text) {
+            const t = String(text || '').trim().toLowerCase();
+            if (!t) return true;
+            const placeholders = [
+                'markpact migration workspace',
+                'markpact migration',
+                'migration workspace',
+                'imported project',
+                'chemical & scientific keypad',
+                'keypad evolution',
+            ];
+            return placeholders.some(p => t.includes(p));
+        }
+
+        function activeProjectRequiresGoal() {
+            const proj = activeProjectRecord();
+            return !!(proj && proj.imported && proj.import_kind === 'http');
+        }
+
+        function projectNeedsGoalPrompt(data) {
+            if (data && data.goal_required) return true;
+            const proj = data && data.project ? data.project : activeProjectRecord();
+            return !!(proj && proj.imported && proj.import_kind === 'http');
+        }
+
+        function clearGoalFields() {
+            projectGoal = '';
+            const goalEl = document.getElementById('goal-input');
+            if (goalEl) goalEl.value = '';
+        }
+
+        function showGoalPromptModal() {
+            const backdrop = document.getElementById('goal-prompt-modal-backdrop');
+            const input = document.getElementById('goal-prompt-input');
+            if (input) input.value = '';
+            if (backdrop) backdrop.classList.add('open');
+            if (input) input.focus();
+        }
+
+        function closeGoalPromptModal() {
+            const backdrop = document.getElementById('goal-prompt-modal-backdrop');
+            if (backdrop) backdrop.classList.remove('open');
+            updateWorkflowUI();
+        }
+
+        function confirmGoalPromptModal() {
+            const input = document.getElementById('goal-prompt-input');
+            const text = (input && input.value.trim()) || '';
+            if (!text || isPlaceholderGoal(text)) return;
+            const goalEl = document.getElementById('goal-input');
+            if (goalEl) goalEl.value = text;
+            requireGoalPrompt = false;
+            closeGoalPromptModal();
+            setProjectGoal();
+        }
+
+        function maybePromptForImportedGoal() {
+            if (!activeProjectRequiresGoal()) {
+                requireGoalPrompt = false;
+                return;
+            }
+            clearGoalFields();
+            requireGoalPrompt = true;
+            pendingGoalOptions = false;
+            updateWorkflowUI();
+            updatePromptBox();
+            showGoalPromptModal();
+        }
+
         function currentUserGoal() {
+            if (requireGoalPrompt && !projectGoal) return '';
             if (projectGoal) return projectGoal;
             const goalEl = document.getElementById('goal-input');
             if (goalEl && goalEl.value.trim()) return goalEl.value.trim();
+            if (activeProjectRequiresGoal()) return '';
+            const fromLedger = ledgerGoalFromPolicy(intractPolicyData);
+            if (fromLedger && !isPlaceholderGoal(fromLedger)) return fromLedger;
             const proj = activeProjectRecord();
-            return (proj && proj.subtitle) ? proj.subtitle : '';
+            const subtitle = (proj && proj.subtitle) ? proj.subtitle : '';
+            return subtitle && !isPlaceholderGoal(subtitle) ? subtitle : '';
         }
 
         function ledgerGoalFromPolicy(data) {
@@ -1651,15 +2324,20 @@
         }
 
         function syncGoalFromLedger(data) {
+            if (requireGoalPrompt || activeProjectRequiresGoal()) return;
             if (projectGoal) return;
             const fromLedger = ledgerGoalFromPolicy(data);
-            if (!fromLedger) return;
+            if (!fromLedger || isPlaceholderGoal(fromLedger)) return;
             projectGoal = fromLedger;
             const goalEl = document.getElementById('goal-input');
             if (goalEl && !goalEl.value.trim()) goalEl.value = fromLedger;
         }
 
         function hasIterationContext() {
+            if (requireGoalPrompt && !projectGoal) {
+                if (annotations.length > 0 || elementHints.length > 0) return true;
+                return false;
+            }
             if (projectGoal || elementHints.length > 0 || annotations.length > 0) return true;
             if (pendingGoalOptions) return true;
             if (currentUserGoal()) return true;
@@ -1732,7 +2410,11 @@
 
         function goalContractPayload() {
             const goalEl = document.getElementById('goal-input');
-            const goalText = (goalEl && goalEl.value.trim()) || projectGoal || currentUserGoal();
+            let goalText = (goalEl && goalEl.value.trim()) || projectGoal || '';
+            if (!goalText && !requireGoalPrompt && !activeProjectRequiresGoal()) {
+                goalText = currentUserGoal();
+            }
+            if (isPlaceholderGoal(goalText)) goalText = '';
             const proj = activeProjectRecord();
             const projectContext = proj
                 ? `${proj.title} (${proj.kind}/${proj.domain})`
@@ -1802,7 +2484,13 @@
             bar.hidden = false;
             if (titleEl) titleEl.textContent = proj ? proj.title : activeProjectId;
             if (metaEl) {
-                metaEl.textContent = (proj ? proj.subtitle + ' · ' : '') + 'Stage S' + activeStage + ' — open Editor or deploy to Services (Markpact).';
+                if (proj && proj.imported) {
+                    const source = proj.import_kind ? proj.import_kind.toUpperCase() : 'IMPORT';
+                    const path = proj.path_hint ? ' · ' + proj.path_hint : '';
+                    metaEl.textContent = source + path + ' · README.markpact.md ready · Stage S' + activeStage + ' — local Editor or Publish.';
+                } else {
+                    metaEl.textContent = (proj ? proj.subtitle + ' · ' : '') + 'Stage S' + activeStage + ' — open Editor or deploy to Services (Markpact).';
+                }
             }
         }
 
@@ -1938,16 +2626,125 @@
                 .then(data => {
                     projectCatalog = Array.isArray(data.projects) ? data.projects : [];
                     projectFilters = data.filters || projectFilters;
+                    recordProjectsCatalog(data);
                     renderFilterChips();
                     renderProjectsGrid();
                     updateProjectActiveBar();
                 })
                 .catch(err => {
+                    recordProjectsAction('catalog_load_failed', null, {
+                        method: 'GET',
+                        requestUrl: '/projects/catalog',
+                        error: err.message,
+                    });
                     const grid = document.getElementById('projects-grid');
                     if (grid) {
                         grid.innerHTML = '<div class="projects-empty">Could not load projects: ' + err.message + '</div>';
                     }
                 });
+        }
+
+        function setImportStatus(kind, message, isError) {
+            const el = document.getElementById('import-' + kind + '-status');
+            if (!el) return;
+            el.textContent = message || '';
+            el.classList.toggle('error', !!isError);
+            el.classList.toggle('ok', !!message && !isError);
+        }
+
+        function setImportBusy(kind, busy) {
+            const btn = document.getElementById('import-' + kind + '-btn');
+            if (btn) btn.disabled = !!busy;
+        }
+
+        function handleImportResult(data, kind) {
+            if (data.error) {
+                setImportStatus(kind, data.error, true);
+                addChatLog('system', '❌ <strong>Import failed:</strong> ' + data.error);
+                return null;
+            }
+            const project = data.project || {};
+            const markpactPath = project.markpact_path || '';
+            const localPath = project.path_hint || (project.id ? 'imported_projects/' + project.id : '');
+            let statusHtml = 'Zaimportowano: <strong>' + escapeHtml(project.title || project.id || 'project') + '</strong>';
+            if (localPath) statusHtml += '<br>Lokalnie: <code>' + escapeHtml(localPath) + '</code>';
+            if (markpactPath) statusHtml += '<br>Markpact: <code>' + escapeHtml(markpactPath.split('/').slice(-3).join('/')) + '</code>';
+            statusHtml += '<br>Gotowe do edycji i publikacji.';
+            const statusEl = document.getElementById('import-' + kind + '-status');
+            if (statusEl) {
+                statusEl.innerHTML = statusHtml;
+                statusEl.classList.remove('error');
+                statusEl.classList.add('ok');
+            } else {
+                setImportStatus(kind, 'Zaimportowano: ' + (project.title || project.id || 'project'), false);
+            }
+            activeProjectId = project.id || activeProjectId;
+            loadProjectsCatalog().then(() => {
+                if (project.id) {
+                    activateProject(project.id, { skipEditorSwitch: true, quiet: true });
+                }
+            });
+            addChatLog('system', `📦 <strong>Imported:</strong> ${project.title || project.id} — Markpact migration ready. Use ⬇ Markpact or 🚀 Publish.`);
+            logEvent('PROJECT_IMPORT', project.id || kind);
+            updateProjectActiveBar();
+            return data;
+        }
+
+        function importProjectZip() {
+            const input = document.getElementById('import-zip-file');
+            const file = input && input.files && input.files[0];
+            if (!file) {
+                setImportStatus('zip', 'Wybierz plik .zip', true);
+                return;
+            }
+            setImportBusy('zip', true);
+            setImportStatus('zip', 'Wysyłanie…', false);
+            const form = new FormData();
+            form.append('file', file, file.name);
+            fetch('/projects/import/zip', { method: 'POST', body: form })
+                .then(res => res.json())
+                .then(data => handleImportResult(data, 'zip'))
+                .catch(err => setImportStatus('zip', err.message, true))
+                .finally(() => setImportBusy('zip', false));
+        }
+
+        function importProjectGit() {
+            const url = (document.getElementById('import-git-url')?.value || '').trim();
+            const branch = (document.getElementById('import-git-branch')?.value || '').trim();
+            if (!url) {
+                setImportStatus('git', 'Podaj URL repozytorium Git', true);
+                return;
+            }
+            setImportBusy('git', true);
+            setImportStatus('git', 'Klonowanie…', false);
+            fetch('/projects/import/git', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: url, branch: branch || undefined })
+            })
+                .then(res => res.json())
+                .then(data => handleImportResult(data, 'git'))
+                .catch(err => setImportStatus('git', err.message, true))
+                .finally(() => setImportBusy('git', false));
+        }
+
+        function importProjectHttp() {
+            const url = (document.getElementById('import-http-url')?.value || '').trim();
+            if (!url) {
+                setImportStatus('http', 'Podaj adres HTTP(S)', true);
+                return;
+            }
+            setImportBusy('http', true);
+            setImportStatus('http', 'Pobieranie strony…', false);
+            fetch('/projects/import/http', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: url })
+            })
+                .then(res => res.json())
+                .then(data => handleImportResult(data, 'http'))
+                .catch(err => setImportStatus('http', err.message, true))
+                .finally(() => setImportBusy('http', false));
         }
 
         function renderFilterChips() {
@@ -1984,6 +2781,173 @@
             return hay.includes(q);
         }
 
+        function formatProjectSize(bytes) {
+            const n = Number(bytes || 0);
+            if (!n) return '—';
+            return formatBytes(n);
+        }
+
+        function renderImportedProjectMeta(project) {
+            if (!project.imported) return '';
+            const url = project.source_url || '';
+            const files = project.file_count != null ? project.file_count : '—';
+            const size = formatProjectSize(project.total_bytes);
+            const pathHint = project.path_hint || '';
+            const markpact = project.markpact_path ? project.markpact_path.split('/').slice(-2).join('/') : '';
+            let html = '<div class="project-meta">';
+            if (url) {
+                html += `<div><strong>URL:</strong> <span class="project-meta-url">${escapeHtml(url)}</span></div>`;
+            }
+            html += `<div><strong>Pliki:</strong> ${escapeHtml(String(files))} · <strong>Rozmiar:</strong> ${escapeHtml(size)}</div>`;
+            if (pathHint) {
+                html += `<div><strong>Ścieżka:</strong> ${escapeHtml(pathHint)}</div>`;
+            }
+            if (markpact) {
+                html += `<div><strong>Markpact:</strong> ${escapeHtml(markpact)}</div>`;
+            }
+            const cssKb = project.visual_css_bytes != null ? Math.max(1, Math.round(Number(project.visual_css_bytes) / 1024)) : null;
+            const outlineNodes = project.outline_node_count != null ? project.outline_node_count : null;
+            if (cssKb != null || outlineNodes != null) {
+                const cssLabel = cssKb != null ? `CSS wizualny: ${cssKb} KB` : '';
+                const outlineLabel = outlineNodes != null ? `szkielet: ${outlineNodes} węzłów` : '';
+                const sep = cssLabel && outlineLabel ? ', ' : '';
+                html += `<div><strong>LLM:</strong> ${escapeHtml(cssLabel + sep + outlineLabel)}</div>`;
+            }
+            html += '</div>';
+            return html;
+        }
+
+        function renderImportedProjectActions(project) {
+            if (!project.deletable) return '';
+            const idJson = JSON.stringify(project.id);
+            const importedButtons = project.imported ? `
+                    <button type="button" class="btn-project-action" onclick='event.stopPropagation(); previewImportedMarkpact(${idJson})'>Kontrakt</button>
+                    <button type="button" class="btn-project-action" onclick='event.stopPropagation(); openProjectLlmHistory(${idJson})'>Historia LLM</button>
+            ` : '';
+            return `
+                <div class="project-card-actions">
+                    <button type="button" class="btn-project-action" onclick='event.stopPropagation(); activateProject(${idJson})'>Editor</button>
+                    <button type="button" class="btn-project-action" onclick='event.stopPropagation(); publishImportedProject(${idJson})'>Publish</button>
+                    ${importedButtons}
+                    <button type="button" class="btn-project-action danger" onclick='event.stopPropagation(); deleteProject(${idJson})'>Usuń</button>
+                </div>
+            `;
+        }
+
+        function publishImportedProject(projectId) {
+            activeProjectId = projectId;
+            activateProject(projectId, { skipEditorSwitch: true, quiet: true })
+                .then(() => publishCurrentProject())
+                .catch(err => addChatLog('system', '❌ <strong>Publish failed: ' + err.message + '</strong>'));
+        }
+
+        function closeMarkpactModal() {
+            const backdrop = document.getElementById('markpact-modal-backdrop');
+            if (backdrop) backdrop.classList.remove('open');
+        }
+
+        function previewImportedMarkpact(projectId) {
+            const backdrop = document.getElementById('markpact-modal-backdrop');
+            const body = document.getElementById('markpact-modal-md');
+            const title = document.getElementById('markpact-modal-title');
+            if (!backdrop || !body) return;
+            if (title) title.textContent = 'Kontrakt Markpact — ' + projectId;
+            body.textContent = 'Ładowanie…';
+            backdrop.classList.add('open');
+            fetch('/projects/imported/' + encodeURIComponent(projectId) + '/markpact')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) throw new Error(data.error);
+                    body.innerHTML = renderTraceMarkdown(data.markdown || '(empty)');
+                })
+                .catch(err => {
+                    body.textContent = 'Nie udało się wczytać kontraktu: ' + err.message;
+                });
+        }
+
+        function openProjectLlmHistory(projectId) {
+            llmProjectFilter = projectId;
+            selectedLlmTraceId = '';
+            switchMainTab('llm');
+            loadLlmTraces(projectId);
+        }
+
+        function deleteImportedProject(projectId) {
+            return deleteProject(projectId);
+        }
+
+        function deleteProject(projectId) {
+            const project = projectCatalog.find(p => p.id === projectId);
+            const label = (project && project.title) ? project.title : projectId;
+            const requestUrl = '/projects/delete';
+            sessionDiagnostics.delete_flow = {
+                phase: 'clicked',
+                project_id: projectId,
+                deletable_from_catalog: !!(project && project.deletable),
+                catalog_entry: snapshotCatalogEntry(projectId),
+                timestamp: new Date().toISOString(),
+            };
+            recordProjectsAction('delete_click', projectId, {
+                method: 'UI',
+                requestUrl: requestUrl,
+            });
+            if (!confirm('Usunąć projekt „' + label + '” z tego workspace?')) {
+                sessionDiagnostics.delete_flow.phase = 'cancelled';
+                recordProjectsAction('delete_cancelled', projectId, { method: 'UI', requestUrl: requestUrl });
+                return;
+            }
+            sessionDiagnostics.delete_flow.phase = 'confirmed';
+            recordProjectsAction('delete_confirmed', projectId, {
+                method: 'POST',
+                requestUrl: requestUrl,
+            });
+            fetch(requestUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: projectId })
+            })
+                .then(async res => {
+                    const text = await res.text();
+                    let data = {};
+                    try {
+                        data = JSON.parse(text);
+                    } catch (_) {
+                        data = { raw: text.slice(0, 500) };
+                    }
+                    recordProjectsAction('delete_response', projectId, {
+                        method: 'POST',
+                        requestUrl: requestUrl,
+                        status: res.status,
+                        responseBody: JSON.stringify(data),
+                        error: data.error || (!res.ok ? ('HTTP ' + res.status) : null),
+                    });
+                    sessionDiagnostics.delete_flow.phase =
+                        res.ok && !data.error ? 'success' : 'failed';
+                    if (data.error) throw new Error(data.error);
+                    if (!res.ok) {
+                        throw new Error('HTTP ' + res.status);
+                    }
+                    if (activeProjectId === projectId) {
+                        activeProjectId = data.activated || '';
+                        llmProjectFilter = '';
+                    }
+                    addChatLog('system', '🗑️ <strong>Usunięto projekt:</strong> ' + label);
+                    return loadProjectsCatalog();
+                })
+                .catch(err => {
+                    if (sessionDiagnostics.delete_flow) {
+                        sessionDiagnostics.delete_flow.phase = 'error';
+                        sessionDiagnostics.delete_flow.error = err.message;
+                    }
+                    recordProjectsAction('delete_error', projectId, {
+                        method: 'DELETE',
+                        requestUrl: requestUrl,
+                        error: err.message,
+                    });
+                    addChatLog('system', '❌ <strong>Usuwanie nie powiodło się:</strong> ' + err.message);
+                });
+        }
+
         function renderProjectsGrid() {
             const grid = document.getElementById('projects-grid');
             if (!grid) return;
@@ -1992,19 +2956,28 @@
                 grid.innerHTML = '<div class="projects-empty">No examples match your filters.</div>';
                 return;
             }
-            grid.innerHTML = visible.map(p => `
-                <article class="project-card${p.id === activeProjectId ? ' selected' : ''}" data-id="${p.id}" onclick="activateProject('${p.id}')">
+            grid.innerHTML = visible.map(p => {
+                const importKind = p.import_kind ? `<span class="project-badge">${escapeHtml(p.import_kind)}</span>` : '';
+                const idJson = JSON.stringify(p.id);
+                return `
+                <article class="project-card${p.id === activeProjectId ? ' selected' : ''}" data-id="${escapeHtml(p.id)}" onclick='activateProject(${idJson})'>
                     <div class="project-card-top">
                         <span class="project-emoji">${p.emoji || '📦'}</span>
                         <div class="project-badges">
-                            <span class="project-badge">${p.domain}</span>
-                            <span class="project-badge">${p.kind}</span>
+                            <span class="project-badge">${escapeHtml(p.domain)}</span>
+                            <span class="project-badge">${escapeHtml(p.kind)}</span>
+                            ${importKind}
+                            ${p.markpact ? '<span class="project-badge">markpact</span>' : ''}
+                            ${p.imported ? '<span class="project-badge">imported</span>' : ''}
                         </div>
                     </div>
-                    <h3 class="project-title">${p.title}</h3>
-                    <p class="project-subtitle">${p.subtitle}</p>
+                    <h3 class="project-title">${escapeHtml(p.title)}</h3>
+                    <p class="project-subtitle">${escapeHtml(p.subtitle)}</p>
+                    ${renderImportedProjectMeta(p)}
+                    ${renderImportedProjectActions(p)}
                 </article>
-            `).join('');
+            `;
+            }).join('');
         }
 
         function activateProject(projectId, opts) {
@@ -2029,10 +3002,11 @@
                 const defScope = scopeMeta.default_focus_scope
                     || defaultScopeForKind((data.project && data.project.kind) || 'web');
                 normalizeFocusScopeForActiveProject({ defaultScope: defScope, force: true });
-                pendingGoalOptions = true;
+                clearGoalFields();
+                requireGoalPrompt = projectNeedsGoalPrompt(data);
+                pendingGoalOptions = !requireGoalPrompt;
                 workspaceEngaged = false;
                 annotations = [];
-                projectGoal = '';
                 elementHints = [];
                 lastTouchedElementIds = [];
                 updateFeedbackList();
@@ -2040,11 +3014,13 @@
                 document.getElementById('tab-editor').disabled = false;
                 const goalEl = document.getElementById('goal-input');
                 const subtitle = (data.project && data.project.subtitle) ? data.project.subtitle : '';
-                if (goalEl && !goalEl.value.trim()) {
-                    goalEl.value = subtitle;
-                }
-                if (subtitle) {
-                    projectGoal = subtitle;
+                if (!requireGoalPrompt) {
+                    if (goalEl && !goalEl.value.trim() && subtitle && !isPlaceholderGoal(subtitle)) {
+                        goalEl.value = subtitle;
+                    }
+                    if (subtitle && !isPlaceholderGoal(subtitle)) {
+                        projectGoal = subtitle;
+                    }
                 }
                 const boot = data.goal_bootstrap || {};
                 const bootOpts = boot.options_written || [];
@@ -2068,7 +3044,9 @@
                 renderProjectsGrid();
                 updateProjectActiveBar();
                 refreshIntractPolicy();
-                if (boot.status !== 'goal_options_seeded') {
+                if (requireGoalPrompt) {
+                    showGoalPromptModal();
+                } else if (boot.status !== 'goal_options_seeded') {
                     scheduleAutoIteration('project_activate');
                 }
                 return data;
@@ -2089,6 +3067,16 @@
                     updateServerOfflineBanner(false);
                     flushPendingLogEvents();
                     return res.json();
+                })
+                .then(data => {
+                    sessionDiagnostics.cinema_runtime = {
+                        cinema_root: data.cinema_root || null,
+                        capsule: data.capsule || data.cinema || null,
+                        workspace_root: data.workspace_root || null,
+                        cinema_player_mtime: data.cinema_player_mtime || null,
+                        template_synced_hint: data.template_synced_hint || null,
+                    };
+                    return data;
                 })
                 .catch(() => {
                     cinemaServerOnline = false;
@@ -2509,7 +3497,9 @@
                     btn.innerText = isIterating ? '⏳ Working…' : 'Set a goal or mark elements to start';
                 }
                 if (hintEl) {
-                    if (ledgerHasEffectiveUi(intractPolicyData) && !projectGoal && !currentUserGoal()) {
+                    if (requireGoalPrompt && !projectGoal) {
+                        hintEl.textContent = 'Ustaw cel projektu (okno lub żółte pole), aby wygenerować opcje A–C.';
+                    } else if (ledgerHasEffectiveUi(intractPolicyData) && !projectGoal && !currentUserGoal()) {
                         hintEl.textContent = 'Ledger has KEEP/DELETE marks — press Enter in the yellow goal field or click Refresh Options to continue.';
                     } else if (currentUserGoal() && !projectGoal) {
                         hintEl.textContent = 'Goal typed but not committed — press Enter in the yellow field, then refresh Options A–C.';
@@ -2542,7 +3532,8 @@
 
         function setProjectGoal() {
             const payload = goalContractPayload();
-            if (!payload.user_goal) return;
+            if (!payload.user_goal || isPlaceholderGoal(payload.user_goal)) return;
+            requireGoalPrompt = false;
             projectGoal = payload.user_goal;
             if (!workspaceEngaged) {
                 pendingGoalOptions = true;
@@ -2745,6 +3736,16 @@
             updateElementHintButton();
         }
 
+        function goalBaselineLabel() {
+            const kind = String(activeProjectRecord()?.kind || 'web').toLowerCase();
+            if (kind === 'calculator') return 'baseline calc.* frozen';
+            if (kind === 'imported') return 'imported site template frozen';
+            if (['dashboard', 'monitor', 'ecosystem', 'api', 'mcp', 'frontend', 'slice'].includes(kind)) {
+                return 'baseline dashboard template frozen';
+            }
+            return 'baseline UI template frozen';
+        }
+
         function updatePromptBox() {
             const box = document.getElementById('prompt-box');
             const deletes = annotations.filter(a => a.type === 'DELETE').map(a => a.id);
@@ -2755,7 +3756,7 @@
             let promptText = `### SUMMARY FOR AI\n\n`;
             promptText += `# FOCUS SCOPE (single-choice hashtag):\n`;
             promptText += `  ${scope.label} — ${scope.help}\n\n`;
-            promptText += `🎯 PROJECT GOAL (→ Intract extensions, baseline calc.* frozen):\n`;
+            promptText += `🎯 PROJECT GOAL (→ Intract extensions, ${goalBaselineLabel()}):\n`;
             promptText += goalLine ? `  ${goalLine}\n` : `  (not set — describe the overall target)\n`;
             promptText += `\n`;
             const hasMarks = keeps.length > 0 || deletes.length > 0;
@@ -2808,6 +3809,12 @@
 
         function runLiveIteration(opts) {
             opts = opts || {};
+            if (requireGoalPrompt && !projectGoal) {
+                if (!opts.auto) {
+                    showGoalPromptModal();
+                }
+                return;
+            }
             if (isIterating) {
                 if (opts.auto) pendingAutoIterate = true;
                 return;
@@ -2883,19 +3890,34 @@
                     at: new Date().toISOString(),
                     mode: iterationMode,
                     status: data.status,
+                    focus_scope: data.focus_scope || scopePayload.focus_scope,
+                    focus_scope_label: data.focus_scope_label || scopePayload.focus_scope_label,
                     options_written: data.options_written || [],
                     keep_count: data.keep_count,
                     delete_count: data.delete_count,
                     spatial_removed: data.spatial_removed || [],
                     error: data.error || null
                 };
-                if (data.status === 'proposed_options_by_llm') {
+                if (data.status === 'proposed_options_by_llm'
+                    || data.status === 'proposed_options_by_llm_patch'
+                    || data.status === 'proposed_options_offline'
+                    || data.status === 'proposed_options_cached'
+                    || data.status === 'proposed_options_by_intract_patch') {
                     pendingGoalOptions = false;
                     const opts = (data.options_written || []).join(', ') || 'A, B, C';
+                    let source = 'LLM';
+                    if (data.status === 'proposed_options_by_llm_patch') {
+                        source = 'LLM patch';
+                    } else if (data.status === 'proposed_options_cached') {
+                        source = 'cache';
+                    } else if (data.status === 'proposed_options_offline'
+                        || data.status === 'proposed_options_by_intract_patch') {
+                        source = 'scope offline';
+                    }
                     document.getElementById('wf-step-2')?.classList.add('done');
                     document.getElementById('wf-step-3')?.classList.add('active');
                     if (!opts.auto) {
-                        addChatLog('system', `✨ <strong>Options ready (${opts}).</strong> Click A, B, or C to promote.`);
+                        addChatLog('system', `✨ <strong>Options ready (${source}: ${opts}).</strong> Click A, B, or C to promote.`);
                     }
                     logEvent('ITERATION_OPTIONS', `status=${data.status} options=${opts}`);
                     reloadCinemaFrames(data.options_stamp);
@@ -2922,9 +3944,15 @@
                     reloadCinemaFrames();
                     refreshHistory();
                 } else {
+                    const scopeId = data.focus_scope || scopePayload.focus_scope || currentFocusScope;
+                    const isLlmFailed = /^llm_failed:/i.test(String(data.status || ''));
                     const errMsg = (data.error || data.status || 'unknown')
                         .replace(/^llm_(skipped|failed):\\s*/i, '');
-                    addChatLog('system', `⚠️ <strong>Could not run AI: ${errMsg}</strong>`);
+                    if (isLlmFailed && scopeId === 'functions') {
+                        addChatLog('system', '⚠️ <strong>#functions requires an LLM.</strong> Enable network + API key in workspace <code>nexu.yaml</code>, or switch to a visual scope (#colors, #display, …) for offline Options A–C.');
+                    } else {
+                        addChatLog('system', `⚠️ <strong>Could not run AI: ${errMsg}</strong>`);
+                    }
                     logEvent('ITERATION_SKIPPED', data.error || data.status);
                     addChatLog('system', '📝 <strong>Your marks were kept — adjust and try again.</strong>');
                 }
@@ -3126,6 +4154,8 @@
                 htmlPreviews = { error: err.message };
             }
 
+            syncGoalFromLedger(intractPolicyData);
+            const effectiveProjectGoal = projectGoal || currentUserGoal();
             const state = {
                 timestamp: new Date().toISOString(),
                 dashboard: 'Nexu',
@@ -3158,7 +4188,7 @@
                     deleteCount: allMarks.filter(a => a.type === 'DELETE').length,
                     historyEvents: annotationHistory.length
                 },
-                projectGoal: projectGoal,
+                projectGoal: effectiveProjectGoal,
                 elementHints: elementHints,
                 userHints: buildLegacyHintsPayload(),
                 history: {
@@ -3169,7 +4199,8 @@
                 intractPolicy: intractPolicyData,
                 policyContracts: buildPolicyContractsExport(intractPolicyData),
                 htmlPreviews: htmlPreviews,
-                htmlPreviewNote: 'Scripts stripped; each preview capped at ' + HTML_PREVIEW_MAX_CHARS + ' chars'
+                htmlPreviewNote: 'Scripts stripped; each preview capped at ' + HTML_PREVIEW_MAX_CHARS + ' chars',
+                diagnostics: buildSessionDiagnostics(),
             };
 
             const json = JSON.stringify(state, null, 2);
@@ -3189,7 +4220,7 @@
                     toast.classList.remove('show');
                 }, 2000);
                 logEvent('COPY_STATE', `Copied ${json.length} chars (history=${historyCheckpoints.length}, previews=yes)`);
-                addChatLog('system', '📋 <strong>Session JSON copied</strong> (history, policy contracts, effective UI, HTML previews).');
+                addChatLog('system', '📋 <strong>Session JSON copied</strong> (history, policy, HTML previews, diagnostics for Projects/delete).');
             } catch (err) {
                 addChatLog('system', '❌ <strong>Clipboard copy failed: ' + err.message + '</strong>');
             } finally {
@@ -3214,6 +4245,15 @@
                     if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
                         setProjectGoal();
+                    }
+                });
+            }
+            const goalPromptInput = document.getElementById('goal-prompt-input');
+            if (goalPromptInput) {
+                goalPromptInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        confirmGoalPromptModal();
                     }
                 });
             }

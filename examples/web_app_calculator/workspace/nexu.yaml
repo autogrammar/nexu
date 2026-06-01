@@ -21,10 +21,14 @@ llm:
   allow_network_calls: true
 cinema:
   # Live Cinema /iterate tuning (overridable via CINEMA_* env vars)
+  fast_scope_options: true          # visual scopes → offline A–C (~10–50ms)
+  llm_patch_options: true           # visual scopes can use compact JSON/CSS LLM patches
+  options_cache: true               # cache alt_a/b/c under cinema/cache/options/
+  force_llm: false                  # opt-in: skip offline fast path, always call LLM
   markpact_context_chars: 4000   # max Markpact markdown in LLM prompt (summary mode)
-  markpact_context_mode: summary # summary | full | off
+  markpact_context_mode: summary # summary | full | off (auto-off for visual scopes)
   html_context_chars: 8000       # max current stage HTML in prompt
-  max_tokens: 4096               # per-call output cap (batch uses max(..., 8192))
+  max_tokens: 20480              # per-call output cap (batch uses max(..., 8192))
   option_generation_mode: batch  # batch (1 call for A-C) | parallel (3 calls)
   llm_trace_keep: 80             # retained exchanges in LLM debug tab
 orchestration:

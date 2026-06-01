@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from pathlib import Path
 from typing import Any
 
 DASHBOARD_KINDS = frozenset(
@@ -12,7 +13,11 @@ DASHBOARD_KINDS = frozenset(
 SCOPE_STYLE_ID = "nexu-scope-variant"
 
 # kind -> ordered scope ids shown in Cinema player
+IMPORTED_KINDS = frozenset({"imported", "web"})
+
 SCOPE_IDS_BY_KIND: dict[str, tuple[str, ...]] = {
+    "imported": ("functions", "display", "colors", "shapes", "orientation"),
+    "web": ("functions", "display", "colors", "shapes", "orientation"),
     "dashboard": ("functions", "display", "colors", "shapes", "orientation"),
     "monitor": ("functions", "display", "colors", "shapes", "orientation"),
     "ecosystem": ("functions", "display", "colors", "shapes", "orientation"),
@@ -35,17 +40,29 @@ DEFAULT_SCOPE_BY_KIND: dict[str, str] = {
     "monitor": "functions",
     "ecosystem": "functions",
     "api": "functions",
+    "imported": "functions",
+    "web": "functions",
     "calculator": "keypad",
 }
+
+# Visual scopes handled by cinema_offline_options + inject_scope_style (~10–50ms).
+OFFLINE_FAST_SCOPES_CALCULATOR = frozenset(
+    {"colors", "shapes", "display", "orientation", "keypad"}
+)
+OFFLINE_FAST_SCOPES_DASHBOARD = frozenset(
+    {"colors", "shapes", "display", "orientation"}
+)
 
 
 def ui_type_for_kind(kind: str, *, html_hint: str = "") -> str:
     k = (kind or "").strip().lower()
+    if k in IMPORTED_KINDS:
+        return "web"
     if k in DASHBOARD_KINDS:
         return "dashboard"
     if k == "calculator":
         return "calculator"
-    text = (html_hint or "").lower()
+    text = re.sub(r"<script\b[^>]*>[\s\S]*?</script>", "", html_hint or "", flags=re.I).lower()
     if "calc-body" in text or "btn-eq" in text:
         return "calculator"
     if "app-shell" in text or "kpi-card" in text or "kpi-grid" in text:
@@ -55,7 +72,7 @@ def ui_type_for_kind(kind: str, *, html_hint: str = "") -> str:
 
 def allowed_scope_ids(project_kind: str) -> tuple[str, ...]:
     k = (project_kind or "").strip().lower()
-    return SCOPE_IDS_BY_KIND.get(k, SCOPE_IDS_BY_KIND["calculator"])
+    return SCOPE_IDS_BY_KIND.get(k, SCOPE_IDS_BY_KIND["web"])
 
 
 def default_scope_for_kind(project_kind: str) -> str:
@@ -70,6 +87,35 @@ def normalize_focus_scope(scope: str, project_kind: str) -> str:
     if s in allowed:
         return s
     return default_scope_for_kind(project_kind)
+
+
+def offline_fast_scopes_for_kind(project_kind: str) -> frozenset[str]:
+    """Scopes that may use the offline A–C path on /iterate (not functions)."""
+    k = (project_kind or "").strip().lower()
+    if k in DASHBOARD_KINDS or k in IMPORTED_KINDS:
+        return OFFLINE_FAST_SCOPES_DASHBOARD
+    if k == "calculator":
+        return OFFLINE_FAST_SCOPES_CALCULATOR
+    return OFFLINE_FAST_SCOPES_DASHBOARD
+
+
+def scope_supports_offline_fast_path(scope: str, project_kind: str) -> bool:
+    """True when focus_scope can be patched locally without a full LLM HTML call."""
+    normalized = normalize_focus_scope(scope, project_kind)
+    return normalized in offline_fast_scopes_for_kind(project_kind)
+
+
+def cinema_has_offline_baseline(cinema_dir: Path | str) -> bool:
+    """True when stage HTML exists for scoped offline A–C patching."""
+    stage0 = Path(cinema_dir) / "stage0.html"
+    if not stage0.is_file():
+        return False
+    try:
+        text = stage0.read_text(encoding="utf-8")
+    except OSError:
+        return False
+    lowered = text.lower()
+    return len(text.strip()) >= 120 and "<body" in lowered
 
 
 def scope_option_variants(
@@ -131,8 +177,9 @@ def scope_option_variants(
         ]
     if scope == "orientation":
         base = (
-            "ORIENTATION-ONLY evolution. Preserve functions, labels, data, and colors. "
-            "Change layout direction and panel ordering only. "
+            "ORIENTATION-ONLY evolution. Preserve functions, labels, data, colors, and all "
+            "button ids/classes. Change layout direction and panel ordering only via CSS. "
+            "Return a complete HTML5 document with head/body structure intact. "
         )
         return [
             (
@@ -329,18 +376,78 @@ def _calc_scope_css(scope: str, variant: str) -> str:
     return ""
 
 
+def _web_scope_css(scope: str, variant: str) -> str:
+    """Generic palette / layout patches for imported or arbitrary web HTML."""
+    v = variant if variant in ("a", "b", "c") else "b"
+    if scope == "colors":
+        palettes = {
+            "a": (
+                "html,body{background:#0b1224!important;color:#e2e8f0!important;}"
+                "a,button,[role='button']{color:#38bdf8!important;}"
+                "h1,h2,h3,header,.brand{color:#38bdf8!important;}"
+            ),
+            "b": (
+                "html,body{background:#020617!important;color:#f8fafc!important;}"
+                "a,button,[role='button']{color:#facc15!important;}"
+                "h1,h2,h3,header{border-color:rgba(248,250,252,0.35)!important;}"
+            ),
+            "c": (
+                "html,body{background:linear-gradient(160deg,#1e1033,#312e81)!important;color:#fce7f3!important;}"
+                "a,button,[role='button']{color:#e879f9!important;}"
+                "h1,h2,h3,header{color:#f9a8d4!important;}"
+            ),
+        }
+        return palettes[v]
+    if scope == "shapes":
+        radii = {
+            "a": "button,[role='button'],input,select,textarea,section,article,nav,header,footer"
+            "{border-radius:4px!important;}",
+            "b": "button,[role='button'],input,select,textarea,section,article,nav,header,footer"
+            "{border-radius:10px!important;}",
+            "c": "button,[role='button'],input,select,textarea,section,article,nav,header,footer"
+            "{border-radius:999px!important;}",
+        }
+        return radii[v]
+    if scope == "display":
+        scales = {
+            "a": "h1{font-size:1.35rem!important;}h2{font-size:1rem!important;}p{font-size:0.9rem!important;}",
+            "b": "h1{font-size:1.65rem!important;}h2{font-size:1.15rem!important;}p{font-size:1rem!important;}",
+            "c": "h1{font-size:1.9rem!important;font-weight:700!important;}h2{font-size:1.25rem!important;}",
+        }
+        return scales[v]
+    if scope == "orientation":
+        layouts = {
+            "a": "body{display:flex!important;flex-direction:column!important;gap:12px!important;}",
+            "b": "body{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:16px!important;}",
+            "c": "main,section{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))!important;gap:14px!important;}",
+        }
+        return layouts[v]
+    return ""
+
+
+def _resolve_scope_kind(project_kind: str, html: str) -> str:
+    kind = (project_kind or "").strip().lower()
+    if kind in IMPORTED_KINDS or kind in DASHBOARD_KINDS or kind == "calculator":
+        return kind
+    lowered = (html or "").lower()
+    if "calc-body" in lowered or "btn-eq" in lowered:
+        return "calculator"
+    if "kpi-grid" in lowered or "app-shell" in lowered:
+        return "dashboard"
+    return "web"
+
+
 def inject_scope_style(html: str, scope: str, variant: str, *, project_kind: str = "") -> str:
-    inferred = project_kind or (
-        "calculator"
-        if "calc-body" in html.lower()
-        else ("dashboard" if "kpi-grid" in html.lower() else "web")
-    )
+    inferred = _resolve_scope_kind(project_kind, html)
     scope = normalize_focus_scope(scope, inferred)
-    css = (
-        _calc_scope_css(scope, variant)
-        if inferred == "calculator" or "calc-body" in html.lower()
-        else _scope_css(scope, variant)
-    )
+    if inferred == "calculator" or (
+        inferred not in IMPORTED_KINDS.union(DASHBOARD_KINDS) and "calc-body" in html.lower()
+    ):
+        css = _calc_scope_css(scope, variant)
+    elif inferred in DASHBOARD_KINDS or "kpi-grid" in html.lower():
+        css = _scope_css(scope, variant)
+    else:
+        css = _web_scope_css(scope, variant) or _scope_css(scope, variant)
     cleaned = strip_scope_style(html)
     if not css:
         return cleaned
@@ -357,8 +464,76 @@ def inject_scope_style(html: str, scope: str, variant: str, *, project_kind: str
     return block + cleaned
 
 
+def scoped_html_fragment(html: str, focus_scope: str, project_kind: str) -> str | None:
+    """Smaller HTML slice for scoped LLM prompts when the scope is visual-only."""
+    if not scope_supports_offline_fast_path(focus_scope, project_kind):
+        return None
+    text = str(html or "")
+    scope = normalize_focus_scope(focus_scope, project_kind)
+    patterns = (
+        r'(<div[^>]*class=[\'"][^\'"]*calc-body[^\'"]*[\'"][\s\S]*?</div>\s*</div>)',
+        r'(<div[^>]*class=[\'"][^\'"]*app-shell[^\'"]*[\'"][\s\S]*?</div>\s*</div>)',
+    )
+    for pattern in patterns:
+        match = re.search(pattern, text, flags=re.I)
+        if match and len(match.group(1)) >= 40:
+            return (
+                f"<!-- scoped DOM fragment for #{scope}; regenerate full page from baseline -->\n"
+                + match.group(1)
+            )
+    return None
+
+
 def scope_meta_for_project(project_kind: str) -> dict[str, Any]:
     return {
         "default_focus_scope": default_scope_for_kind(project_kind),
         "allowed_focus_scopes": list(allowed_scope_ids(project_kind)),
     }
+
+
+def load_cinema_ui_profile(
+    active: dict[str, Any] | None,
+    cinema_dir: Path | str,
+) -> dict[str, Any]:
+    """Resolve active project kind/title and UI type for Cinema server + offline paths."""
+    project = active if isinstance(active, dict) else {}
+    kind = str(project.get("kind") or "").lower()
+    title = str(project.get("title") or project.get("id") or "").strip()
+    html_hint = ""
+    stage0 = Path(cinema_dir) / "stage0.html"
+    if stage0.is_file():
+        try:
+            html_hint = stage0.read_text(encoding="utf-8")
+        except OSError:
+            html_hint = ""
+    profile: dict[str, Any] = {
+        "kind": kind,
+        "title": title,
+        "ui_type": ui_type_for_kind(kind, html_hint=html_hint),
+        "active": project,
+    }
+    try:
+        from .cinema_http_preprocess import load_http_preprocess_artifacts
+
+        http_ctx = load_http_preprocess_artifacts(cinema_dir, project)
+        if http_ctx:
+            profile.update(http_ctx)
+    except Exception:
+        pass
+    return profile
+
+
+def can_use_offline_fast_iterate(
+    focus_scope: str,
+    project_kind: str,
+    cinema_dir: Path | str,
+    *,
+    force_llm: bool = False,
+    fast_scope_options: bool = True,
+) -> bool:
+    """True when /iterate may skip LLM and use offline scope A–C generation."""
+    if force_llm or not fast_scope_options:
+        return False
+    if not scope_supports_offline_fast_path(focus_scope, project_kind):
+        return False
+    return cinema_has_offline_baseline(cinema_dir)

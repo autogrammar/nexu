@@ -1,0 +1,176 @@
+"""Tests for HTTP import preprocessing (visual CSS + HTML outline)."""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+import pytest
+
+from nexu.cinema_http_preprocess import (
+    build_html_outline,
+    build_http_llm_context,
+    extract_visual_css,
+    prepare_http_preview_html,
+    preprocess_http_import,
+    sanitize_http_preview_html,
+)
+from nexu.cinema_scope import load_cinema_ui_profile
+
+
+SAMPLE_HTML = """<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { color: #112233; background: #fff; font-family: sans-serif; }
+    .hero { border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,.2); width: 100%; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .noise { content: "ignore"; }
+  </style>
+  <link rel="stylesheet" href="assets/theme.css">
+</head>
+<body id="page" class="landing" data-nexu-target="root">
+  <header class="top"><h1>Welcome</h1></header>
+  <main class="hero"><p>Long paragraph with lots of marketing copy here.</p></main>
+  <script>console.log('skip');</script>
+</body>
+</html>
+"""
+
+LINKED_CSS = """
+:root { --accent: #ff5500; }
+.card { color: var(--accent); border: 1px solid #ccc; min-height: 120px; }
+@media print { body { display: none; } }
+.btn { display: flex; gap: 8px; padding: 12px; }
+"""
+
+
+def test_extract_visual_css_keeps_color_and_shape_rules(tmp_path: Path) -> None:
+    assets = tmp_path / "assets"
+    assets.mkdir()
+    (assets / "theme.css").write_text(LINKED_CSS, encoding="utf-8")
+    css, meta = extract_visual_css(SAMPLE_HTML, ["assets/theme.css"], tmp_path)
+    assert "color:" in css or "color " in css
+    assert "border-radius" in css
+    assert "--accent" in css
+    assert "display: flex" in css
+    assert "@keyframes" not in css
+    assert "@media print" not in css
+    assert meta["visual_css_bytes"] > 0
+
+
+def test_build_html_outline_smaller_than_source_and_strips_scripts() -> None:
+    outline, meta = build_html_outline(SAMPLE_HTML)
+    assert len(outline) < len(SAMPLE_HTML)
+    assert "<script" not in outline.lower()
+    assert 'id="page"' in outline
+    assert 'data-nexu-target="root"' in outline
+    assert "Welcome" not in outline
+    assert meta["outline_node_count"] >= 4
+
+
+def test_preprocess_http_import_writes_artifacts(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    source.mkdir()
+    assets = source / "assets"
+    assets.mkdir()
+    (assets / "theme.css").write_text(LINKED_CSS, encoding="utf-8")
+    (source / "index.html").write_text(SAMPLE_HTML, encoding="utf-8")
+    fetch_meta = {"stylesheets": [{"local": "assets/theme.css"}]}
+
+    fields = preprocess_http_import(source, fetch_meta=fetch_meta)
+
+    assert fields["llm_context_mode"] == "patch"
+    assert (source / "nexu-visual.css").is_file()
+    assert (source / "nexu-outline.html").is_file()
+    assert fields["visual_css_bytes"] > 0
+    assert fields["outline_node_count"] >= 4
+    outline = (source / "nexu-outline.html").read_text(encoding="utf-8")
+    assert len(outline) < len(SAMPLE_HTML)
+
+
+def test_build_http_llm_context_combines_css_and_outline() -> None:
+    ctx = build_http_llm_context(
+        {
+            "visual_css": "body { color: red; }",
+            "html_outline": "<body><main>…</main></body>",
+        }
+    )
+    assert "patch mode" in ctx.lower()
+    assert "```css" in ctx
+    assert "```html" in ctx
+
+
+def test_load_cinema_ui_profile_includes_http_preprocess(tmp_path: Path) -> None:
+    cinema = tmp_path / "cinema"
+    project_id = "http-example.com"
+    project_dir = cinema / "imported_projects" / project_id
+    source = project_dir / "source"
+    source.mkdir(parents=True)
+    (source / "index.html").write_text(SAMPLE_HTML, encoding="utf-8")
+    preprocess_http_import(source)
+    (project_dir / "project.json").write_text(
+        json.dumps(
+            {
+                "id": project_id,
+                "visual_css_path": "source/nexu-visual.css",
+                "html_outline_path": "source/nexu-outline.html",
+                "llm_context_mode": "patch",
+                "visual_css_bytes": 42,
+                "outline_node_count": 7,
+            }
+        ),
+        encoding="utf-8",
+    )
+    (cinema / "stage0.html").write_text(SAMPLE_HTML, encoding="utf-8")
+
+    profile = load_cinema_ui_profile({"id": project_id, "kind": "imported"}, cinema)
+
+    assert profile["llm_context_mode"] == "patch"
+    assert profile["visual_css"]
+    assert profile["html_outline"]
+    assert profile["ui_type"] == "web"
+
+
+def test_extract_visual_css_rejects_paths_outside_source_dir(tmp_path: Path) -> None:
+    outside = tmp_path / "outside.css"
+    outside.write_text("body { color: blue; }", encoding="utf-8")
+    css, _ = extract_visual_css(SAMPLE_HTML, [str(outside)], tmp_path / "source")
+    assert "color: blue" not in css
+
+
+LITESPEED_FIXTURE = """<!DOCTYPE html>
+<html>
+<head>
+  <base href="https://malortgdynia.pl/">
+  <link rel="stylesheet" href="/wp-content/themes/kadence/style.css">
+  <script src="https://malortgdynia.pl/wp-includes/js/jquery.min.js"></script>
+  <script src="/wp-content/plugins/litespeed-cache/assets/js/instant_click.min.js"></script>
+  <script>
+    fetch('https://malortgdynia.pl/wp-content/plugins/litespeed-cache/guest.vary.php')
+      .then(function(r){ return r.json(); })
+      .then(function(d){ window.__lsc = d; });
+  </script>
+</head>
+<body><h1>Malort</h1></body>
+</html>
+"""
+
+
+def test_sanitize_http_preview_strips_external_and_fetch_scripts() -> None:
+    cleaned, meta = sanitize_http_preview_html(LITESPEED_FIXTURE)
+    assert meta["preview_scripts_removed"] == 3
+    assert "guest.vary.php" not in cleaned
+    assert "fetch(" not in cleaned
+    assert "jquery.min.js" not in cleaned
+    assert "instant_click.min.js" not in cleaned
+    assert 'href="/wp-content/themes/kadence/style.css"' in cleaned
+    assert "<h1>Malort</h1>" in cleaned
+
+
+def test_prepare_http_preview_injects_network_shim() -> None:
+    prepared, meta = prepare_http_preview_html(LITESPEED_FIXTURE)
+    assert meta["preview_shim_injected"] is True
+    assert "nexu preview: block cross-origin fetch" in prepared
+    assert "window.kadenceConfig" in prepared
+    assert prepared.index("nexu preview: block cross-origin fetch") < prepared.lower().index("<link")

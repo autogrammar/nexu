@@ -37,6 +37,10 @@ def _render_server_script(
         CINEMA_MAX_TOKENS=repr(int(cinema_config.max_tokens)),
         CINEMA_OPTION_GENERATION_MODE=repr(str(cinema_config.option_generation_mode)),
         CINEMA_LLM_TRACE_KEEP=repr(int(cinema_config.llm_trace_keep)),
+        CINEMA_FORCE_LLM=repr(bool(cinema_config.force_llm)),
+        CINEMA_FAST_SCOPE_OPTIONS=repr(bool(cinema_config.fast_scope_options)),
+        CINEMA_LLM_PATCH_OPTIONS=repr(bool(cinema_config.llm_patch_options)),
+        CINEMA_OPTIONS_CACHE=repr(bool(cinema_config.options_cache)),
     )
 
 

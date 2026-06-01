@@ -20,6 +20,7 @@ from .cinema_policy import (
 from .cinema_scripts import write_cinema_inject_files
 
 ACTIVE_PROJECT_FILE = "active_project.json"
+DELETED_PROJECTS_FILE = "projects.deleted.json"
 
 
 @dataclass(frozen=True)
@@ -146,17 +147,111 @@ EXAMPLE_PROJECTS: tuple[ExampleProject, ...] = (
 )
 
 
-def list_project_catalog() -> dict[str, Any]:
+def deleted_project_ids(cinema_dir: Path | None = None) -> set[str]:
+    """Workspace-local tombstones for seed/demo projects.
+
+    Seed projects live in the package, so deleting them from one workspace means
+    hiding them in that workspace rather than removing package files.
+    """
+    if cinema_dir is None:
+        return set()
+    path = Path(cinema_dir) / DELETED_PROJECTS_FILE
+    if not path.is_file():
+        return set()
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return set()
+    if not isinstance(data, list):
+        return set()
+    return {str(item) for item in data if str(item).strip()}
+
+
+def mark_project_deleted(cinema_dir: Path, project_id: str) -> None:
+    path = Path(cinema_dir) / DELETED_PROJECTS_FILE
+    deleted = sorted(deleted_project_ids(cinema_dir).union({project_id}))
+    path.write_text(json.dumps(deleted, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+def is_example_project_id(project_id: str) -> bool:
+    return any(p.id == project_id for p in EXAMPLE_PROJECTS)
+
+
+def list_project_catalog(cinema_dir: Path | None = None) -> dict[str, Any]:
+    deleted = deleted_project_ids(cinema_dir)
+    projects = []
+    for project in EXAMPLE_PROJECTS:
+        if project.id in deleted:
+            continue
+        data = project.to_public_dict()
+        if cinema_dir is not None:
+            data.update(
+                {
+                    "imported": False,
+                    "deletable": True,
+                    "source_kind": "demo",
+                    "path_hint": f"projects/{project.id}",
+                    "workspace_store": ".nexu",
+                }
+            )
+        projects.append(data)
     domains = sorted({p.domain for p in EXAMPLE_PROJECTS})
     kinds = sorted({p.kind for p in EXAMPLE_PROJECTS})
     return {
-        "projects": [p.to_public_dict() for p in EXAMPLE_PROJECTS],
+        "projects": projects,
         "filters": {
-            "domains": domains,
-            "kinds": kinds,
-            "tags": sorted({tag for p in EXAMPLE_PROJECTS for tag in p.tags}),
+            "domains": sorted(
+                {str(p.get("domain") or "") for p in projects if p.get("domain")}
+            )
+            or domains,
+            "kinds": sorted({str(p.get("kind") or "") for p in projects if p.get("kind")})
+            or kinds,
+            "tags": sorted({tag for p in projects for tag in (p.get("tags") or [])}),
         },
     }
+
+
+def delete_example_project(
+    cinema_dir: Path,
+    project_id: str,
+    *,
+    repo_root: Path | None = None,
+    workspace_root: Path | None = None,
+    capsule_name: str | None = None,
+) -> dict[str, Any]:
+    """Hide a seed/demo project from this workspace catalog."""
+    if not is_example_project_id(project_id):
+        return {"error": f"unknown project: {project_id}"}
+    mark_project_deleted(cinema_dir, project_id)
+    active = load_active_project(cinema_dir) or {}
+    was_active = str(active.get("id") or "") == project_id
+    result: dict[str, Any] = {
+        "status": "deleted",
+        "id": project_id,
+        "was_active": was_active,
+        "delete_mode": "workspace_tombstone",
+        "path": str(Path(cinema_dir) / DELETED_PROJECTS_FILE),
+    }
+    if was_active:
+        fallback = next((p.id for p in EXAMPLE_PROJECTS if p.id != project_id), "")
+        while fallback and fallback in deleted_project_ids(cinema_dir):
+            deleted = deleted_project_ids(cinema_dir)
+            fallback = next((p.id for p in EXAMPLE_PROJECTS if p.id not in deleted), "")
+        if fallback:
+            activation = activate_example_project(
+                cinema_dir,
+                fallback,
+                repo_root=repo_root,
+                capsule_name=capsule_name,
+                workspace_root=workspace_root,
+            )
+            result["activated"] = (activation.get("project") or {}).get("id", fallback)
+        else:
+            active_path = Path(cinema_dir) / ACTIVE_PROJECT_FILE
+            if active_path.exists():
+                active_path.unlink()
+            result["activated"] = None
+    return result
 
 
 def _resolve_source_cinema(project: ExampleProject, repo_root: Path | None) -> Path | None:

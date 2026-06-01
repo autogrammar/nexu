@@ -40,6 +40,8 @@
 │   │   │   ├── cinema_player.html
 │   │   │   ├── _inject_runtime.html
 │   │   │   ├── _inject_shield.html
+│   │   │   ├── nexu_hooks.py
+│   │   │   ├── server.py
 │   │   │   ├── stage0.html
 │   │   │   ├── stage1.html
 │   │   │   └── stage2.html
@@ -104,6 +106,8 @@
 │           └── web
 │               └── README.md
 ├── goal.yaml
+├── image-1.png
+├── image.png
 ├── LICENSE
 ├── Makefile
 ├── project
@@ -140,20 +144,36 @@
 │       ├── bundle.py
 │       ├── capsule.py
 │       ├── cinema_baseline_contracts.py
+│       ├── cinema_goal_contracts.py
 │       ├── cinema_history.py
+│       ├── cinema_html.py
+│       ├── cinema_html_validate.py
+│       ├── cinema_iterate.py
+│       ├── cinema_llm_contracts.py
+│       ├── cinema_llm.py
 │       ├── cinema_markpact.py
 │       ├── cinema_offline_options.py
+│       ├── cinema_options_cache.py
 │       ├── cinema_policy.py
+│       ├── cinema_project_imports.py
 │       ├── cinema_projects.py
 │       ├── cinema_publish.py
 │       ├── cinema.py
+│       ├── cinema_scope.py
 │       ├── cinema_scripts.py
 │       ├── cinema_server.py
+│       ├── cinema_traces.py
+│       ├── cinema_ui_patch.py
 │       ├── cli.py
 │       ├── config.py
 │       ├── diff.py
 │       ├── drift.py
 │       ├── export_prompt.py
+│       ├── fast_delivery
+│       │   ├── context.py
+│       │   ├── __init__.py
+│       │   ├── options.py
+│       │   └── router.py
 │       ├── files.py
 │       ├── freeze.py
 │       ├── git.py
@@ -196,16 +216,27 @@
 │   ├── test_capsule_next_stage.py
 │   ├── test_capsule_runtime_report.py
 │   ├── test_cinema_baseline_contracts.py
+│   ├── test_cinema_goal_contracts.py
 │   ├── test_cinema_history.py
+│   ├── test_cinema_html_validate.py
+│   ├── test_cinema_iterate.py
+│   ├── test_cinema_llm_contracts.py
+│   ├── test_cinema_llm.py
 │   ├── test_cinema_markpact.py
 │   ├── test_cinema_offline_options.py
+│   ├── test_cinema_options_cache.py
 │   ├── test_cinema_policy.py
+│   ├── test_cinema_project_imports.py
 │   ├── test_cinema_projects.py
 │   ├── test_cinema_publish.py
+│   ├── test_cinema_scope.py
 │   ├── test_cinema_scripts.py
 │   ├── test_cinema_server.py
 │   ├── test_cinema_spatial_patch.py
+│   ├── test_cinema_traces.py
+│   ├── test_cinema_ui_patch.py
 │   ├── test_export_prompt_ledger.py
+│   ├── test_fast_delivery.py
 │   ├── test_intract.py
 │   ├── test_models.py
 │   ├── test_nexu.py
@@ -220,4 +251,4 @@
 ├── uv.lock
 └── VERSION
 
-49 directories, 172 files
+50 directories, 202 files

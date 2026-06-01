@@ -22,8 +22,17 @@ from nexu.cinema_policy import (
 from nexu.cinema_projects import (
     activate_example_project,
     find_nexu_repo_root,
-    list_project_catalog,
     load_active_project,
+)
+from nexu.cinema_project_imports import (
+    activate_imported_project,
+    delete_imported_project,
+    import_git_project,
+    import_http_project,
+    import_zip_project,
+    imported_project_llm_log,
+    merged_projects_catalog,
+    read_imported_markpact,
 )
 from nexu.cinema_publish import (
     list_published_services,
@@ -31,7 +40,6 @@ from nexu.cinema_publish import (
     start_published_service,
     stop_published_service,
 )
-from nexu.cinema_offline_options import write_goal_options_offline
 from nexu.cinema_scripts import apply_spatial_deletes_to_html, finalize_cinema_html
 
 ROOT = Path('/home/tom/github/semcod/nexu/examples/web_app_calculator/workspace')
@@ -126,26 +134,6 @@ def sync_option_previews(stage: int = 0, delete_ids=None):
     )
 
 
-def write_offline_goal_options(
-    *,
-    keep_els=None,
-    delete_els=None,
-    hints=None,
-    user_goal="",
-    goal_contract_lines=None,
-):
-    cinema = Path(__file__).resolve().parent
-    labels = write_goal_options_offline(
-        cinema,
-        keep_els=list(keep_els or []),
-        delete_els=list(delete_els or []),
-        hints=list(hints or []),
-        user_goal=str(user_goal or ""),
-        goal_contract_lines=list(goal_contract_lines or []),
-    )
-    return labels
-
-
 def patch_option_previews(
     stage: int = 0,
     session_keep=None,
@@ -176,11 +164,15 @@ def patch_option_previews(
 
 
 def projects_catalog():
-    return list_project_catalog()
+    cinema = Path(__file__).resolve().parent
+    return merged_projects_catalog(cinema)
 
 
 def activate_project(project_id: str):
     cinema = Path(__file__).resolve().parent
+    imported_meta = (cinema / "imported_projects" / project_id / "project.json")
+    if imported_meta.exists():
+        return activate_imported_project(cinema, project_id)
     return activate_example_project(
         cinema,
         project_id,
@@ -188,6 +180,54 @@ def activate_project(project_id: str):
         capsule_name=CAPSULE,
         workspace_root=ROOT,
     )
+
+
+def import_project_from_zip(filename: str, content_base64: str = "", *, content_bytes: bytes | None = None):
+    cinema = Path(__file__).resolve().parent
+    return import_zip_project(
+        cinema,
+        filename,
+        content_base64,
+        content_bytes=content_bytes,
+    )
+
+
+def import_project_from_git(git_url: str, branch: str = "", *, allow_network: bool = True):
+    cinema = Path(__file__).resolve().parent
+    return import_git_project(
+        cinema,
+        git_url,
+        branch=branch or None,
+        allow_network=allow_network,
+    )
+
+
+def import_project_from_http(site_url: str, *, allow_network: bool = True):
+    cinema = Path(__file__).resolve().parent
+    return import_http_project(cinema, site_url, allow_network=allow_network)
+
+
+def delete_imported(project_id: str):
+    cinema = Path(__file__).resolve().parent
+    repo_root = find_nexu_repo_root(ROOT)
+    return delete_imported_project(
+        cinema,
+        project_id,
+        workspace_root=ROOT,
+        capsule_name=CAPSULE,
+        repo_root=repo_root,
+    )
+
+
+def imported_markpact(project_id: str):
+    cinema = Path(__file__).resolve().parent
+    return read_imported_markpact(cinema, project_id)
+
+
+def imported_llm_log(project_id: str):
+    cinema = Path(__file__).resolve().parent
+    trace_dir = cinema / "llm_traces"
+    return imported_project_llm_log(cinema, project_id, trace_dir)
 
 
 def active_project():
@@ -203,6 +243,7 @@ def export_markpact_readme(stage: int = 0, user_goal: str = ""):
         capsule_name=CAPSULE,
         user_goal=user_goal or "",
         effective_ui=effective,
+        workspace_root=ROOT,
     )
     return {
         "filename": markpact_download_filename(CAPSULE, stage),

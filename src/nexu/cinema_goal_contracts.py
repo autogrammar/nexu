@@ -129,9 +129,20 @@ def propose_goal_extension_contracts(
     slug = _slug(expected or text)
     kind = (project_kind or "").strip().lower()
     template_base = f"cinema.{capsule_name}.S{stage}.ui.template"
-    baseline_anchor = (
-        "calc.app.kind" if kind in ("", "calculator") else template_base
-    )
+    if kind in ("imported", "web") or kind in {
+        "dashboard",
+        "monitor",
+        "ecosystem",
+        "api",
+        "mcp",
+        "frontend",
+        "slice",
+    }:
+        baseline_anchor = template_base
+    elif kind == "calculator" or not kind:
+        baseline_anchor = "calc.app.kind"
+    else:
+        baseline_anchor = template_base
     proposals: list[dict[str, Any]] = [
         _goal_contract_dict(
             f"goal.{capsule_name}.S{stage}.target.{slug}",
@@ -174,7 +185,9 @@ def propose_goal_extension_contracts(
             ),
         )
 
-    if any(w in text.lower() for w in ("minimal", "prosty", "compact", "mniej")):
+    if kind == "calculator" and any(
+        w in text.lower() for w in ("minimal", "prosty", "compact", "mniej")
+    ):
         proposals.append(
             _goal_contract_dict(
                 f"goal.{capsule_name}.S{stage}.trait.minimal",
@@ -187,7 +200,9 @@ def propose_goal_extension_contracts(
             ),
         )
 
-    if any(w in text.lower() for w in ("expand", "rich", "więcej", "rozbudow")):
+    if kind == "calculator" and any(
+        w in text.lower() for w in ("expand", "rich", "więcej", "rozbudow")
+    ):
         proposals.append(
             _goal_contract_dict(
                 f"goal.{capsule_name}.S{stage}.trait.expanded",
@@ -262,6 +277,8 @@ def propose_goal_extension_contracts(
         w in lower
         for w in (
             "engineer",
+            "engineers",
+            "engineering",
             "inżynier",
             "inzynier",
             "space",
@@ -278,7 +295,7 @@ def propose_goal_extension_contracts(
                 "precision metrics, mission-control aesthetic in labels and layout.",
                 capsule_name=capsule_name,
                 stage=stage,
-                based_on="calc.ui.display",
+                based_on="calc.ui.display" if kind == "calculator" else template_base,
             ),
         )
 

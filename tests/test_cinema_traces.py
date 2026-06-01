@@ -5,6 +5,7 @@ from nexu.cinema_traces import (
     list_llm_traces,
     read_llm_trace,
     redact_secrets,
+    text_metrics,
     write_llm_trace,
 )
 from nexu.config import load_config
@@ -46,6 +47,13 @@ def test_redact_secrets_masks_api_keys() -> None:
     assert "[REDACTED" in redacted
 
 
+def test_text_metrics_counts_utf8_bytes_and_estimated_tokens() -> None:
+    metrics = text_metrics("abcdą")
+    assert metrics["chars"] == 5
+    assert metrics["bytes"] == 6
+    assert metrics["tokens_est"] == 2
+
+
 def test_write_and_read_llm_trace(tmp_path: Path) -> None:
     trace_dir = tmp_path / "llm_traces"
     index_path = trace_dir / "index.json"
@@ -66,8 +74,14 @@ def test_write_and_read_llm_trace(tmp_path: Path) -> None:
     listed = list_llm_traces(trace_dir)
     assert len(listed["traces"]) == 1
     assert listed["traces"][0]["label"].startswith("Option A")
+    assert listed["traces"][0]["prompt_bytes"] >= listed["traces"][0]["prompt_chars"]
+    assert listed["traces"][0]["prompt_tokens_est"] > 0
+    assert listed["traces"][0]["total_bytes"] >= listed["traces"][0]["prompt_bytes"]
     payload = read_llm_trace(trace_dir, trace_id or "")
     assert "## Prompt sent to LLM" in payload["markdown"]
+    assert "- prompt_bytes:" in payload["markdown"]
+    assert payload["bytes"] > 0
+    assert payload["markdown_metrics"]["tokens_est"] > 0
     assert "hello" in payload["markdown"]
     assert "super-secret-key-value" not in payload["markdown"]
 
@@ -83,6 +97,7 @@ cinema:
   max_tokens: 8192
   option_generation_mode: parallel
   llm_trace_keep: 12
+  options_cache: false
 """.strip(),
         encoding="utf-8",
     )
@@ -93,3 +108,4 @@ cinema:
     assert config.cinema.max_tokens == 8192
     assert config.cinema.option_generation_mode == "parallel"
     assert config.cinema.llm_trace_keep == 12
+    assert config.cinema.options_cache is False

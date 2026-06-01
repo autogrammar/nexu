@@ -8,6 +8,8 @@ import re
 from pathlib import Path
 from typing import Any
 
+from .cinema_html import ensure_html_document_closure
+from .cinema_html_validate import prepare_cinema_html_document
 from .config import load_config, load_env_files
 
 _CONFIG_CACHE: tuple[float, object] | None = None
@@ -81,18 +83,6 @@ def looks_like_html_document(text: str) -> bool:
     return "<html" in sample or "<!doctype" in sample
 
 
-def _ensure_html_document_closure(html: str) -> str:
-    out = str(html or "").strip()
-    lower = out.lower()
-    if "<html" not in lower:
-        return out
-    if "</body>" not in lower:
-        out += "\n</body>"
-    if "</html>" not in lower:
-        out += "\n</html>"
-    return out
-
-
 def normalize_html_document(text: str) -> str:
     """Extract and normalize one HTML document from LLM output."""
     cleaned = _strip_rich_console_artifacts(_strip_markdown_fences(text))
@@ -104,7 +94,7 @@ def normalize_html_document(text: str) -> str:
         return "<!DOCTYPE html>\n" + match.group(0).strip()
     match = re.search(r"(?:<!DOCTYPE\s+html\s*>)?\s*<html[\s\S]*", cleaned, flags=re.I)
     if match:
-        partial = _ensure_html_document_closure(match.group(0).strip())
+        partial = ensure_html_document_closure(match.group(0).strip())
         if partial.lstrip().upper().startswith("<!DOCTYPE"):
             return partial
         return "<!DOCTYPE html>\n" + partial
@@ -118,7 +108,7 @@ def extract_html_document(text: str) -> str:
 _BATCH_ALT_FILES = {"A": "alt_a.html", "B": "alt_b.html", "C": "alt_c.html"}
 
 
-def parse_batch_alt_options(text: str) -> dict[str, str]:
+def parse_batch_alt_options(text: str, *, ui_type: str = "web") -> dict[str, str]:
     """Parse NEXU_ALT_A/B/C marked batch LLM output into option filenames."""
     cleaned = _strip_rich_console_artifacts(text or "")
     out: dict[str, str] = {}
@@ -136,13 +126,18 @@ def parse_batch_alt_options(text: str) -> dict[str, str]:
                 flags=re.I,
             )
             if strict:
-                out[filename] = strict.group("html").strip()
+                html = strict.group("html").strip()
+            else:
+                continue
+        else:
+            html = normalize_html_document(segment_match.group("body"))
+        if not looks_like_html_document(html):
             continue
-        html = normalize_html_document(segment_match.group("body"))
-        if looks_like_html_document(html):
-            if not html.lstrip().upper().startswith("<!DOCTYPE"):
-                html = "<!DOCTYPE html>\n" + html.lstrip()
-            out[filename] = html
+        prepared, ok, _errors = prepare_cinema_html_document(html, ui_type=ui_type)
+        if ok and prepared:
+            out[filename] = prepared
+    if set(out.keys()) != set(_BATCH_ALT_FILES.values()):
+        return {}
     return out
 
 
@@ -243,7 +238,7 @@ def call_cinema_text_llm(
     root: Path,
     *,
     model: str | None = None,
-    max_tokens: int = 4096,
+    max_tokens: int = 20480,
     system_prompt: str | None = None,
 ) -> tuple[str | None, str | None]:
     """Return raw LLM text content via LiteLLM/OpenRouter."""
@@ -262,8 +257,10 @@ def call_cinema_text_llm(
 
     resolved_model = model or llm.model
     system = system_prompt or (
-        "You are a UI evolution engine. Return only one complete HTML "
-        "document. No markdown fences, no explanation."
+        "You are a UI evolution engine. Return exactly one complete HTML5 document "
+        "with <!DOCTYPE html>, <html>, <head> (all CSS in <style> tags inside head), "
+        "and <body>. Preserve existing DOM ids and calculator/dashboard structure. "
+        "No markdown fences, no explanation."
     )
 
     try:
@@ -297,7 +294,8 @@ def call_cinema_html_llm(
     root: Path,
     *,
     model: str | None = None,
-    max_tokens: int = 4096,
+    max_tokens: int = 20480,
+    ui_type: str = "web",
 ) -> tuple[str | None, str | None]:
     """
     Generate one complete HTML document via LiteLLM/OpenRouter.
@@ -314,11 +312,15 @@ def call_cinema_html_llm(
         return None, err
     raw = normalize_html_document(content or "")
     if raw and looks_like_html_document(raw):
-        if not raw.lstrip().upper().startswith("<!DOCTYPE"):
-            raw = "<!DOCTYPE html>\n" + raw.lstrip()
         if has_terminal_artifacts(raw):
             return None, "LLM output contained terminal box-drawing artifacts, not clean HTML"
-        return raw, None
+        prepared, ok, validation_errors = prepare_cinema_html_document(raw, ui_type=ui_type)
+        if ok and prepared:
+            return prepared, None
+        detail = "; ".join(validation_errors[:4])
+        preview = _compact_response_preview(content or "")
+        suffix = f"; response_preview={preview}" if preview else ""
+        return None, "LLM HTML failed structure validation: " + detail + suffix
     preview = _compact_response_preview(content or "")
     detail = f"; response_preview={preview}" if preview else ""
     return None, "LLM did not return a complete HTML document" + detail

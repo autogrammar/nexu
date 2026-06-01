@@ -2,7 +2,7 @@
 
 app {
   name: nexu;
-  version: 0.5.17;
+  version: 0.5.20;
 }
 
 dependencies {
@@ -50,7 +50,41 @@ workflow[name="quality-redup"] {
 
 workflow[name="quality"] {
   trigger: manual;
-  step-1: run cmd=ruff check src/nexu/cinema.py src/nexu/cinema_server.py src/nexu/cinema_baseline_contracts.py src/nexu/cinema_markpact.py src/nexu/cinema_publish.py src/nexu/cinema_offline_options.py src/nexu/verify.py src/nexu/intract_adapter.py tests/test_cinema_server.py tests/test_cinema_baseline_contracts.py tests/test_cinema_markpact.py tests/test_cinema_publish.py tests/test_cinema_offline_options.py;
+  step-1: run cmd=ruff check \;
+  step-2: run cmd=src/nexu/cinema.py \;
+  step-3: run cmd=src/nexu/cinema_server.py \;
+  step-4: run cmd=src/nexu/cinema_baseline_contracts.py \;
+  step-5: run cmd=src/nexu/cinema_goal_contracts.py \;
+  step-6: run cmd=src/nexu/cinema_html.py \;
+  step-7: run cmd=src/nexu/cinema_html_validate.py \;
+  step-8: run cmd=src/nexu/cinema_llm_contracts.py \;
+  step-9: run cmd=src/nexu/cinema_markpact.py \;
+  step-10: run cmd=src/nexu/cinema_project_imports.py \;
+  step-11: run cmd=src/nexu/cinema_projects.py \;
+  step-12: run cmd=src/nexu/cinema_scripts.py \;
+  step-13: run cmd=src/nexu/cinema_publish.py \;
+  step-14: run cmd=src/nexu/cinema_offline_options.py \;
+  step-15: run cmd=src/nexu/cinema_options_cache.py \;
+  step-16: run cmd=src/nexu/cinema_ui_patch.py \;
+  step-17: run cmd=src/nexu/fast_delivery/__init__.py \;
+  step-18: run cmd=src/nexu/fast_delivery/context.py \;
+  step-19: run cmd=src/nexu/fast_delivery/options.py \;
+  step-20: run cmd=src/nexu/fast_delivery/router.py \;
+  step-21: run cmd=src/nexu/intract.py \;
+  step-22: run cmd=src/nexu/verify.py \;
+  step-23: run cmd=src/nexu/intract_adapter.py \;
+  step-24: run cmd=tests/test_cinema_server.py \;
+  step-25: run cmd=tests/test_cinema_baseline_contracts.py \;
+  step-26: run cmd=tests/test_cinema_goal_contracts.py \;
+  step-27: run cmd=tests/test_cinema_markpact.py \;
+  step-28: run cmd=tests/test_cinema_project_imports.py \;
+  step-29: run cmd=tests/test_cinema_projects.py \;
+  step-30: run cmd=tests/test_cinema_scripts.py \;
+  step-31: run cmd=tests/test_cinema_publish.py \;
+  step-32: run cmd=tests/test_cinema_offline_options.py \;
+  step-33: run cmd=tests/test_cinema_options_cache.py \;
+  step-34: run cmd=tests/test_cinema_ui_patch.py \;
+  step-35: run cmd=tests/test_fast_delivery.py;
 }
 
 workflow[name="quality-strict"] {

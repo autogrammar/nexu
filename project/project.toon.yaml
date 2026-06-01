@@ -1,52 +1,52 @@
-# nexu | 288 func | 57f | 8565L | python | 2026-05-31
+# nexu | 573 func | 75f | 17111L | python | 2026-06-01
 # generated in 0.00s
 
 HEALTH:
-  CC̄=3.8  critical=20 (limit:10)  dup=0  cycles=0
+  CC̄=4.8  critical=60 (limit:10)  dup=0  cycles=0
 
 ALERTS[20]:
+  !!! cc_exceeded      CustomHTTPRequestHandler.do_POST = 211 (limit:15)
+  !!! high_fan_out     CustomHTTPRequestHandler.do_POST = 148 (limit:10)
+  !!! cc_exceeded      propose_goal_extension_contracts = 37 (limit:15)
+  !!! cc_exceeded      write_goal_options_offline = 37 (limit:15)
+  !!! cc_exceeded      CustomHTTPRequestHandler.do_GET = 34 (limit:15)
+  !!! high_fan_out     write_goal_options_offline = 29 (limit:10)
+  !!! high_fan_out     CustomHTTPRequestHandler.do_GET = 29 (limit:10)
   !!! high_fan_out     run_example = 23 (limit:10)
+  !!! high_fan_out     load_config = 23 (limit:10)
   !!! high_fan_out     start_published_service = 22 (limit:10)
-  !!! high_fan_out     build_review_packet = 21 (limit:10)
-  !!! high_fan_out     activate_example_project = 21 (limit:10)
-  !!! high_fan_out     build_capsule_report = 21 (limit:10)
-  !!! high_fan_out     create_capsule = 21 (limit:10)
-  !!  high_fan_out     main = 19 (limit:10)
-  !!  high_fan_out     verify_capsule = 18 (limit:10)
-  !!  high_fan_out     build_intract_policy_snapshot = 18 (limit:10)
-  !!  high_fan_out     load_config = 17 (limit:10)
 
-MODULES[77] (top by size):
-  M[src/nexu/cinema_policy.py] 655L C:0 F:33 CC↑13 D:3 (python)
-  M[src/nexu/cinema_scripts.py] 622L C:0 F:5 CC↑6 D:4 (python)
-  M[src/nexu/cinema_offline_options.py] 520L C:0 F:19 CC↑16 D:1 (python)
+MODULES[96] (top by size):
+  M[examples/web_app_calculator/cinema/server.py] 2746L C:2 F:68 CC↑211 D:0 (python)
+  M[src/nexu/cinema_project_imports.py] 1034L C:0 F:45 CC↑20 D:1 (python)
+  M[src/nexu/cinema_policy.py] 861L C:0 F:40 CC↑13 D:6 (python)
+  M[src/nexu/cinema_offline_options.py] 799L C:0 F:26 CC↑37 D:1 (python)
+  M[src/nexu/cinema_scripts.py] 696L C:0 F:7 CC↑6 D:6 (python)
+  M[src/nexu/cinema_projects.py] 650L C:1 F:14 CC↑18 D:4 (python)
+  M[src/nexu/cinema_scope.py] 539L C:0 F:18 CC↑11 D:6 (python)
+  M[src/nexu/cinema_http_preprocess.py] 518L C:1 F:24 CC↑18 D:3 (python)
   M[goal.yaml] 512L C:0 F:0 CC↑0 D:0 (yaml)
-  M[src/nexu/cinema_publish.py] 459L C:0 F:21 CC↑17 D:0 (python)
+  M[src/nexu/cinema_publish.py] 459L C:0 F:21 CC↑17 D:1 (python)
   M[src/nexu/mcp_server.py] 393L C:0 F:13 CC↑6 D:1 (python)
   M[src/nexu/cli.py] 379L C:0 F:23 CC↑4 D:0 (python)
-  M[src/nexu/cinema_projects.py] 359L C:1 F:9 CC↑16 D:0 (python)
-  M[src/nexu/verify.py] 317L C:0 F:14 CC↑12 D:7 (python)
-  M[src/nexu/cinema_history.py] 244L C:0 F:13 CC↑8 D:1 (python)
-  M[src/nexu/orchestrate.py] 232L C:0 F:6 CC↑13 D:2 (python)
-  M[src/nexu/cinema.py] 199L C:0 F:9 CC↑11 D:3 (python)
-  M[src/nexu/cinema_baseline_contracts.py] 184L C:0 F:6 CC↑9 D:1 (python)
-  M[src/nexu/llm.py] 165L C:0 F:5 CC↑8 D:2 (python)
-  M[src/nexu/export_prompt.py] 160L C:0 F:3 CC↑12 D:4 (python)
-  LANGS: python:59/yaml:8/shell:3/other:2/json:2/txt:1/yml:1/toml:1
+  M[src/nexu/cinema_llm.py] 326L C:0 F:17 CC↑16 D:1 (python)
+  M[src/nexu/verify.py] 317L C:0 F:14 CC↑12 D:0 (python)
+  M[src/nexu/cinema_goal_contracts.py] 315L C:0 F:6 CC↑37 D:2 (python)
+  LANGS: python:77/yaml:9/other:2/txt:2/json:2/shell:2/yml:1/toml:1
 
 HOTSPOTS[10]:
+  ★ CustomHTTPRequestHandler.do_POST fan=148  // Orchestrates 148 calls
+  ★ write_goal_options_offline fan=29  // Write alt_a/b/c.html without LLM. Returns human labels for options written.
+  ★ CustomHTTPRequestHandler.do_GET fan=29  // Orchestrates 29 calls
   ★ run_example fan=23  // Orchestrates 23 calls
-  ★ start_published_service fan=22  // Orchestrates 22 calls
-  ★ build_review_packet fan=21  // Orchestrates 21 calls
-  ★ activate_example_project fan=21  // Load example UI into the live cinema directory (no browser reload).
-  ★ build_capsule_report fan=21  // Orchestrates 21 calls
+  ★ load_config fan=23  // Orchestrates 23 calls
 
-REFACTOR[11]:
-  [1] H/H Split god module src/nexu/cinema_offline_options.py (520L, 0 classes)
-  [2] H/H Split god module src/nexu/cinema_policy.py (655L, 0 classes)
-  [3] H/H Split god module src/nexu/cinema_scripts.py (622L, 0 classes)
-  [4] H/H Split god module goal.yaml (512L, 0 classes)
-  [5] M/L Split activate_example_project (CC=16)
+REFACTOR[15]:
+  [1] H/L Split propose_goal_extension_contracts (CC=37)
+  [2] H/L Split write_goal_options_offline (CC=37)
+  [3] H/L Split CustomHTTPRequestHandler.do_GET (CC=34)
+  [4] H/L Split CustomHTTPRequestHandler.do_POST (CC=211)
+  [5] H/H Split god module examples/web_app_calculator/cinema/server.py (2746L, 2 classes)
 
 EVOLUTION:
-  2026-05-31 CC̄=3.8 crit=20 8565L // Automated analysis
+  2026-06-01 CC̄=4.8 crit=60 17111L // Automated analysis

@@ -1,6 +1,14 @@
+import json
+import os
+import subprocess
+import sys
+import time
 from dataclasses import dataclass
+from http.client import HTTPConnection
 from pathlib import Path
+from socket import AF_INET, SOCK_STREAM, socket
 
+import nexu
 from nexu.cinema import _cinema_template_text, _render_cinema_template, write_cinema_nexu_hooks
 from nexu.cinema_server import _render_server_script, start_cinema_player_server
 from nexu.config import CinemaConfig, LLMConfig
@@ -27,7 +35,12 @@ def test_render_server_script_embeds_runtime_context() -> None:
     assert script.startswith("#!/usr/bin/python3")
     assert "WORKSPACE_PATH = '/tmp/workspace'" in script
     assert "CAPSULE_NAME = 'demo'" in script
+    assert '"cinema_root": str(DIRECTORY)' in script
+    assert '"workspace_root": str(ROOT_PATH)' in script
+    assert "cinema_player_mtime" in script
     assert "_load_cinema_ui_profile" in script
+    assert "load_cinema_ui_profile" in script
+    assert "build_iterate_response_payload" in script
     assert "_llm_prompt_rules" in script
     assert "Intract LLM communication contract" in script
     assert "build_llm_contract_block" in script
@@ -40,20 +53,43 @@ def test_render_server_script_embeds_runtime_context() -> None:
     assert "has_terminal_artifacts" in script
     assert "_compact_html_for_llm" in script
     assert "_compact_markpact_for_llm" in script
-    assert "omitted from Markpact context" in script
+    assert "from nexu.fast_delivery import compact_html_for_llm" in script
+    assert "from nexu.fast_delivery import compact_markpact_for_llm" in script
+    assert "from nexu.fast_delivery import effective_markpact_mode" in script
+    assert "from nexu.fast_delivery import is_options_ready_status" in script
     assert "DEFAULT_MARKPACT_CONTEXT_MODE" in script
     assert "DEFAULT_MARKPACT_CONTEXT_CHARS" in script
     assert "DEFAULT_HTML_CONTEXT_CHARS" in script
     assert "DEFAULT_LLM_TRACE_KEEP" in script
     assert "OPTION_GENERATION_MODE" in script
+    assert "FAST_SCOPE_OPTIONS" in script
+    assert "LLM_PATCH_OPTIONS" in script
+    assert "_try_intract_fast_options" in script
+    assert "_try_llm_patch_options" in script
     assert "_call_llm_batch_options" in script
     assert "_generate_parallel_options" in script
     assert 'OPTION_GENERATION_MODE in {"batch", "single", "1"}' in script
     assert "parse_batch_alt_options" in script
     assert "from nexu.cinema_traces import write_llm_trace" in script
+    assert "class ThreadingHTTPServer" in script
+    assert "if not batch_html" not in script
     assert "ThreadPoolExecutor" in script
     assert '"llx"' not in script
-    assert "proposed_options_offline" not in script
+    assert "proposed_options_offline" in script
+    assert "proposed_options_cached" in script
+    assert "proposed_options_by_llm_patch" in script
+    assert "supports_llm_patch_scope" in script
+    assert "can_use_offline_fast_iterate" in script
+    assert "cinema_has_offline_baseline" in script
+    assert "FORCE_LLM" in script
+    assert "FAST_SCOPE_OPTIONS" in script
+    assert "OPTIONS_CACHE" in script
+    assert "llm_patch_options" in script
+    assert "_effective_markpact_mode" in script
+    assert "_try_read_options_cache" in script
+    assert "from nexu.fast_delivery import read_cached_options" in script
+    assert "from nexu.fast_delivery import store_options_cache" in script
+    assert "from nexu.cinema_iterate import build_iterate_response_payload" in script
     assert "SYS_EXE = '/usr/bin/python3'" in script
     assert "ALLOW_NETWORK_CALLS = False" in script
     assert "def _llm_network_allowed()" in script
@@ -119,6 +155,13 @@ def test_cinema_player_template_is_externalized() -> None:
     assert 'id="goal-input"' in html
     assert "goalContractPayload" in html
     assert "focus_scope" in html
+    assert "lastIteration" in html
+    assert "buildSessionDiagnostics" in html
+    assert "diagnostics: buildSessionDiagnostics()" in html
+    assert "recordProjectsCatalog" in html
+    assert "sessionDiagnostics.delete_flow" in html
+    assert "focus_scope: data.focus_scope" in html
+    assert "#functions requires an LLM" in html
     assert "offline templates" not in html
     assert 'id="llm-status-badge"' in html
     assert "refreshLlmStatus" in html
@@ -126,6 +169,14 @@ def test_cinema_player_template_is_externalized() -> None:
     assert 'id="llm-shell"' in html
     assert "loadLlmTraces" in html
     assert "renderTraceMarkdown" in html
+    assert 'id="llm-trace-stats"' in html
+    assert "copyLlmRequest" in html
+    assert "downloadLlmRequest" in html
+    assert "tokens est" in html
+    assert "proposed_options_offline" in html
+    assert "proposed_options_by_llm_patch" in html
+    assert "LLM patch" in html
+    assert "scope offline" in html
     assert "user_goal" in html
     assert "active_example_project" in html
     assert "goal_bootstrap" in html
@@ -134,6 +185,490 @@ def test_cinema_player_template_is_externalized() -> None:
     assert "syncGoalFromLedger" in html
     assert "server-offline-banner" in html
     assert "updateServerOfflineBanner" in html
+    assert 'id="projects-shell"' in html
+    assert "importProjectZip" in html
+    assert "importProjectGit" in html
+    assert "importProjectHttp" in html
+    assert "/projects/import/zip" in html
+    assert "/projects/import/git" in html
+    assert "/projects/import/http" in html
+    assert "README.markpact.md" in html
+    assert "publishImportedProject" in html
+    assert "Gotowe do edycji i publikacji" in html
+    assert "ZIP, Git URL albo HTTP website" in html
+    assert "onclick='activateProject(${idJson})'" in html
+    assert 'onclick="activateProject(${idJson})"' not in html
+    assert "onclick='event.stopPropagation(); previewImportedMarkpact(${idJson})'" in html
+    assert "onclick='event.stopPropagation(); publishImportedProject(${idJson})'" in html
+    assert "onclick='event.stopPropagation(); deleteProject(${idJson})'" in html
+    assert "function deleteImportedProject(projectId)" in html
+    assert "/projects/delete" in html
+
+
+def test_render_server_script_embeds_project_import_routes() -> None:
+    script = _render_server_script(
+        Path("/tmp/workspace"),
+        "demo",
+        _LLMConfig(),
+        CinemaConfig(),
+        "/usr/bin/python3",
+    )
+    assert "/projects/import/zip" in script
+    assert "/projects/import/git" in script
+    assert "/projects/import/http" in script
+    assert "def _import_project_zip(" in script
+    assert "def _import_project_git(" in script
+    assert "def _import_project_http(" in script
+    assert "import_project_from_http" in script
+    assert "prefer_local_scope" in script
+    assert "delete_workspace_project" in script
+
+
+def test_write_cinema_nexu_hooks_includes_import_helpers(tmp_path: Path) -> None:
+    write_cinema_nexu_hooks(tmp_path, Path("/tmp/workspace"), "demo")
+    hooks = (tmp_path / "nexu_hooks.py").read_text(encoding="utf-8")
+    assert "merged_projects_catalog" in hooks
+    assert "import_project_from_zip" in hooks
+    assert "import_project_from_git" in hooks
+    assert "import_project_from_http" in hooks
+    assert "activate_imported_project" in hooks
+
+
+def _free_port() -> int:
+    with socket(AF_INET, SOCK_STREAM) as probe:
+        probe.bind(("127.0.0.1", 0))
+        return int(probe.getsockname()[1])
+
+
+def test_iterate_colors_scope_uses_offline_path(tmp_path: Path) -> None:
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    (workspace / "nexu.yaml").write_text(
+        "project:\n  name: demo\ncinema:\n  fast_scope_options: true\n  force_llm: false\n",
+        encoding="utf-8",
+    )
+    cap = workspace / ".nexu" / "capsules" / "demo"
+    (cap / "src").mkdir(parents=True)
+    (cap / "src" / "app.py").write_text("# demo\n", encoding="utf-8")
+    (cap / "policy.json").write_text('{"keep":[],"delete":[]}', encoding="utf-8")
+    (cinema / "active_project.json").write_text(
+        json.dumps({"id": "web_app_calculator", "kind": "calculator", "title": "Calculator"}),
+        encoding="utf-8",
+    )
+    stage_html = (
+        "<!DOCTYPE html><html><head></head><body>"
+        "<div class='calc-body'><div class='screen' id='screen'>0</div>"
+        "<div class='grid'><div class='btn' id='btn-7'>7</div></div></div></body></html>"
+    )
+    (cinema / "stage0.html").write_text(stage_html, encoding="utf-8")
+    (cinema / "intract_policy_ledger.json").write_text("[]", encoding="utf-8")
+    write_cinema_nexu_hooks(cinema, workspace, "demo")
+    llm = LLMConfig(allow_network_calls=False, model=CINEMA_LLM_MODEL)
+    cinema_cfg = CinemaConfig(force_llm=False, fast_scope_options=True, options_cache=True)
+    (cinema / "server.py").write_text(
+        _render_server_script(workspace, "demo", llm, cinema_cfg, sys.executable),
+        encoding="utf-8",
+    )
+
+    port = _free_port()
+    nexu_src = str(Path(nexu.__file__).resolve().parent.parent)
+    proc = subprocess.Popen(
+        [sys.executable, str(cinema / "server.py"), str(port)],
+        cwd=cinema,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        env={**os.environ, "PYTHONPATH": nexu_src},
+    )
+    try:
+        deadline = time.time() + 8.0
+        while time.time() < deadline:
+            try:
+                conn = HTTPConnection("127.0.0.1", port, timeout=0.5)
+                conn.request("GET", "/llm/status")
+                conn.getresponse().read()
+                conn.close()
+                break
+            except OSError:
+                time.sleep(0.05)
+        else:
+            raise AssertionError("cinema server did not start")
+
+        body = json.dumps(
+            {
+                "iteration_mode": "goal_options",
+                "focus_scope": "colors",
+                "focus_scope_label": "#colors",
+                "current_stage": 0,
+                "prompt": "",
+                "annotations": [],
+            }
+        ).encode("utf-8")
+        conn = HTTPConnection("127.0.0.1", port, timeout=10.0)
+        conn.request(
+            "POST",
+            "/iterate",
+            body=body,
+            headers={"Content-Type": "application/json", "Content-Length": str(len(body))},
+        )
+        resp = conn.getresponse()
+        payload = json.loads(resp.read().decode("utf-8"))
+        conn.close()
+
+        assert resp.status == 200
+        assert payload["status"] == "proposed_options_offline"
+        assert payload["focus_scope"] == "colors"
+        assert payload["focus_scope_label"] == "#colors"
+        assert len(payload.get("options_written") or []) == 3
+        alt_a = (cinema / "alt_a.html").read_text(encoding="utf-8")
+        assert "nexu-scope-variant" in alt_a
+        assert "colors:" in " ".join(payload["options_written"]).lower()
+
+        conn = HTTPConnection("127.0.0.1", port, timeout=10.0)
+        conn.request(
+            "POST",
+            "/iterate",
+            body=body,
+            headers={"Content-Type": "application/json", "Content-Length": str(len(body))},
+        )
+        cached_resp = conn.getresponse()
+        cached_payload = json.loads(cached_resp.read().decode("utf-8"))
+        conn.close()
+        assert cached_resp.status == 200
+        assert cached_payload["status"] == "proposed_options_cached"
+        assert cached_payload.get("options_written") == payload.get("options_written")
+    finally:
+        proc.terminate()
+        try:
+            proc.wait(timeout=3)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+
+
+def test_iterate_colors_scope_uses_llm_patch_when_available(tmp_path: Path) -> None:
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    (workspace / "nexu.yaml").write_text(
+        "\n".join(
+            [
+                "project:",
+                "  name: demo",
+                "llm:",
+                "  provider: openrouter",
+                "  model: test-model",
+                "  api_key_env: OPENROUTER_API_KEY",
+                "  allow_network_calls: true",
+                "cinema:",
+                "  fast_scope_options: true",
+                "  llm_patch_options: true",
+                "  options_cache: false",
+                "  force_llm: false",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    cap = workspace / ".nexu" / "capsules" / "demo"
+    (cap / "src").mkdir(parents=True)
+    (cap / "src" / "app.py").write_text("# demo\n", encoding="utf-8")
+    (cap / "policy.json").write_text('{"keep":[],"delete":[]}', encoding="utf-8")
+    (cinema / "active_project.json").write_text(
+        json.dumps({"id": "web_app_calculator", "kind": "calculator", "title": "Calculator"}),
+        encoding="utf-8",
+    )
+    stage_html = (
+        "<!DOCTYPE html><html><head></head><body>"
+        "<div class='calc-body'><div class='screen' id='screen'>0</div>"
+        "<div class='grid'><div class='btn' id='btn-7'>7</div></div></div></body></html>"
+    )
+    (cinema / "stage0.html").write_text(stage_html, encoding="utf-8")
+    (cinema / "intract_policy_ledger.json").write_text("[]", encoding="utf-8")
+    write_cinema_nexu_hooks(cinema, workspace, "demo")
+    llm = LLMConfig(allow_network_calls=True, model="test-model")
+    cinema_cfg = CinemaConfig(
+        force_llm=False,
+        fast_scope_options=True,
+        llm_patch_options=True,
+        options_cache=False,
+    )
+    (cinema / "server.py").write_text(
+        _render_server_script(workspace, "demo", llm, cinema_cfg, sys.executable),
+        encoding="utf-8",
+    )
+    hooks_dir = tmp_path / "hooks"
+    hooks_dir.mkdir()
+    (hooks_dir / "sitecustomize.py").write_text(
+        """
+import nexu.cinema_llm
+
+def fake_call_cinema_text_llm(*args, **kwargs):
+    return (
+        '{"variants":{'
+        '"alt_a.html":{"label":"Option A (colors: blue)","css":".screen{color:#38bdf8;}"}'
+        ',"alt_b.html":{"label":"Option B (colors: white)","css":".screen{color:#fff;}"}'
+        ',"alt_c.html":{"label":"Option C (colors: pink)","css":".screen{color:#f47;}"}'
+        '}}',
+        None,
+    )
+
+nexu.cinema_llm.call_cinema_text_llm = fake_call_cinema_text_llm
+""".lstrip(),
+        encoding="utf-8",
+    )
+
+    port = _free_port()
+    nexu_src = str(Path(nexu.__file__).resolve().parent.parent)
+    proc = subprocess.Popen(
+        [sys.executable, str(cinema / "server.py"), str(port)],
+        cwd=cinema,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        env={
+            **os.environ,
+            "PYTHONPATH": f"{hooks_dir}{os.pathsep}{nexu_src}",
+            "OPENROUTER_API_KEY": "test-key",
+        },
+    )
+    try:
+        deadline = time.time() + 8.0
+        while time.time() < deadline:
+            try:
+                conn = HTTPConnection("127.0.0.1", port, timeout=0.5)
+                conn.request("GET", "/llm/status")
+                conn.getresponse().read()
+                conn.close()
+                break
+            except OSError:
+                time.sleep(0.05)
+        else:
+            raise AssertionError("cinema server did not start")
+
+        body = json.dumps(
+            {
+                "iteration_mode": "goal_options",
+                "focus_scope": "colors",
+                "focus_scope_label": "#colors",
+                "current_stage": 0,
+                "prompt": "",
+                "annotations": [],
+                "force_refresh": True,
+            }
+        ).encode("utf-8")
+        conn = HTTPConnection("127.0.0.1", port, timeout=10.0)
+        conn.request(
+            "POST",
+            "/iterate",
+            body=body,
+            headers={"Content-Type": "application/json", "Content-Length": str(len(body))},
+        )
+        resp = conn.getresponse()
+        payload = json.loads(resp.read().decode("utf-8"))
+        conn.close()
+
+        assert resp.status == 200
+        assert payload["status"] == "proposed_options_by_llm_patch"
+        assert payload["options_written"] == [
+            "Option A (colors: blue)",
+            "Option B (colors: white)",
+            "Option C (colors: pink)",
+        ]
+        assert ".screen{color:#38bdf8;}" in (cinema / "alt_a.html").read_text(
+            encoding="utf-8"
+        )
+    finally:
+        proc.terminate()
+        try:
+            proc.wait(timeout=3)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+
+
+def test_effective_markpact_mode_off_for_visual_scope() -> None:
+    script = _render_server_script(
+        Path("/tmp/workspace"),
+        "demo",
+        _LLMConfig(),
+        CinemaConfig(markpact_context_mode="summary"),
+        "/usr/bin/python3",
+    )
+    assert "def _effective_markpact_mode(" in script
+    assert "effective_markpact_mode(" in script
+    assert "default_mode=default" in script
+    assert "env_off=env_off" in script
+
+
+def test_iterate_functions_scope_skips_offline_fast_path(tmp_path: Path) -> None:
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    (workspace / "nexu.yaml").write_text(
+        "project:\n  name: demo\ncinema:\n  fast_scope_options: true\n  force_llm: false\n",
+        encoding="utf-8",
+    )
+    cap = workspace / ".nexu" / "capsules" / "demo"
+    (cap / "src").mkdir(parents=True)
+    (cap / "src" / "app.py").write_text("# demo\n", encoding="utf-8")
+    (cap / "policy.json").write_text('{"keep":[],"delete":[]}', encoding="utf-8")
+    (cinema / "active_project.json").write_text(
+        json.dumps({"id": "web_app_calculator", "kind": "calculator", "title": "Calculator"}),
+        encoding="utf-8",
+    )
+    stage_html = (
+        "<!DOCTYPE html><html><head></head><body>"
+        "<div class='calc-body'><div class='screen' id='screen'>0</div>"
+        "<div class='grid'><div class='btn' id='btn-7'>7</div></div></div></body></html>"
+    )
+    (cinema / "stage0.html").write_text(stage_html, encoding="utf-8")
+    (cinema / "intract_policy_ledger.json").write_text("[]", encoding="utf-8")
+    write_cinema_nexu_hooks(cinema, workspace, "demo")
+    llm = LLMConfig(allow_network_calls=False, model=CINEMA_LLM_MODEL)
+    cinema_cfg = CinemaConfig(force_llm=False, fast_scope_options=True, options_cache=False)
+    (cinema / "server.py").write_text(
+        _render_server_script(workspace, "demo", llm, cinema_cfg, sys.executable),
+        encoding="utf-8",
+    )
+
+    port = _free_port()
+    nexu_src = str(Path(nexu.__file__).resolve().parent.parent)
+    proc = subprocess.Popen(
+        [sys.executable, str(cinema / "server.py"), str(port)],
+        cwd=cinema,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        env={**os.environ, "PYTHONPATH": nexu_src},
+    )
+    try:
+        deadline = time.time() + 8.0
+        while time.time() < deadline:
+            try:
+                conn = HTTPConnection("127.0.0.1", port, timeout=0.5)
+                conn.request("GET", "/llm/status")
+                conn.getresponse().read()
+                conn.close()
+                break
+            except OSError:
+                time.sleep(0.05)
+        else:
+            raise AssertionError("cinema server did not start")
+
+        body = json.dumps(
+            {
+                "iteration_mode": "goal_options",
+                "focus_scope": "functions",
+                "focus_scope_label": "#functions",
+                "current_stage": 0,
+                "prompt": "",
+                "annotations": [],
+            }
+        ).encode("utf-8")
+        conn = HTTPConnection("127.0.0.1", port, timeout=10.0)
+        conn.request(
+            "POST",
+            "/iterate",
+            body=body,
+            headers={"Content-Type": "application/json", "Content-Length": str(len(body))},
+        )
+        resp = conn.getresponse()
+        payload = json.loads(resp.read().decode("utf-8"))
+        conn.close()
+
+        assert resp.status == 200
+        assert payload["status"].startswith("llm_failed")
+        assert payload["focus_scope"] == "functions"
+        assert "proposed_options_offline" not in payload["status"]
+        assert payload.get("error")
+    finally:
+        proc.terminate()
+        try:
+            proc.wait(timeout=3)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+
+
+def test_iterate_colors_without_stage0_skips_offline(tmp_path: Path) -> None:
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    (workspace / "nexu.yaml").write_text(
+        "project:\n  name: demo\ncinema:\n  fast_scope_options: true\n  force_llm: false\n",
+        encoding="utf-8",
+    )
+    cap = workspace / ".nexu" / "capsules" / "demo"
+    (cap / "src").mkdir(parents=True)
+    (cap / "src" / "app.py").write_text("# demo\n", encoding="utf-8")
+    (cap / "policy.json").write_text('{"keep":[],"delete":[]}', encoding="utf-8")
+    (cinema / "active_project.json").write_text(
+        json.dumps({"id": "web_app_calculator", "kind": "calculator", "title": "Calculator"}),
+        encoding="utf-8",
+    )
+    (cinema / "intract_policy_ledger.json").write_text("[]", encoding="utf-8")
+    write_cinema_nexu_hooks(cinema, workspace, "demo")
+    llm = LLMConfig(allow_network_calls=False, model=CINEMA_LLM_MODEL)
+    cinema_cfg = CinemaConfig(force_llm=False, fast_scope_options=True, options_cache=False)
+    (cinema / "server.py").write_text(
+        _render_server_script(workspace, "demo", llm, cinema_cfg, sys.executable),
+        encoding="utf-8",
+    )
+
+    port = _free_port()
+    nexu_src = str(Path(nexu.__file__).resolve().parent.parent)
+    proc = subprocess.Popen(
+        [sys.executable, str(cinema / "server.py"), str(port)],
+        cwd=cinema,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        env={**os.environ, "PYTHONPATH": nexu_src},
+    )
+    try:
+        deadline = time.time() + 8.0
+        while time.time() < deadline:
+            try:
+                conn = HTTPConnection("127.0.0.1", port, timeout=0.5)
+                conn.request("GET", "/llm/status")
+                conn.getresponse().read()
+                conn.close()
+                break
+            except OSError:
+                time.sleep(0.05)
+        else:
+            raise AssertionError("cinema server did not start")
+
+        body = json.dumps(
+            {
+                "iteration_mode": "goal_options",
+                "focus_scope": "colors",
+                "focus_scope_label": "#colors",
+                "current_stage": 0,
+                "prompt": "",
+                "annotations": [],
+            }
+        ).encode("utf-8")
+        conn = HTTPConnection("127.0.0.1", port, timeout=10.0)
+        conn.request(
+            "POST",
+            "/iterate",
+            body=body,
+            headers={"Content-Type": "application/json", "Content-Length": str(len(body))},
+        )
+        resp = conn.getresponse()
+        payload = json.loads(resp.read().decode("utf-8"))
+        conn.close()
+
+        assert resp.status == 200
+        assert payload["status"].startswith("llm_failed")
+        assert payload["focus_scope"] == "colors"
+        assert payload["status"] != "proposed_options_offline"
+    finally:
+        proc.terminate()
+        try:
+            proc.wait(timeout=3)
+        except subprocess.TimeoutExpired:
+            proc.kill()
 
 
 def test_start_cinema_player_server_returns_url_without_opening(
@@ -145,3 +680,183 @@ def test_start_cinema_player_server_returns_url_without_opening(
     url = start_cinema_player_server(tmp_path, Path("/tmp/workspace"), "demo", open_browser=False)
 
     assert url == "http://127.0.0.1:8099/cinema_player.html"
+
+
+def test_projects_import_zip_endpoint(tmp_path: Path) -> None:
+    import base64
+    import zipfile
+
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    (workspace / "nexu.yaml").write_text("project:\n  name: demo\n", encoding="utf-8")
+    write_cinema_nexu_hooks(cinema, workspace, "demo")
+    llm = LLMConfig(allow_network_calls=False, model=CINEMA_LLM_MODEL)
+    (cinema / "server.py").write_text(
+        _render_server_script(workspace, "demo", llm, CinemaConfig(), sys.executable),
+        encoding="utf-8",
+    )
+
+    archive = tmp_path / "pkg.zip"
+    with zipfile.ZipFile(archive, "w") as zf:
+        zf.writestr("app/index.html", "<html><body>ok</body></html>")
+
+    port = _free_port()
+    nexu_src = str(Path(nexu.__file__).resolve().parent.parent)
+    proc = subprocess.Popen(
+        [sys.executable, str(cinema / "server.py"), str(port)],
+        cwd=cinema,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        env={**os.environ, "PYTHONPATH": nexu_src},
+    )
+    try:
+        deadline = time.time() + 8.0
+        while time.time() < deadline:
+            try:
+                conn = HTTPConnection("127.0.0.1", port, timeout=0.5)
+                conn.request("GET", "/health")
+                conn.getresponse().read()
+                conn.close()
+                break
+            except OSError:
+                time.sleep(0.05)
+        else:
+            raise AssertionError("cinema server did not start")
+
+        body = json.dumps(
+            {
+                "filename": "pkg.zip",
+                "content_base64": base64.b64encode(archive.read_bytes()).decode("ascii"),
+            }
+        ).encode("utf-8")
+        conn = HTTPConnection("127.0.0.1", port, timeout=10.0)
+        conn.request(
+            "POST",
+            "/projects/import/zip",
+            body=body,
+            headers={"Content-Type": "application/json", "Content-Length": str(len(body))},
+        )
+        resp = conn.getresponse()
+        payload = json.loads(resp.read().decode("utf-8"))
+        conn.close()
+
+        assert resp.status == 200
+        assert payload["status"] == "project_imported"
+        assert payload["project"]["kind"] == "imported"
+
+        conn = HTTPConnection("127.0.0.1", port, timeout=10.0)
+        conn.request("GET", "/projects/catalog")
+        resp = conn.getresponse()
+        catalog = json.loads(resp.read().decode("utf-8"))
+        conn.close()
+        imported = [p for p in catalog.get("projects", []) if p.get("imported")]
+        assert imported
+        entry = imported[0]
+        assert entry.get("source_url")
+        assert entry.get("file_count", 0) >= 1
+        assert entry.get("total_bytes", 0) > 0
+        project_id = entry["id"]
+
+        conn = HTTPConnection("127.0.0.1", port, timeout=10.0)
+        conn.request("GET", f"/projects/imported/{project_id}/markpact")
+        resp = conn.getresponse()
+        markpact = json.loads(resp.read().decode("utf-8"))
+        conn.close()
+        assert resp.status == 200
+        assert "Markpact migration" in markpact.get("markdown", "")
+
+        conn = HTTPConnection("127.0.0.1", port, timeout=10.0)
+        conn.request("DELETE", f"/projects/imported/{project_id}")
+        resp = conn.getresponse()
+        deleted = json.loads(resp.read().decode("utf-8"))
+        conn.close()
+        assert resp.status == 200
+        assert deleted.get("status") == "deleted"
+        assert not (cinema / "imported_projects" / project_id).exists()
+    finally:
+        proc.terminate()
+        try:
+            proc.wait(timeout=3)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+
+
+def test_delete_imported_http_domain_id_via_api(tmp_path: Path) -> None:
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    (workspace / "nexu.yaml").write_text("project:\n  name: demo\n", encoding="utf-8")
+    write_cinema_nexu_hooks(cinema, workspace, "demo")
+    llm = LLMConfig(allow_network_calls=False, model=CINEMA_LLM_MODEL)
+    (cinema / "server.py").write_text(
+        _render_server_script(workspace, "demo", llm, CinemaConfig(), sys.executable),
+        encoding="utf-8",
+    )
+
+    project_id = "http-malortgdynia.pl"
+    project_dir = cinema / "imported_projects" / project_id
+    project_dir.mkdir(parents=True)
+    (project_dir / "project.json").write_text(
+        json.dumps(
+            {
+                "id": project_id,
+                "title": "Malortgdynia.Pl",
+                "import_kind": "http",
+                "source": "https://malortgdynia.pl/",
+            }
+        ),
+        encoding="utf-8",
+    )
+    (project_dir / "source").mkdir()
+    (project_dir / "README.markpact.md").write_text("# Markpact migration\n", encoding="utf-8")
+
+    port = _free_port()
+    nexu_src = str(Path(nexu.__file__).resolve().parent.parent)
+    proc = subprocess.Popen(
+        [sys.executable, str(cinema / "server.py"), str(port)],
+        cwd=cinema,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        env={**os.environ, "PYTHONPATH": nexu_src},
+    )
+    try:
+        deadline = time.time() + 8.0
+        while time.time() < deadline:
+            try:
+                conn = HTTPConnection("127.0.0.1", port, timeout=0.5)
+                conn.request("GET", "/health")
+                conn.getresponse().read()
+                conn.close()
+                break
+            except OSError:
+                time.sleep(0.05)
+        else:
+            raise AssertionError("cinema server did not start")
+
+        conn = HTTPConnection("127.0.0.1", port, timeout=10.0)
+        conn.request("GET", "/projects/catalog")
+        resp = conn.getresponse()
+        catalog = json.loads(resp.read().decode("utf-8"))
+        conn.close()
+        entry = next(p for p in catalog["projects"] if p["id"] == project_id)
+        assert entry["deletable"] is True
+        assert entry["imported"] is True
+
+        conn = HTTPConnection("127.0.0.1", port, timeout=10.0)
+        conn.request("DELETE", f"/projects/imported/{project_id}/")
+        resp = conn.getresponse()
+        deleted = json.loads(resp.read().decode("utf-8"))
+        conn.close()
+        assert resp.status == 200
+        assert deleted.get("status") == "deleted"
+        assert deleted.get("id") == project_id
+        assert not project_dir.exists()
+    finally:
+        proc.terminate()
+        try:
+            proc.wait(timeout=3)
+        except subprocess.TimeoutExpired:
+            proc.kill()

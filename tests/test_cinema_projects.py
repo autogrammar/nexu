@@ -5,6 +5,7 @@ from nexu.cinema_policy import _normalize_html_body
 from nexu.cinema_projects import (
     EXAMPLE_PROJECTS,
     activate_example_project,
+    delete_example_project,
     list_project_catalog,
 )
 
@@ -13,6 +14,20 @@ def test_list_project_catalog_has_nine_examples():
     catalog = list_project_catalog()
     assert len(catalog["projects"]) == 9
     assert "web" in catalog["filters"]["domains"]
+
+
+def test_workspace_catalog_can_hide_demo_project(tmp_path: Path):
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+
+    result = delete_example_project(cinema, "web_app_dashboard", workspace_root=tmp_path)
+    catalog = list_project_catalog(cinema)
+
+    assert result["status"] == "deleted"
+    assert result["delete_mode"] == "workspace_tombstone"
+    assert "web_app_dashboard" not in {p["id"] for p in catalog["projects"]}
+    assert (cinema / "projects.deleted.json").exists()
+    assert all(p.get("deletable") is True for p in catalog["projects"])
 
 
 def test_activate_example_project_seeds_when_no_source(tmp_path: Path):

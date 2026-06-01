@@ -170,6 +170,76 @@ def ensure_option_previews_from_stages(cinema_dir: Path) -> dict[str, Any]:
     return {"status": "options_built_from_stages", "files": written}
 
 
+def ensure_http_option_previews_from_stage0(cinema_dir: Path) -> dict[str, Any]:
+    """Clone fetched website stage0 into Options A–C (palette iterations stay on-site)."""
+    stage0 = cinema_dir / "stage0.html"
+    if not stage0.is_file():
+        return {"status": "skipped", "files": []}
+    html = stage0.read_text(encoding="utf-8")
+    written: list[str] = []
+    for alt_name, title in (
+        ("alt_a.html", "Option A (site baseline)"),
+        ("alt_b.html", "Option B (site balanced)"),
+        ("alt_c.html", "Option C (site expanded)"),
+    ):
+        (cinema_dir / alt_name).write_text(_replace_html_title(html, title), encoding="utf-8")
+        written.append(alt_name)
+    return {"status": "options_cloned_from_stage0", "files": written}
+
+
+def refresh_imported_policy_snapshot(
+    cinema_dir: Path,
+    meta: dict[str, Any],
+    active: dict[str, Any],
+) -> None:
+    """Rebuild intract_policy.json for imported projects without calculator baselines."""
+    cinema_dir = Path(cinema_dir)
+    project_id = str(meta.get("id") or "")
+    import_kind = str(meta.get("import_kind") or "")
+    markpact_path = str(meta.get("markpact_path") or "")
+    template_id = f"cinema.{project_id}.S0.ui.template"
+    snapshot = {
+        "version": "intract.policy.v1",
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "project": {
+            "root": str(cinema_dir),
+            "name": project_id,
+            "has_intract_yaml": bool(markpact_path),
+            "intract_path": markpact_path or None,
+        },
+        "capsule": {
+            "name": project_id,
+            "exists": True,
+            "path": str(cinema_dir / "imported_projects" / project_id),
+            "is_calculator": False,
+            "is_imported": True,
+            "import_kind": import_kind,
+        },
+        "baseline_contracts": {
+            "project": [],
+            "capsule": [
+                {
+                    "id": template_id,
+                    "scope": "capsule",
+                    "intent": "layout:imported_web",
+                    "priority": 2,
+                    "domain": "ui",
+                    "meaning": (
+                        "Imported web UI snapshot; evolve palette, typography, and layout "
+                        "without replacing the page information architecture."
+                    ),
+                    "source": "nexu.cinema.imported",
+                }
+            ],
+        },
+        "active_example_project": active,
+    }
+    (cinema_dir / "intract_policy.json").write_text(
+        json.dumps(snapshot, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+
+
 def _replace_html_title(html: str, title: str) -> str:
     import re
 

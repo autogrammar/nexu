@@ -1,167 +1,134 @@
-# code2llm | 77f 8565L | python:59,yaml:8,shell:3,json:2,yml:1,txt:1,toml:1 | 2026-05-31
-# generated in 0.01s
-# CC̅=3.8 | critical:4/288 | dups:0 | cycles:0
+# code2llm | 96f 17111L | python:77,yaml:9,txt:2,shell:2,json:2,toml:1,yml:1 | 2026-06-01
+# generated in 0.03s
+# CC̅=4.8 | critical:16/573 | dups:0 | cycles:0
 
-HEALTH[4]:
-  🟡 CC    activate_example_project CC=16 (limit:15)
+HEALTH[16]:
+  🟡 CC    _extract_content CC=16 (limit:15)
+  🟡 CC    propose_goal_extension_contracts CC=37 (limit:15)
   🟡 CC    build_markpact_readme CC=18 (limit:15)
   🟡 CC    start_published_service CC=17 (limit:15)
-  🟡 CC    write_goal_options_offline CC=16 (limit:15)
+  🟡 CC    write_goal_options_offline CC=37 (limit:15)
+  🟡 CC    build_llm_communication_contract_lines CC=15 (limit:15)
+  🟡 CC    validate_cinema_html_document CC=16 (limit:15)
+  🟡 CC    _effective_ui_constraints_from_ledger CC=17 (limit:15)
+  🟡 CC    _merge_ui_constraints CC=17 (limit:15)
+  🟡 CC    do_GET CC=34 (limit:15)
+  🟡 CC    do_POST CC=211 (limit:15)
+  🟡 CC    load_http_preprocess_artifacts CC=18 (limit:15)
+  🟡 CC    _ensure_project_meta_fields CC=20 (limit:15)
+  🟡 CC    delete_imported_project CC=16 (limit:15)
+  🟡 CC    list_project_catalog CC=17 (limit:15)
+  🟡 CC    activate_example_project CC=18 (limit:15)
 
 REFACTOR[1]:
-  1. split 4 high-CC methods  (CC>15)
+  1. split 16 high-CC methods  (CC>15)
 
-PIPELINES[63]:
-  [1] Src [main]: main
+PIPELINES[98]:
+  [1] Src [main]: main → print
       PURITY: 100% pure
-  [2] Src [main]: main → init_project → ensure_project_dirs → nexu_dir
+  [2] Src [main]: main → print
       PURITY: 100% pure
-  [3] Src [simulate_realtime_sync]: simulate_realtime_sync
+  [3] Src [simulate_realtime_sync]: simulate_realtime_sync → print
       PURITY: 100% pure
   [4] Src [main]: main → run_example → init_project → ensure_project_dirs → ...(1 more)
       PURITY: 100% pure
-  [5] Src [main]: main → print_code
+  [5] Src [main]: main → print_code → print
       PURITY: 100% pure
-  [6] Src [main]: main
+  [6] Src [main]: main → print
       PURITY: 100% pure
   [7] Src [main]: main → init_project → ensure_project_dirs → nexu_dir
       PURITY: 100% pure
-  [8] Src [list_users]: list_users
+  [8] Src [apply_manifest_from_ledger]: apply_manifest_from_ledger → apply_ledger_from_cinema → project_root
       PURITY: 100% pure
-  [9] Src [preview_menu_icons]: preview_menu_icons
+  [9] Src [apply_spatial_patch]: apply_spatial_patch → apply_spatial_deletes_to_html → _delete_match_keys
       PURITY: 100% pure
-  [10] Src [main]: main → init_project → ensure_project_dirs → nexu_dir
+  [10] Src [propose_llm]: propose_llm → propose_llm_for_stage → cinema_dir_for → capsule_dir → ...(2 more)
       PURITY: 100% pure
-  [11] Src [render_dashboard]: render_dashboard
+  [11] Src [append_policy_entry]: append_policy_entry → append_iteration_ledger_entry → normalize_proposals_for_ledger → _proposal_kind_and_element
       PURITY: 100% pure
-  [12] Src [render_dashboard]: render_dashboard
+  [12] Src [append_goal_policy_entry]: append_goal_policy_entry → append_goal_ledger_entry → normalize_proposals_for_ledger → _proposal_kind_and_element
       PURITY: 100% pure
-  [13] Src [main]: main
+  [13] Src [goal_contract_lines]: goal_contract_lines → load_goal_contract_lines → _resolve_ledger_path → policy_ledger_path → ...(4 more)
       PURITY: 100% pure
-  [14] Src [init]: init → project_root
+  [14] Src [validate_artifact]: validate_artifact → validate_intract_artifact → ensure_intract_on_path → project_root
       PURITY: 100% pure
-  [15] Src [freeze]: freeze → project_root
+  [15] Src [save_history]: save_history → save_history_checkpoint → _load_index → history_index_path → ...(1 more)
       PURITY: 100% pure
-  [16] Src [capsule_create]: capsule_create → project_root
+  [16] Src [list_history]: list_history → list_history_checkpoints → _load_index → history_index_path → ...(1 more)
       PURITY: 100% pure
-  [17] Src [capsule_list]: capsule_list → project_root
+  [17] Src [restore_history]: restore_history → restore_history_checkpoint → project_root
       PURITY: 100% pure
-  [18] Src [capsule_status_command]: capsule_status_command → project_root
+  [18] Src [effective_ui_constraints]: effective_ui_constraints → load_effective_ui_constraints → policy_ledger_path → cinema_dir_for → ...(3 more)
       PURITY: 100% pure
-  [19] Src [capsule_iterate]: capsule_iterate → project_root
+  [19] Src [sync_option_previews]: sync_option_previews → sync_option_previews_from_workspace → apply_spatial_deletes_to_html → _delete_match_keys
       PURITY: 100% pure
-  [20] Src [capsule_blueprint]: capsule_blueprint → project_root
+  [20] Src [patch_option_previews]: patch_option_previews → load_effective_ui_constraints → policy_ledger_path → cinema_dir_for → ...(3 more)
       PURITY: 100% pure
-  [21] Src [capsule_export_prompt]: capsule_export_prompt → project_root
+  [21] Src [projects_catalog]: projects_catalog → merged_projects_catalog → list_project_catalog → deleted_project_ids
       PURITY: 100% pure
-  [22] Src [capsule_diff]: capsule_diff → project_root
+  [22] Src [activate_project]: activate_project → activate_example_project → reset_cinema_policy_ledger
       PURITY: 100% pure
-  [23] Src [capsule_drift]: capsule_drift → project_root
+  [23] Src [import_project_from_zip]: import_project_from_zip → import_zip_project → _project_dir → _imports_root
       PURITY: 100% pure
-  [24] Src [capsule_verify]: capsule_verify → project_root
+  [24] Src [import_project_from_git]: import_project_from_git → import_git_project → _validate_git_url
       PURITY: 100% pure
-  [25] Src [capsule_plan]: capsule_plan → project_root
+  [25] Src [import_project_from_http]: import_project_from_http → import_http_project → _project_dir → _imports_root
       PURITY: 100% pure
-  [26] Src [capsule_runtime]: capsule_runtime → project_root
+  [26] Src [delete_imported]: delete_imported → find_nexu_repo_root
       PURITY: 100% pure
-  [27] Src [capsule_report]: capsule_report → project_root
+  [27] Src [imported_markpact]: imported_markpact → read_imported_markpact → normalize_imported_project_id
       PURITY: 100% pure
-  [28] Src [capsule_journal]: capsule_journal → project_root
+  [28] Src [imported_llm_log]: imported_llm_log → imported_project_llm_log → normalize_imported_project_id
       PURITY: 100% pure
-  [29] Src [capsule_orchestrate]: capsule_orchestrate → project_root
+  [29] Src [active_project]: active_project → load_active_project
       PURITY: 100% pure
-  [30] Src [capsule_review]: capsule_review → project_root
+  [30] Src [export_markpact_readme]: export_markpact_readme → load_effective_ui_constraints → policy_ledger_path → cinema_dir_for → ...(3 more)
       PURITY: 100% pure
-  [31] Src [capsule_bundle]: capsule_bundle → project_root
+  [31] Src [services_catalog]: services_catalog → list_published_services → _load_registry → _registry_path → ...(1 more)
       PURITY: 100% pure
-  [32] Src [capsule_promote]: capsule_promote → project_root
+  [32] Src [publish_service]: publish_service → publish_project_service → _slug_service_id
       PURITY: 100% pure
-  [33] Src [mcp_tools]: mcp_tools
+  [33] Src [start_service]: start_service → start_published_service → _load_registry → _registry_path → ...(1 more)
       PURITY: 100% pure
-  [34] Src [mcp_serve]: mcp_serve → project_root
+  [34] Src [stop_service]: stop_service → stop_published_service → _load_registry → _registry_path → ...(1 more)
       PURITY: 100% pure
-  [35] Src [to_public_dict]: to_public_dict
+  [35] Src [list_users]: list_users
       PURITY: 100% pure
-  [36] Src [list_project_catalog]: list_project_catalog
+  [36] Src [preview_menu_icons]: preview_menu_icons
       PURITY: 100% pure
-  [37] Src [activate_example_project]: activate_example_project → _resolve_source_cinema
+  [37] Src [main]: main → print
       PURITY: 100% pure
-  [38] Src [load_active_project]: load_active_project
+  [38] Src [render_dashboard]: render_dashboard
       PURITY: 100% pure
-  [39] Src [list_history_checkpoints]: list_history_checkpoints → _load_index → history_index_path → history_dir
+  [39] Src [render_dashboard]: render_dashboard
       PURITY: 100% pure
-  [40] Src [restore_history_checkpoint]: restore_history_checkpoint → project_root
+  [40] Src [main]: main → print
       PURITY: 100% pure
-  [41] Src [ledger_archive_for_display]: ledger_archive_for_display → _ledger_snapshot
+  [41] Src [init]: init → project_root
       PURITY: 100% pure
-  [42] Src [sha256_text]: sha256_text
+  [42] Src [freeze]: freeze → project_root
       PURITY: 100% pure
-  [43] Src [to_dict]: to_dict
+  [43] Src [capsule_create]: capsule_create → project_root
       PURITY: 100% pure
-  [44] Src [from_dict]: from_dict → utc_now
+  [44] Src [capsule_list]: capsule_list → project_root
       PURITY: 100% pure
-  [45] Src [to_dict]: to_dict
+  [45] Src [capsule_status_command]: capsule_status_command → project_root
       PURITY: 100% pure
-  [46] Src [from_dict]: from_dict → utc_now
+  [46] Src [capsule_iterate]: capsule_iterate → project_root
       PURITY: 100% pure
-  [47] Src [to_dict]: to_dict
+  [47] Src [capsule_blueprint]: capsule_blueprint → project_root
       PURITY: 100% pure
-  [48] Src [to_dict]: to_dict
+  [48] Src [capsule_export_prompt]: capsule_export_prompt → project_root
       PURITY: 100% pure
-  [49] Src [to_dict]: to_dict
+  [49] Src [capsule_diff]: capsule_diff → project_root
       PURITY: 100% pure
-  [50] Src [_apply_promotion_from_mcp]: _apply_promotion_from_mcp → build_promotion_plan → load_capsule → read_yaml
+  [50] Src [capsule_drift]: capsule_drift → project_root
       PURITY: 100% pure
 
 LAYERS:
-  src/                            CC̄=3.9    ←in:0  →out:0
-  │ !! cinema_policy              655L  0C   33m  CC=13     ←3
-  │ !! cinema_scripts             622L  0C    5m  CC=6      ←4
-  │ !! cinema_offline_options     520L  0C   19m  CC=16     ←1
-  │ !! cinema_publish             459L  0C   21m  CC=17     ←0
-  │ mcp_server                 393L  0C   13m  CC=6      ←1
-  │ cli                        379L  0C   23m  CC=4      ←0
-  │ !! cinema_projects            359L  1C    9m  CC=16     ←0
-  │ verify                     317L  0C   14m  CC=12     ←7
-  │ cinema_history             244L  0C   13m  CC=8      ←1
-  │ orchestrate                232L  0C    6m  CC=13     ←2
-  │ cinema                     199L  0C    9m  CC=11     ←3
-  │ cinema_baseline_contracts   184L  0C    6m  CC=9      ←1
-  │ llm                        165L  0C    5m  CC=8      ←2
-  │ export_prompt              160L  0C    3m  CC=12     ←4
-  │ review                     157L  0C    2m  CC=5      ←2
-  │ intract_adapter            133L  0C    6m  CC=9      ←1
-  │ runtime                    131L  0C    4m  CC=9      ←4
-  │ capsule                    124L  0C    5m  CC=8      ←18
-  │ config                     121L  3C    5m  CC=10     ←4
-  │ !! cinema_markpact            120L  0C    3m  CC=18     ←1
-  │ cinema_server              119L  0C    8m  CC=4      ←1
-  │ report                      94L  0C    3m  CC=2      ←2
-  │ promote                     92L  0C    3m  CC=6      ←3
-  │ init_project                86L  0C    1m  CC=3      ←6
-  │ plan                        81L  0C    2m  CC=9      ←4
-  │ blueprint                   73L  0C    1m  CC=7      ←7
-  │ bundle                      55L  0C    2m  CC=5      ←2
-  │ files                       51L  0C    4m  CC=8      ←7
-  │ iterate                     44L  0C    1m  CC=7      ←5
-  │ journal                     43L  0C    3m  CC=5      ←8
-  │ paths                       35L  0C    6m  CC=2      ←23
-  │ __init__                     5L  0C    0m  CC=0.0    ←0
-  │ intract                      0L  1C    6m  CC=12     ←7
-  │ freeze                       0L  0C    1m  CC=2      ←6
-  │ status                       0L  0C    1m  CC=3      ←3
-  │ drift                        0L  0C    1m  CC=7      ←5
-  │ git                          0L  0C    1m  CC=4      ←2
-  │ hashing                      0L  0C    2m  CC=2      ←4
-  │ models                       0L  9C   10m  CC=3      ←20
-  │ diff                         0L  0C    1m  CC=12     ←9
-  │ __main__                     0L  0C    0m  CC=0.0    ←0
-  │
-  scripts/                        CC̄=3.5    ←in:0  →out:0
-  │ check-doc-links            114L  0C    8m  CC=12     ←0
-  │ ci-cinema-smoke.sh          48L  0C    0m  CC=0.0    ←0
-  │
-  examples/                       CC̄=2.8    ←in:0  →out:26  !! split
+  examples/                       CC̄=5.3    ←in:0  →out:60  !! split
+  │ !! server                    2746L  2C   68m  CC=211    ←0
+  │ nexu_hooks                 280L  0C   28m  CC=11     ←7
   │ run                        118L  0C    1m  CC=2      ←0
   │ run                        110L  0C    1m  CC=2      ←0
   │ run                         97L  0C    1m  CC=8      ←0
@@ -172,6 +139,7 @@ LAYERS:
   │ docker-compose.yml          70L  0C    0m  CC=0.0    ←0
   │ realtime_lane_nexu_sync     62L  0C    1m  CC=2      ←0
   │ scientific_calculator_demo    61L  0C    1m  CC=2      ←0
+  │ nexu.yaml                   54L  0C    0m  CC=0.0    ←0
   │ nexu.yaml                   42L  0C    0m  CC=0.0    ←0
   │ calculator                  38L  0C    1m  CC=1      ←0
   │ calculator                  38L  0C    1m  CC=1      ←0
@@ -190,13 +158,76 @@ LAYERS:
   │ inputs.json                  4L  0C    0m  CC=0.0    ←0
   │ requirements.txt             1L  0C    0m  CC=0.0    ←0
   │
+  src/                            CC̄=4.8    ←in:0  →out:0
+  │ !! cinema_project_imports    1034L  0C   45m  CC=20     ←1
+  │ !! cinema_policy              861L  0C   40m  CC=13     ←6
+  │ !! cinema_offline_options     799L  0C   26m  CC=37     ←1
+  │ !! cinema_scripts             696L  0C    7m  CC=6      ←6
+  │ !! cinema_projects            650L  1C   14m  CC=18     ←4
+  │ !! cinema_scope               539L  0C   18m  CC=11     ←6
+  │ !! cinema_http_preprocess     518L  1C   24m  CC=18     ←3
+  │ !! cinema_publish             459L  0C   21m  CC=17     ←1
+  │ mcp_server                 393L  0C   13m  CC=6      ←1
+  │ cli                        379L  0C   23m  CC=4      ←0
+  │ !! cinema_llm                 326L  0C   17m  CC=16     ←1
+  │ verify                     317L  0C   14m  CC=12     ←0
+  │ !! cinema_goal_contracts      315L  0C    6m  CC=37     ←2
+  │ cinema_history             244L  0C   13m  CC=8      ←2
+  │ orchestrate                232L  0C    6m  CC=13     ←2
+  │ !! cinema_html_validate       220L  0C   11m  CC=16     ←4
+  │ !! cinema_markpact            207L  0C    5m  CC=18     ←2
+  │ cinema                     194L  0C    9m  CC=11     ←5
+  │ config                     191L  4C    6m  CC=14     ←5
+  │ cinema_ui_patch            190L  0C    9m  CC=9      ←1
+  │ !! cinema_llm_contracts       182L  0C    6m  CC=15     ←1
+  │ cinema_baseline_contracts   173L  0C    5m  CC=9      ←2
+  │ cinema_traces              166L  0C    7m  CC=9      ←2
+  │ llm                        165L  0C    5m  CC=8      ←2
+  │ export_prompt              160L  0C    3m  CC=12     ←4
+  │ review                     157L  0C    2m  CC=5      ←2
+  │ cinema_server              144L  0C    8m  CC=4      ←2
+  │ intract                    140L  1C    7m  CC=12     ←9
+  │ intract_adapter            133L  0C    6m  CC=9      ←1
+  │ runtime                    131L  0C    4m  CC=9      ←4
+  │ cinema_options_cache       128L  0C    8m  CC=9      ←1
+  │ options                    128L  0C    5m  CC=11     ←1
+  │ capsule                    124L  0C    5m  CC=8      ←18
+  │ report                      94L  0C    3m  CC=2      ←2
+  │ promote                     92L  0C    3m  CC=6      ←3
+  │ init_project                86L  0C    1m  CC=3      ←6
+  │ plan                        81L  0C    2m  CC=9      ←4
+  │ blueprint                   73L  0C    1m  CC=7      ←7
+  │ router                      68L  1C    3m  CC=9      ←1
+  │ cinema_iterate              66L  0C    1m  CC=11     ←1
+  │ context                     66L  0C    3m  CC=9      ←1
+  │ bundle                      55L  0C    2m  CC=5      ←2
+  │ files                       51L  0C    4m  CC=8      ←7
+  │ iterate                     44L  0C    1m  CC=7      ←5
+  │ journal                     43L  0C    3m  CC=5      ←8
+  │ paths                       35L  0C    6m  CC=2      ←23
+  │ __init__                    24L  0C    0m  CC=0.0    ←0
+  │ cinema_html                 16L  0C    1m  CC=5      ←2
+  │ __init__                     5L  0C    0m  CC=0.0    ←0
+  │ freeze                       0L  0C    1m  CC=2      ←6
+  │ status                       0L  0C    1m  CC=3      ←3
+  │ drift                        0L  0C    1m  CC=7      ←5
+  │ git                          0L  0C    1m  CC=4      ←2
+  │ hashing                      0L  0C    2m  CC=2      ←4
+  │ models                       0L  9C   10m  CC=3      ←20
+  │ diff                         0L  0C    1m  CC=12     ←9
+  │ __main__                     0L  0C    0m  CC=0.0    ←0
+  │
+  scripts/                        CC̄=3.1    ←in:91  →out:0
+  │ check-doc-links            114L  0C    8m  CC=12     ←0
+  │ ci-cinema-smoke.sh          85L  0C    1m  CC=0.0    ←12
+  │
   ./                              CC̄=0.0    ←in:0  →out:0
   │ !! goal.yaml                  512L  0C    0m  CC=0.0    ←0
+  │ tree.txt                   254L  0C    0m  CC=0.0    ←0
+  │ Makefile                    96L  0C    0m  CC=0.0    ←0
   │ pyproject.toml              85L  0C    0m  CC=0.0    ←0
-  │ Makefile                    62L  0C    0m  CC=0.0    ←0
   │ project.sh                  50L  0C    0m  CC=0.0    ←0
   │ pyqual.yaml                 25L  0C    0m  CC=0.0    ←0
-  │ tree.sh                      1L  0C    0m  CC=0.0    ←0
   │
   testql-scenarios/               CC̄=0.0    ←in:0  →out:0
   │ generated-cli-tests.testql.toon.yaml    20L  0C    0m  CC=0.0    ←0
@@ -208,23 +239,30 @@ LAYERS:
      src/vico/freeze.py                        0L
      src/vico/git.py                           0L
      src/vico/hashing.py                       0L
-     src/vico/intract.py                       0L
      src/vico/models.py                        0L
      src/vico/status.py                        0L
 
 COUPLING:
-                                                  src.nexu                     src.vico                     examples   examples.web_app_dashboard  examples.web_app_calculator
-                     src.nexu                           ──                           62                          ←21                           ←9                           ←5  hub
-                     src.vico                           12                           ──                           ←5                           ←1                           ←1  hub
-                     examples                           21                            5                           ──                                                            !! fan-out
-   examples.web_app_dashboard                            9                            1                                                        ──                               !! fan-out
-  examples.web_app_calculator                            5                            1                                                                                     ──
+                                                                src.nexu         examples.web_app_calculator                             scripts                            src.vico                            examples  examples.web_app_pactown_ecosystem          examples.web_app_dashboard      examples.web_app_event_monitor
+                            src.nexu                                  ──                                   6                                   2                                  53                                 ←20                                                                      ←9                                      hub
+         examples.web_app_calculator                                  85                                  ──                                   4                                   1                                  ←1                                                                                                              hub
+                             scripts                                  ←2                                  ←4                                  ──                                                                     ←34                                 ←22                                 ←10                                 ←19  hub
+                            src.vico                                  12                                  ←1                                                                      ──                                  ←5                                                                      ←1                                      hub
+                            examples                                  20                                   1                                  34                                   5                                  ──                                                                                                              !! fan-out
+  examples.web_app_pactown_ecosystem                                                                                                          22                                                                                                          ──                                                                          !! fan-out
+          examples.web_app_dashboard                                   9                                                                      10                                   1                                                                                                          ──                                      !! fan-out
+      examples.web_app_event_monitor                                                                                                          19                                                                                                                                                                                  ──  !! fan-out
   CYCLES: none
-  HUB: src.nexu/ (fan-in=47)
-  HUB: src.vico/ (fan-in=69)
-  SMELL: examples/ fan-out=26 → split needed
-  SMELL: src.nexu/ fan-out=62 → split needed
-  SMELL: examples.web_app_dashboard/ fan-out=10 → split needed
+  HUB: src.nexu/ (fan-in=126)
+  HUB: examples.web_app_calculator/ (fan-in=7)
+  HUB: scripts/ (fan-in=91)
+  HUB: src.vico/ (fan-in=60)
+  SMELL: examples.web_app_dashboard/ fan-out=20 → split needed
+  SMELL: src.nexu/ fan-out=61 → split needed
+  SMELL: examples.web_app_calculator/ fan-out=90 → split needed
+  SMELL: examples.web_app_pactown_ecosystem/ fan-out=22 → split needed
+  SMELL: examples/ fan-out=60 → split needed
+  SMELL: examples.web_app_event_monitor/ fan-out=19 → split needed
   SMELL: src.vico/ fan-out=12 → split needed
 
 EXTERNAL:

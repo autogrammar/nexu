@@ -40,6 +40,16 @@ def trace_slug(value: str) -> str:
     return slug[:80] or "trace"
 
 
+def text_metrics(text: str) -> dict[str, int]:
+    """Small dependency-free metrics for LLM trace sizing."""
+    value = str(text or "")
+    return {
+        "chars": len(value),
+        "bytes": len(value.encode("utf-8")),
+        "tokens_est": max(1, (len(value) + 3) // 4) if value else 0,
+    }
+
+
 def read_trace_index(index_path: Path) -> list[dict]:
     try:
         data = json.loads(index_path.read_text(encoding="utf-8"))
@@ -69,13 +79,26 @@ def write_llm_trace(
         prompt_text = redact_secrets(prompt, extra_values=redact_values)
         output_text = redact_secrets(output, extra_values=redact_values)
         error_text = redact_secrets(error, extra_values=redact_values)
+        prompt_metrics = text_metrics(prompt_text)
+        output_metrics = text_metrics(output_text)
+        total_metrics = {
+            key: prompt_metrics[key] + output_metrics[key]
+            for key in ("chars", "bytes", "tokens_est")
+        }
         markdown = (
             f"# LLM Trace: {label}\n\n"
             f"- timestamp: `{now}`\n"
             f"- model: `{model or 'unknown'}`\n"
             f"- duration_ms: `{duration_ms}`\n"
-            f"- prompt_chars: `{len(prompt_text)}`\n"
-            f"- output_chars: `{len(output_text)}`\n"
+            f"- prompt_chars: `{prompt_metrics['chars']}`\n"
+            f"- prompt_bytes: `{prompt_metrics['bytes']}`\n"
+            f"- prompt_tokens_est: `{prompt_metrics['tokens_est']}`\n"
+            f"- output_chars: `{output_metrics['chars']}`\n"
+            f"- output_bytes: `{output_metrics['bytes']}`\n"
+            f"- output_tokens_est: `{output_metrics['tokens_est']}`\n"
+            f"- total_chars: `{total_metrics['chars']}`\n"
+            f"- total_bytes: `{total_metrics['bytes']}`\n"
+            f"- total_tokens_est: `{total_metrics['tokens_est']}`\n"
             f"- status: `{'error' if error_text else 'ok'}`\n\n"
             "## Prompt sent to LLM\n\n"
             "```markdown\n"
@@ -100,8 +123,15 @@ def write_llm_trace(
                     "timestamp": now,
                     "model": model or "unknown",
                     "duration_ms": duration_ms,
-                    "prompt_chars": len(prompt_text),
-                    "output_chars": len(output_text),
+                    "prompt_chars": prompt_metrics["chars"],
+                    "prompt_bytes": prompt_metrics["bytes"],
+                    "prompt_tokens_est": prompt_metrics["tokens_est"],
+                    "output_chars": output_metrics["chars"],
+                    "output_bytes": output_metrics["bytes"],
+                    "output_tokens_est": output_metrics["tokens_est"],
+                    "total_chars": total_metrics["chars"],
+                    "total_bytes": total_metrics["bytes"],
+                    "total_tokens_est": total_metrics["tokens_est"],
                     "status": "error" if error_text else "ok",
                     "file": path.name,
                 },
@@ -126,4 +156,11 @@ def read_llm_trace(trace_dir: Path, trace_id: str) -> dict:
     path = trace_dir / f"{safe}.md"
     if not path.is_file():
         return {"error": "trace not found"}
-    return {"id": safe, "markdown": path.read_text(encoding="utf-8")}
+    markdown = path.read_text(encoding="utf-8")
+    return {
+        "id": safe,
+        "filename": path.name,
+        "bytes": path.stat().st_size,
+        "markdown": markdown,
+        "markdown_metrics": text_metrics(markdown),
+    }
