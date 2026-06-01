@@ -7,19 +7,24 @@ from unittest.mock import patch
 import pytest
 
 from nexu.cinema_project_imports import (
+    _build_http_preview_stage0,
     _safe_extract_zip,
     _validate_git_url,
     _validate_http_url,
     activate_imported_project,
     delete_imported_project,
     delete_project,
+    extract_markpact_embedded_files,
+    http_cinema_files_match_import,
     http_stage_matches_import,
     import_git_project,
     import_http_project,
+    import_markpact_project,
     import_zip_project,
     is_deletable_imported_id,
     list_imported_projects,
     merged_projects_catalog,
+    promote_cinema_option,
     read_imported_markpact,
     reject_import_stage_replacement,
     restore_http_import_stages_if_needed,
@@ -261,7 +266,7 @@ def test_import_http_project_fetches_and_migrates(tmp_path: Path):
     assert len(meta["fetch_meta"]["images"]) == 3
     stage0 = (cinema / "stage0.html").read_text(encoding="utf-8")
     assert ">Site</h1>" in stage0
-    assert '<base href="https://example.com/demo/">' in stage0
+    assert "<base" not in stage0.lower()
     assert f'imported_projects/{project_id}/source/assets/stylesheet-0.css' in stage0
     assert f'imported_projects/{project_id}/source/assets/image-0.png' in stage0
     assert f'imported_projects/{project_id}/source/assets/image-1.png 2x' in stage0
@@ -290,6 +295,62 @@ def test_import_http_project_fetches_and_migrates(tmp_path: Path):
     index_html = (project_dir / "source" / "index.html").read_text(encoding="utf-8")
     assert len(outline) < len(index_html)
     assert any(a.get("kind") == "visual_css" for a in meta.get("artifacts") or [])
+
+
+def test_build_http_preview_stage0_serves_extracted_css_from_cinema(tmp_path: Path) -> None:
+    """Organize-extracted assets must not resolve against the import origin base URL."""
+    project_id = "http-example.com"
+    source_dir = tmp_path / "source"
+    source_dir.mkdir(parents=True)
+    (source_dir / "nexu-extracted.css").write_text("body { color: navy; }", encoding="utf-8")
+    (source_dir / "index.html").write_text(
+        """<!DOCTYPE html><html><head>
+<base href="https://example.com/">
+<link rel="stylesheet" href="nexu-extracted.css">
+</head><body><h1>Demo</h1></body></html>""",
+        encoding="utf-8",
+    )
+    (source_dir / "nexu-fetch-meta.json").write_text(
+        json.dumps({"final_url": "https://example.com/"}),
+        encoding="utf-8",
+    )
+    meta = {
+        "id": project_id,
+        "source_dir": str(source_dir),
+        "organize": {"extracted_files": ["nexu-extracted.css"]},
+    }
+
+    stage0 = _build_http_preview_stage0(meta)
+
+    assert stage0 is not None
+    assert f'imported_projects/{project_id}/source/nexu-extracted.css' in stage0
+    assert 'href="nexu-extracted.css"' not in stage0
+    assert "<base" not in stage0.lower()
+
+
+def test_build_http_preview_stage0_absolutizes_remote_asset_refs(tmp_path: Path) -> None:
+    project_id = "http-example.com"
+    source_dir = tmp_path / "source"
+    source_dir.mkdir(parents=True)
+    (source_dir / "index.html").write_text(
+        """<!DOCTYPE html><html><head>
+<base href="https://example.com/app/">
+<link rel="stylesheet" href="/cdn/theme.css">
+</head><body><img src="/img/logo.png" alt="Logo"></body></html>""",
+        encoding="utf-8",
+    )
+    (source_dir / "nexu-fetch-meta.json").write_text(
+        json.dumps({"final_url": "https://example.com/app/"}),
+        encoding="utf-8",
+    )
+    meta = {"id": project_id, "source_dir": str(source_dir)}
+
+    stage0 = _build_http_preview_stage0(meta)
+
+    assert stage0 is not None
+    assert 'href="https://example.com/cdn/theme.css"' in stage0
+    assert 'src="https://example.com/img/logo.png"' in stage0
+    assert "<base" not in stage0.lower()
 
 
 def test_import_http_project_uses_rendered_dom_snapshot(tmp_path: Path):
@@ -644,6 +705,54 @@ def test_delete_imported_project_removes_directory(tmp_path: Path):
     assert not list_imported_projects(cinema)
 
 
+def test_extract_markpact_embedded_files_parses_fenced_blocks() -> None:
+    md = (
+        "# Demo\n\n"
+        "```html markpact:file path=index.html\n"
+        "<html><body>Hi</body></html>\n"
+        "```\n\n"
+        "````json markpact:file path=nexu-import-meta.json\n"
+        '{"title": "Demo"}\n'
+        "````\n"
+    )
+    files = extract_markpact_embedded_files(md)
+    paths = {path for path, _ in files}
+    assert "index.html" in paths
+    assert "nexu-import-meta.json" in paths
+
+
+def test_import_markpact_project_extracts_files_and_activates(tmp_path: Path) -> None:
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    md = (
+        "# Demo App — Markpact\n\n"
+        "```html markpact:file path=index.html\n"
+        "<html><body><h1>Hi</h1></body></html>\n"
+        "```\n\n"
+        "```json markpact:file path=nexu-import-meta.json\n"
+        '{"title": "Demo App"}\n'
+        "```\n"
+    )
+    result = import_markpact_project(cinema, "demo-app.md", content_bytes=md.encode("utf-8"))
+    assert result["status"] == "project_imported"
+    project_id = result["project"]["id"]
+    assert project_id.startswith("markpact-")
+    assert result["project"]["import_kind"] == "markpact"
+    assert result["project"]["title"] == "Demo App"
+    project_dir = cinema / "imported_projects" / project_id
+    assert (project_dir / "README.markpact.md").read_text(encoding="utf-8") == md
+    index_html = (project_dir / "source" / "index.html").read_text(encoding="utf-8")
+    assert "<h1" in index_html and "Hi</h1>" in index_html
+    assert is_deletable_imported_id(project_id)
+
+
+def test_import_markpact_project_rejects_non_markdown(tmp_path: Path) -> None:
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    result = import_markpact_project(cinema, "bundle.zip", content_bytes=b"not md")
+    assert result["error"]
+
+
 def test_read_imported_markpact_returns_markdown(tmp_path: Path):
     cinema = tmp_path / "cinema"
     cinema.mkdir()
@@ -693,6 +802,27 @@ def test_http_stage_matches_import_ignores_nexu_shield_selectors(tmp_path: Path)
     assert http_stage_matches_import(shield_html, meta)
 
 
+def test_http_cinema_files_match_import_detects_polluted_alt(tmp_path: Path) -> None:
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    meta = {
+        "id": "http-example.org",
+        "import_kind": "http",
+        "source": "https://example.org/",
+        "source_url": "https://example.org/",
+    }
+    site = (
+        '<html><body data-nexu-import-preview="http"><h1>Live site</h1>'
+        "https://example.org/</body></html>"
+    )
+    (cinema / "stage0.html").write_text(site, encoding="utf-8")
+    (cinema / "alt_b.html").write_text(
+        '<html><body class="calc-body"><section id="functions">7</section></body></html>',
+        encoding="utf-8",
+    )
+    assert not http_cinema_files_match_import(cinema, meta)
+
+
 def test_restore_http_import_stages_if_needed_rebuilds_from_seed(tmp_path: Path) -> None:
     cinema = tmp_path / "cinema"
     cinema.mkdir()
@@ -731,6 +861,57 @@ def test_restore_http_import_stages_if_needed_rebuilds_from_seed(tmp_path: Path)
     alt_a = (cinema / "alt_a.html").read_text(encoding="utf-8")
     assert "<h1>Live site</h1>" in alt_a
     assert "calculator alt" not in alt_a
+
+
+def test_promote_http_import_restores_polluted_alt_before_copy(tmp_path: Path) -> None:
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    project_id = "http-malortgdynia.pl"
+    project_dir = cinema / "imported_projects" / project_id
+    source_dir = project_dir / "source"
+    source_dir.mkdir(parents=True)
+    site_html = (
+        '<html><body data-nexu-import-preview="http"><h1>Malort Gdynia</h1>'
+        "https://malortgdynia.pl/</body></html>"
+    )
+    (source_dir / "index.html").write_text(site_html, encoding="utf-8")
+    (source_dir / "nexu-fetch-meta.json").write_text(
+        json.dumps({"final_url": "https://malortgdynia.pl/"}),
+        encoding="utf-8",
+    )
+    meta = {
+        "id": project_id,
+        "title": "Malort",
+        "import_kind": "http",
+        "source": "https://malortgdynia.pl/",
+        "source_dir": str(source_dir),
+    }
+    (project_dir / "project.json").write_text(json.dumps(meta), encoding="utf-8")
+    calc_html = (
+        '<html><head><title>Scientific Calculator (S1)</title></head>'
+        '<body class="calc-body" data-project="web_app_calculator">'
+        '<section id="functions">7</section></body></html>'
+    )
+    (cinema / "stage0.html").write_text(calc_html, encoding="utf-8")
+    (cinema / "alt_b.html").write_text(calc_html, encoding="utf-8")
+    (cinema / "active_project.json").write_text(
+        json.dumps({"id": project_id, "kind": "imported", "import_kind": "http"}),
+        encoding="utf-8",
+    )
+
+    activate_imported_project(cinema, project_id)
+    (cinema / "alt_b.html").write_text(calc_html, encoding="utf-8")
+
+    result = promote_cinema_option(cinema, alt_name="alt_b.html", stage=0)
+
+    assert result.get("status") == "promoted"
+    stage0 = (cinema / "stage0.html").read_text(encoding="utf-8")
+    assert "Malort Gdynia" in stage0
+    assert "Scientific Calculator" not in stage0
+    assert "calc-body" not in stage0
+    alt_b = (cinema / "alt_b.html").read_text(encoding="utf-8")
+    assert "Malort Gdynia" in alt_b
+    assert "Scientific Calculator" not in alt_b
 
 
 def test_activate_http_import_after_calculator_pollution(tmp_path: Path) -> None:

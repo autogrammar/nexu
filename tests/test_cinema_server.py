@@ -1,3 +1,4 @@
+import base64
 import json
 import os
 import subprocess
@@ -196,15 +197,18 @@ def test_cinema_player_template_is_externalized() -> None:
     assert "nexu-cinema-theme" in html
     assert 'id="projects-shell"' in html
     assert "importProjectZip" in html
+    assert "importProjectMarkpact" in html
     assert "importProjectGit" in html
     assert "importProjectHttp" in html
     assert "/projects/import/zip" in html
+    assert "/projects/import/markpact" in html
     assert "/projects/import/git" in html
     assert "/projects/import/http" in html
+    assert "Upload Markpact" in html
     assert "README.markpact.md" in html
     assert "publishImportedProject" in html
     assert "Gotowe do edycji i publikacji" in html
-    assert "ZIP, Git URL albo HTTP website" in html
+    assert "ZIP, Markpact README, Git URL albo HTTP website" in html
     assert "onclick='activateProject(${idJson})'" in html
     assert 'onclick="activateProject(${idJson})"' not in html
     assert "onclick='event.stopPropagation(); previewImportedMarkpact(${idJson})'" in html
@@ -230,10 +234,16 @@ def test_cinema_player_template_is_externalized() -> None:
     assert "let scopedAnnotations = {}" in html
     assert "function annotationsFromLedgerForScope" in html
     assert "function loadActiveScopeAnnotations" in html
+    assert "entryMatchesVisibleContractScope" in html
+    assert "seenPolicyLines" in html
+    assert "scope ${activeScope || 'all'}" in html
     assert "persistActiveScopeAnnotations()" in html
     assert "function scopeMarkLabel" in html
     assert "attachIframeSyncHandlers" in html
     assert "syncAllIframeVisuals(true)" in html
+    assert "deletePublishedService" in html
+    assert "/services/delete" in html
+    assert "btn-service danger" in html
 
 
 def test_render_server_script_embeds_project_import_routes() -> None:
@@ -251,6 +261,9 @@ def test_render_server_script_embeds_project_import_routes() -> None:
     assert "def _import_project_git(" in script
     assert "def _import_project_http(" in script
     assert "import_project_from_http" in script
+    assert "def _delete_service(" in script
+    assert "/services/delete" in script
+    assert "import_project_from_markpact" in script
     assert "prefer_local_scope" in script
     assert "DASHBOARD_KINDS" in script
     assert "can_use_offline_fast_iterate" in script
@@ -262,11 +275,95 @@ def test_render_server_script_embeds_project_import_routes() -> None:
     assert "delete_workspace_project" in script
 
 
+def test_cinema_server_imports_markpact_upload(tmp_path: Path) -> None:
+    workspace = tmp_path / "workspace"
+    cinema = tmp_path / "cinema"
+    workspace.mkdir()
+    cinema.mkdir()
+    (cinema / "stage0.html").write_text(
+        "<!DOCTYPE html><html><body><h1>Base</h1></body></html>",
+        encoding="utf-8",
+    )
+    (cinema / "intract_policy_ledger.json").write_text("[]", encoding="utf-8")
+    write_cinema_nexu_hooks(cinema, workspace, "demo")
+    (cinema / "server.py").write_text(
+        _render_server_script(
+            workspace,
+            "demo",
+            LLMConfig(allow_network_calls=False, model=CINEMA_LLM_MODEL),
+            CinemaConfig(),
+            sys.executable,
+        ),
+        encoding="utf-8",
+    )
+
+    port = _free_port()
+    nexu_src = str(Path(nexu.__file__).resolve().parent.parent)
+    proc = subprocess.Popen(
+        [sys.executable, str(cinema / "server.py"), str(port)],
+        cwd=cinema,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        env={**os.environ, "PYTHONPATH": nexu_src},
+    )
+    try:
+        deadline = time.time() + 8.0
+        while time.time() < deadline:
+            try:
+                conn = HTTPConnection("127.0.0.1", port, timeout=0.5)
+                conn.request("GET", "/projects/catalog")
+                conn.getresponse().read()
+                conn.close()
+                break
+            except OSError:
+                time.sleep(0.05)
+        else:
+            raise AssertionError("cinema server did not start")
+
+        markdown = (
+            "# Uploaded App\n\n"
+            "```html markpact:file path=index.html\n"
+            "<!DOCTYPE html><html><body><main><h1>Uploaded</h1></main></body></html>\n"
+            "```\n"
+        )
+        body = json.dumps(
+            {
+                "filename": "uploaded-app.md",
+                "content_base64": base64.b64encode(markdown.encode("utf-8")).decode("ascii"),
+            }
+        ).encode("utf-8")
+        conn = HTTPConnection("127.0.0.1", port, timeout=10.0)
+        conn.request(
+            "POST",
+            "/projects/import/markpact",
+            body=body,
+            headers={"Content-Type": "application/json", "Content-Length": str(len(body))},
+        )
+        resp = conn.getresponse()
+        payload = json.loads(resp.read().decode("utf-8"))
+        conn.close()
+
+        assert resp.status == 200
+        assert payload["status"] == "project_imported"
+        assert payload["project"]["import_kind"] == "markpact"
+        assert payload["project"]["id"].startswith("markpact-uploaded-app")
+        project_dir = cinema / "imported_projects" / payload["project"]["id"]
+        assert (project_dir / "README.markpact.md").read_text(encoding="utf-8") == markdown
+        assert "Uploaded" in (project_dir / "source" / "index.html").read_text(encoding="utf-8")
+    finally:
+        proc.terminate()
+        try:
+            proc.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+
+
 def test_write_cinema_nexu_hooks_includes_import_helpers(tmp_path: Path) -> None:
     write_cinema_nexu_hooks(tmp_path, Path("/tmp/workspace"), "demo")
     hooks = (tmp_path / "nexu_hooks.py").read_text(encoding="utf-8")
     assert "merged_projects_catalog" in hooks
     assert "import_project_from_zip" in hooks
+    assert "import_project_from_markpact" in hooks
     assert "import_project_from_git" in hooks
     assert "import_project_from_http" in hooks
     assert "activate_imported_project" in hooks

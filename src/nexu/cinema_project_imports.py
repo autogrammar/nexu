@@ -47,6 +47,8 @@ MAX_ZIP_BYTES = 25_000_000
 MAX_UNCOMPRESSED_BYTES = 100_000_000
 MAX_ZIP_FILES = 500
 MAX_HTTP_BYTES = 5_000_000
+MAX_MARKPACT_BYTES = 2_000_000
+MAX_MARKPACT_EMBED_FILES = 200
 MAX_STYLESHEET_BYTES = 500_000
 MAX_STYLESHEETS = 5
 HTTP_TIMEOUT = 30
@@ -54,10 +56,21 @@ HTTP_USER_AGENT = "Mozilla/5.0 (compatible; nexu-cinema-import/1.0; +https://git
 _LINK_TAG_RE = re.compile(r"<link\b[^>]*>", re.IGNORECASE)
 _HREF_ATTR_RE = re.compile(r"""\bhref\s*=\s*(['"])(.*?)\1""", re.IGNORECASE)
 _REL_ATTR_RE = re.compile(r"""\brel\s*=\s*(['"])(.*?)\1""", re.IGNORECASE)
+_BASE_TAG_RE = re.compile(r"<base\b[^>]*>\s*", re.IGNORECASE)
+_IMG_TAG_RE = re.compile(r"<img\b[^>]*>", re.IGNORECASE)
+_SCRIPT_OPEN_TAG_RE = re.compile(r"<script\b[^>]*>", re.IGNORECASE)
+_SRC_ATTR_RE = re.compile(r"""\bsrc\s*=\s*(['"])(.*?)\1""", re.IGNORECASE)
+_DATA_SRC_ATTR_RE = re.compile(r"""\bdata-src\s*=\s*(['"])(.*?)\1""", re.IGNORECASE)
+_SRCSET_ATTR_RE = re.compile(r"""\bsrcset\s*=\s*(['"])(.*?)\1""", re.IGNORECASE)
+_CINEMA_LOCAL_PREFIX = "imported_projects/"
 _CHARSET_RE = re.compile(r"charset=([^\s;]+)", re.IGNORECASE)
 GIT_TIMEOUT = 120
 SKIP_DIRS = {".git", ".venv", "venv", "node_modules", "dist", "build", "__pycache__"}
-IMPORTED_ID_RE = re.compile(r"^(zip|git|http)-[a-zA-Z0-9._-]+$")
+IMPORTED_ID_RE = re.compile(r"^(zip|git|http|markpact)-[a-zA-Z0-9._-]+$")
+_MARKPACT_FILE_HDR_RE = re.compile(
+    r"(`{3,4})(\w+)?\s+markpact:file\s+path=([^\s\n]+)\s*\n",
+    re.IGNORECASE,
+)
 DEFAULT_FALLBACK_PROJECT = "web_app_calculator"
 
 
@@ -106,18 +119,48 @@ def reject_import_stage_replacement(html: str, meta: dict[str, Any]) -> str | No
     )
 
 
+_CINEMA_STAGE_FILES = (
+    "stage0.html",
+    "stage1.html",
+    "stage2.html",
+    "alt_a.html",
+    "alt_b.html",
+    "alt_c.html",
+)
+
+
+def http_cinema_files_match_import(cinema_dir: Path, meta: dict[str, Any]) -> bool:
+    """True when stage0 and option previews still reflect the HTTP import snapshot."""
+    for name in _CINEMA_STAGE_FILES:
+        path = cinema_dir / name
+        if not path.is_file():
+            continue
+        try:
+            html = path.read_text(encoding="utf-8")
+        except OSError:
+            return False
+        if html.strip() and not http_stage_matches_import(html, meta):
+            return False
+    stage0 = cinema_dir / "stage0.html"
+    if not stage0.is_file():
+        return False
+    try:
+        return http_stage_matches_import(stage0.read_text(encoding="utf-8"), meta)
+    except OSError:
+        return False
+
+
 def restore_http_import_stages_if_needed(cinema_dir: Path, meta: dict[str, Any]) -> dict[str, Any]:
     """Rebuild stage0 and option previews when live HTML drifted from the import seed."""
     project_id = str(meta.get("id") or "")
     if not project_id.startswith("http-"):
         return {"status": "skipped", "files": []}
-    stage0_path = cinema_dir / "stage0.html"
-    current = stage0_path.read_text(encoding="utf-8") if stage0_path.is_file() else ""
-    if current and http_stage_matches_import(current, meta):
+    if http_cinema_files_match_import(cinema_dir, meta):
         return {"status": "unchanged", "files": []}
     stage0_html = _build_http_preview_stage0(meta)
     if not stage0_html:
         return {"status": "error", "reason": "missing import seed HTML", "files": []}
+    stage0_path = cinema_dir / "stage0.html"
     stage0_path.write_text(stage0_html, encoding="utf-8")
     options_sync = ensure_http_option_previews_from_stage0(cinema_dir)
     return {
@@ -323,6 +366,124 @@ def _rewrite_local_asset_refs(html: str, *, project_id: str, assets: list[dict[s
     return rewritten
 
 
+def _rewrite_organize_extracted_refs(
+    html: str,
+    *,
+    project_id: str,
+    extracted_files: list[str] | None = None,
+) -> str:
+    """Point organize-extracted CSS/JS at Cinema-served paths, not the import origin."""
+    names: list[str] = []
+    for item in extracted_files or []:
+        name = str(item or "").strip()
+        if name and not name.startswith(_CINEMA_LOCAL_PREFIX):
+            names.append(name)
+    if not names:
+        names = ["nexu-extracted.css", "nexu-extracted.js"]
+    rewritten = html
+    for name in names:
+        cinema_path = f"imported_projects/{project_id}/source/{name.lstrip('/')}"
+        for quote in ('"', "'"):
+            rewritten = rewritten.replace(f"{quote}{name}{quote}", f"{quote}{cinema_path}{quote}")
+    return rewritten
+
+
+def _strip_base_href(html: str) -> str:
+    return _BASE_TAG_RE.sub("", html)
+
+
+def _is_cinema_local_ref(ref: str) -> bool:
+    ref = str(ref or "").strip()
+    if not ref:
+        return False
+    if ref.startswith(_CINEMA_LOCAL_PREFIX):
+        return True
+    if ref.startswith("assets/"):
+        return True
+    return ref in {"nexu-extracted.css", "nexu-extracted.js"}
+
+
+def _absolutize_external_ref(ref: str, page_url: str) -> str:
+    ref = str(ref or "").strip()
+    if not ref or ref.startswith(("data:", "blob:", "javascript:", "#", "mailto:")):
+        return ref
+    if ref.startswith(("http://", "https://", "//")):
+        return ref
+    if _is_cinema_local_ref(ref):
+        return ref
+    return urljoin(page_url, ref)
+
+
+def _parse_srcset(value: str) -> list[tuple[str, str]]:
+    out: list[tuple[str, str]] = []
+    for item in str(value or "").split(","):
+        piece = item.strip()
+        if not piece:
+            continue
+        parts = piece.split()
+        url = parts[0]
+        descriptor = " ".join(parts[1:])
+        out.append((url, descriptor))
+    return out
+
+
+def _format_srcset(items: list[tuple[str, str]]) -> str:
+    chunks: list[str] = []
+    for url, descriptor in items:
+        chunks.append((url + (" " + descriptor if descriptor else "")).strip())
+    return ", ".join(chunks)
+
+
+def _absolutize_external_urls(html: str, page_url: str) -> str:
+    """Resolve remaining import-origin relative URLs without a cross-origin ``<base href>``."""
+
+    def _fix_link(match: re.Match[str]) -> str:
+        tag = match.group(0)
+        href_match = _HREF_ATTR_RE.search(tag)
+        if not href_match:
+            return tag
+        href = href_match.group(2).strip()
+        absolute = _absolutize_external_ref(href, page_url)
+        if absolute == href:
+            return tag
+        return _HREF_ATTR_RE.sub(f'href="{absolute}"', tag, count=1)
+
+    def _fix_img(match: re.Match[str]) -> str:
+        tag = match.group(0)
+        for pattern in (_SRC_ATTR_RE, _DATA_SRC_ATTR_RE):
+            src_match = pattern.search(tag)
+            if not src_match:
+                continue
+            src = src_match.group(2).strip()
+            absolute = _absolutize_external_ref(src, page_url)
+            if absolute != src:
+                tag = pattern.sub(lambda m: f'{m.group(0).split("=", 1)[0]}="{absolute}"', tag, count=1)
+        srcset_match = _SRCSET_ATTR_RE.search(tag)
+        if srcset_match:
+            mirrored = [
+                (_absolutize_external_ref(url, page_url), desc)
+                for url, desc in _parse_srcset(srcset_match.group(2))
+            ]
+            tag = _SRCSET_ATTR_RE.sub(f'srcset="{_format_srcset(mirrored)}"', tag, count=1)
+        return tag
+
+    def _fix_script(match: re.Match[str]) -> str:
+        tag = match.group(0)
+        src_match = _SRC_ATTR_RE.search(tag)
+        if not src_match:
+            return tag
+        src = src_match.group(2).strip()
+        absolute = _absolutize_external_ref(src, page_url)
+        if absolute == src:
+            return tag
+        return _SRC_ATTR_RE.sub(f'src="{absolute}"', tag, count=1)
+
+    html = _LINK_TAG_RE.sub(_fix_link, html)
+    html = _IMG_TAG_RE.sub(_fix_img, html)
+    html = _SCRIPT_OPEN_TAG_RE.sub(_fix_script, html)
+    return html
+
+
 def _fetch_meta_assets(fetch_meta: dict[str, Any]) -> list[dict[str, Any]]:
     assets: list[dict[str, Any]] = []
     seen: set[str] = set()
@@ -404,7 +565,17 @@ def _build_http_preview_stage0(meta: dict[str, Any]) -> str | None:
         saved = [item for item in saved_assets if isinstance(item, dict)]
         html = _rewrite_local_stylesheets(html, project_id=project_id, saved=saved)
     html = _rewrite_local_asset_refs(html, project_id=project_id, assets=_fetch_meta_assets(fetch_meta))
-    html = _inject_base_href(html, _document_base_href(page_url))
+    organize = meta.get("organize") if isinstance(meta.get("organize"), dict) else {}
+    extracted_files = organize.get("extracted_files")
+    if not isinstance(extracted_files, list):
+        extracted_files = None
+    html = _rewrite_organize_extracted_refs(
+        html,
+        project_id=project_id,
+        extracted_files=extracted_files,
+    )
+    html = _strip_base_href(html)
+    html = _absolutize_external_urls(html, page_url)
     html, _preview_meta = prepare_http_preview_html(html)
     html = inject_cinema_shield(html)
     if 'data-nexu-import-preview="http"' not in html:
@@ -442,6 +613,70 @@ def _detect_run_notes(root: Path) -> list[str]:
     if not notes:
         notes.append("inspect project files and define the first Markpact run block")
     return notes
+
+
+def _safe_markpact_rel_path(rel: str) -> str | None:
+    normalized = str(rel or "").strip().replace("\\", "/").lstrip("/")
+    if not normalized or normalized.startswith("/"):
+        return None
+    parts = normalized.split("/")
+    if any(part in {"", ".", ".."} for part in parts):
+        return None
+    return normalized
+
+
+def extract_markpact_embedded_files(markdown: str) -> list[tuple[str, str]]:
+    """Parse ``markpact:file`` fenced blocks from a Markpact README."""
+    files: list[tuple[str, str]] = []
+    pos = 0
+    while pos < len(markdown):
+        match = _MARKPACT_FILE_HDR_RE.search(markdown, pos)
+        if not match:
+            break
+        fence = match.group(1)
+        rel = _safe_markpact_rel_path(match.group(3))
+        body_start = match.end()
+        close = markdown.find(f"\n{fence}", body_start)
+        if close < 0:
+            break
+        body = markdown[body_start:close]
+        if rel:
+            files.append((rel, body))
+        pos = close + len(fence) + 1
+    return files
+
+
+def _title_from_markpact_content(
+    markdown: str,
+    filename: str,
+    embedded: list[tuple[str, str]],
+) -> str:
+    for path, body in embedded:
+        if not path.endswith("nexu-import-meta.json"):
+            continue
+        try:
+            meta = json.loads(body)
+        except json.JSONDecodeError:
+            continue
+        title = str(meta.get("title") or "").strip()
+        if title:
+            return title
+    heading = re.search(r"^#\s+(.+?)(?:\s+—|\s*$)", markdown, re.MULTILINE)
+    if heading:
+        return heading.group(1).strip()
+    stem = Path(filename or "markpact.md").stem
+    return stem.replace("-", " ").replace("_", " ").title() or "Markpact import"
+
+
+def _write_markpact_embedded_files(source_dir: Path, embedded: list[tuple[str, str]]) -> None:
+    for rel, body in embedded[:MAX_MARKPACT_EMBED_FILES]:
+        dest = (source_dir / rel).resolve()
+        if not str(dest).startswith(str(source_dir.resolve())):
+            raise ValueError(f"unsafe markpact path: {rel}")
+        if len(body.encode("utf-8")) > MAX_FILE_BYTES:
+            raise ValueError(f"embedded file too large: {rel}")
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_text(body, encoding="utf-8")
 
 
 def _read_text_for_markpact(path: Path) -> str | None:
@@ -802,6 +1037,57 @@ def import_zip_project(
     )
 
 
+def import_markpact_project(
+    cinema_dir: Path,
+    filename: str,
+    content_base64: str = "",
+    *,
+    content_bytes: bytes | None = None,
+) -> dict[str, Any]:
+    safe_name = Path(filename or "project.md").name
+    suffix = safe_name.lower()
+    if not suffix.endswith((".md", ".markdown")):
+        return {"error": "Markpact upload must be a .md or .markdown file"}
+    if content_bytes is not None:
+        raw = content_bytes
+    else:
+        raw = base64.b64decode(content_base64)
+    if not raw:
+        return {"error": "empty markpact upload"}
+    if len(raw) > MAX_MARKPACT_BYTES:
+        return {"error": f"markpact file exceeds {MAX_MARKPACT_BYTES} bytes"}
+    try:
+        markdown = raw.decode("utf-8")
+    except UnicodeDecodeError:
+        return {"error": "markpact file must be UTF-8 text"}
+    if "markpact:file" not in markdown:
+        return {"error": "no markpact:file blocks found in README"}
+    try:
+        embedded = extract_markpact_embedded_files(markdown)
+    except ValueError as exc:
+        return {"error": str(exc)}
+    title = _title_from_markpact_content(markdown, safe_name, embedded)
+    project_id = "markpact-" + _slug(Path(safe_name).stem or title)
+    dest = _project_dir(cinema_dir, project_id)
+    if dest.exists():
+        shutil.rmtree(dest)
+    source_dir = dest / "source"
+    source_dir.mkdir(parents=True, exist_ok=True)
+    try:
+        _write_markpact_embedded_files(source_dir, embedded)
+    except ValueError as exc:
+        return {"error": str(exc)}
+    return _finish_import(
+        cinema_dir,
+        project_id=project_id,
+        source_dir=source_dir,
+        source=safe_name,
+        import_kind="markpact",
+        title=title,
+        markpact_markdown=markdown,
+    )
+
+
 def _import_kind_from_id(project_id: str) -> str:
     if project_id.startswith("http-"):
         return "http"
@@ -809,19 +1095,21 @@ def _import_kind_from_id(project_id: str) -> str:
         return "git"
     if project_id.startswith("zip-"):
         return "zip"
+    if project_id.startswith("markpact-"):
+        return "markpact"
     return "unknown"
 
 
 def _project_title_from_id(project_id: str) -> str:
-    for prefix in ("git-", "zip-", "http-"):
+    for prefix in ("git-", "zip-", "http-", "markpact-"):
         if project_id.startswith(prefix):
             return project_id[len(prefix) :].replace("-", " ").title()
     return project_id.replace("-", " ").title()
 
 
 def _maybe_organize_import_source(source_dir: Path, import_kind: str) -> dict[str, Any]:
-    """Organize index HTML for imported web snapshots (HTTP/ZIP/git); skip when no index."""
-    if import_kind not in {"http", "zip", "git"}:
+    """Organize index HTML for imported web snapshots (HTTP/ZIP/git/markpact); skip when no index."""
+    if import_kind not in {"http", "zip", "git", "markpact"}:
         return {}
     organized = organize_html_project_dir(source_dir)
     if organized is None:
@@ -837,8 +1125,10 @@ def _finish_import(
     source: str,
     import_kind: str | None = None,
     fetch_meta: dict[str, Any] | None = None,
+    title: str | None = None,
+    markpact_markdown: str | None = None,
 ) -> dict[str, Any]:
-    title = _project_title_from_id(project_id)
+    resolved_title = title or _project_title_from_id(project_id)
     resolved_kind = import_kind or _import_kind_from_id(project_id)
     preprocess_fields: dict[str, Any] = {}
     organize_meta = _maybe_organize_import_source(source_dir, resolved_kind)
@@ -846,7 +1136,15 @@ def _finish_import(
         preprocess_fields = preprocess_http_import(source_dir, fetch_meta=fetch_meta)
     files = _iter_project_files(source_dir)
     _, total_bytes = _source_stats(source_dir)
-    markpact = _build_markpact_migration(source_dir, project_id=project_id, title=title, source=source)
+    if markpact_markdown is not None:
+        markpact = markpact_markdown
+    else:
+        markpact = _build_markpact_migration(
+            source_dir,
+            project_id=project_id,
+            title=resolved_title,
+            source=source,
+        )
     markpact_path = _project_dir(cinema_dir, project_id) / "README.markpact.md"
     markpact_path.write_text(markpact, encoding="utf-8")
     capsule, workspace_root = _infer_workspace_context(cinema_dir)
@@ -856,7 +1154,7 @@ def _finish_import(
         source_url = str(fetch_meta["final_url"]).strip() or source
     meta = {
         "id": project_id,
-        "title": title,
+        "title": resolved_title,
         "source": source,
         "source_url": source_url,
         "source_dir": str(source_dir),
@@ -1023,7 +1321,12 @@ def _ensure_project_meta_fields(
 def _catalog_entry_from_meta(meta: dict[str, Any], cinema_dir: Path) -> dict[str, Any]:
     project_id = str(meta.get("id") or "")
     import_kind = str(meta.get("import_kind") or _import_kind_from_id(project_id))
-    kind_emoji = {"zip": "📦", "git": "🔗", "http": "🌐"}.get(import_kind, "📦")
+    kind_emoji = {
+        "zip": "📦",
+        "git": "🔗",
+        "http": "🌐",
+        "markpact": "📄",
+    }.get(import_kind, "📦")
     return {
         "id": project_id,
         "title": meta.get("title"),
@@ -1211,8 +1514,16 @@ def delete_imported_project(
 
     active = load_active_project(cinema_dir) or {}
     was_active = str(active.get("id") or "") == normalized_id
+    from .cinema_publish import delete_published_services_for_project
+
+    services_removed = delete_published_services_for_project(cinema_dir, normalized_id)
     shutil.rmtree(project_dir)
-    result: dict[str, Any] = {"status": "deleted", "id": normalized_id, "was_active": was_active}
+    result: dict[str, Any] = {
+        "status": "deleted",
+        "id": normalized_id,
+        "was_active": was_active,
+        "services_removed": services_removed,
+    }
     if was_active:
         _delete_active_project_fallback(
             cinema_dir,
@@ -1275,6 +1586,58 @@ def merged_projects_catalog(cinema_dir: Path) -> dict[str, Any]:
     kinds = sorted({str(p.get("kind") or "") for p in projects if p.get("kind")})
     tags = sorted({tag for p in projects for tag in (p.get("tags") or [])})
     return {"projects": projects, "filters": {"domains": domains, "kinds": kinds, "tags": tags}}
+
+
+def _load_http_import_meta(cinema_dir: Path, project_id: str) -> dict[str, Any] | None:
+    if not project_id.startswith("http-"):
+        return None
+    meta_path = _project_dir(cinema_dir, project_id) / "project.json"
+    if not meta_path.is_file():
+        return None
+    try:
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    return meta if isinstance(meta, dict) else None
+
+
+def promote_cinema_option(
+    cinema_dir: Path,
+    *,
+    alt_name: str,
+    stage: int,
+) -> dict[str, Any]:
+    """Promote an option file onto stage{N}; repair HTTP imports before reading alts."""
+    cinema_dir = Path(cinema_dir)
+    allowed_alts = {"alt_a.html", "alt_b.html", "alt_c.html"}
+    if alt_name not in allowed_alts:
+        return {"error": f"unsupported option file: {alt_name}"}
+    if stage < 0 or stage > 2:
+        return {"error": f"unsupported stage: S{stage}"}
+    alt_path = cinema_dir / alt_name
+    stage_path = cinema_dir / f"stage{stage}.html"
+    if not alt_path.is_file():
+        return {"error": f"option file not found: {alt_name}"}
+
+    active = load_active_project(cinema_dir) or {}
+    project_id = str(active.get("id") or "")
+    options_sync: dict[str, Any] = {}
+    meta = _load_http_import_meta(cinema_dir, project_id)
+    if meta is not None:
+        restore_result = restore_http_import_stages_if_needed(cinema_dir, meta)
+        options_sync = dict(restore_result.get("options_sync") or {})
+
+    stage_path.write_text(alt_path.read_text(encoding="utf-8"), encoding="utf-8")
+    if meta is not None:
+        options_sync = ensure_http_option_previews_from_stage0(cinema_dir)
+
+    return {
+        "status": "promoted",
+        "alt": alt_name,
+        "stage": stage,
+        "stage_path": stage_path.name,
+        "options_sync": options_sync,
+    }
 
 
 def activate_imported_project(cinema_dir: Path, project_id: str) -> dict[str, Any]:

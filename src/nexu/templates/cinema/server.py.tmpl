@@ -969,6 +969,11 @@ def _import_project(data: dict) -> dict:
             str(data.get("filename") or "project.zip"),
             str(data.get("content_base64") or ""),
         )
+    if kind == "markpact":
+        return nexu_hooks.import_project_from_markpact(
+            str(data.get("filename") or "project.md"),
+            str(data.get("content_base64") or ""),
+        )
     return {"error": "unsupported import kind"}
 
 
@@ -1006,28 +1011,81 @@ def _import_project_http(data: dict) -> dict:
     )
 
 
-def _parse_multipart_zip(post_data: bytes, content_type: str) -> tuple[str, bytes] | dict:
-    import cgi
-
-    environ = {
-        "REQUEST_METHOD": "POST",
-        "CONTENT_TYPE": content_type,
-        "CONTENT_LENGTH": str(len(post_data)),
-    }
-    form = cgi.FieldStorage(
-        fp=__import__("io").BytesIO(post_data),
-        headers={"content-type": content_type},
-        environ=environ,
-        keep_blank_values=True,
+def _import_project_markpact(content: bytes, filename: str) -> dict:
+    try:
+        import nexu_hooks
+    except ImportError:
+        return {"error": "nexu_hooks.py missing; regenerate cinema (make cinema)"}
+    return nexu_hooks.import_project_from_markpact(
+        filename or "project.md",
+        content_bytes=content,
     )
-    upload = form["file"] if "file" in form else form["zip"] if "zip" in form else None
-    if upload is None or not getattr(upload, "file", None):
-        return {"error": "missing zip file field (file or zip)"}
-    filename = str(getattr(upload, "filename", "") or "project.zip")
-    content = upload.file.read()
-    if not content:
-        return {"error": "empty zip upload"}
-    return filename, content
+
+
+
+def _parse_multipart_upload(
+    post_data: bytes,
+    content_type: str,
+    *,
+    field_names: tuple[str, ...],
+    default_filename: str,
+    empty_error: str,
+    missing_error: str,
+) -> tuple[str, bytes] | dict:
+    from email.parser import BytesParser
+    from email.policy import default
+
+    if "multipart/form-data" not in (content_type or "").lower():
+        return {"error": "expected multipart/form-data"}
+    crlf = bytes([13, 10])
+    raw = (
+        b"MIME-Version: 1.0" + crlf
+        + b"Content-Type: "
+        + content_type.encode("utf-8", "surrogateescape")
+        + crlf + crlf
+        + post_data
+    )
+    msg = BytesParser(policy=default).parsebytes(raw)
+    for part in msg.walk():
+        if part.get_content_maintype() == "multipart":
+            continue
+        disposition = part.get("Content-Disposition", "")
+        if not disposition:
+            continue
+        name = part.get_param("name", header="content-disposition")
+        if name not in field_names:
+            continue
+        filename = part.get_filename() or default_filename
+        payload = part.get_payload(decode=True)
+        if payload is None:
+            text = part.get_payload()
+            payload = text.encode("utf-8") if isinstance(text, str) else b""
+        if not payload:
+            return {"error": empty_error}
+        return str(filename), payload
+    return {"error": missing_error}
+
+
+def _parse_multipart_zip(post_data: bytes, content_type: str) -> tuple[str, bytes] | dict:
+    return _parse_multipart_upload(
+        post_data,
+        content_type,
+        field_names=("file", "zip"),
+        default_filename="project.zip",
+        empty_error="empty zip upload",
+        missing_error="missing zip file field (file or zip)",
+    )
+
+
+def _parse_multipart_markpact(post_data: bytes, content_type: str) -> tuple[str, bytes] | dict:
+    return _parse_multipart_upload(
+        post_data,
+        content_type,
+        field_names=("file", "markpact"),
+        default_filename="project.md",
+        empty_error="empty markpact upload",
+        missing_error="missing markpact file field (file or markpact)",
+    )
 
 
 def _export_markpact_markdown(*, stage: int = 0, user_goal: str = "") -> dict:
@@ -1073,6 +1131,14 @@ def _stop_service(service_id: str) -> dict:
     except ImportError:
         return {"error": "nexu_hooks.py missing; regenerate cinema (make cinema)"}
     return nexu_hooks.stop_service(service_id)
+
+
+def _delete_service(service_id: str) -> dict:
+    try:
+        import nexu_hooks
+    except ImportError:
+        return {"error": "nexu_hooks.py missing; regenerate cinema (make cinema)"}
+    return nexu_hooks.delete_service(service_id)
 
 
 class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
@@ -1535,6 +1601,29 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(str(e).encode('utf-8'))
                 return
 
+        elif self.path == '/services/delete':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            try:
+                data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+                service_id = str(data.get('service_id') or data.get('id') or '').strip()
+                if not service_id:
+                    payload = {"error": "missing service_id"}
+                else:
+                    payload = _delete_service(service_id)
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json; charset=utf-8')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(str(e).encode('utf-8'))
+                return
+
         elif self.path == '/projects/activate':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
@@ -1646,6 +1735,37 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(str(e).encode('utf-8'))
                 return
 
+        elif self.path in ('/projects/import/markpact', '/projects/import/markpact/'):
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            try:
+                content_type = str(self.headers.get('Content-Type') or '')
+                if 'multipart/form-data' in content_type:
+                    parsed = _parse_multipart_markpact(post_data, content_type)
+                    if isinstance(parsed, dict):
+                        payload = parsed
+                    else:
+                        filename, content = parsed
+                        payload = _import_project_markpact(content, filename)
+                else:
+                    data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+                    payload = _import_project_markpact(
+                        base64.b64decode(str(data.get('content_base64') or '')),
+                        str(data.get('filename') or 'project.md'),
+                    )
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json; charset=utf-8')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+                return
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(str(e).encode('utf-8'))
+                return
+
         elif self.path in ('/projects/delete', '/projects/delete/'):
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
@@ -1686,15 +1806,25 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 elif stage < 0 or stage > 2:
                     payload = {"error": f"unsupported stage: S{stage}"}
                 else:
-                    alt_path = DIRECTORY / alt_name
-                    stage_path = DIRECTORY / f'stage{stage}.html'
-                    if not alt_path.exists():
-                        payload = {"error": f"option file not found: {alt_name}"}
+                    from nexu.cinema_project_imports import promote_cinema_option
+
+                    promote_result = promote_cinema_option(
+                        DIRECTORY,
+                        alt_name=alt_name,
+                        stage=stage,
+                    )
+                    if promote_result.get("error"):
+                        payload = {"error": promote_result["error"]}
                     else:
-                        stage_path.write_text(alt_path.read_text(encoding='utf-8'), encoding='utf-8')
                         options_sync = _patch_option_previews(
                             stage, focus_scope=focus_scope
                         )
+                        patch_files = list(options_sync.get("files") or [])
+                        restore_files = list(
+                            (promote_result.get("options_sync") or {}).get("files") or []
+                        )
+                        if restore_files and not patch_files:
+                            options_sync = promote_result.get("options_sync") or options_sync
                         history_entry = _save_history_checkpoint(
                             action='promote',
                             stage=stage,
@@ -1705,7 +1835,7 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                             "status": "promoted",
                             "alt": alt_name,
                             "stage": stage,
-                            "stage_path": str(stage_path.name),
+                            "stage_path": promote_result.get("stage_path"),
                             "history_checkpoint": history_entry,
                             "options_sync": options_sync,
                         }

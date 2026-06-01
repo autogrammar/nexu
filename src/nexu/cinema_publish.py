@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
 import socket
 import subprocess
 import sys
@@ -20,6 +21,11 @@ from .cinema_policy import load_effective_ui_constraints
 SERVICES_DIR_NAME = "services"
 REGISTRY_FILE = "registry.json"
 PORT_RANGE = range(9200, 9299)
+_SERVICE_ID_RE = re.compile(r"^[a-zA-Z0-9._-]+$")
+_IMPORTED_SOURCE_PREFIX_RE = re.compile(
+    r"imported_projects/([a-zA-Z0-9._-]+)/source/",
+    re.IGNORECASE,
+)
 
 
 def services_root(cinema_dir: Path) -> Path:
@@ -193,19 +199,50 @@ goal-driven changes from regressing the baseline UI/functionality:
     return readme
 
 
+def _imported_project_ids_in_html(html: str) -> set[str]:
+    return set(_IMPORTED_SOURCE_PREFIX_RE.findall(html))
+
+
+def _bundle_imported_source_assets(
+    cinema_dir: Path,
+    service_dir: Path,
+    html: str,
+) -> tuple[str, list[str]]:
+    """Copy imported project source trees and rewrite cinema-local asset URLs."""
+    copied: list[str] = []
+    rewritten = html
+    for project_id in sorted(_imported_project_ids_in_html(html)):
+        source_root = cinema_dir / "imported_projects" / project_id / "source"
+        if not source_root.is_dir():
+            continue
+        prefix = f"imported_projects/{project_id}/source/"
+        for src_file in sorted(source_root.rglob("*")):
+            if not src_file.is_file():
+                continue
+            rel = src_file.relative_to(source_root)
+            dest_rel = f"source/{rel.as_posix()}"
+            dest = service_dir / dest_rel
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src_file, dest)
+            copied.append(dest_rel)
+        rewritten = rewritten.replace(prefix, "source/")
+    return rewritten, copied
+
+
 def _prepare_service_directory(
     cinema_dir: Path,
     stage_file: Path,
     service_id: str,
-) -> tuple[Path, dict[str, Any]]:
-    """Create service directory and copy HTML file."""
+) -> tuple[Path, list[str]]:
+    """Create service directory with stage HTML and any linked local assets."""
     service_dir = services_root(cinema_dir) / service_id
     service_dir.mkdir(parents=True, exist_ok=True)
-    
+
     html = stage_file.read_text(encoding="utf-8")
+    html, copied_assets = _bundle_imported_source_assets(cinema_dir, service_dir, html)
     (service_dir / "index.html").write_text(html, encoding="utf-8")
-    
-    return service_dir, {}
+
+    return service_dir, copied_assets
 
 
 def _generate_markpact_export(
@@ -328,9 +365,7 @@ def publish_project_service(
     service_id = _slug_service_id(project_id, capsule_name, stage)
     
     # Prepare service directory and files
-    service_dir, prep_error = _prepare_service_directory(cinema_dir, stage_file, service_id)
-    if prep_error:
-        return prep_error
+    service_dir, copied_assets = _prepare_service_directory(cinema_dir, stage_file, service_id)
     
     from .cinema import build_intract_policy_snapshot
 
@@ -369,6 +404,7 @@ def publish_project_service(
         "status": "published",
         "service": entry,
         "service_dir": str(service_dir.relative_to(cinema_dir)),
+        "copied_assets": copied_assets,
     }
     if auto_start:
         started = start_published_service(cinema_dir, service_id)
@@ -467,3 +503,67 @@ def stop_published_service(cinema_dir: Path, service_id: str) -> dict[str, Any]:
             break
     _save_registry(cinema_dir, {"services": services})
     return {"status": "stopped", "service": entry}
+
+
+def _validate_service_id(service_id: str) -> str | None:
+    sid = (service_id or "").strip()
+    if not sid or not _SERVICE_ID_RE.fullmatch(sid):
+        return "invalid service_id"
+    return None
+
+
+def delete_published_service(cinema_dir: Path, service_id: str) -> dict[str, Any]:
+    """Stop, unregister, and remove files for a published service."""
+    sid_err = _validate_service_id(service_id)
+    if sid_err:
+        return {"error": sid_err}
+
+    data = _load_registry(cinema_dir)
+    services: list[dict[str, Any]] = list(data.get("services") or [])
+    entry = next((s for s in services if s.get("id") == service_id), None)
+    if entry is None:
+        return {"error": f"unknown service: {service_id}"}
+
+    if entry.get("status") == "running" or entry.get("pid"):
+        stop_published_service(cinema_dir, service_id)
+
+    services = [s for s in services if s.get("id") != service_id]
+    _save_registry(cinema_dir, {"services": services})
+
+    service_dir = services_root(cinema_dir) / service_id
+    if service_dir.exists():
+        shutil.rmtree(service_dir)
+
+    return {"status": "deleted", "id": service_id}
+
+
+def delete_published_services_for_project(
+    cinema_dir: Path,
+    project_id: str,
+) -> dict[str, Any]:
+    """Remove all published services linked to a project id."""
+    normalized = (project_id or "").strip()
+    if not normalized:
+        return {"deleted": [], "count": 0}
+
+    data = _load_registry(cinema_dir)
+    matching = [
+        s
+        for s in data.get("services") or []
+        if str(s.get("project_id") or "") == normalized
+    ]
+    deleted: list[str] = []
+    errors: list[dict[str, str]] = []
+    for entry in matching:
+        sid = str(entry.get("id") or "")
+        if not sid:
+            continue
+        result = delete_published_service(cinema_dir, sid)
+        if result.get("error"):
+            errors.append({"id": sid, "error": str(result["error"])})
+        else:
+            deleted.append(sid)
+    out: dict[str, Any] = {"deleted": deleted, "count": len(deleted)}
+    if errors:
+        out["errors"] = errors
+    return out
