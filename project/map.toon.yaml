@@ -1,5 +1,5 @@
-# nexu | 122f 24567L | python:116,shell:3,javascript:2,less:1 | 2026-06-02
-# stats: 885 func | 19 cls | 122 mod | CC̄=4.8 | critical:88 | cycles:0
+# nexu | 122f 24554L | python:116,shell:3,javascript:2,less:1 | 2026-06-02
+# stats: 821 func | 17 cls | 122 mod | CC̄=4.9 | critical:81 | cycles:0
 # alerts[5]: CC test_cinema_player_template_is_externalized=93; CC test_render_server_script_embeds_runtime_context=80; CC test_import_http_project_fetches_and_migrates=35; CC test_import_zip_project_creates_markpact_migration_and_options=22; CC test_render_server_script_embeds_project_import_routes=20
 # hotspots[5]: test_projects_import_zip_endpoint fan=33; test_iterate_dashboard_kinds_colors_prefers_offline_before_llm fan=32; test_iterate_colors_scope_uses_offline_path fan=31; test_cinema_server_imports_markpact_upload fan=30; test_iterate_colors_scope_uses_llm_patch_when_available fan=30
 # evolution: baseline
@@ -18,7 +18,7 @@ M[122]:
   examples/scientific_calculator_demo2.py,87
   examples/vertical_slice/src/flow.py,10
   examples/web_app_calculator/cinema/nexu_hooks.py,354
-  examples/web_app_calculator/cinema/server.py,3317
+  examples/web_app_calculator/cinema/server.py,3224
   examples/web_app_calculator/markpact_sandbox/sandbox/src/calculator.py,38
   examples/web_app_calculator/run.py,111
   examples/web_app_calculator/src/calculator.py,39
@@ -40,7 +40,7 @@ M[122]:
   src/nexu/cinema.py,195
   src/nexu/cinema_baseline_contracts.py,174
   src/nexu/cinema_dom_patch.py,28
-  src/nexu/cinema_goal_contracts.py,346
+  src/nexu/cinema_goal_contracts.py,396
   src/nexu/cinema_history.py,245
   src/nexu/cinema_html.py,17
   src/nexu/cinema_html_validate.py,206
@@ -54,7 +54,7 @@ M[122]:
   src/nexu/cinema_policy.py,915
   src/nexu/cinema_project_imports.py,1684
   src/nexu/cinema_projects.py,721
-  src/nexu/cinema_publish.py,603
+  src/nexu/cinema_publish.py,633
   src/nexu/cinema_scope.py,254
   src/nexu/cinema_scripts.py,713
   src/nexu/cinema_server.py,145
@@ -194,79 +194,6 @@ D:
     stop_service(service_id)
     delete_service(service_id)
   examples/web_app_calculator/cinema/server.py:
-    e: _load_cinema_ui_profile,_goal_entry_kwargs,_llm_prompt_intro,_llm_prompt_rules,_llm_communication_contract_block,_load_env_file,_load_all_env,_resolve_model,_llm_network_allowed,_litellm_available,_llm_status_payload,_trace_slug,_read_trace_index,_write_llm_trace,_list_llm_traces,_path_segments,_parse_imported_project_route,_delete_imported_project,_delete_project,_imported_markpact,_imported_llm_log,_read_llm_trace,_ensure_api_key_env,_strip_markdown_fences,_extract_html_document,_compact_html_for_llm,_effective_markpact_mode,_compact_markpact_for_llm,_try_read_options_cache,_store_options_cache,_extract_llm_content,_compact_llm_error,_load_policy_payload,_apply_entry_constraints,_effective_ui_constraints_from_ledger,_update_constraints,_merge_ui_constraints,_ensure_intract_on_path,_propose_cinema_contracts,_proposal_kind_and_element,_proposal_delta_text,_normalize_proposals_for_ledger,_append_policy_entry_legacy,_nexu_hooks_apply,_nexu_hooks_verify,_propose_llm_for_stage,_validate_intract_artifact,_append_policy_entry,_save_history_checkpoint,_list_history,_restore_history,_sync_option_previews,_patch_option_previews,_projects_catalog,_active_project,_activate_project,_import_project,_import_project_zip,_import_project_git,_import_project_http,_import_project_markpact,_parse_multipart_upload,_parse_multipart_zip,_parse_multipart_markpact,_export_markpact_markdown,_services_catalog,_publish_service,_start_service,_stop_service,_delete_service,CustomHTTPRequestHandler,ThreadingHTTPServer
-    CustomHTTPRequestHandler: __init__(0),do_GET(0),_handle_post_log(1),_handle_post_manifest_apply_ledger(1),_handle_post_capsule_verify(0),_handle_post_propose_llm(1),_handle_post_propose_goal(1),_handle_post_history_restore(1),do_POST(0),_handle_post_services_publish(1),_handle_post_services_start(1),_handle_post_services_stop(1),_handle_post_services_delete(1),do_POST(0),_handle_post_projects_activate(1),_handle_post_projects_import(1),_handle_post_projects_import_zip(1),_handle_post_projects_import_git(1),_handle_post_projects_import_http(1),_handle_post_projects_import_markpact(1),_handle_post_projects_delete(1),do_POST(0),do_DELETE(0),do_OPTIONS(0)
-    ThreadingHTTPServer:
-    _load_cinema_ui_profile()
-    _goal_entry_kwargs(data)
-    _llm_prompt_intro(profile)
-    _llm_prompt_rules(profile)
-    _llm_communication_contract_block()
-    _load_env_file(path;override_keys)
-    _load_all_env()
-    _resolve_model()
-    _llm_network_allowed()
-    _litellm_available()
-    _llm_status_payload()
-    _trace_slug(value)
-    _read_trace_index()
-    _write_llm_trace()
-    _list_llm_traces(project_id)
-    _path_segments(path)
-    _parse_imported_project_route(path)
-    _delete_imported_project(project_id)
-    _delete_project(project_id)
-    _imported_markpact(project_id)
-    _imported_llm_log(project_id)
-    _read_llm_trace(trace_id)
-    _ensure_api_key_env()
-    _strip_markdown_fences(text)
-    _extract_html_document(text)
-    _compact_html_for_llm(html)
-    _effective_markpact_mode(focus_scope;project_kind)
-    _compact_markpact_for_llm(markdown)
-    _try_read_options_cache()
-    _store_options_cache()
-    _extract_llm_content(response)
-    _compact_llm_error(err_text)
-    _load_policy_payload()
-    _apply_entry_constraints(entry;state)
-    _effective_ui_constraints_from_ledger(ledger;stage;focus_scope)
-    _update_constraints(state;elements;value)
-    _merge_ui_constraints(ledger_keep;ledger_delete;session_keep;session_delete)
-    _ensure_intract_on_path()
-    _propose_cinema_contracts(stage;keep_els;delete_els)
-    _proposal_kind_and_element(proposal)
-    _proposal_delta_text(stage;proposal)
-    _normalize_proposals_for_ledger(stage;proposals)
-    _append_policy_entry_legacy(stage;keep_els;delete_els;status;model)
-    _nexu_hooks_apply()
-    _nexu_hooks_verify()
-    _propose_llm_for_stage(stage;goal)
-    _validate_intract_artifact(artifact;proposals;filename)
-    _append_policy_entry(stage;keep_els;delete_els;status;model)
-    _save_history_checkpoint()
-    _list_history()
-    _restore_history(checkpoint_id)
-    _sync_option_previews(stage;delete_els)
-    _patch_option_previews(stage;session_keep;session_delete;focus_scope)
-    _projects_catalog()
-    _active_project()
-    _activate_project(project_id)
-    _import_project(data)
-    _import_project_zip(content;filename)
-    _import_project_git(data)
-    _import_project_http(data)
-    _import_project_markpact(content;filename)
-    _parse_multipart_upload(post_data;content_type)
-    _parse_multipart_zip(post_data;content_type)
-    _parse_multipart_markpact(post_data;content_type)
-    _export_markpact_markdown()
-    _services_catalog()
-    _publish_service()
-    _start_service(service_id)
-    _stop_service(service_id)
-    _delete_service(service_id)
   examples/web_app_calculator/markpact_sandbox/sandbox/src/calculator.py:
     e: render_calculator
     render_calculator(calculator_state)
@@ -342,7 +269,7 @@ D:
     e: build_function_option_patches
     build_function_option_patches(html_text)
   src/nexu/cinema_goal_contracts.py:
-    e: _hints_text,is_chemical_goal,_slug,_goal_contract_dict,_resolve_baseline_anchor,_build_detail_text,_detect_chemical_trait,_detect_minimal_trait,_detect_expanded_trait,_detect_api_trait,_detect_dashboard_trait,_detect_engineering_trait,_collect_trait_proposals,propose_goal_extension_contracts,goal_traits_from_contract_lines
+    e: _hints_text,is_chemical_goal,_slug,_goal_contract_dict,_resolve_baseline_anchor,_build_detail_text,_detect_chemical_trait,_detect_minimal_trait,_detect_expanded_trait,_detect_api_trait,_detect_dashboard_trait,_detect_engineering_trait,_collect_trait_proposals,_build_contract_context,_create_main_target_proposal,_create_focus_scope_proposal,propose_goal_extension_contracts,goal_traits_from_contract_lines
     _hints_text(hints)
     is_chemical_goal(hints)
     _slug(text)
@@ -356,6 +283,9 @@ D:
     _detect_dashboard_trait(lower;capsule_name;stage;template_base)
     _detect_engineering_trait(lower;kind;capsule_name;stage;template_base)
     _collect_trait_proposals(text;lower;kind;capsule_name;stage;template_base)
+    _build_contract_context(goal;focus_scope;focus_scope_label;current_state;expected_version;project_context;project_kind;capsule_name;stage)
+    _create_main_target_proposal(capsule_name;stage;ctx)
+    _create_focus_scope_proposal(capsule_name;stage;ctx)
     propose_goal_extension_contracts(goal)
     goal_traits_from_contract_lines(lines)
   src/nexu/cinema_history.py:
@@ -662,7 +592,7 @@ D:
     activate_example_project(cinema_dir;project_id)
     load_active_project(cinema_dir)
   src/nexu/cinema_publish.py:
-    e: _service_url_mode,_public_service_url,services_root,_registry_path,_load_registry,_save_registry,_slug_service_id,_pick_port,_port_open,_http_ok,_service_alive,_refresh_service_status,list_published_services,_write_service_readme,_imported_project_ids_in_html,_bundle_imported_source_assets,_prepare_service_directory,_generate_markpact_export,_allocate_service_port,_create_service_entry,_register_service,_handle_existing_service,publish_project_service,_spawn_http_server,_wait_for_service_running,start_published_service,stop_published_service,_validate_service_id,delete_published_service,delete_published_services_for_project
+    e: _service_url_mode,_public_service_url,services_root,_registry_path,_load_registry,_save_registry,_slug_service_id,_pick_port,_port_open,_http_ok,_service_alive,_refresh_service_status,list_published_services,_write_service_readme,_imported_project_ids_in_html,_bundle_imported_source_assets,_prepare_service_directory,_generate_markpact_export,_allocate_service_port,_create_service_entry,_register_service,_handle_existing_service,publish_project_service,_spawn_http_server,_wait_for_service_running,_find_service_entry,_ensure_service_port,_update_service_entry_for_startup,start_published_service,stop_published_service,_validate_service_id,delete_published_service,delete_published_services_for_project
     _service_url_mode()
     _public_service_url(service_id)
     services_root(cinema_dir)
@@ -688,6 +618,9 @@ D:
     publish_project_service(cinema_dir;root;capsule_name)
     _spawn_http_server(service_dir;port)
     _wait_for_service_running(entry;deadline)
+    _find_service_entry(services;service_id)
+    _ensure_service_port(entry;services;service_id)
+    _update_service_entry_for_startup(entry;services;service_id;port;proc)
     start_published_service(cinema_dir;service_id)
     stop_published_service(cinema_dir;service_id)
     _validate_service_id(service_id)

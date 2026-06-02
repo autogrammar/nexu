@@ -15,7 +15,7 @@ project_file('examples/scientific_calculator_demo.py', 62, 'python').
 project_file('examples/scientific_calculator_demo2.py', 87, 'python').
 project_file('examples/vertical_slice/src/flow.py', 10, 'python').
 project_file('examples/web_app_calculator/cinema/nexu_hooks.py', 354, 'python').
-project_file('examples/web_app_calculator/cinema/server.py', 3317, 'python').
+project_file('examples/web_app_calculator/cinema/server.py', 3230, 'python').
 project_file('examples/web_app_calculator/markpact_sandbox/sandbox/src/calculator.py', 38, 'python').
 project_file('examples/web_app_calculator/run.py', 111, 'python').
 project_file('examples/web_app_calculator/src/calculator.py', 39, 'python').
@@ -169,76 +169,6 @@ python_function('examples/web_app_calculator/cinema/nexu_hooks.py', 'publish_ser
 python_function('examples/web_app_calculator/cinema/nexu_hooks.py', 'start_service', 1, 1, 3).
 python_function('examples/web_app_calculator/cinema/nexu_hooks.py', 'stop_service', 1, 1, 3).
 python_function('examples/web_app_calculator/cinema/nexu_hooks.py', 'delete_service', 1, 1, 3).
-python_function('examples/web_app_calculator/cinema/server.py', '_load_cinema_ui_profile', 0, 7, 7).
-python_function('examples/web_app_calculator/cinema/server.py', '_goal_entry_kwargs', 1, 4, 3).
-python_function('examples/web_app_calculator/cinema/server.py', '_llm_prompt_intro', 1, 6, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_llm_prompt_rules', 1, 4, 3).
-python_function('examples/web_app_calculator/cinema/server.py', '_llm_communication_contract_block', 0, 2, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_load_env_file', 2, 11, 7).
-python_function('examples/web_app_calculator/cinema/server.py', '_load_all_env', 0, 3, 3).
-python_function('examples/web_app_calculator/cinema/server.py', '_resolve_model', 0, 4, 2).
-python_function('examples/web_app_calculator/cinema/server.py', '_llm_network_allowed', 0, 2, 2).
-python_function('examples/web_app_calculator/cinema/server.py', '_litellm_available', 0, 2, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_llm_status_payload', 0, 3, 9).
-python_function('examples/web_app_calculator/cinema/server.py', '_trace_slug', 1, 1, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_read_trace_index', 0, 1, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_write_llm_trace', 0, 3, 5).
-python_function('examples/web_app_calculator/cinema/server.py', '_list_llm_traces', 1, 6, 5).
-python_function('examples/web_app_calculator/cinema/server.py', '_path_segments', 1, 3, 4).
-python_function('examples/web_app_calculator/cinema/server.py', '_parse_imported_project_route', 1, 5, 2).
-python_function('examples/web_app_calculator/cinema/server.py', '_delete_imported_project', 1, 2, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_delete_project', 1, 2, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_imported_markpact', 1, 2, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_imported_llm_log', 1, 2, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_read_llm_trace', 1, 1, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_ensure_api_key_env', 0, 3, 2).
-python_function('examples/web_app_calculator/cinema/server.py', '_strip_markdown_fences', 1, 6, 5).
-python_function('examples/web_app_calculator/cinema/server.py', '_extract_html_document', 1, 3, 4).
-python_function('examples/web_app_calculator/cinema/server.py', '_compact_html_for_llm', 1, 1, 4).
-python_function('examples/web_app_calculator/cinema/server.py', '_effective_markpact_mode', 2, 1, 4).
-python_function('examples/web_app_calculator/cinema/server.py', '_compact_markpact_for_llm', 1, 3, 6).
-python_function('examples/web_app_calculator/cinema/server.py', '_try_read_options_cache', 0, 2, 3).
-python_function('examples/web_app_calculator/cinema/server.py', '_store_options_cache', 0, 1, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_extract_llm_content', 1, 9, 6).
-python_function('examples/web_app_calculator/cinema/server.py', '_compact_llm_error', 1, 2, 4).
-python_function('examples/web_app_calculator/cinema/server.py', '_load_policy_payload', 0, 4, 5).
-python_function('examples/web_app_calculator/cinema/server.py', '_apply_entry_constraints', 2, 7, 3).
-python_function('examples/web_app_calculator/cinema/server.py', '_effective_ui_constraints_from_ledger', 3, 13, 8).
-python_function('examples/web_app_calculator/cinema/server.py', '_update_constraints', 3, 4, 2).
-python_function('examples/web_app_calculator/cinema/server.py', '_merge_ui_constraints', 4, 5, 3).
-python_function('examples/web_app_calculator/cinema/server.py', '_ensure_intract_on_path', 0, 5, 5).
-python_function('examples/web_app_calculator/cinema/server.py', '_propose_cinema_contracts', 3, 11, 8).
-python_function('examples/web_app_calculator/cinema/server.py', '_proposal_kind_and_element', 1, 12, 3).
-python_function('examples/web_app_calculator/cinema/server.py', '_proposal_delta_text', 2, 5, 3).
-python_function('examples/web_app_calculator/cinema/server.py', '_normalize_proposals_for_ledger', 2, 3, 6).
-python_function('examples/web_app_calculator/cinema/server.py', '_append_policy_entry_legacy', 5, 3, 12).
-python_function('examples/web_app_calculator/cinema/server.py', '_nexu_hooks_apply', 0, 2, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_nexu_hooks_verify', 0, 2, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_propose_llm_for_stage', 2, 2, 2).
-python_function('examples/web_app_calculator/cinema/server.py', '_validate_intract_artifact', 3, 2, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_append_policy_entry', 5, 2, 2).
-python_function('examples/web_app_calculator/cinema/server.py', '_save_history_checkpoint', 0, 3, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_list_history', 0, 4, 2).
-python_function('examples/web_app_calculator/cinema/server.py', '_restore_history', 1, 2, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_sync_option_previews', 2, 2, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_patch_option_previews', 4, 2, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_projects_catalog', 0, 2, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_active_project', 0, 2, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_activate_project', 1, 2, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_import_project', 1, 15, 8).
-python_function('examples/web_app_calculator/cinema/server.py', '_import_project_zip', 2, 3, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_import_project_git', 1, 5, 4).
-python_function('examples/web_app_calculator/cinema/server.py', '_import_project_http', 1, 3, 4).
-python_function('examples/web_app_calculator/cinema/server.py', '_import_project_markpact', 2, 3, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_parse_multipart_upload', 2, 11, 13).
-python_function('examples/web_app_calculator/cinema/server.py', '_parse_multipart_zip', 2, 1, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_parse_multipart_markpact', 2, 1, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_export_markpact_markdown', 0, 2, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_services_catalog', 0, 2, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_publish_service', 0, 2, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_start_service', 1, 2, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_stop_service', 1, 2, 1).
-python_function('examples/web_app_calculator/cinema/server.py', '_delete_service', 1, 2, 1).
 python_function('examples/web_app_calculator/markpact_sandbox/sandbox/src/calculator.py', 'render_calculator', 1, 1, 0).
 python_function('examples/web_app_calculator/run.py', 'main', 0, 2, 13).
 python_function('examples/web_app_calculator/src/calculator.py', 'render_calculator', 1, 1, 0).
@@ -1019,32 +949,6 @@ python_function('tests/test_review_bundle.py', 'test_review_bundle_and_promotion
 python_function('tests/test_verify_intract.py', 'test_verify_treats_manifest_intract_fail_as_warn', 1, 8, 8).
 
 % ── Python Classes ───────────────────────────────────────
-python_class('examples/web_app_calculator/cinema/server.py', 'CustomHTTPRequestHandler').
-python_method('CustomHTTPRequestHandler', '__init__', 0, 1, 3).
-python_method('CustomHTTPRequestHandler', 'do_GET', 0, 39, 30).
-python_method('CustomHTTPRequestHandler', '_handle_post_log', 1, 3, 16).
-python_method('CustomHTTPRequestHandler', '_handle_post_manifest_apply_ledger', 1, 3, 12).
-python_method('CustomHTTPRequestHandler', '_handle_post_capsule_verify', 0, 2, 8).
-python_method('CustomHTTPRequestHandler', '_handle_post_propose_llm', 1, 4, 12).
-python_method('CustomHTTPRequestHandler', '_handle_post_propose_goal', 1, 7, 15).
-python_method('CustomHTTPRequestHandler', '_handle_post_history_restore', 1, 5, 13).
-python_method('CustomHTTPRequestHandler', '_handle_post_services_publish', 1, 9, 12).
-python_method('CustomHTTPRequestHandler', '_handle_post_services_start', 1, 6, 12).
-python_method('CustomHTTPRequestHandler', '_handle_post_services_stop', 1, 6, 12).
-python_method('CustomHTTPRequestHandler', '_handle_post_services_delete', 1, 6, 12).
-python_method('CustomHTTPRequestHandler', 'do_POST', 0, 192, 12).
-python_method('CustomHTTPRequestHandler', '_handle_post_projects_activate', 1, 6, 12).
-python_method('CustomHTTPRequestHandler', '_handle_post_projects_import', 1, 3, 10).
-python_method('CustomHTTPRequestHandler', '_handle_post_projects_import_zip', 1, 8, 14).
-python_method('CustomHTTPRequestHandler', '_handle_post_projects_import_git', 1, 3, 10).
-python_method('CustomHTTPRequestHandler', '_handle_post_projects_import_http', 1, 3, 10).
-python_method('CustomHTTPRequestHandler', '_handle_post_projects_import_markpact', 1, 8, 14).
-python_method('CustomHTTPRequestHandler', '_handle_post_projects_delete', 1, 8, 14).
-python_method('CustomHTTPRequestHandler', '_handle_post_promote', 1, 14, 17).
-python_method('CustomHTTPRequestHandler', 'do_POST', 0, 192, 133).
-python_method('CustomHTTPRequestHandler', 'do_DELETE', 0, 9, 12).
-python_method('CustomHTTPRequestHandler', 'do_OPTIONS', 0, 1, 3).
-python_class('examples/web_app_calculator/cinema/server.py', 'ThreadingHTTPServer').
 python_class('src/nexu/cinema_http_preprocess.py', '_OutlineParser').
 python_method('_OutlineParser', '__init__', 0, 1, 2).
 python_method('_OutlineParser', '_keep_attr', 1, 2, 2).
