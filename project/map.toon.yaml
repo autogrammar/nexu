@@ -1,11 +1,11 @@
-# nexu | 122f 23212L | python:116,shell:3,javascript:2,less:1 | 2026-06-01
-# stats: 835 func | 19 cls | 122 mod | CC̄=4.7 | critical:82 | cycles:0
-# alerts[5]: CC test_cinema_player_template_is_externalized=79; CC test_render_server_script_embeds_runtime_context=74; CC test_import_http_project_fetches_and_migrates=35; CC test_import_zip_project_creates_markpact_migration_and_options=22; CC test_projects_import_zip_endpoint=19
-# hotspots[5]: test_projects_import_zip_endpoint fan=33; test_iterate_dashboard_kinds_colors_prefers_offline_before_llm fan=32; test_iterate_colors_scope_uses_offline_path fan=31; test_iterate_colors_scope_uses_llm_patch_when_available fan=30; test_iterate_functions_scope_skips_offline_fast_path fan=29
+# nexu | 122f 24567L | python:116,shell:3,javascript:2,less:1 | 2026-06-02
+# stats: 885 func | 19 cls | 122 mod | CC̄=4.8 | critical:88 | cycles:0
+# alerts[5]: CC test_cinema_player_template_is_externalized=93; CC test_render_server_script_embeds_runtime_context=80; CC test_import_http_project_fetches_and_migrates=35; CC test_import_zip_project_creates_markpact_migration_and_options=22; CC test_render_server_script_embeds_project_import_routes=20
+# hotspots[5]: test_projects_import_zip_endpoint fan=33; test_iterate_dashboard_kinds_colors_prefers_offline_before_llm fan=32; test_iterate_colors_scope_uses_offline_path fan=31; test_cinema_server_imports_markpact_upload fan=30; test_iterate_colors_scope_uses_llm_patch_when_available fan=30
 # evolution: baseline
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
 M[122]:
-  app.doql.less,153
+  app.doql.less,202
   deploy/docker/cinema_serve.py,54
   examples/backend_service/app/users.py,9
   examples/frontend_view/src/menu_icons.py,25
@@ -17,8 +17,8 @@ M[122]:
   examples/scientific_calculator_demo.py,62
   examples/scientific_calculator_demo2.py,87
   examples/vertical_slice/src/flow.py,10
-  examples/web_app_calculator/cinema/nexu_hooks.py,332
-  examples/web_app_calculator/cinema/server.py,3040
+  examples/web_app_calculator/cinema/nexu_hooks.py,354
+  examples/web_app_calculator/cinema/server.py,3317
   examples/web_app_calculator/markpact_sandbox/sandbox/src/calculator.py,38
   examples/web_app_calculator/run.py,111
   examples/web_app_calculator/src/calculator.py,39
@@ -44,17 +44,17 @@ M[122]:
   src/nexu/cinema_history.py,245
   src/nexu/cinema_html.py,17
   src/nexu/cinema_html_validate.py,206
-  src/nexu/cinema_http_preprocess.py,663
+  src/nexu/cinema_http_preprocess.py,688
   src/nexu/cinema_iterate.py,67
   src/nexu/cinema_llm.py,333
   src/nexu/cinema_llm_contracts.py,197
   src/nexu/cinema_markpact.py,216
   src/nexu/cinema_offline_options.py,902
   src/nexu/cinema_options_cache.py,129
-  src/nexu/cinema_policy.py,907
-  src/nexu/cinema_project_imports.py,1291
+  src/nexu/cinema_policy.py,915
+  src/nexu/cinema_project_imports.py,1684
   src/nexu/cinema_projects.py,721
-  src/nexu/cinema_publish.py,470
+  src/nexu/cinema_publish.py,603
   src/nexu/cinema_scope.py,254
   src/nexu/cinema_scripts.py,713
   src/nexu/cinema_server.py,145
@@ -106,14 +106,14 @@ M[122]:
   tests/test_cinema_markpact.py,45
   tests/test_cinema_offline_options.py,318
   tests/test_cinema_options_cache.py,65
-  tests/test_cinema_policy.py,290
-  tests/test_cinema_project_imports.py,779
+  tests/test_cinema_policy.py,314
+  tests/test_cinema_project_imports.py,960
   tests/test_cinema_project_ir.py,23
   tests/test_cinema_projects.py,206
-  tests/test_cinema_publish.py,99
+  tests/test_cinema_publish.py,234
   tests/test_cinema_scope.py,592
   tests/test_cinema_scripts.py,67
-  tests/test_cinema_server.py,1018
+  tests/test_cinema_server.py,1126
   tests/test_cinema_spatial_patch.py,30
   tests/test_cinema_traces.py,112
   tests/test_cinema_ui_patch.py,156
@@ -161,7 +161,7 @@ D:
     e: run_flow
     run_flow(menu_items)
   examples/web_app_calculator/cinema/nexu_hooks.py:
-    e: apply_manifest_from_ledger,verify_capsule,apply_spatial_patch,propose_llm,append_policy_entry,append_goal_policy_entry,goal_contract_lines,validate_artifact,save_history,list_history,restore_history,effective_ui_constraints,sync_option_previews,patch_option_previews,projects_catalog,activate_project,import_project_from_zip,import_project_from_git,import_project_from_http,delete_imported,delete_workspace_project,imported_markpact,imported_llm_log,active_project,export_markpact_readme,services_catalog,publish_service,start_service,stop_service
+    e: apply_manifest_from_ledger,verify_capsule,apply_spatial_patch,propose_llm,append_policy_entry,append_goal_policy_entry,goal_contract_lines,validate_artifact,save_history,list_history,restore_history,effective_ui_constraints,sync_option_previews,patch_option_previews,projects_catalog,activate_project,import_project_from_zip,import_project_from_git,import_project_from_http,import_project_from_markpact,delete_imported,delete_workspace_project,imported_markpact,imported_llm_log,active_project,export_markpact_readme,services_catalog,publish_service,start_service,stop_service,delete_service
     apply_manifest_from_ledger()
     verify_capsule()
     apply_spatial_patch(html;delete_ids)
@@ -181,6 +181,7 @@ D:
     import_project_from_zip(filename;content_base64)
     import_project_from_git(git_url;branch)
     import_project_from_http(site_url)
+    import_project_from_markpact(filename;content_base64)
     delete_imported(project_id)
     delete_workspace_project(project_id)
     imported_markpact(project_id)
@@ -191,9 +192,10 @@ D:
     publish_service()
     start_service(service_id)
     stop_service(service_id)
+    delete_service(service_id)
   examples/web_app_calculator/cinema/server.py:
-    e: _load_cinema_ui_profile,_goal_entry_kwargs,_llm_prompt_intro,_llm_prompt_rules,_llm_communication_contract_block,_load_env_file,_load_all_env,_resolve_model,_llm_network_allowed,_litellm_available,_llm_status_payload,_trace_slug,_read_trace_index,_write_llm_trace,_list_llm_traces,_path_segments,_parse_imported_project_route,_delete_imported_project,_delete_project,_imported_markpact,_imported_llm_log,_read_llm_trace,_ensure_api_key_env,_strip_markdown_fences,_extract_html_document,_compact_html_for_llm,_effective_markpact_mode,_compact_markpact_for_llm,_try_read_options_cache,_store_options_cache,_extract_llm_content,_compact_llm_error,_load_policy_payload,_apply_entry_constraints,_effective_ui_constraints_from_ledger,_update_constraints,_merge_ui_constraints,_ensure_intract_on_path,_propose_cinema_contracts,_proposal_kind_and_element,_proposal_delta_text,_normalize_proposals_for_ledger,_append_policy_entry_legacy,_nexu_hooks_apply,_nexu_hooks_verify,_propose_llm_for_stage,_validate_intract_artifact,_append_policy_entry,_save_history_checkpoint,_list_history,_restore_history,_sync_option_previews,_patch_option_previews,_projects_catalog,_active_project,_activate_project,_import_project,_import_project_zip,_import_project_git,_import_project_http,_parse_multipart_zip,_export_markpact_markdown,_services_catalog,_publish_service,_start_service,_stop_service,CustomHTTPRequestHandler,ThreadingHTTPServer
-    CustomHTTPRequestHandler: __init__(0),do_GET(0),do_POST(0),do_DELETE(0),do_OPTIONS(0)
+    e: _load_cinema_ui_profile,_goal_entry_kwargs,_llm_prompt_intro,_llm_prompt_rules,_llm_communication_contract_block,_load_env_file,_load_all_env,_resolve_model,_llm_network_allowed,_litellm_available,_llm_status_payload,_trace_slug,_read_trace_index,_write_llm_trace,_list_llm_traces,_path_segments,_parse_imported_project_route,_delete_imported_project,_delete_project,_imported_markpact,_imported_llm_log,_read_llm_trace,_ensure_api_key_env,_strip_markdown_fences,_extract_html_document,_compact_html_for_llm,_effective_markpact_mode,_compact_markpact_for_llm,_try_read_options_cache,_store_options_cache,_extract_llm_content,_compact_llm_error,_load_policy_payload,_apply_entry_constraints,_effective_ui_constraints_from_ledger,_update_constraints,_merge_ui_constraints,_ensure_intract_on_path,_propose_cinema_contracts,_proposal_kind_and_element,_proposal_delta_text,_normalize_proposals_for_ledger,_append_policy_entry_legacy,_nexu_hooks_apply,_nexu_hooks_verify,_propose_llm_for_stage,_validate_intract_artifact,_append_policy_entry,_save_history_checkpoint,_list_history,_restore_history,_sync_option_previews,_patch_option_previews,_projects_catalog,_active_project,_activate_project,_import_project,_import_project_zip,_import_project_git,_import_project_http,_import_project_markpact,_parse_multipart_upload,_parse_multipart_zip,_parse_multipart_markpact,_export_markpact_markdown,_services_catalog,_publish_service,_start_service,_stop_service,_delete_service,CustomHTTPRequestHandler,ThreadingHTTPServer
+    CustomHTTPRequestHandler: __init__(0),do_GET(0),_handle_post_log(1),_handle_post_manifest_apply_ledger(1),_handle_post_capsule_verify(0),_handle_post_propose_llm(1),_handle_post_propose_goal(1),_handle_post_history_restore(1),do_POST(0),_handle_post_services_publish(1),_handle_post_services_start(1),_handle_post_services_stop(1),_handle_post_services_delete(1),do_POST(0),_handle_post_projects_activate(1),_handle_post_projects_import(1),_handle_post_projects_import_zip(1),_handle_post_projects_import_git(1),_handle_post_projects_import_http(1),_handle_post_projects_import_markpact(1),_handle_post_projects_delete(1),do_POST(0),do_DELETE(0),do_OPTIONS(0)
     ThreadingHTTPServer:
     _load_cinema_ui_profile()
     _goal_entry_kwargs(data)
@@ -255,12 +257,16 @@ D:
     _import_project_zip(content;filename)
     _import_project_git(data)
     _import_project_http(data)
+    _import_project_markpact(content;filename)
+    _parse_multipart_upload(post_data;content_type)
     _parse_multipart_zip(post_data;content_type)
+    _parse_multipart_markpact(post_data;content_type)
     _export_markpact_markdown()
     _services_catalog()
     _publish_service()
     _start_service(service_id)
     _stop_service(service_id)
+    _delete_service(service_id)
   examples/web_app_calculator/markpact_sandbox/sandbox/src/calculator.py:
     e: render_calculator
     render_calculator(calculator_state)
@@ -386,7 +392,7 @@ D:
     prepare_cinema_html_document(html)
     filter_valid_option_batch(batch)
   src/nexu/cinema_http_preprocess.py:
-    e: _safe_read_under,_extract_inline_css,_extract_stylesheet_hrefs,_normalize_linked_paths,_rule_is_visual,_filter_visual_css,extract_visual_css,_script_src_allowed_for_preview,_should_remove_preview_script,sanitize_http_preview_html,inject_http_preview_shim,prepare_http_preview_html,build_html_outline,_write_preprocess_artifacts,preprocess_cinema_seed,http_preprocess_artifacts_present,ensure_http_preprocess_artifacts,preprocess_http_import,_project_meta_path,load_cinema_seed_preprocess_artifacts,_load_project_meta,_load_organize_patch_context,load_http_preprocess_artifacts,http_patch_llm_rules,_OutlineParser
+    e: _safe_read_under,_extract_inline_css,_extract_stylesheet_hrefs,_normalize_linked_paths,_rule_is_visual,_filter_visual_css,extract_visual_css,_script_src_allowed_for_preview,_should_remove_preview_script,sanitize_http_preview_html,inject_http_preview_shim,prepare_http_preview_html,build_html_outline,_write_preprocess_artifacts,preprocess_cinema_seed,http_preprocess_artifacts_present,ensure_http_preprocess_artifacts,preprocess_http_import,_project_meta_path,load_cinema_seed_preprocess_artifacts,_load_project_meta,_load_organize_patch_context,_local_source_rel_path,_read_http_source_artifacts,_build_http_artifacts_payload,load_http_preprocess_artifacts,http_patch_llm_rules,_OutlineParser
     _OutlineParser: __init__(0),_keep_attr(1),handle_starttag(2),handle_endtag(1),handle_data(1)
     _safe_read_under(base_dir;rel_path)
     _extract_inline_css(html)
@@ -410,6 +416,9 @@ D:
     load_cinema_seed_preprocess_artifacts(cinema_dir;active)
     _load_project_meta(meta_path)
     _load_organize_patch_context(source_dir;organize)
+    _local_source_rel_path(path)
+    _read_http_source_artifacts(source_dir;meta)
+    _build_http_artifacts_payload()
     load_http_preprocess_artifacts(cinema_dir;active)
     http_patch_llm_rules()
   src/nexu/cinema_iterate.py:
@@ -544,9 +553,10 @@ D:
     validate_intract_artifact(artifact;proposals)
     verify_capsule_workspace(root;capsule_name)
   src/nexu/cinema_project_imports.py:
-    e: http_stage_matches_import,reject_import_stage_replacement,restore_http_import_stages_if_needed,_slug,_imports_root,_project_dir,_validate_http_url,_validate_git_url,_safe_extract_zip,_charset_from_content_type,_decode_http_bytes,_document_base_href,_fetch_http_body,_same_origin,_extract_stylesheet_hrefs,_fetch_http_stylesheets,_rewrite_local_stylesheets,_rewrite_local_asset_refs,_fetch_meta_assets,_inject_base_href,_find_http_index_path,_load_http_fetch_meta,_build_http_preview_stage0,_iter_project_files,_detect_run_notes,_read_text_for_markpact,_build_markpact_migration,_stage_html,_apply_http_preprocess_fields,_refresh_http_preprocess_if_needed,_activate_imported,import_git_project,import_http_project,import_zip_project,_import_kind_from_id,_project_title_from_id,_maybe_organize_import_source,_finish_import,_infer_workspace_context,_source_stats,_source_url_from_meta,normalize_imported_project_id,is_deletable_imported_id,_resolve_markpact_path,_with_workspace_meta_defaults,_compile_meta_fields,_ensure_project_meta_fields,_catalog_entry_from_meta,_filter_traces_for_project,read_imported_markpact,imported_project_llm_log,_verify_delete_paths,_activate_delete_fallback,_clear_active_project,_delete_active_project_fallback,delete_imported_project,delete_project,list_imported_projects,merged_projects_catalog,activate_imported_project
+    e: http_stage_matches_import,reject_import_stage_replacement,http_cinema_files_match_import,restore_http_import_stages_if_needed,_slug,_imports_root,_project_dir,_validate_http_url,_validate_git_url,_safe_extract_zip,_charset_from_content_type,_decode_http_bytes,_document_base_href,_fetch_http_body,_same_origin,_extract_stylesheet_hrefs,_fetch_http_stylesheets,_rewrite_local_stylesheets,_rewrite_local_asset_refs,_rewrite_organize_extracted_refs,_strip_base_href,_is_cinema_local_ref,_absolutize_external_ref,_parse_srcset,_format_srcset,_absolutize_external_urls,_fetch_meta_assets,_inject_base_href,_find_http_index_path,_load_http_fetch_meta,_http_preview_source_context,_read_http_preview_html,_rewrite_optional_stylesheets,_extract_organize_files,_ensure_http_preview_marker,_build_http_preview_stage0,_iter_project_files,_detect_run_notes,_safe_markpact_rel_path,extract_markpact_embedded_files,_title_from_markpact_content,_write_markpact_embedded_files,_read_text_for_markpact,_build_markpact_migration,_stage_html,_apply_http_preprocess_fields,_refresh_http_preprocess_if_needed,_activate_imported,import_git_project,import_http_project,import_zip_project,import_markpact_project,_import_kind_from_id,_project_title_from_id,_maybe_organize_import_source,_finish_import,_infer_workspace_context,_source_stats,_source_url_from_meta,normalize_imported_project_id,is_deletable_imported_id,_resolve_markpact_path,_with_workspace_meta_defaults,_compile_meta_fields,_ensure_project_meta_fields,_catalog_entry_from_meta,_filter_traces_for_project,read_imported_markpact,imported_project_llm_log,_verify_delete_paths,_activate_delete_fallback,_clear_active_project,_delete_active_project_fallback,delete_imported_project,delete_project,list_imported_projects,merged_projects_catalog,_load_http_import_meta,promote_cinema_option,activate_imported_project
     http_stage_matches_import(html;meta)
     reject_import_stage_replacement(html;meta)
+    http_cinema_files_match_import(cinema_dir;meta)
     restore_http_import_stages_if_needed(cinema_dir;meta)
     _slug(value)
     _imports_root(cinema_dir)
@@ -563,13 +573,29 @@ D:
     _fetch_http_stylesheets(html)
     _rewrite_local_stylesheets(html)
     _rewrite_local_asset_refs(html)
+    _rewrite_organize_extracted_refs(html)
+    _strip_base_href(html)
+    _is_cinema_local_ref(ref)
+    _absolutize_external_ref(ref;page_url)
+    _parse_srcset(value)
+    _format_srcset(items)
+    _absolutize_external_urls(html;page_url)
     _fetch_meta_assets(fetch_meta)
     _inject_base_href(html;base_href)
     _find_http_index_path(source_dir)
     _load_http_fetch_meta(source_dir)
+    _http_preview_source_context(meta)
+    _read_http_preview_html(index_path)
+    _rewrite_optional_stylesheets(html)
+    _extract_organize_files(meta)
+    _ensure_http_preview_marker(html)
     _build_http_preview_stage0(meta)
     _iter_project_files(root)
     _detect_run_notes(root)
+    _safe_markpact_rel_path(rel)
+    extract_markpact_embedded_files(markdown)
+    _title_from_markpact_content(markdown;filename;embedded)
+    _write_markpact_embedded_files(source_dir;embedded)
     _read_text_for_markpact(path)
     _build_markpact_migration(root)
     _stage_html(meta)
@@ -579,6 +605,7 @@ D:
     import_git_project(cinema_dir;git_url)
     import_http_project(cinema_dir;site_url)
     import_zip_project(cinema_dir;filename;content_base64)
+    import_markpact_project(cinema_dir;filename;content_base64)
     _import_kind_from_id(project_id)
     _project_title_from_id(project_id)
     _maybe_organize_import_source(source_dir;import_kind)
@@ -604,6 +631,8 @@ D:
     delete_project(cinema_dir;project_id)
     list_imported_projects(cinema_dir)
     merged_projects_catalog(cinema_dir)
+    _load_http_import_meta(cinema_dir;project_id)
+    promote_cinema_option(cinema_dir)
     activate_imported_project(cinema_dir;project_id)
   src/nexu/cinema_projects.py:
     e: find_nexu_repo_root,deleted_project_ids,mark_project_deleted,is_example_project_id,_project_catalog_entry,_catalog_filters,list_project_catalog,delete_example_project,_resolve_source_cinema,_project_widgets,_seed_html_for_project,_copy_cinema_files,_write_seed_variants,_find_example_project,_active_project_meta,_write_active_project_meta,_resolve_root_for_project_source,_copy_or_seed_project_files,_sync_project_options,_apply_preprocess_meta,_bootstrap_goal_from_project,_init_project_activation,activate_example_project,load_active_project,ExampleProject
@@ -633,7 +662,9 @@ D:
     activate_example_project(cinema_dir;project_id)
     load_active_project(cinema_dir)
   src/nexu/cinema_publish.py:
-    e: services_root,_registry_path,_load_registry,_save_registry,_slug_service_id,_pick_port,_port_open,_http_ok,_service_alive,_refresh_service_status,list_published_services,_write_service_readme,_prepare_service_directory,_generate_markpact_export,_allocate_service_port,_create_service_entry,_register_service,_handle_existing_service,publish_project_service,_spawn_http_server,_wait_for_service_running,start_published_service,stop_published_service
+    e: _service_url_mode,_public_service_url,services_root,_registry_path,_load_registry,_save_registry,_slug_service_id,_pick_port,_port_open,_http_ok,_service_alive,_refresh_service_status,list_published_services,_write_service_readme,_imported_project_ids_in_html,_bundle_imported_source_assets,_prepare_service_directory,_generate_markpact_export,_allocate_service_port,_create_service_entry,_register_service,_handle_existing_service,publish_project_service,_spawn_http_server,_wait_for_service_running,start_published_service,stop_published_service,_validate_service_id,delete_published_service,delete_published_services_for_project
+    _service_url_mode()
+    _public_service_url(service_id)
     services_root(cinema_dir)
     _registry_path(cinema_dir)
     _load_registry(cinema_dir)
@@ -646,6 +677,8 @@ D:
     _refresh_service_status(entry)
     list_published_services(cinema_dir)
     _write_service_readme(service_dir)
+    _imported_project_ids_in_html(html)
+    _bundle_imported_source_assets(cinema_dir;service_dir;html)
     _prepare_service_directory(cinema_dir;stage_file;service_id)
     _generate_markpact_export(service_dir;cinema_dir;root;capsule_name;stage;user_goal)
     _allocate_service_port(cinema_dir;service_id)
@@ -657,6 +690,9 @@ D:
     _wait_for_service_running(entry;deadline)
     start_published_service(cinema_dir;service_id)
     stop_published_service(cinema_dir;service_id)
+    _validate_service_id(service_id)
+    delete_published_service(cinema_dir;service_id)
+    delete_published_services_for_project(cinema_dir;project_id)
   src/nexu/cinema_scope.py:
     e: cinema_has_offline_baseline,scope_option_variants,scope_meta_for_project,load_cinema_ui_profile,can_use_offline_fast_iterate
     cinema_has_offline_baseline(cinema_dir)
@@ -1032,7 +1068,7 @@ D:
     test_options_cache_key_changes_with_stage_or_ledger()
     test_write_read_and_apply_options_cache(tmp_path)
   tests/test_cinema_policy.py:
-    e: test_resolve_iteration_mode,test_normalize_manifest_target_defaults_invalid,test_apply_ledger_from_cinema_project_only,test_effective_ui_constraints_from_ledger_last_wins,test_effective_ui_constraints_filters_project_and_scope,test_promote_applies_spatial_deletes_only_for_functions_scope,test_refresh_imported_policy_snapshot_keeps_markpact_separate_from_intract,test_intract_manifest_path_rejects_markpact_readme,test_effective_ui_constraints_ignores_unscoped_when_focus_scope_set,test_merge_ui_constraint_lists_session_overrides_ledger,test_sync_option_previews_empty_delete_ids_mirrors_workspace,test_sync_option_previews_from_workspace,test_enforce_deletes_on_option_previews,test_ensure_option_previews_from_stages,test_propose_ui_delta_and_validate
+    e: test_resolve_iteration_mode,test_normalize_manifest_target_defaults_invalid,test_apply_ledger_from_cinema_project_only,test_effective_ui_constraints_from_ledger_last_wins,test_effective_ui_constraints_filters_project_and_scope,test_promote_applies_spatial_deletes_only_for_functions_scope,test_refresh_imported_policy_snapshot_keeps_markpact_separate_from_intract,test_intract_manifest_path_rejects_markpact_readme,test_effective_ui_constraints_ignores_unscoped_when_focus_scope_set,test_merge_ui_constraint_lists_session_overrides_ledger,test_sync_option_previews_empty_delete_ids_mirrors_workspace,test_sync_option_previews_from_workspace,test_enforce_deletes_on_option_previews,test_ensure_option_previews_from_stages,test_propose_ui_delta_and_validate,test_iteration_ledger_contracts_use_active_project_and_scope
     test_resolve_iteration_mode()
     test_normalize_manifest_target_defaults_invalid()
     test_apply_ledger_from_cinema_project_only(tmp_path)
@@ -1048,8 +1084,9 @@ D:
     test_enforce_deletes_on_option_previews(tmp_path)
     test_ensure_option_previews_from_stages(tmp_path)
     test_propose_ui_delta_and_validate(tmp_path)
+    test_iteration_ledger_contracts_use_active_project_and_scope(tmp_path)
   tests/test_cinema_project_imports.py:
-    e: test_import_zip_project_creates_markpact_migration_and_options,test_merged_projects_catalog_includes_imported,test_delete_project_hides_demo_from_workspace_catalog,test_import_zip_with_index_html_organizes_source,test_import_zip_without_index_html_skips_organize,test_activate_imported_project_reloads_stages,test_validate_urls_reject_file_scheme,test_safe_extract_zip_rejects_unsafe_paths,test_import_http_project_fetches_and_migrates,test_import_http_project_uses_rendered_dom_snapshot,test_activate_http_import_regenerates_preview_stage0,test_activate_http_import_regenerates_preprocess_when_missing,test_activate_http_import_empty_subtitle_not_goal,test_activate_zip_import_does_not_require_user_goal,test_activate_imported_project_resets_calculator_ledger,test_import_http_project_requires_network_flag,test_import_git_project_requires_network_flag,test_is_deletable_imported_id,test_delete_imported_http_domain_id_with_dot,test_delete_imported_project_removes_directory,test_read_imported_markpact_returns_markdown,test_http_stage_matches_import_rejects_calculator_pollution,test_http_stage_matches_import_ignores_nexu_shield_selectors,test_restore_http_import_stages_if_needed_rebuilds_from_seed,test_activate_http_import_after_calculator_pollution
+    e: test_import_zip_project_creates_markpact_migration_and_options,test_merged_projects_catalog_includes_imported,test_delete_project_hides_demo_from_workspace_catalog,test_import_zip_with_index_html_organizes_source,test_import_zip_without_index_html_skips_organize,test_activate_imported_project_reloads_stages,test_validate_urls_reject_file_scheme,test_safe_extract_zip_rejects_unsafe_paths,test_import_http_project_fetches_and_migrates,test_build_http_preview_stage0_serves_extracted_css_from_cinema,test_build_http_preview_stage0_absolutizes_remote_asset_refs,test_import_http_project_uses_rendered_dom_snapshot,test_activate_http_import_regenerates_preview_stage0,test_activate_http_import_regenerates_preprocess_when_missing,test_activate_http_import_empty_subtitle_not_goal,test_activate_zip_import_does_not_require_user_goal,test_activate_imported_project_resets_calculator_ledger,test_import_http_project_requires_network_flag,test_import_git_project_requires_network_flag,test_is_deletable_imported_id,test_delete_imported_http_domain_id_with_dot,test_delete_imported_project_removes_directory,test_extract_markpact_embedded_files_parses_fenced_blocks,test_import_markpact_project_extracts_files_and_activates,test_import_markpact_project_rejects_non_markdown,test_read_imported_markpact_returns_markdown,test_http_stage_matches_import_rejects_calculator_pollution,test_http_stage_matches_import_ignores_nexu_shield_selectors,test_http_cinema_files_match_import_detects_polluted_alt,test_restore_http_import_stages_if_needed_rebuilds_from_seed,test_promote_http_import_restores_polluted_alt_before_copy,test_activate_http_import_after_calculator_pollution
     test_import_zip_project_creates_markpact_migration_and_options(tmp_path)
     test_merged_projects_catalog_includes_imported(tmp_path)
     test_delete_project_hides_demo_from_workspace_catalog(tmp_path)
@@ -1059,6 +1096,8 @@ D:
     test_validate_urls_reject_file_scheme()
     test_safe_extract_zip_rejects_unsafe_paths(tmp_path)
     test_import_http_project_fetches_and_migrates(tmp_path)
+    test_build_http_preview_stage0_serves_extracted_css_from_cinema(tmp_path)
+    test_build_http_preview_stage0_absolutizes_remote_asset_refs(tmp_path)
     test_import_http_project_uses_rendered_dom_snapshot(tmp_path)
     test_activate_http_import_regenerates_preview_stage0(tmp_path)
     test_activate_http_import_regenerates_preprocess_when_missing(tmp_path)
@@ -1070,10 +1109,15 @@ D:
     test_is_deletable_imported_id()
     test_delete_imported_http_domain_id_with_dot(tmp_path)
     test_delete_imported_project_removes_directory(tmp_path)
+    test_extract_markpact_embedded_files_parses_fenced_blocks()
+    test_import_markpact_project_extracts_files_and_activates(tmp_path)
+    test_import_markpact_project_rejects_non_markdown(tmp_path)
     test_read_imported_markpact_returns_markdown(tmp_path)
     test_http_stage_matches_import_rejects_calculator_pollution(tmp_path)
     test_http_stage_matches_import_ignores_nexu_shield_selectors(tmp_path)
+    test_http_cinema_files_match_import_detects_polluted_alt(tmp_path)
     test_restore_http_import_stages_if_needed_rebuilds_from_seed(tmp_path)
+    test_promote_http_import_restores_polluted_alt_before_copy(tmp_path)
     test_activate_http_import_after_calculator_pollution(tmp_path)
   tests/test_cinema_project_ir.py:
     e: test_build_project_ir_extracts_functional_outline
@@ -1090,11 +1134,16 @@ D:
     test_activate_dashboard_replaces_stale_calculator_options(tmp_path)
     test_activate_calculator_preserves_distinct_option_previews()
   tests/test_cinema_publish.py:
-    e: cinema_setup,test_publish_creates_service_files,test_list_and_start_stop_service,test_publish_missing_stage_returns_error
+    e: cinema_setup,test_publish_creates_service_files,test_list_and_start_stop_service,test_list_migrates_old_localhost_service_urls,test_publish_can_generate_subdomain_public_urls,test_publish_missing_stage_returns_error,test_publish_http_import_bundles_source_assets,test_delete_published_service_removes_registry_and_files,test_delete_unknown_service_returns_error
     cinema_setup(tmp_path)
     test_publish_creates_service_files(cinema_setup)
     test_list_and_start_stop_service(cinema_setup)
+    test_list_migrates_old_localhost_service_urls(cinema_setup)
+    test_publish_can_generate_subdomain_public_urls(cinema_setup;monkeypatch)
     test_publish_missing_stage_returns_error(cinema_setup)
+    test_publish_http_import_bundles_source_assets(tmp_path)
+    test_delete_published_service_removes_registry_and_files(cinema_setup)
+    test_delete_unknown_service_returns_error(cinema_setup)
   tests/test_cinema_scope.py:
     e: test_dashboard_disallows_keypad_scope,test_calculator_allows_keypad_scope,test_offline_fast_scopes_per_kind,test_dashboard_colors_offline_labels,test_scope_option_variants_dashboard_functions,test_strip_and_inject_scope_style,test_scoped_html_fragment_for_calculator_colors,test_cinema_has_offline_baseline,test_inject_scope_style_calculator_colors,test_load_cinema_ui_profile_from_active_and_stage,test_ui_profile_ignores_runtime_script_tokens,test_can_use_offline_fast_iterate,test_imported_kind_uses_web_scopes,test_http_import_offline_colors_keeps_site_markers,test_http_import_offline_colors_recolors_marked_buttons,test_http_import_offline_colors_respects_keep_marks,test_http_import_offline_orientation_marks_create_two_column_patch,test_http_import_offline_colors_recolors_kadence_heading_inline,test_http_import_offline_colors_recolors_all_marked_kadence_headings,test_http_import_offline_orientation_two_columns_with_delete_marks,test_http_import_offline_display_keeps_entry_content_headings,test_http_import_offline_shapes_keeps_content_button_radii
     test_dashboard_disallows_keypad_scope()
@@ -1128,7 +1177,7 @@ D:
     test_inject_cinema_shield_skips_lazy_placeholder_imgs()
     test_inject_cinema_shield_requires_meaningful_image_alt()
   tests/test_cinema_server.py:
-    e: test_render_server_script_embeds_runtime_context,test_render_server_script_embeds_openrouter_model,test_write_cinema_nexu_hooks_uses_template,test_render_stage_template_injects_runtime_scripts,test_cinema_player_template_is_externalized,test_render_server_script_embeds_project_import_routes,test_write_cinema_nexu_hooks_includes_import_helpers,_free_port,test_iterate_colors_scope_uses_offline_path,test_iterate_dashboard_kinds_colors_prefers_offline_before_llm,test_iterate_colors_scope_uses_llm_patch_when_available,test_effective_markpact_mode_off_for_visual_scope,test_iterate_functions_scope_skips_offline_fast_path,test_iterate_colors_without_stage0_skips_offline,test_start_cinema_player_server_returns_url_without_opening,test_projects_import_zip_endpoint,test_delete_imported_http_domain_id_via_api,_LLMConfig
+    e: test_render_server_script_embeds_runtime_context,test_render_server_script_embeds_openrouter_model,test_write_cinema_nexu_hooks_uses_template,test_render_stage_template_injects_runtime_scripts,test_cinema_player_template_is_externalized,test_render_server_script_embeds_project_import_routes,test_cinema_server_imports_markpact_upload,test_write_cinema_nexu_hooks_includes_import_helpers,_free_port,test_iterate_colors_scope_uses_offline_path,test_iterate_dashboard_kinds_colors_prefers_offline_before_llm,test_iterate_colors_scope_uses_llm_patch_when_available,test_effective_markpact_mode_off_for_visual_scope,test_iterate_functions_scope_skips_offline_fast_path,test_iterate_colors_without_stage0_skips_offline,test_start_cinema_player_server_returns_url_without_opening,test_projects_import_zip_endpoint,test_delete_imported_http_domain_id_via_api,_LLMConfig
     _LLMConfig:
     test_render_server_script_embeds_runtime_context()
     test_render_server_script_embeds_openrouter_model()
@@ -1136,6 +1185,7 @@ D:
     test_render_stage_template_injects_runtime_scripts()
     test_cinema_player_template_is_externalized()
     test_render_server_script_embeds_project_import_routes()
+    test_cinema_server_imports_markpact_upload(tmp_path)
     test_write_cinema_nexu_hooks_includes_import_helpers(tmp_path)
     _free_port()
     test_iterate_colors_scope_uses_offline_path(tmp_path)

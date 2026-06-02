@@ -1384,473 +1384,506 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 return
         return super().do_GET()
 
+    def _handle_post_log(self, post_data: bytes):
+        try:
+            data = json.loads(post_data.decode('utf-8', errors='replace'))
+            timestamp = datetime.now().isoformat()
+            action = data.get('action', 'unknown')
+            details = data.get('details', '')
+            
+            file_exists = LOG_CSV.exists()
+            with open(LOG_CSV, mode='a', newline='', encoding='utf-8') as f:
+                writer = csv.writer(f)
+                if not file_exists:
+                    writer.writerow(['timestamp', 'action', 'details'])
+                writer.writerow([timestamp, action, details])
+            
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json; charset=utf-8')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps({"status": "logged"}).encode('utf-8'))
+        except Exception as e:
+            self.send_response(500)
+            self.end_headers()
+            self.wfile.write(str(e).encode('utf-8'))
+
+    def _handle_post_manifest_apply_ledger(self, post_data: bytes):
+        try:
+            data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+            dry_run = bool(data.get('dry_run', False))
+            target = str(data.get('target', 'both'))
+            payload = _nexu_hooks_apply(dry_run=dry_run, target=target)
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json; charset=utf-8')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(str(e).encode('utf-8'))
+
+    def _handle_post_capsule_verify(self):
+        try:
+            payload = _nexu_hooks_verify()
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json; charset=utf-8')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(str(e).encode('utf-8'))
+
+    def _handle_post_propose_llm(self, post_data: bytes):
+        try:
+            data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+            stage = int(data.get('current_stage', 0))
+            goal = str(data.get('goal', '') or '')
+            payload = _propose_llm_for_stage(stage, goal)
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json; charset=utf-8')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(str(e).encode('utf-8'))
+
+    def _handle_post_propose_goal(self, post_data: bytes):
+        try:
+            data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+            stage = int(data.get('current_stage', 0))
+            goal = str(data.get('goal', '') or data.get('user_goal', '') or '').strip()
+            if not goal:
+                payload = {"error": "goal required"}
+            else:
+                import nexu_hooks
+                entry = nexu_hooks.append_goal_policy_entry(
+                    stage, goal, **_goal_entry_kwargs(data)
+                )
+                proposals = entry.get("proposed_contracts") or []
+                payload = {
+                    "status": "goal_defined",
+                    "count": len(proposals),
+                    "user_goal": goal,
+                    "proposals": proposals,
+                }
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json; charset=utf-8')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(str(e).encode('utf-8'))
+
+    def _handle_post_history_restore(self, post_data: bytes):
+        try:
+            data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+            cp_id = str(data.get('checkpoint_id', '') or data.get('id', '')).strip()
+            if not cp_id:
+                payload = {"error": "checkpoint_id required"}
+            else:
+                apply_manifest = bool(data.get('apply_manifest', True))
+                target = str(data.get('target', 'both'))
+                payload = _restore_history(cp_id, apply_manifest=apply_manifest, target=target)
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json; charset=utf-8')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(str(e).encode('utf-8'))
+
+    def _handle_post_services_publish(self, post_data: bytes):
+        try:
+            data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+            payload = _publish_service(
+                stage=int(data.get('stage', 0)),
+                project_id=str(data.get('project_id') or data.get('id') or ''),
+                project_title=str(data.get('project_title') or data.get('title') or ''),
+                user_goal=str(data.get('goal') or data.get('user_goal') or ''),
+            )
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json; charset=utf-8')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(str(e).encode('utf-8'))
+
+    def _handle_post_services_start(self, post_data: bytes):
+        try:
+            data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+            service_id = str(data.get('service_id') or data.get('id') or '').strip()
+            if not service_id:
+                payload = {"error": "missing service_id"}
+            else:
+                payload = _start_service(service_id)
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json; charset=utf-8')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(str(e).encode('utf-8'))
+
+    def _handle_post_services_stop(self, post_data: bytes):
+        try:
+            data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+            service_id = str(data.get('service_id') or data.get('id') or '').strip()
+            if not service_id:
+                payload = {"error": "missing service_id"}
+            else:
+                payload = _stop_service(service_id)
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json; charset=utf-8')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(str(e).encode('utf-8'))
+
+    def _handle_post_services_delete(self, post_data: bytes):
+        try:
+            data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+            service_id = str(data.get('service_id') or data.get('id') or '').strip()
+            if not service_id:
+                payload = {"error": "missing service_id"}
+            else:
+                payload = _delete_service(service_id)
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json; charset=utf-8')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(str(e).encode('utf-8'))
+
+    def _handle_post_projects_activate(self, post_data: bytes):
+        try:
+            data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+            project_id = str(data.get('id') or data.get('project_id') or '').strip()
+            if not project_id:
+                payload = {"error": "missing project id"}
+            else:
+                payload = _activate_project(project_id)
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json; charset=utf-8')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(str(e).encode('utf-8'))
+
+    def _handle_post_projects_import(self, post_data: bytes):
+        try:
+            data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+            payload = _import_project(data)
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json; charset=utf-8')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(str(e).encode('utf-8'))
+
+    def _handle_post_projects_import_zip(self, post_data: bytes):
+        try:
+            content_type = str(self.headers.get('Content-Type') or '')
+            if 'multipart/form-data' in content_type:
+                parsed = _parse_multipart_zip(post_data, content_type)
+                if isinstance(parsed, dict):
+                    payload = parsed
+                else:
+                    filename, content = parsed
+                    payload = _import_project_zip(content, filename)
+            else:
+                data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+                payload = _import_project_zip(
+                    base64.b64decode(str(data.get('content_base64') or '')),
+                    str(data.get('filename') or 'project.zip'),
+                )
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json; charset=utf-8')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(str(e).encode('utf-8'))
+
+    def _handle_post_projects_import_git(self, post_data: bytes):
+        try:
+            data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+            payload = _import_project_git(data)
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json; charset=utf-8')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(str(e).encode('utf-8'))
+
+    def _handle_post_projects_import_http(self, post_data: bytes):
+        try:
+            data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+            payload = _import_project_http(data)
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json; charset=utf-8')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(str(e).encode('utf-8'))
+
+    def _handle_post_projects_import_markpact(self, post_data: bytes):
+        try:
+            content_type = str(self.headers.get('Content-Type') or '')
+            if 'multipart/form-data' in content_type:
+                parsed = _parse_multipart_markpact(post_data, content_type)
+                if isinstance(parsed, dict):
+                    payload = parsed
+                else:
+                    filename, content = parsed
+                    payload = _import_project_markpact(content, filename)
+            else:
+                data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+                payload = _import_project_markpact(
+                    base64.b64decode(str(data.get('content_base64') or '')),
+                    str(data.get('filename') or 'project.md'),
+                )
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json; charset=utf-8')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(str(e).encode('utf-8'))
+
+    def _handle_post_projects_delete(self, post_data: bytes):
+        try:
+            data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+            from urllib.parse import unquote
+            project_id = unquote(str(data.get('id') or data.get('project_id') or '').strip())
+            if not project_id:
+                payload = {"error": "missing project id"}
+            else:
+                payload = _delete_project(project_id)
+            status = 404 if str(payload.get("error") or "").startswith("unknown project") else 200
+            self.send_response(status)
+            self.send_header('Content-type', 'application/json; charset=utf-8')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(str(e).encode('utf-8'))
+
+    def _handle_post_promote(self, post_data: bytes):
+        try:
+            data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
+            alt_name = str(data.get('alt', 'alt_a.html')).split('?')[0]
+            stage = int(data.get('stage', 0))
+            focus_scope = str(data.get('focus_scope', '') or '').strip()
+            allowed_alts = {'alt_a.html', 'alt_b.html', 'alt_c.html'}
+            if alt_name not in allowed_alts:
+                payload = {"error": f"unsupported option file: {alt_name}"}
+            elif stage < 0 or stage > 2:
+                payload = {"error": f"unsupported stage: S{stage}"}
+            else:
+                from nexu.cinema_project_imports import promote_cinema_option
+                promote_result = promote_cinema_option(
+                    DIRECTORY,
+                    alt_name=alt_name,
+                    stage=stage,
+                )
+                if promote_result.get("error"):
+                    payload = {"error": promote_result["error"]}
+                else:
+                    options_sync = _patch_option_previews(
+                        stage, focus_scope=focus_scope
+                    )
+                    patch_files = list(options_sync.get("files") or [])
+                    restore_files = list(
+                        (promote_result.get("options_sync") or {}).get("files") or []
+                    )
+                    if restore_files and not patch_files:
+                        options_sync = promote_result.get("options_sync") or options_sync
+                    history_entry = _save_history_checkpoint(
+                        action='promote',
+                        stage=stage,
+                        status='promoted',
+                        extra=alt_name,
+                    )
+                    payload = {
+                        "status": "promoted",
+                        "alt": alt_name,
+                        "stage": stage,
+                        "stage_path": promote_result.get("stage_path"),
+                        "history_checkpoint": history_entry,
+                        "options_sync": options_sync,
+                    }
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json; charset=utf-8')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(str(e).encode('utf-8'))
+
     def do_POST(self):
         if self.path == '/log':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
-            try:
-                data = json.loads(post_data.decode('utf-8', errors='replace'))
-                timestamp = datetime.now().isoformat()
-                action = data.get('action', 'unknown')
-                details = data.get('details', '')
-                
-                # Append to CSV log using robust UTF-8 encoding
-                file_exists = LOG_CSV.exists()
-                with open(LOG_CSV, mode='a', newline='', encoding='utf-8') as f:
-                    writer = csv.writer(f)
-                    if not file_exists:
-                        writer.writerow(['timestamp', 'action', 'details'])
-                    writer.writerow([timestamp, action, details])
-                
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json; charset=utf-8')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(json.dumps({"status": "logged"}).encode('utf-8'))
-                return
-            except Exception as e:
-                self.send_response(500)
-                self.end_headers()
-                self.wfile.write(str(e).encode('utf-8'))
-                return
+            self._handle_post_log(post_data)
+            return
 
         elif self.path == '/manifest/apply-ledger':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
-            try:
-                data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
-                dry_run = bool(data.get('dry_run', False))
-                target = str(data.get('target', 'both'))
-                payload = _nexu_hooks_apply(dry_run=dry_run, target=target)
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json; charset=utf-8')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
-                return
-            except Exception as e:
-                self.send_response(500)
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(str(e).encode('utf-8'))
-                return
+            self._handle_post_manifest_apply_ledger(post_data)
+            return
 
         elif self.path == '/capsule/verify':
-            try:
-                payload = _nexu_hooks_verify()
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json; charset=utf-8')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
-                return
-            except Exception as e:
-                self.send_response(500)
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(str(e).encode('utf-8'))
-                return
+            self._handle_post_capsule_verify()
+            return
 
         elif self.path == '/propose/llm':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
-            try:
-                data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
-                stage = int(data.get('current_stage', 0))
-                goal = str(data.get('goal', '') or '')
-                payload = _propose_llm_for_stage(stage, goal)
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json; charset=utf-8')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
-                return
-            except Exception as e:
-                self.send_response(500)
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(str(e).encode('utf-8'))
-                return
+            self._handle_post_propose_llm(post_data)
+            return
 
         elif self.path == '/propose/goal':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
-            try:
-                data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
-                stage = int(data.get('current_stage', 0))
-                goal = str(data.get('goal', '') or data.get('user_goal', '') or '').strip()
-                if not goal:
-                    payload = {"error": "goal required"}
-                else:
-                    import nexu_hooks
-                    entry = nexu_hooks.append_goal_policy_entry(
-                        stage, goal, **_goal_entry_kwargs(data)
-                    )
-                    proposals = entry.get("proposed_contracts") or []
-                    payload = {
-                        "status": "goal_defined",
-                        "count": len(proposals),
-                        "user_goal": goal,
-                        "proposals": proposals,
-                    }
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json; charset=utf-8')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
-                return
-            except Exception as e:
-                self.send_response(500)
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(str(e).encode('utf-8'))
-                return
+            self._handle_post_propose_goal(post_data)
+            return
                 
         elif self.path == '/history/restore':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
-            try:
-                data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
-                cp_id = str(data.get('checkpoint_id', '') or data.get('id', '')).strip()
-                if not cp_id:
-                    payload = {"error": "checkpoint_id required"}
-                else:
-                    apply_manifest = bool(data.get('apply_manifest', True))
-                    target = str(data.get('target', 'both'))
-                    payload = _restore_history(cp_id, apply_manifest=apply_manifest, target=target)
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json; charset=utf-8')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
-                return
-            except Exception as e:
-                self.send_response(500)
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(str(e).encode('utf-8'))
-                return
+            self._handle_post_history_restore(post_data)
+            return
 
         elif self.path == '/services/publish':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
-            try:
-                data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
-                payload = _publish_service(
-                    stage=int(data.get('stage', 0)),
-                    project_id=str(data.get('project_id') or data.get('id') or ''),
-                    project_title=str(data.get('project_title') or data.get('title') or ''),
-                    user_goal=str(data.get('goal') or data.get('user_goal') or ''),
-                )
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json; charset=utf-8')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
-                return
-            except Exception as e:
-                self.send_response(500)
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(str(e).encode('utf-8'))
-                return
+            self._handle_post_services_publish(post_data)
+            return
 
         elif self.path == '/services/start':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
-            try:
-                data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
-                service_id = str(data.get('service_id') or data.get('id') or '').strip()
-                if not service_id:
-                    payload = {"error": "missing service_id"}
-                else:
-                    payload = _start_service(service_id)
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json; charset=utf-8')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
-                return
-            except Exception as e:
-                self.send_response(500)
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(str(e).encode('utf-8'))
-                return
+            self._handle_post_services_start(post_data)
+            return
 
         elif self.path == '/services/stop':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
-            try:
-                data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
-                service_id = str(data.get('service_id') or data.get('id') or '').strip()
-                if not service_id:
-                    payload = {"error": "missing service_id"}
-                else:
-                    payload = _stop_service(service_id)
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json; charset=utf-8')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
-                return
-            except Exception as e:
-                self.send_response(500)
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(str(e).encode('utf-8'))
-                return
+            self._handle_post_services_stop(post_data)
+            return
 
         elif self.path == '/services/delete':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
-            try:
-                data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
-                service_id = str(data.get('service_id') or data.get('id') or '').strip()
-                if not service_id:
-                    payload = {"error": "missing service_id"}
-                else:
-                    payload = _delete_service(service_id)
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json; charset=utf-8')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
-                return
-            except Exception as e:
-                self.send_response(500)
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(str(e).encode('utf-8'))
-                return
+            self._handle_post_services_delete(post_data)
+            return
 
         elif self.path == '/projects/activate':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
-            try:
-                data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
-                project_id = str(data.get('id') or data.get('project_id') or '').strip()
-                if not project_id:
-                    payload = {"error": "missing project id"}
-                else:
-                    payload = _activate_project(project_id)
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json; charset=utf-8')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
-                return
-            except Exception as e:
-                self.send_response(500)
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(str(e).encode('utf-8'))
-                return
+            self._handle_post_projects_activate(post_data)
+            return
 
         elif self.path in ('/projects/import', '/projects/import/'):
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
-            try:
-                data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
-                payload = _import_project(data)
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json; charset=utf-8')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
-                return
-            except Exception as e:
-                self.send_response(500)
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(str(e).encode('utf-8'))
-                return
+            self._handle_post_projects_import(post_data)
+            return
 
         elif self.path in ('/projects/import/zip', '/projects/import/zip/'):
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
-            try:
-                content_type = str(self.headers.get('Content-Type') or '')
-                if 'multipart/form-data' in content_type:
-                    parsed = _parse_multipart_zip(post_data, content_type)
-                    if isinstance(parsed, dict):
-                        payload = parsed
-                    else:
-                        filename, content = parsed
-                        payload = _import_project_zip(content, filename)
-                else:
-                    data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
-                    payload = _import_project_zip(
-                        base64.b64decode(str(data.get('content_base64') or '')),
-                        str(data.get('filename') or 'project.zip'),
-                    )
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json; charset=utf-8')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
-                return
-            except Exception as e:
-                self.send_response(500)
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(str(e).encode('utf-8'))
-                return
+            self._handle_post_projects_import_zip(post_data)
+            return
 
         elif self.path in ('/projects/import/git', '/projects/import/git/'):
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
-            try:
-                data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
-                payload = _import_project_git(data)
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json; charset=utf-8')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
-                return
-            except Exception as e:
-                self.send_response(500)
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(str(e).encode('utf-8'))
-                return
+            self._handle_post_projects_import_git(post_data)
+            return
 
         elif self.path in ('/projects/import/http', '/projects/import/http/'):
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
-            try:
-                data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
-                payload = _import_project_http(data)
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json; charset=utf-8')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
-                return
-            except Exception as e:
-                self.send_response(500)
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(str(e).encode('utf-8'))
-                return
+            self._handle_post_projects_import_http(post_data)
+            return
 
         elif self.path in ('/projects/import/markpact', '/projects/import/markpact/'):
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
-            try:
-                content_type = str(self.headers.get('Content-Type') or '')
-                if 'multipart/form-data' in content_type:
-                    parsed = _parse_multipart_markpact(post_data, content_type)
-                    if isinstance(parsed, dict):
-                        payload = parsed
-                    else:
-                        filename, content = parsed
-                        payload = _import_project_markpact(content, filename)
-                else:
-                    data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
-                    payload = _import_project_markpact(
-                        base64.b64decode(str(data.get('content_base64') or '')),
-                        str(data.get('filename') or 'project.md'),
-                    )
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json; charset=utf-8')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
-                return
-            except Exception as e:
-                self.send_response(500)
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(str(e).encode('utf-8'))
-                return
+            self._handle_post_projects_import_markpact(post_data)
+            return
 
         elif self.path in ('/projects/delete', '/projects/delete/'):
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
-            try:
-                data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
-                from urllib.parse import unquote
-
-                project_id = unquote(str(data.get('id') or data.get('project_id') or '').strip())
-                if not project_id:
-                    payload = {"error": "missing project id"}
-                else:
-                    payload = _delete_project(project_id)
-                status = 404 if str(payload.get("error") or "").startswith("unknown project") else 200
-                self.send_response(status)
-                self.send_header('Content-type', 'application/json; charset=utf-8')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
-                return
-            except Exception as e:
-                self.send_response(500)
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(str(e).encode('utf-8'))
-                return
+            self._handle_post_projects_delete(post_data)
+            return
 
         elif self.path == '/promote':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
-            try:
-                data = json.loads(post_data.decode('utf-8', errors='replace')) if post_data else {}
-                alt_name = str(data.get('alt', 'alt_a.html')).split('?')[0]
-                stage = int(data.get('stage', 0))
-                focus_scope = str(data.get('focus_scope', '') or '').strip()
-                allowed_alts = {'alt_a.html', 'alt_b.html', 'alt_c.html'}
-                if alt_name not in allowed_alts:
-                    payload = {"error": f"unsupported option file: {alt_name}"}
-                elif stage < 0 or stage > 2:
-                    payload = {"error": f"unsupported stage: S{stage}"}
-                else:
-                    from nexu.cinema_project_imports import promote_cinema_option
-
-                    promote_result = promote_cinema_option(
-                        DIRECTORY,
-                        alt_name=alt_name,
-                        stage=stage,
-                    )
-                    if promote_result.get("error"):
-                        payload = {"error": promote_result["error"]}
-                    else:
-                        options_sync = _patch_option_previews(
-                            stage, focus_scope=focus_scope
-                        )
-                        patch_files = list(options_sync.get("files") or [])
-                        restore_files = list(
-                            (promote_result.get("options_sync") or {}).get("files") or []
-                        )
-                        if restore_files and not patch_files:
-                            options_sync = promote_result.get("options_sync") or options_sync
-                        history_entry = _save_history_checkpoint(
-                            action='promote',
-                            stage=stage,
-                            status='promoted',
-                            extra=alt_name,
-                        )
-                        payload = {
-                            "status": "promoted",
-                            "alt": alt_name,
-                            "stage": stage,
-                            "stage_path": promote_result.get("stage_path"),
-                            "history_checkpoint": history_entry,
-                            "options_sync": options_sync,
-                        }
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json; charset=utf-8')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(json.dumps(payload, ensure_ascii=False).encode('utf-8'))
-                return
-            except Exception as e:
-                self.send_response(500)
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(str(e).encode('utf-8'))
-                return
+            self._handle_post_promote(post_data)
+            return
 
         elif self.path == '/iterate':
             content_length = int(self.headers['Content-Length'])

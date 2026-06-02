@@ -597,6 +597,41 @@ def _load_organize_patch_context(
     return ctx
 
 
+def _local_source_rel_path(path: str) -> str:
+    return path[len("source/") :] if path.startswith("source/") else path
+
+
+def _read_http_source_artifacts(
+    source_dir: Path,
+    meta: dict[str, Any],
+) -> tuple[str, str, str, str]:
+    css_rel = str(meta.get("visual_css_path") or "source/nexu-visual.css")
+    outline_rel = str(meta.get("html_outline_path") or "source/nexu-outline.html")
+    visual_css = _safe_read_under(source_dir, _local_source_rel_path(css_rel)) or ""
+    html_outline = _safe_read_under(source_dir, _local_source_rel_path(outline_rel)) or ""
+    return visual_css, html_outline, css_rel, outline_rel
+
+
+def _build_http_artifacts_payload(
+    *,
+    meta: dict[str, Any],
+    visual_css: str,
+    html_outline: str,
+    organize_ctx: dict[str, Any],
+) -> dict[str, Any]:
+    if not visual_css and not html_outline and not organize_ctx:
+        return {}
+    return {
+        "llm_context_mode": str(meta.get("llm_context_mode") or "patch"),
+        "visual_css": visual_css,
+        "html_outline": html_outline,
+        "visual_css_bytes": int(meta.get("visual_css_bytes") or len(visual_css.encode("utf-8"))),
+        "outline_node_count": int(meta.get("outline_node_count") or 0),
+        "visual_css_truncated": bool(meta.get("visual_css_truncated")),
+        **organize_ctx,
+    }
+
+
 def load_http_preprocess_artifacts(
     cinema_dir: Path | str,
     active: dict[str, Any] | None,
@@ -612,29 +647,19 @@ def load_http_preprocess_artifacts(
         return {}
     project_dir = meta_path.parent
     source_dir = project_dir / "source"
-    css_rel = str(meta.get("visual_css_path") or "source/nexu-visual.css")
-    outline_rel = str(meta.get("html_outline_path") or "source/nexu-outline.html")
-    css_local = css_rel[len("source/") :] if css_rel.startswith("source/") else css_rel
-    outline_local = outline_rel[len("source/") :] if outline_rel.startswith("source/") else outline_rel
-    visual_css = _safe_read_under(source_dir, css_local) or ""
-    html_outline = _safe_read_under(source_dir, outline_local) or ""
+    visual_css, html_outline, css_rel, outline_rel = _read_http_source_artifacts(source_dir, meta)
     organize_ctx = _load_organize_patch_context(
         source_dir,
         meta.get("organize") if isinstance(meta.get("organize"), dict) else {},
         css_rel=css_rel,
         outline_rel=outline_rel,
     )
-    if not visual_css and not html_outline and not organize_ctx:
-        return {}
-    return {
-        "llm_context_mode": str(meta.get("llm_context_mode") or "patch"),
-        "visual_css": visual_css,
-        "html_outline": html_outline,
-        "visual_css_bytes": int(meta.get("visual_css_bytes") or len(visual_css.encode("utf-8"))),
-        "outline_node_count": int(meta.get("outline_node_count") or 0),
-        "visual_css_truncated": bool(meta.get("visual_css_truncated")),
-        **organize_ctx,
-    }
+    return _build_http_artifacts_payload(
+        meta=meta,
+        visual_css=visual_css,
+        html_outline=html_outline,
+        organize_ctx=organize_ctx,
+    )
 
 
 def http_patch_llm_rules() -> str:

@@ -2,7 +2,7 @@
 
 app {
   name: nexu;
-  version: 0.5.32;
+  version: 0.5.34;
 }
 
 dependencies {
@@ -139,6 +139,55 @@ workflow[name="cinema-repair"] {
 workflow[name="ci-cinema-smoke"] {
   trigger: manual;
   step-1: run cmd=./scripts/ci-cinema-smoke.sh;
+}
+
+workflow[name="publish-test"] {
+  trigger: manual;
+  step-1: run cmd=echo "🚀 Publishing to TestPyPI...";
+  step-2: run cmd=bash -c 'if [ -z "$${TWINE_USERNAME}" ] && [ -z "$${TWINE_PASSWORD}" ] && [ -z "$${PYPI_API_TOKEN}" ]; then \;
+  step-3: run cmd=echo "⚠️  No PyPI credentials found. Set TWINE_USERNAME and TWINE_PASSWORD or PYPI_API_TOKEN"; \;
+  step-4: run cmd=echo "   Example: TWINE_USERNAME=__token__ TWINE_PASSWORD=pypi-xxx make publish-test"; \;
+  step-5: run cmd=echo "   Skipping publish-test."; \;
+  step-6: run cmd=else \;
+  step-7: run cmd=$(PYTHON) -m venv publish-test-env && \;
+  step-8: run cmd=publish-test-env/bin/pip install twine && \;
+  step-9: run cmd=publish-test-env/bin/python -m twine upload --repository testpypi dist/* && \;
+  step-10: run cmd=rm -rf publish-test-env && \;
+  step-11: run cmd=echo "✓ Published to TestPyPI"; \;
+  step-12: run cmd=fi';
+}
+
+workflow[name="bump-patch"] {
+  trigger: manual;
+  step-1: run cmd=echo "🔢 Bumping patch version...";
+  step-2: run cmd=$(PYTHON) scripts/bump_version.py patch 2>/dev/null || echo "Create scripts/bump_version.py or edit pyproject.toml manually";
+}
+
+workflow[name="bump-minor"] {
+  trigger: manual;
+  step-1: run cmd=echo "🔢 Bumping minor version...";
+  step-2: run cmd=$(PYTHON) scripts/bump_version.py minor 2>/dev/null || echo "Create scripts/bump_version.py or edit pyproject.toml manually";
+}
+
+workflow[name="bump-major"] {
+  trigger: manual;
+  step-1: run cmd=echo "🔢 Bumping major version...";
+  step-2: run cmd=$(PYTHON) scripts/bump_version.py major 2>/dev/null || echo "Create scripts/bump_version.py or edit pyproject.toml manually";
+}
+
+workflow[name="publish"] {
+  trigger: manual;
+  step-1: run cmd=echo "🚀 Publishing to PyPI...";
+  step-2: run cmd=echo "🔢 Bumping patch version...";
+  step-3: run cmd=$(MAKE) bump-patch;
+  step-4: run cmd=echo "🔨 Rebuilding package with new version...";
+  step-5: run cmd=$(MAKE) build;
+  step-6: run cmd=echo "📦 Publishing to PyPI...";
+  step-7: run cmd=$(PYTHON) -m venv publish-env;
+  step-8: run cmd=publish-env/bin/pip install twine;
+  step-9: run cmd=publish-env/bin/python -m twine upload dist/*;
+  step-10: run cmd=rm -rf publish-env;
+  step-11: run cmd=echo "✓ Published to PyPI";
 }
 
 deploy {

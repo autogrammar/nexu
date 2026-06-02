@@ -457,7 +457,11 @@ def _absolutize_external_urls(html: str, page_url: str) -> str:
             src = src_match.group(2).strip()
             absolute = _absolutize_external_ref(src, page_url)
             if absolute != src:
-                tag = pattern.sub(lambda m: f'{m.group(0).split("=", 1)[0]}="{absolute}"', tag, count=1)
+                tag = pattern.sub(
+                    lambda m, absolute=absolute: f'{m.group(0).split("=", 1)[0]}="{absolute}"',
+                    tag,
+                    count=1,
+                )
         srcset_match = _SRCSET_ATTR_RE.search(tag)
         if srcset_match:
             mirrored = [
@@ -542,7 +546,7 @@ def _load_http_fetch_meta(source_dir: Path) -> dict[str, Any]:
     return raw if isinstance(raw, dict) else {}
 
 
-def _build_http_preview_stage0(meta: dict[str, Any]) -> str | None:
+def _http_preview_source_context(meta: dict[str, Any]) -> tuple[str, Path, Path, dict[str, Any], str] | None:
     project_id = str(meta.get("id") or "")
     if not project_id.startswith("http-"):
         return None
@@ -556,19 +560,53 @@ def _build_http_preview_stage0(meta: dict[str, Any]) -> str | None:
     page_url = str(fetch_meta.get("final_url") or meta.get("source") or "").strip()
     if not page_url:
         return None
+    return project_id, source_dir, index_path, fetch_meta, page_url
+
+
+def _read_http_preview_html(index_path: Path) -> str | None:
     try:
-        html = index_path.read_text(encoding="utf-8")
+        return index_path.read_text(encoding="utf-8")
     except OSError:
         return None
+
+
+def _rewrite_optional_stylesheets(html: str, *, project_id: str, fetch_meta: dict[str, Any]) -> str:
     saved_assets = fetch_meta.get("stylesheets")
-    if isinstance(saved_assets, list):
-        saved = [item for item in saved_assets if isinstance(item, dict)]
-        html = _rewrite_local_stylesheets(html, project_id=project_id, saved=saved)
-    html = _rewrite_local_asset_refs(html, project_id=project_id, assets=_fetch_meta_assets(fetch_meta))
+    if not isinstance(saved_assets, list):
+        return html
+    saved = [item for item in saved_assets if isinstance(item, dict)]
+    return _rewrite_local_stylesheets(html, project_id=project_id, saved=saved)
+
+
+def _extract_organize_files(meta: dict[str, Any]) -> list[str] | None:
     organize = meta.get("organize") if isinstance(meta.get("organize"), dict) else {}
     extracted_files = organize.get("extracted_files")
-    if not isinstance(extracted_files, list):
-        extracted_files = None
+    return extracted_files if isinstance(extracted_files, list) else None
+
+
+def _ensure_http_preview_marker(html: str) -> str:
+    if 'data-nexu-import-preview="http"' in html:
+        return html
+    return re.sub(
+        r"(<body\b)([^>]*>)",
+        r'\1 data-nexu-import-preview="http"\2',
+        html,
+        count=1,
+        flags=re.IGNORECASE,
+    )
+
+
+def _build_http_preview_stage0(meta: dict[str, Any]) -> str | None:
+    context = _http_preview_source_context(meta)
+    if context is None:
+        return None
+    project_id, _source_dir, index_path, fetch_meta, page_url = context
+    html = _read_http_preview_html(index_path)
+    if html is None:
+        return None
+    html = _rewrite_optional_stylesheets(html, project_id=project_id, fetch_meta=fetch_meta)
+    html = _rewrite_local_asset_refs(html, project_id=project_id, assets=_fetch_meta_assets(fetch_meta))
+    extracted_files = _extract_organize_files(meta)
     html = _rewrite_organize_extracted_refs(
         html,
         project_id=project_id,
@@ -578,15 +616,7 @@ def _build_http_preview_stage0(meta: dict[str, Any]) -> str | None:
     html = _absolutize_external_urls(html, page_url)
     html, _preview_meta = prepare_http_preview_html(html)
     html = inject_cinema_shield(html)
-    if 'data-nexu-import-preview="http"' not in html:
-        html = re.sub(
-            r"(<body\b)([^>]*>)",
-            r'\1 data-nexu-import-preview="http"\2',
-            html,
-            count=1,
-            flags=re.IGNORECASE,
-        )
-    return html
+    return _ensure_http_preview_marker(html)
 
 
 def _iter_project_files(root: Path) -> list[Path]:

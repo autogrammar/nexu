@@ -5,22 +5,17 @@
 
 - **Project**: /home/tom/github/semcod/nexu
 - **Primary Language**: python
-- **Languages**: python: 78, yaml: 9, json: 3, txt: 2, shell: 2
+- **Languages**: python: 77, yaml: 9, json: 3, txt: 2, shell: 2
 - **Analysis Mode**: static
-- **Total Functions**: 637
-- **Total Classes**: 19
-- **Modules**: 101
-- **Entry Points**: 136
+- **Total Functions**: 598
+- **Total Classes**: 17
+- **Modules**: 100
+- **Entry Points**: 151
 
 ## Architecture by Module
 
-### examples.web_app_calculator.cinema.server
-- **Functions**: 71
-- **Classes**: 2
-- **File**: `server.py`
-
 ### src.nexu.cinema_project_imports
-- **Functions**: 60
+- **Functions**: 80
 - **File**: `cinema_project_imports.py`
 
 ### src.nexu.cinema_policy
@@ -31,14 +26,18 @@
 - **Functions**: 32
 - **File**: `cinema_offline_options.py`
 
-### examples.web_app_calculator.cinema.nexu_hooks
-- **Functions**: 29
-- **File**: `nexu_hooks.py`
-
 ### src.nexu.cinema_http_preprocess
-- **Functions**: 29
+- **Functions**: 32
 - **Classes**: 1
 - **File**: `cinema_http_preprocess.py`
+
+### examples.web_app_calculator.cinema.nexu_hooks
+- **Functions**: 31
+- **File**: `nexu_hooks.py`
+
+### src.nexu.cinema_publish
+- **Functions**: 30
+- **File**: `cinema_publish.py`
 
 ### src.nexu.cinema_projects
 - **Functions**: 25
@@ -48,10 +47,6 @@
 ### src.nexu.cli
 - **Functions**: 23
 - **File**: `cli.py`
-
-### src.nexu.cinema_publish
-- **Functions**: 23
-- **File**: `cinema_publish.py`
 
 ### sdk.js.repatch-sdk
 - **Functions**: 23
@@ -99,15 +94,13 @@
 - **Functions**: 8
 - **File**: `cinema_server.py`
 
+### src.nexu.cinema_options_cache
+- **Functions**: 8
+- **File**: `cinema_options_cache.py`
+
 ## Key Entry Points
 
 Main execution flows into the system:
-
-### examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler.do_POST
-- **Calls**: None.do_POST, int, self.rfile.read, json.loads, None.isoformat, data.get, data.get, LOG_CSV.exists
-
-### examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler.do_GET
-- **Calls**: self.path.startswith, examples.web_app_calculator.cinema.server._parse_imported_project_route, self.path.startswith, self.path.startswith, None.do_GET, player_path.is_file, None.encode, self.send_response
 
 ### examples.web_app_pactown_ecosystem.run.main
 - **Calls**: scripts.ci-cinema-smoke.print, scripts.ci-cinema-smoke.print, scripts.ci-cinema-smoke.print, scripts.ci-cinema-smoke.print, subprocess.Popen, scripts.ci-cinema-smoke.print, range, scripts.ci-cinema-smoke.print
@@ -130,9 +123,6 @@ Main execution flows into the system:
 ### examples.web_app_calculator.run.main
 - **Calls**: work.exists, work.mkdir, src_dir.mkdir, shutil.copy, fixtures_dir.mkdir, shutil.copy, src.nexu.init_project.init_project, src.vico.freeze.freeze_project
 
-### examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler.do_DELETE
-- **Calls**: examples.web_app_calculator.cinema.server._path_segments, self.send_response, self.send_header, self.end_headers, len, examples.web_app_calculator.cinema.server._delete_imported_project, None.encode, self.send_response
-
 ### examples.nexu_markpact_exporter.main
 - **Calls**: scripts.ci-cinema-smoke.print, src_file.read_text, scripts.ci-cinema-smoke.print, scripts.ci-cinema-smoke.print, output_dir.mkdir, readme_path.write_text, scripts.ci-cinema-smoke.print, scripts.ci-cinema-smoke.print
 
@@ -142,6 +132,9 @@ Main execution flows into the system:
 ### src.nexu.cli.capsule_diff
 > Compare capsule src files against the frozen baseline lock.
 - **Calls**: capsule_app.command, src.nexu.paths.project_root, src.vico.diff.diff_capsule, Table, table.add_row, table.add_row, table.add_row, table.add_row
+
+### src.nexu.cinema_traces.write_llm_trace
+- **Calls**: trace_dir.mkdir, None.isoformat, src.nexu.cinema_traces.redact_secrets, src.nexu.cinema_traces.redact_secrets, src.nexu.cinema_traces.redact_secrets, src.nexu.cinema_traces.text_metrics, src.nexu.cinema_traces.text_metrics, path.write_text
 
 ### examples.scientific_calculator_demo2.main
 - **Calls**: work.exists, work.mkdir, None.mkdir, original_file.write_text, examples.scientific_calculator_demo2.print_code, src.nexu.init_project.init_project, src.vico.freeze.freeze_project, src.nexu.capsule.create_capsule
@@ -154,12 +147,24 @@ Main execution flows into the system:
 > Show capsule event journal.
 - **Calls**: capsule_app.command, src.nexu.paths.project_root, Table, console.print, src.nexu.journal.read_journal, table.add_row, str, str
 
+### src.nexu.fast_delivery.options.read_cached_options
+> Apply cached alt_a/b/c files into a Cinema directory when available.
+- **Calls**: src.nexu.cinema_options_cache.options_cache_key, src.nexu.cinema_options_cache.read_options_cache, src.nexu.cinema_html_validate.filter_valid_option_batch, list, Path, enumerate, dict, src.nexu.fast_delivery.options._compatible_with_stage
+
 ### src.vico.models.Capsule.from_dict
 - **Calls**: CapsuleSelection, CapsuleRuntime, cls, data.get, data.get, data.get, data.get, data.get
 
 ### src.nexu.cli.capsule_create
 > Create an isolated capsule from selected project files.
 - **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.capsule.create_capsule, src.nexu.blueprint.build_blueprint, console.print, console.print, console.print, typer.Argument
+
+### src.nexu.cinema_offline_options.write_goal_options_offline
+> Write alt_a/b/c.html without LLM. Returns human labels for options written.
+- **Calls**: Path, list, list, list, None.strip, src.nexu.cinema_goal_contracts.goal_traits_from_contract_lines, src.nexu.cinema_offline_options._detect_project_types, None.lower
+
+### src.nexu.cinema_scope.load_cinema_ui_profile
+> Resolve active project kind/title and UI type for Cinema server + offline paths.
+- **Calls**: None.lower, None.strip, stage0.is_file, isinstance, Path, ui_type_for_kind, src.nexu.cinema_http_preprocess.load_http_preprocess_artifacts, str
 
 ### examples.web_app_calculator.cinema.nexu_hooks.append_policy_entry
 - **Calls**: None.strip, None.lower, src.nexu.cinema_policy.append_iteration_ledger_entry, None.resolve, src.nexu.cinema_projects.load_active_project, str, None.strip, None.strip
@@ -180,6 +185,10 @@ Main execution flows into the system:
 > Build a promotion plan for copying capsule changes back to the source project.
 - **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.promote.build_promotion_plan, console.print, console.print, src.nexu.promote.apply_promotion_plan, console.print, typer.Argument
 
+### src.nexu.cinema_llm.parse_batch_alt_options
+> Parse NEXU_ALT_A/B/C marked batch LLM output into option filenames.
+- **Calls**: src.nexu.cinema_llm._strip_rich_console_artifacts, _BATCH_ALT_FILES.items, re.search, src.nexu.cinema_html_validate.prepare_cinema_html_document, set, set, re.search, src.nexu.cinema_llm.normalize_html_document
+
 ### src.nexu.cli.capsule_review
 > Build an evidence-based review packet for human or optional LLM review.
 - **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.review.build_review_packet, console.print, console.print, console.print, typer.Argument, typer.Option
@@ -187,46 +196,30 @@ Main execution flows into the system:
 ### sdk.js.repatch-sdk.RepatchSDK.removeMatch
 - **Calls**: sdk.js.repatch-sdk.querySelector, sdk.js.repatch-sdk.insertAdjacentHTML, sdk.js.repatch-sdk.log, sdk.js.repatch-sdk.Error, sdk.js.repatch-sdk.trim, sdk.js.repatch-sdk.replace, sdk.js.repatch-sdk.getElementById, sdk.js.repatch-sdk.createElement
 
-### examples.web_app_calculator.cinema.server._extract_llm_content
-- **Calls**: getattr, getattr, getattr, isinstance, str, None.join, isinstance, item.get
-
 ### src.nexu.cli.capsule_plan
 > Create a deterministic S1..Sn capsule iteration plan.
 - **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.plan.build_iteration_plan, console.print, console.print, src.nexu.cli._print_yaml, typer.Argument, typer.Option
 
-### src.nexu.cinema_project_imports._fetch_http_stylesheets
-- **Calls**: assets_dir.mkdir, enumerate, src.nexu.cinema_project_imports._extract_stylesheet_hrefs, urljoin, None.write_bytes, saved.append, src.nexu.cinema_project_imports._same_origin, src.nexu.cinema_project_imports._fetch_http_body
+### src.nexu.fast_delivery.context.compact_markpact_for_llm
+> Keep only high-value Markpact sections for fast LLM requests.
+- **Calls**: str, None.lower, re.sub, None.rstrip, None.strip, re.search, None.join, len
 
-### src.nexu.cinema_options_cache.apply_options_cache
-- **Calls**: list, enumerate, cached.get, files.get, None.write_text, written.append, cached.get, len
-
-### examples.realtime_lane_nexu_sync.simulate_realtime_sync
-- **Calls**: scripts.ci-cinema-smoke.print, scripts.ci-cinema-smoke.print, scripts.ci-cinema-smoke.print, scripts.ci-cinema-smoke.print, scripts.ci-cinema-smoke.print, scripts.ci-cinema-smoke.print, analyze_project, scripts.ci-cinema-smoke.print
+### src.nexu.cinema_project_imports.promote_cinema_option
+> Promote an option file onto stage{N}; repair HTTP imports before reading alts.
+- **Calls**: Path, str, src.nexu.cinema_project_imports._load_http_import_meta, stage_path.write_text, alt_path.is_file, src.nexu.cinema_projects.load_active_project, src.nexu.cinema_project_imports.restore_http_import_stages_if_needed, dict
 
 ## Process Flows
 
 Key execution flows identified:
 
-### Flow 1: do_POST
-```
-do_POST [examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler]
-```
-
-### Flow 2: do_GET
-```
-do_GET [examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler]
-  └─ →> _parse_imported_project_route
-      └─> _path_segments
-```
-
-### Flow 3: main
+### Flow 1: main
 ```
 main [examples.web_app_pactown_ecosystem.run]
   └─ →> print
   └─ →> print
 ```
 
-### Flow 4: verify_capsule
+### Flow 2: verify_capsule
 ```
 verify_capsule [src.nexu.verify]
   └─> _scan_capsule_contracts
@@ -242,13 +235,7 @@ verify_capsule [src.nexu.verify]
           └─> nexu_dir
 ```
 
-### Flow 5: do_DELETE
-```
-do_DELETE [examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler]
-  └─ →> _path_segments
-```
-
-### Flow 6: append_goal_policy_entry
+### Flow 3: append_goal_policy_entry
 ```
 append_goal_policy_entry [examples.web_app_calculator.cinema.nexu_hooks]
   └─ →> append_goal_ledger_entry
@@ -258,7 +245,7 @@ append_goal_policy_entry [examples.web_app_calculator.cinema.nexu_hooks]
   └─ →> load_active_project
 ```
 
-### Flow 7: capsule_diff
+### Flow 4: capsule_diff
 ```
 capsule_diff [src.nexu.cli]
   └─ →> project_root
@@ -268,7 +255,14 @@ capsule_diff [src.nexu.cli]
           └─ →> capsule_dir
 ```
 
-### Flow 8: capsule_status_command
+### Flow 5: write_llm_trace
+```
+write_llm_trace [src.nexu.cinema_traces]
+  └─> redact_secrets
+  └─> redact_secrets
+```
+
+### Flow 6: capsule_status_command
 ```
 capsule_status_command [src.nexu.cli]
   └─ →> project_root
@@ -278,7 +272,7 @@ capsule_status_command [src.nexu.cli]
           └─ →> capsule_dir
 ```
 
-### Flow 9: capsule_journal
+### Flow 7: capsule_journal
 ```
 capsule_journal [src.nexu.cli]
   └─ →> project_root
@@ -288,9 +282,36 @@ capsule_journal [src.nexu.cli]
       └─ →> read_yaml
 ```
 
-### Flow 10: from_dict
+### Flow 8: read_cached_options
+```
+read_cached_options [src.nexu.fast_delivery.options]
+  └─ →> options_cache_key
+      └─> _digest
+      └─> _digest
+  └─ →> read_options_cache
+  └─ →> filter_valid_option_batch
+      └─> prepare_cinema_html_document
+          └─> repair_html_structure
+          └─> validate_cinema_html_document
+```
+
+### Flow 9: from_dict
 ```
 from_dict [src.vico.models.Capsule]
+```
+
+### Flow 10: capsule_create
+```
+capsule_create [src.nexu.cli]
+  └─ →> project_root
+  └─ →> create_capsule
+      └─ →> ensure_project_dirs
+          └─> nexu_dir
+          └─> snapshots_dir
+  └─ →> build_blueprint
+      └─ →> load_capsule
+          └─ →> read_yaml
+          └─ →> capsule_dir
 ```
 
 ## Key Classes
@@ -298,11 +319,6 @@ from_dict [src.vico.models.Capsule]
 ### sdk.js.repatch-sdk.RepatchSDK
 - **Methods**: 23
 - **Key Methods**: sdk.js.repatch-sdk.RepatchSDK.connect, sdk.js.repatch-sdk.RepatchSDK._connectWS, sdk.js.repatch-sdk.RepatchSDK.payload, sdk.js.repatch-sdk.RepatchSDK.setTimeout, sdk.js.repatch-sdk.RepatchSDK._connectSSE, sdk.js.repatch-sdk.RepatchSDK.payload, sdk.js.repatch-sdk.RepatchSDK.onPatch, sdk.js.repatch-sdk.RepatchSDK.apply, sdk.js.repatch-sdk.RepatchSDK.dslClean, sdk.js.repatch-sdk.RepatchSDK.addMatch
-
-### examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler
-- **Methods**: 5
-- **Key Methods**: examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler.__init__, examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler.do_GET, examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler.do_POST, examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler.do_DELETE, examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler.do_OPTIONS
-- **Inherits**: http.server.SimpleHTTPRequestHandler
 
 ### src.nexu.cinema_http_preprocess._OutlineParser
 - **Methods**: 5
@@ -332,10 +348,6 @@ from_dict [src.vico.models.Capsule]
 ### src.vico.models.PromptExport
 - **Methods**: 1
 - **Key Methods**: src.vico.models.PromptExport.to_dict
-
-### examples.web_app_calculator.cinema.server.ThreadingHTTPServer
-- **Methods**: 0
-- **Inherits**: socketserver.ThreadingMixIn, socketserver.TCPServer
 
 ### src.nexu.config.LLMConfig
 - **Methods**: 0
@@ -376,33 +388,9 @@ Key functions that process and transform data:
 ### examples.web_app_calculator.cinema.nexu_hooks.validate_artifact
 - **Output to**: src.nexu.cinema_policy.validate_intract_artifact
 
-### examples.web_app_calculator.cinema.server._parse_imported_project_route
-- **Output to**: examples.web_app_calculator.cinema.server._path_segments, len
-
-### examples.web_app_calculator.cinema.server._validate_intract_artifact
-- **Output to**: nexu_hooks.validate_artifact
-
-### examples.web_app_calculator.cinema.server._parse_multipart_zip
-- **Output to**: cgi.FieldStorage, str, upload.file.read, str, len
-
 ### src.nexu.cinema_llm.parse_batch_alt_options
 > Parse NEXU_ALT_A/B/C marked batch LLM output into option filenames.
 - **Output to**: src.nexu.cinema_llm._strip_rich_console_artifacts, _BATCH_ALT_FILES.items, re.search, src.nexu.cinema_html_validate.prepare_cinema_html_document, set
-
-### src.nexu.cinema_project_imports._validate_http_url
-- **Output to**: urlparse, url.strip
-
-### src.nexu.cinema_project_imports._validate_git_url
-- **Output to**: url.strip, source.lower, lowered.startswith, lowered.startswith, re.match
-
-### src.nexu.cinema_project_imports._decode_http_bytes
-- **Output to**: src.nexu.cinema_project_imports._charset_from_content_type, body.decode, body.decode
-
-### src.nexu.cinema_project_imports._apply_http_preprocess_fields
-- **Output to**: list, None.strip, updated.get, any, artifacts.append
-
-### src.nexu.cinema_project_imports._refresh_http_preprocess_if_needed
-- **Output to**: str, Path, src.nexu.cinema_project_imports._load_http_fetch_meta, src.nexu.cinema_http_preprocess.ensure_http_preprocess_artifacts, src.nexu.cinema_project_imports._apply_http_preprocess_fields
 
 ### src.nexu.cinema_projects._apply_preprocess_meta
 - **Output to**: None.isoformat, src.nexu.cinema_http_preprocess.preprocess_cinema_seed, str, meta.update, datetime.now
@@ -424,6 +412,9 @@ Key functions that process and transform data:
 
 ### src.nexu.cinema_options_cache.invalidate_options_cache
 - **Output to**: cache_root.is_dir, shutil.rmtree
+
+### src.nexu.cinema_publish._validate_service_id
+- **Output to**: None.strip, _SERVICE_ID_RE.fullmatch
 
 ### src.nexu.cinema_llm_contracts._format_contract_params
 - **Output to**: src.nexu.cinema_llm_contracts._compact, src.nexu.cinema_llm_contracts._compact, src.nexu.cinema_llm_contracts._compact, None.join, None.join
@@ -453,6 +444,31 @@ Key functions that process and transform data:
 > True when compact LLM patch artifacts exist under source_dir.
 - **Output to**: str, str, None.is_file, None.is_file, isinstance
 
+### src.nexu.cinema_http_preprocess.ensure_http_preprocess_artifacts
+> Regenerate nexu-visual.css + nexu-outline.html when missing (HTTP re-activate migration).
+- **Output to**: src.nexu.cinema_http_preprocess.http_preprocess_artifacts_present, src.nexu.cinema_http_preprocess.preprocess_http_import, source_dir.is_dir
+
+### src.nexu.cinema_http_preprocess.preprocess_http_import
+> Write nexu-visual.css and nexu-outline.html under source_dir; return project.json fields.
+- **Output to**: meta.get, isinstance, index_path.is_file, index_path.is_file, index_path.read_text
+
+### src.nexu.cinema_http_preprocess.load_cinema_seed_preprocess_artifacts
+> Load compact seed preprocess artifacts from cinema dir when active_project uses patch mode.
+- **Output to**: Path, str, str, isinstance, str
+
+### src.nexu.cinema_http_preprocess.load_http_preprocess_artifacts
+> Load compact HTTP import artifacts for LLM prompts when the active project is http-*.
+- **Output to**: str, src.nexu.cinema_http_preprocess._project_meta_path, src.nexu.cinema_http_preprocess._load_project_meta, src.nexu.cinema_http_preprocess._read_http_source_artifacts, src.nexu.cinema_http_preprocess._load_organize_patch_context
+
+### src.nexu.cinema_project_imports._validate_http_url
+- **Output to**: urlparse, url.strip
+
+### src.nexu.cinema_project_imports._validate_git_url
+- **Output to**: url.strip, source.lower, lowered.startswith, lowered.startswith, re.match
+
+### src.nexu.cinema_project_imports._decode_http_bytes
+- **Output to**: src.nexu.cinema_project_imports._charset_from_content_type, body.decode, body.decode
+
 ## Behavioral Patterns
 
 ### state_machine_RepatchSDK
@@ -464,15 +480,12 @@ Key functions that process and transform data:
 
 Functions exposed as public API (no underscore prefix):
 
-- `examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler.do_POST` - 784 calls
-- `examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler.do_GET` - 189 calls
 - `src.nexu.config.load_config` - 76 calls
 - `examples.web_app_pactown_ecosystem.run.main` - 39 calls
 - `examples.web_app_event_monitor.run.main` - 37 calls
 - `examples.web_app_dashboard.run.main` - 35 calls
 - `src.nexu.cinema.build_intract_policy_snapshot` - 32 calls
 - `src.nexu.report.build_capsule_report` - 32 calls
-- `src.nexu.cinema_http_preprocess.load_http_preprocess_artifacts` - 31 calls
 - `src.nexu.orchestrate.build_capsule_orchestration` - 28 calls
 - `examples.run_examples.run_example` - 26 calls
 - `src.nexu.verify.verify_capsule` - 26 calls
@@ -483,13 +496,12 @@ Functions exposed as public API (no underscore prefix):
 - `src.nexu.capsule.create_capsule` - 24 calls
 - `examples.scientific_calculator_demo.main` - 23 calls
 - `examples.web_app_calculator.run.main` - 23 calls
-- `examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler.do_DELETE` - 23 calls
 - `examples.nexu_markpact_exporter.main` - 22 calls
 - `src.nexu.orchestrate.offline_orchestration_from_context` - 22 calls
-- `src.nexu.cinema_project_imports.import_http_project` - 21 calls
 - `src.nexu.cinema_markpact.build_markpact_readme` - 21 calls
+- `src.nexu.cinema_publish.start_published_service` - 21 calls
 - `scripts.check-doc-links.check_links` - 21 calls
-- `src.nexu.cinema_publish.start_published_service` - 20 calls
+- `src.nexu.cinema_project_imports.import_http_project` - 21 calls
 - `src.nexu.cinema_html_validate.relocate_style_tags_to_head` - 20 calls
 - `src.nexu.cinema_html_validate.repair_html_structure` - 20 calls
 - `examples.web_app_calculator.cinema.nexu_hooks.append_goal_policy_entry` - 19 calls
@@ -501,9 +513,13 @@ Functions exposed as public API (no underscore prefix):
 - `src.nexu.cinema_history.restore_history_checkpoint` - 18 calls
 - `src.nexu.export_prompt.export_iteration_prompt` - 18 calls
 - `src.nexu.cinema_http_preprocess.load_cinema_seed_preprocess_artifacts` - 18 calls
+- `src.nexu.cinema_project_imports.import_markpact_project` - 18 calls
 - `examples.scientific_calculator_demo2.main` - 17 calls
 - `src.nexu.cli.capsule_status_command` - 17 calls
 - `src.nexu.cli.capsule_journal` - 17 calls
+- `src.nexu.cinema_projects.delete_example_project` - 17 calls
+- `src.nexu.cinema_goal_contracts.propose_goal_extension_contracts` - 17 calls
+- `src.nexu.cinema_publish.publish_project_service` - 17 calls
 
 ## System Interactions
 
@@ -511,14 +527,6 @@ How components interact:
 
 ```mermaid
 graph TD
-    do_POST --> do_POST
-    do_POST --> int
-    do_POST --> read
-    do_POST --> loads
-    do_POST --> isoformat
-    do_GET --> startswith
-    do_GET --> _parse_imported_proj
-    do_GET --> do_GET
     main --> print
     main --> Popen
     main --> exists
@@ -535,12 +543,20 @@ graph TD
     main --> setdefault
     main --> load_env_files
     main --> write_text
-    do_DELETE --> _path_segments
-    do_DELETE --> send_response
-    do_DELETE --> send_header
-    do_DELETE --> end_headers
-    do_DELETE --> len
     main --> read_text
+    append_goal_policy_e --> strip
+    append_goal_policy_e --> append_goal_ledger_e
+    append_goal_policy_e --> resolve
+    append_goal_policy_e --> load_active_project
+    capsule_diff --> command
+    capsule_diff --> project_root
+    capsule_diff --> diff_capsule
+    capsule_diff --> Table
+    capsule_diff --> add_row
+    write_llm_trace --> mkdir
+    write_llm_trace --> isoformat
+    write_llm_trace --> redact_secrets
+    main --> print_code
 ```
 
 ## Reverse Engineering Guidelines

@@ -469,30 +469,35 @@ def _wait_for_service_running(entry: dict[str, Any], deadline: float) -> dict[st
     return refreshed
 
 
-def start_published_service(cinema_dir: Path, service_id: str) -> dict[str, Any]:
-    data = _load_registry(cinema_dir)
-    services: list[dict[str, Any]] = list(data.get("services") or [])
+def _find_service_entry(
+    services: list[dict[str, Any]], service_id: str
+) -> tuple[dict[str, Any] | None, list[dict[str, Any]]]:
+    """Find service entry by ID and return it with the services list."""
     entry = next((s for s in services if s.get("id") == service_id), None)
-    if entry is None:
-        return {"error": f"unknown service: {service_id}"}
+    return entry, services
 
-    entry = _refresh_service_status(entry)
-    if entry.get("status") == "running":
-        return {"status": "already_running", "service": entry}
 
-    service_dir = services_root(cinema_dir) / service_id
-    if not (service_dir / "index.html").exists():
-        return {"error": f"missing service files for {service_id}"}
-
+def _ensure_service_port(
+    entry: dict[str, Any], services: list[dict[str, Any]], service_id: str
+) -> tuple[int, dict[str, Any] | None]:
+    """Ensure the service has an allocated port."""
     port = int(entry.get("port") or 0)
     if not port:
         used = {int(s["port"]) for s in services if s.get("port")}
         port = _pick_port(used) or 0
     if not port:
-        return {"error": "no free port for service"}
+        return 0, {"error": "no free port for service"}
+    return port, None
 
-    proc = _spawn_http_server(service_dir, port)
 
+def _update_service_entry_for_startup(
+    entry: dict[str, Any],
+    services: list[dict[str, Any]],
+    service_id: str,
+    port: int,
+    proc: subprocess.Popen,
+) -> dict[str, Any]:
+    """Update entry with startup info and persist to registry."""
     entry["port"] = port
     entry["pid"] = proc.pid
     entry["local_url"] = f"http://127.0.0.1:{port}/"
@@ -504,6 +509,31 @@ def start_published_service(cinema_dir: Path, service_id: str) -> dict[str, Any]
         if item.get("id") == service_id:
             services[idx] = entry
             break
+    return entry
+
+
+def start_published_service(cinema_dir: Path, service_id: str) -> dict[str, Any]:
+    data = _load_registry(cinema_dir)
+    services: list[dict[str, Any]] = list(data.get("services") or [])
+    entry, _ = _find_service_entry(services, service_id)
+
+    if entry is None:
+        return {"error": f"unknown service: {service_id}"}
+
+    entry = _refresh_service_status(entry)
+    if entry.get("status") == "running":
+        return {"status": "already_running", "service": entry}
+
+    service_dir = services_root(cinema_dir) / service_id
+    if not (service_dir / "index.html").exists():
+        return {"error": f"missing service files for {service_id}"}
+
+    port, error = _ensure_service_port(entry, services, service_id)
+    if error:
+        return error
+
+    proc = _spawn_http_server(service_dir, port)
+    entry = _update_service_entry_for_startup(entry, services, service_id, port, proc)
     _save_registry(cinema_dir, {"services": services})
 
     deadline = time.time() + 2.0

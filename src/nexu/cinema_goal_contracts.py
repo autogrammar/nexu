@@ -261,6 +261,86 @@ def _collect_trait_proposals(
     return [t for t in detectors if t is not None]
 
 
+def _build_contract_context(
+    goal: str,
+    focus_scope: str,
+    focus_scope_label: str,
+    current_state: str,
+    expected_version: str,
+    project_context: str,
+    project_kind: str,
+    capsule_name: str,
+    stage: int,
+) -> dict[str, Any]:
+    """Build context dictionary with all processed input values."""
+    text = (goal or "").strip()
+    scope = _slug(focus_scope or focus_scope_label or "focus", max_len=24)
+    scope_display = (
+        focus_scope_label or (f"#{focus_scope}" if focus_scope else "#functions")
+    ).strip()
+    kind = (project_kind or "").strip().lower()
+    template_base = f"cinema.{capsule_name}.S{stage}.ui.template"
+    baseline_anchor = _resolve_baseline_anchor(kind, template_base)
+    detail_text = _build_detail_text(
+        scope_display,
+        (project_context or "").strip(),
+        (current_state or "").strip(),
+        (expected_version or "").strip(),
+    )
+    slug = _slug(expected_version or text)
+
+    return {
+        "text": text,
+        "scope": scope,
+        "scope_display": scope_display,
+        "kind": kind,
+        "template_base": template_base,
+        "baseline_anchor": baseline_anchor,
+        "detail_text": detail_text,
+        "slug": slug,
+    }
+
+
+def _create_main_target_proposal(
+    capsule_name: str,
+    stage: int,
+    ctx: dict[str, Any],
+) -> dict[str, Any]:
+    """Create the main target proposal contract."""
+    detail_suffix = f" Context: {ctx['detail_text']}." if ctx["detail_text"] else ""
+    return _goal_contract_dict(
+        f"goal.{capsule_name}.S{stage}.target.{ctx['slug']}",
+        "define:target_solution",
+        f"Project goal (user): {ctx['text']}. Evolve UI toward this target without "
+        f"removing baseline structure unless explicitly marked DELETE.{detail_suffix}",
+        capsule_name=capsule_name,
+        stage=stage,
+        require=["freeze.baseline", "verify.capsule"],
+        based_on=ctx["baseline_anchor"],
+    )
+
+
+def _create_focus_scope_proposal(
+    capsule_name: str,
+    stage: int,
+    ctx: dict[str, Any],
+) -> dict[str, Any] | None:
+    """Create focus scope proposal if scope is defined."""
+    if not ctx.get("scope") or ctx["scope"] == "focus":
+        return None
+    return _goal_contract_dict(
+        f"goal.{capsule_name}.S{stage}.scope.{ctx['scope']}",
+        f"focus:{ctx['scope']}",
+        f"Constrain the next Cinema iteration to {ctx['scope_display']}: compare the "
+        "current slice with the expected version/actions and keep unrelated "
+        "project behavior stable.",
+        capsule_name=capsule_name,
+        stage=stage,
+        require=["freeze.baseline"],
+        based_on=f"cinema.{capsule_name}.S{stage}.ui.template",
+    )
+
+
 def propose_goal_extension_contracts(
     goal: str,
     *,
@@ -277,56 +357,26 @@ def propose_goal_extension_contracts(
     Turn a natural-language project goal into Intract contracts that *extend*
     the frozen baseline model (calc.app.kind, layout contracts), not replace it.
     """
-    text = (goal or "").strip()
-    if not text:
+    ctx = _build_contract_context(
+        goal, focus_scope, focus_scope_label, current_state,
+        expected_version, project_context, project_kind, capsule_name, stage,
+    )
+    if not ctx["text"]:
         return []
 
-    scope = _slug(focus_scope or focus_scope_label or "focus", max_len=24)
-    scope_display = (
-        focus_scope_label or (f"#{focus_scope}" if focus_scope else "#functions")
-    ).strip()
-    kind = (project_kind or "").strip().lower()
-    template_base = f"cinema.{capsule_name}.S{stage}.ui.template"
-    baseline_anchor = _resolve_baseline_anchor(kind, template_base)
-    detail_text = _build_detail_text(
-        scope_display,
-        (project_context or "").strip(),
-        (current_state or "").strip(),
-        (expected_version or "").strip(),
-    )
-    slug = _slug(expected_version or text)
-
     proposals: list[dict[str, Any]] = [
-        _goal_contract_dict(
-            f"goal.{capsule_name}.S{stage}.target.{slug}",
-            "define:target_solution",
-            f"Project goal (user): {text}. Evolve UI toward this target without "
-            "removing baseline structure unless explicitly marked DELETE."
-            + (f" Context: {detail_text}." if detail_text else ""),
-            capsule_name=capsule_name,
-            stage=stage,
-            require=["freeze.baseline", "verify.capsule"],
-            based_on=baseline_anchor,
-        ),
+        _create_main_target_proposal(capsule_name, stage, ctx),
     ]
 
     if focus_scope or focus_scope_label:
-        proposals.append(
-            _goal_contract_dict(
-                f"goal.{capsule_name}.S{stage}.scope.{scope}",
-                f"focus:{scope}",
-                f"Constrain the next Cinema iteration to {scope_display}: compare the "
-                "current slice with the expected version/actions and keep unrelated "
-                "project behavior stable.",
-                capsule_name=capsule_name,
-                stage=stage,
-                require=["freeze.baseline"],
-                based_on=f"cinema.{capsule_name}.S{stage}.ui.template",
-            ),
-        )
+        scope_proposal = _create_focus_scope_proposal(capsule_name, stage, ctx)
+        if scope_proposal:
+            proposals.append(scope_proposal)
 
-    lower = text.lower()
-    traits = _collect_trait_proposals(text, lower, kind, capsule_name, stage, template_base)
+    traits = _collect_trait_proposals(
+        ctx["text"], ctx["text"].lower(), ctx["kind"],
+        capsule_name, stage, ctx["template_base"],
+    )
     proposals.extend(traits)
 
     return proposals
