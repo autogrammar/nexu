@@ -5,14 +5,19 @@
 
 - **Project**: /home/tom/github/semcod/nexu
 - **Primary Language**: python
-- **Languages**: python: 77, yaml: 9, json: 3, txt: 2, shell: 2
+- **Languages**: python: 78, yaml: 9, json: 3, txt: 2, shell: 2
 - **Analysis Mode**: static
-- **Total Functions**: 598
-- **Total Classes**: 17
-- **Modules**: 100
-- **Entry Points**: 151
+- **Total Functions**: 747
+- **Total Classes**: 20
+- **Modules**: 101
+- **Entry Points**: 206
 
 ## Architecture by Module
+
+### examples.web_app_calculator.cinema.server
+- **Functions**: 144
+- **Classes**: 4
+- **File**: `server.py`
 
 ### src.nexu.cinema_project_imports
 - **Functions**: 80
@@ -22,22 +27,22 @@
 - **Functions**: 44
 - **File**: `cinema_policy.py`
 
-### src.nexu.cinema_offline_options
-- **Functions**: 32
-- **File**: `cinema_offline_options.py`
+### src.nexu.cinema_publish
+- **Functions**: 33
+- **File**: `cinema_publish.py`
 
 ### src.nexu.cinema_http_preprocess
 - **Functions**: 32
 - **Classes**: 1
 - **File**: `cinema_http_preprocess.py`
 
+### src.nexu.cinema_offline_options
+- **Functions**: 32
+- **File**: `cinema_offline_options.py`
+
 ### examples.web_app_calculator.cinema.nexu_hooks
 - **Functions**: 31
 - **File**: `nexu_hooks.py`
-
-### src.nexu.cinema_publish
-- **Functions**: 30
-- **File**: `cinema_publish.py`
 
 ### src.nexu.cinema_projects
 - **Functions**: 25
@@ -58,7 +63,7 @@
 - **File**: `cinema_llm.py`
 
 ### src.nexu.cinema_goal_contracts
-- **Functions**: 15
+- **Functions**: 18
 - **File**: `cinema_goal_contracts.py`
 
 ### examples.mcp_patch_demo.server
@@ -94,13 +99,17 @@
 - **Functions**: 8
 - **File**: `cinema_server.py`
 
-### src.nexu.cinema_options_cache
-- **Functions**: 8
-- **File**: `cinema_options_cache.py`
-
 ## Key Entry Points
 
 Main execution flows into the system:
+
+### examples.web_app_calculator.cinema.server._IterateHandler._build_llm_context
+> Build LLM context from annotations and hints.
+- **Calls**: bool, None.strip, examples.web_app_calculator.cinema.server._IterateHandler._load_policy_payload, examples.web_app_calculator.cinema.server._load_cinema_ui_profile, None.lower, list, list, examples.web_app_calculator.cinema.server._IterateHandler._merge_ui_constraints
+
+### examples.web_app_calculator.cinema.server._IterateHandler._parse_request_data
+> Parse and normalize request data.
+- **Calls**: json.loads, self.data.get, int, self.data.get, None.strip, None.strip, None.strip, None.strip
 
 ### examples.web_app_pactown_ecosystem.run.main
 - **Calls**: scripts.ci-cinema-smoke.print, scripts.ci-cinema-smoke.print, scripts.ci-cinema-smoke.print, scripts.ci-cinema-smoke.print, subprocess.Popen, scripts.ci-cinema-smoke.print, range, scripts.ci-cinema-smoke.print
@@ -111,210 +120,179 @@ Main execution flows into the system:
 ### examples.web_app_dashboard.run.main
 - **Calls**: work.exists, work.mkdir, src_dir.mkdir, shutil.copy, fixtures_dir.mkdir, shutil.copy, scripts.ci-cinema-smoke.print, src.nexu.init_project.init_project
 
+### examples.web_app_calculator.cinema.server._IterateHandler._try_llm_patch_options
+> Try LLM patch options for visual scopes.
+- **Calls**: None.lower, None.lower, build_ui_patch_prompt, examples.web_app_calculator.cinema.server._ensure_api_key_env, time.time, examples.web_app_calculator.cinema.server._resolve_model, examples.web_app_calculator.cinema.server._llm_network_allowed, examples.web_app_calculator.cinema.server._write_llm_trace
+
+### examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler._handle_post_promote
+- **Calls**: int, None.strip, self.send_response, self.send_header, self.send_header, self.end_headers, self.wfile.write, json.loads
+
+### examples.web_app_calculator.cinema.server._IterateHandler._call_llm
+> Call LLM to generate HTML.
+- **Calls**: examples.web_app_calculator.cinema.server._ensure_api_key_env, time.time, examples.web_app_calculator.cinema.server._resolve_model, examples.web_app_calculator.cinema.server._llm_network_allowed, examples.web_app_calculator.cinema.server._write_llm_trace, src.nexu.cinema_server._litellm_available, examples.web_app_calculator.cinema.server._write_llm_trace, src.nexu.cinema_llm.call_cinema_html_llm
+
+### examples.web_app_calculator.cinema.server._IterateHandler._build_llm_prompt
+> Build the LLM prompt for iteration.
+- **Calls**: examples.web_app_calculator.cinema.server._effective_markpact_mode, examples.web_app_calculator.cinema.server._llm_communication_contract_block, nexu_hooks.export_markpact_readme, str, None.strip, self.ui_profile.get, active.get, active.get
+
+### examples.web_app_calculator.cinema.server._IterateHandler._call_llm_batch_options
+> Call LLM to generate batch options.
+- **Calls**: self._build_batch_options_prompt, examples.web_app_calculator.cinema.server._ensure_api_key_env, time.time, examples.web_app_calculator.cinema.server._resolve_model, examples.web_app_calculator.cinema.server._llm_network_allowed, examples.web_app_calculator.cinema.server._write_llm_trace, src.nexu.cinema_llm.call_cinema_text_llm, self._parse_batch_options
+
+### examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler._handle_get_export_markpact
+- **Calls**: urlparse, parse_qs, int, str, examples.web_app_calculator.cinema.server._export_markpact_markdown, payload.get, str, None.encode
+
+### examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler._handle_post_services_publish
+- **Calls**: examples.web_app_calculator.cinema.server._publish_service, self.send_response, self.send_header, self.send_header, self.end_headers, self.wfile.write, json.loads, None.encode
+
 ### src.nexu.verify.verify_capsule
 - **Calls**: src.nexu.capsule.load_capsule, src.nexu.paths.capsule_dir, src.nexu.verify._scan_capsule_contracts, findings.extend, src.nexu.files.collect_files, findings.extend, findings.extend, findings.extend
+
+### examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler._handle_post_projects_import_zip
+- **Calls**: str, self.send_response, self.send_header, self.send_header, self.end_headers, self.wfile.write, examples.web_app_calculator.cinema.server._parse_multipart_zip, isinstance
+
+### examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler._handle_post_projects_import_markpact
+- **Calls**: str, self.send_response, self.send_header, self.send_header, self.end_headers, self.wfile.write, examples.web_app_calculator.cinema.server._parse_multipart_markpact, isinstance
 
 ### deploy.docker.cinema_serve.main
 - **Calls**: None.resolve, int, os.environ.get, os.environ.setdefault, src.nexu.config.load_env_files, src.nexu.config.load_config, src.nexu.cinema_policy.cinema_dir_for, cinema_dir.mkdir
 
-### examples.scientific_calculator_demo.main
-- **Calls**: work.exists, work.mkdir, None.mkdir, None.write_text, scripts.ci-cinema-smoke.print, src.nexu.init_project.init_project, src.vico.freeze.freeze_project, src.nexu.capsule.create_capsule
+### examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler._handle_post_propose_goal
+- **Calls**: int, None.strip, self.send_response, self.send_header, self.send_header, self.end_headers, self.wfile.write, json.loads
+
+### examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler._handle_post_history_restore
+- **Calls**: None.strip, self.send_response, self.send_header, self.send_header, self.end_headers, self.wfile.write, json.loads, bool
+
+### examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler._handle_post_projects_delete
+- **Calls**: unquote, self.send_response, self.send_header, self.send_header, self.end_headers, self.wfile.write, json.loads, None.strip
 
 ### examples.web_app_calculator.run.main
 - **Calls**: work.exists, work.mkdir, src_dir.mkdir, shutil.copy, fixtures_dir.mkdir, shutil.copy, src.nexu.init_project.init_project, src.vico.freeze.freeze_project
 
-### examples.nexu_markpact_exporter.main
+### examples.calculator_demo.scientific_calculator_demo.main
+- **Calls**: work.exists, work.mkdir, None.mkdir, None.write_text, scripts.ci-cinema-smoke.print, src.nexu.init_project.init_project, src.vico.freeze.freeze_project, src.nexu.capsule.create_capsule
+
+### examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler._handle_post_log
+- **Calls**: json.loads, None.isoformat, data.get, data.get, LOG_CSV.exists, self.send_response, self.send_header, self.send_header
+
+### examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler.do_DELETE
+- **Calls**: examples.web_app_calculator.cinema.server._path_segments, self.send_response, self.send_header, self.end_headers, len, examples.web_app_calculator.cinema.server._delete_imported_project, None.encode, self.send_response
+
+### examples.markpact_integration.nexu_markpact_exporter.main
 - **Calls**: scripts.ci-cinema-smoke.print, src_file.read_text, scripts.ci-cinema-smoke.print, scripts.ci-cinema-smoke.print, output_dir.mkdir, readme_path.write_text, scripts.ci-cinema-smoke.print, scripts.ci-cinema-smoke.print
 
-### examples.web_app_calculator.cinema.nexu_hooks.append_goal_policy_entry
-- **Calls**: None.strip, None.strip, src.nexu.cinema_policy.append_goal_ledger_entry, None.resolve, src.nexu.cinema_projects.load_active_project, None.strip, None.strip, str
+### examples.web_app_calculator.cinema.server._IterateHandler._finalize_llm_html
+> Finalize LLM-generated HTML.
+- **Calls**: re.sub, re.sub, cleaned.lower, match.group, match.group, re.sub, None.strip, text.lower
 
-### src.nexu.cli.capsule_diff
-> Compare capsule src files against the frozen baseline lock.
-- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.vico.diff.diff_capsule, Table, table.add_row, table.add_row, table.add_row, table.add_row
+### examples.web_app_calculator.cinema.server._IterateHandler._try_function_patch_options
+> Try function patch options for #functions scope.
+- **Calls**: None.lower, None.lower, time.time, src.nexu.cinema_dom_patch.build_function_option_patches, files.items, examples.web_app_calculator.cinema.server._write_llm_trace, None.strip, str
 
-### src.nexu.cinema_traces.write_llm_trace
-- **Calls**: trace_dir.mkdir, None.isoformat, src.nexu.cinema_traces.redact_secrets, src.nexu.cinema_traces.redact_secrets, src.nexu.cinema_traces.redact_secrets, src.nexu.cinema_traces.text_metrics, src.nexu.cinema_traces.text_metrics, path.write_text
+### examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler._handle_post_manifest_apply_ledger
+- **Calls**: bool, str, examples.web_app_calculator.cinema.server._nexu_hooks_apply, self.send_response, self.send_header, self.send_header, self.end_headers, self.wfile.write
 
-### examples.scientific_calculator_demo2.main
-- **Calls**: work.exists, work.mkdir, None.mkdir, original_file.write_text, examples.scientific_calculator_demo2.print_code, src.nexu.init_project.init_project, src.vico.freeze.freeze_project, src.nexu.capsule.create_capsule
+### examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler._handle_post_propose_llm
+- **Calls**: int, str, examples.web_app_calculator.cinema.server._propose_llm_for_stage, self.send_response, self.send_header, self.send_header, self.end_headers, self.wfile.write
 
-### src.nexu.cli.capsule_status_command
-> Show capsule status, latest iteration, diff counters and verification summary.
-- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.vico.status.capsule_status, console.print, console.print, console.print, Table, files.items
+### examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler._handle_post_services_start
+- **Calls**: None.strip, self.send_response, self.send_header, self.send_header, self.end_headers, self.wfile.write, json.loads, examples.web_app_calculator.cinema.server._start_service
 
-### src.nexu.cli.capsule_journal
-> Show capsule event journal.
-- **Calls**: capsule_app.command, src.nexu.paths.project_root, Table, console.print, src.nexu.journal.read_journal, table.add_row, str, str
-
-### src.nexu.fast_delivery.options.read_cached_options
-> Apply cached alt_a/b/c files into a Cinema directory when available.
-- **Calls**: src.nexu.cinema_options_cache.options_cache_key, src.nexu.cinema_options_cache.read_options_cache, src.nexu.cinema_html_validate.filter_valid_option_batch, list, Path, enumerate, dict, src.nexu.fast_delivery.options._compatible_with_stage
-
-### src.vico.models.Capsule.from_dict
-- **Calls**: CapsuleSelection, CapsuleRuntime, cls, data.get, data.get, data.get, data.get, data.get
-
-### src.nexu.cli.capsule_create
-> Create an isolated capsule from selected project files.
-- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.capsule.create_capsule, src.nexu.blueprint.build_blueprint, console.print, console.print, console.print, typer.Argument
-
-### src.nexu.cinema_offline_options.write_goal_options_offline
-> Write alt_a/b/c.html without LLM. Returns human labels for options written.
-- **Calls**: Path, list, list, list, None.strip, src.nexu.cinema_goal_contracts.goal_traits_from_contract_lines, src.nexu.cinema_offline_options._detect_project_types, None.lower
-
-### src.nexu.cinema_scope.load_cinema_ui_profile
-> Resolve active project kind/title and UI type for Cinema server + offline paths.
-- **Calls**: None.lower, None.strip, stage0.is_file, isinstance, Path, ui_type_for_kind, src.nexu.cinema_http_preprocess.load_http_preprocess_artifacts, str
-
-### examples.web_app_calculator.cinema.nexu_hooks.append_policy_entry
-- **Calls**: None.strip, None.lower, src.nexu.cinema_policy.append_iteration_ledger_entry, None.resolve, src.nexu.cinema_projects.load_active_project, str, None.strip, None.strip
-
-### examples.web_app_calculator.cinema.nexu_hooks.patch_option_previews
-> Apply DELETE policy to alt_a/b/c without copying workspace.
-- **Calls**: src.nexu.cinema_policy.load_effective_ui_constraints, src.nexu.cinema_policy.enforce_deletes_on_option_previews, None.resolve, src.nexu.cinema_policy.promote_applies_spatial_deletes, src.nexu.cinema_policy.merge_ui_constraint_lists, list, Path, list
-
-### src.nexu.cli.capsule_iterate
-> Create planned S1..Sn iteration folders and prompts.
-- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.iterate.iterate_capsule, src.nexu.journal.append_journal, console.print, src.nexu.cinema.generate_cinema_player, console.print, typer.Argument
-
-### src.nexu.cli.capsule_orchestrate
-> Build an offline or LLM-assisted orchestration plan for capsule evolution.
-- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.orchestrate.build_capsule_orchestration, console.print, console.print, console.print, typer.Argument, typer.Option
-
-### src.nexu.cli.capsule_promote
-> Build a promotion plan for copying capsule changes back to the source project.
-- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.promote.build_promotion_plan, console.print, console.print, src.nexu.promote.apply_promotion_plan, console.print, typer.Argument
-
-### src.nexu.cinema_llm.parse_batch_alt_options
-> Parse NEXU_ALT_A/B/C marked batch LLM output into option filenames.
-- **Calls**: src.nexu.cinema_llm._strip_rich_console_artifacts, _BATCH_ALT_FILES.items, re.search, src.nexu.cinema_html_validate.prepare_cinema_html_document, set, set, re.search, src.nexu.cinema_llm.normalize_html_document
-
-### src.nexu.cli.capsule_review
-> Build an evidence-based review packet for human or optional LLM review.
-- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.review.build_review_packet, console.print, console.print, console.print, typer.Argument, typer.Option
-
-### sdk.js.repatch-sdk.RepatchSDK.removeMatch
-- **Calls**: sdk.js.repatch-sdk.querySelector, sdk.js.repatch-sdk.insertAdjacentHTML, sdk.js.repatch-sdk.log, sdk.js.repatch-sdk.Error, sdk.js.repatch-sdk.trim, sdk.js.repatch-sdk.replace, sdk.js.repatch-sdk.getElementById, sdk.js.repatch-sdk.createElement
-
-### src.nexu.cli.capsule_plan
-> Create a deterministic S1..Sn capsule iteration plan.
-- **Calls**: capsule_app.command, src.nexu.paths.project_root, src.nexu.plan.build_iteration_plan, console.print, console.print, src.nexu.cli._print_yaml, typer.Argument, typer.Option
-
-### src.nexu.fast_delivery.context.compact_markpact_for_llm
-> Keep only high-value Markpact sections for fast LLM requests.
-- **Calls**: str, None.lower, re.sub, None.rstrip, None.strip, re.search, None.join, len
-
-### src.nexu.cinema_project_imports.promote_cinema_option
-> Promote an option file onto stage{N}; repair HTTP imports before reading alts.
-- **Calls**: Path, str, src.nexu.cinema_project_imports._load_http_import_meta, stage_path.write_text, alt_path.is_file, src.nexu.cinema_projects.load_active_project, src.nexu.cinema_project_imports.restore_http_import_stages_if_needed, dict
+### examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler._handle_post_services_stop
+- **Calls**: None.strip, self.send_response, self.send_header, self.send_header, self.end_headers, self.wfile.write, json.loads, examples.web_app_calculator.cinema.server._stop_service
 
 ## Process Flows
 
 Key execution flows identified:
 
-### Flow 1: main
+### Flow 1: _build_llm_context
+```
+_build_llm_context [examples.web_app_calculator.cinema.server._IterateHandler]
+  └─> _load_policy_payload
+  └─ →> _load_cinema_ui_profile
+      └─ →> load_cinema_ui_profile
+```
+
+### Flow 2: _parse_request_data
+```
+_parse_request_data [examples.web_app_calculator.cinema.server._IterateHandler]
+```
+
+### Flow 3: main
 ```
 main [examples.web_app_pactown_ecosystem.run]
   └─ →> print
   └─ →> print
 ```
 
-### Flow 2: verify_capsule
+### Flow 4: _try_llm_patch_options
 ```
-verify_capsule [src.nexu.verify]
-  └─> _scan_capsule_contracts
-      └─ →> collect_files
-          └─> rel
-          └─> matches_any
-  └─ →> load_capsule
-      └─ →> read_yaml
-      └─ →> capsule_dir
-          └─> capsules_dir
-  └─ →> capsule_dir
-      └─> capsules_dir
-          └─> nexu_dir
+_try_llm_patch_options [examples.web_app_calculator.cinema.server._IterateHandler]
+  └─ →> _ensure_api_key_env
+      └─> _load_all_env
+          └─> _load_env_file
 ```
 
-### Flow 3: append_goal_policy_entry
+### Flow 5: _handle_post_promote
 ```
-append_goal_policy_entry [examples.web_app_calculator.cinema.nexu_hooks]
-  └─ →> append_goal_ledger_entry
-      └─> normalize_proposals_for_ledger
-          └─> _proposal_kind_and_element
-      └─> append_policy_ledger_entry
-  └─ →> load_active_project
+_handle_post_promote [examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler]
 ```
 
-### Flow 4: capsule_diff
+### Flow 6: _call_llm
 ```
-capsule_diff [src.nexu.cli]
-  └─ →> project_root
-  └─ →> diff_capsule
-      └─ →> load_capsule
-          └─ →> read_yaml
-          └─ →> capsule_dir
-```
-
-### Flow 5: write_llm_trace
-```
-write_llm_trace [src.nexu.cinema_traces]
-  └─> redact_secrets
-  └─> redact_secrets
+_call_llm [examples.web_app_calculator.cinema.server._IterateHandler]
+  └─ →> _ensure_api_key_env
+      └─> _load_all_env
+          └─> _load_env_file
+  └─ →> _resolve_model
+      └─> _load_all_env
+          └─> _load_env_file
 ```
 
-### Flow 6: capsule_status_command
+### Flow 7: _build_llm_prompt
 ```
-capsule_status_command [src.nexu.cli]
-  └─ →> project_root
-  └─ →> capsule_status
-      └─ →> load_capsule
-          └─ →> read_yaml
-          └─ →> capsule_dir
-```
-
-### Flow 7: capsule_journal
-```
-capsule_journal [src.nexu.cli]
-  └─ →> project_root
-  └─ →> read_journal
-      └─> journal_path
-          └─ →> capsule_dir
-      └─ →> read_yaml
+_build_llm_prompt [examples.web_app_calculator.cinema.server._IterateHandler]
+  └─ →> _effective_markpact_mode
+      └─ →> effective_markpact_mode
+  └─ →> _llm_communication_contract_block
+      └─ →> build_llm_contract_block
+          └─> build_llm_communication_contract_lines
 ```
 
-### Flow 8: read_cached_options
+### Flow 8: _call_llm_batch_options
 ```
-read_cached_options [src.nexu.fast_delivery.options]
-  └─ →> options_cache_key
-      └─> _digest
-      └─> _digest
-  └─ →> read_options_cache
-  └─ →> filter_valid_option_batch
-      └─> prepare_cinema_html_document
-          └─> repair_html_structure
-          └─> validate_cinema_html_document
+_call_llm_batch_options [examples.web_app_calculator.cinema.server._IterateHandler]
+  └─ →> _ensure_api_key_env
+      └─> _load_all_env
+          └─> _load_env_file
+  └─ →> _resolve_model
+      └─> _load_all_env
+          └─> _load_env_file
 ```
 
-### Flow 9: from_dict
+### Flow 9: _handle_get_export_markpact
 ```
-from_dict [src.vico.models.Capsule]
+_handle_get_export_markpact [examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler]
+  └─ →> _export_markpact_markdown
 ```
 
-### Flow 10: capsule_create
+### Flow 10: _handle_post_services_publish
 ```
-capsule_create [src.nexu.cli]
-  └─ →> project_root
-  └─ →> create_capsule
-      └─ →> ensure_project_dirs
-          └─> nexu_dir
-          └─> snapshots_dir
-  └─ →> build_blueprint
-      └─ →> load_capsule
-          └─ →> read_yaml
-          └─ →> capsule_dir
+_handle_post_services_publish [examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler]
+  └─ →> _publish_service
 ```
 
 ## Key Classes
+
+### examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler
+- **Methods**: 36
+- **Key Methods**: examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler.__init__, examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler._handle_get_root_redirect, examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler._handle_get_policy, examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler._handle_get_projects_catalog, examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler._handle_get_projects_active, examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler._handle_get_services_catalog, examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler._handle_get_health, examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler._handle_get_llm_status, examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler._handle_get_llm_traces, examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler._handle_get_imported_project_route
+- **Inherits**: http.server.SimpleHTTPRequestHandler
+
+### examples.web_app_calculator.cinema.server._IterateHandler
+> Helper class to handle the /iterate endpoint logic, reducing cyclomatic complexity.
+- **Methods**: 31
+- **Key Methods**: examples.web_app_calculator.cinema.server._IterateHandler.__init__, examples.web_app_calculator.cinema.server._IterateHandler.handle, examples.web_app_calculator.cinema.server._IterateHandler._parse_request_data, examples.web_app_calculator.cinema.server._IterateHandler._restore_http_import_stages_if_needed, examples.web_app_calculator.cinema.server._IterateHandler._read_current_stage_html, examples.web_app_calculator.cinema.server._IterateHandler._build_llm_context, examples.web_app_calculator.cinema.server._IterateHandler._determine_iteration_mode, examples.web_app_calculator.cinema.server._IterateHandler._execute_iteration, examples.web_app_calculator.cinema.server._IterateHandler._execute_options_mode, examples.web_app_calculator.cinema.server._IterateHandler._execute_options_llm
 
 ### sdk.js.repatch-sdk.RepatchSDK
 - **Methods**: 23
@@ -378,6 +356,10 @@ capsule_create [src.nexu.cli]
 > Selected route for one improvement-loop step.
 - **Methods**: 0
 
+### examples.web_app_calculator.cinema.server.ThreadingHTTPServer
+- **Methods**: 0
+- **Inherits**: socketserver.ThreadingMixIn, socketserver.TCPServer
+
 ## Data Transformation Functions
 
 Key functions that process and transform data:
@@ -387,51 +369,6 @@ Key functions that process and transform data:
 
 ### examples.web_app_calculator.cinema.nexu_hooks.validate_artifact
 - **Output to**: src.nexu.cinema_policy.validate_intract_artifact
-
-### src.nexu.cinema_llm.parse_batch_alt_options
-> Parse NEXU_ALT_A/B/C marked batch LLM output into option filenames.
-- **Output to**: src.nexu.cinema_llm._strip_rich_console_artifacts, _BATCH_ALT_FILES.items, re.search, src.nexu.cinema_html_validate.prepare_cinema_html_document, set
-
-### src.nexu.cinema_projects._apply_preprocess_meta
-- **Output to**: None.isoformat, src.nexu.cinema_http_preprocess.preprocess_cinema_seed, str, meta.update, datetime.now
-
-### src.nexu.cinema_policy._process_ledger_entry
-> Process a single ledger entry and update the state.
-- **Output to**: src.nexu.cinema_policy._process_keep_delete_entries, src.nexu.cinema_policy._process_proposed_contracts, entry.get, src.nexu.cinema_policy._ledger_entry_matches_project, src.nexu.cinema_policy._ledger_entry_matches_scope
-
-### src.nexu.cinema_policy._process_keep_delete_entries
-> Process keep and delete entries from a ledger entry.
-- **Output to**: entry.get, None.strip, entry.get, None.strip, str
-
-### src.nexu.cinema_policy._process_proposed_contracts
-> Process proposed contracts from a ledger entry.
-- **Output to**: entry.get, src.nexu.cinema_policy._proposal_kind_and_element, isinstance
-
-### src.nexu.cinema_policy.validate_intract_artifact
-- **Output to**: validate_artifact_with_proposals, src.nexu.cinema_policy.ensure_intract_on_path, src.nexu.cinema_policy.ensure_intract_on_path, Path, str
-
-### src.nexu.cinema_options_cache.invalidate_options_cache
-- **Output to**: cache_root.is_dir, shutil.rmtree
-
-### src.nexu.cinema_publish._validate_service_id
-- **Output to**: None.strip, _SERVICE_ID_RE.fullmatch
-
-### src.nexu.cinema_llm_contracts._format_contract_params
-- **Output to**: src.nexu.cinema_llm_contracts._compact, src.nexu.cinema_llm_contracts._compact, src.nexu.cinema_llm_contracts._compact, None.join, None.join
-
-### src.nexu.cinema_html_validate.validate_css_safety
-> Reject CSS patterns that commonly break Cinema previews.
-- **Output to**: _repatch_validate_css_safety
-
-### src.nexu.cinema_html_validate._validate_basic_tags
-- **Output to**: text.lower, src.nexu.cinema_html_validate._looks_like_html_document, errors.append, errors.append, src.nexu.cinema_html_validate._has_open_tag
-
-### src.nexu.cinema_html_validate._validate_calculator_elements
-- **Output to**: re.search, errors.append, re.search, errors.append
-
-### src.nexu.cinema_html_validate.validate_cinema_html_document
-> Return whether HTML has the minimum structure expected in Cinema previews.
-- **Output to**: None.strip, src.nexu.cinema_html_validate._validate_basic_tags, text.lower, lower.find, re.search
 
 ### src.nexu.cinema_http_preprocess._write_preprocess_artifacts
 - **Output to**: list, src.nexu.cinema_http_preprocess.extract_visual_css, src.nexu.cinema_http_preprocess.build_html_outline, css_path.write_text, outline_path.write_text
@@ -460,6 +397,10 @@ Key functions that process and transform data:
 > Load compact HTTP import artifacts for LLM prompts when the active project is http-*.
 - **Output to**: str, src.nexu.cinema_http_preprocess._project_meta_path, src.nexu.cinema_http_preprocess._load_project_meta, src.nexu.cinema_http_preprocess._read_http_source_artifacts, src.nexu.cinema_http_preprocess._load_organize_patch_context
 
+### src.nexu.cinema_llm.parse_batch_alt_options
+> Parse NEXU_ALT_A/B/C marked batch LLM output into option filenames.
+- **Output to**: src.nexu.cinema_llm._strip_rich_console_artifacts, _BATCH_ALT_FILES.items, re.search, src.nexu.cinema_html_validate.prepare_cinema_html_document, set
+
 ### src.nexu.cinema_project_imports._validate_http_url
 - **Output to**: urlparse, url.strip
 
@@ -469,7 +410,61 @@ Key functions that process and transform data:
 ### src.nexu.cinema_project_imports._decode_http_bytes
 - **Output to**: src.nexu.cinema_project_imports._charset_from_content_type, body.decode, body.decode
 
+### src.nexu.cinema_project_imports._parse_srcset
+- **Output to**: None.split, item.strip, piece.split, None.join, out.append
+
+### src.nexu.cinema_project_imports._format_srcset
+- **Output to**: None.join, chunks.append, None.strip
+
+### src.nexu.cinema_project_imports._apply_http_preprocess_fields
+- **Output to**: list, None.strip, updated.get, any, artifacts.append
+
+### src.nexu.cinema_project_imports._refresh_http_preprocess_if_needed
+- **Output to**: str, Path, src.nexu.cinema_project_imports._load_http_fetch_meta, src.nexu.cinema_http_preprocess.ensure_http_preprocess_artifacts, src.nexu.cinema_project_imports._apply_http_preprocess_fields
+
+### src.nexu.cinema_projects._apply_preprocess_meta
+- **Output to**: None.isoformat, src.nexu.cinema_http_preprocess.preprocess_cinema_seed, str, meta.update, datetime.now
+
+### src.nexu.cinema_policy._process_ledger_entry
+> Process a single ledger entry and update the state.
+- **Output to**: src.nexu.cinema_policy._process_keep_delete_entries, src.nexu.cinema_policy._process_proposed_contracts, entry.get, src.nexu.cinema_policy._ledger_entry_matches_project, src.nexu.cinema_policy._ledger_entry_matches_scope
+
+### src.nexu.cinema_policy._process_keep_delete_entries
+> Process keep and delete entries from a ledger entry.
+- **Output to**: entry.get, None.strip, entry.get, None.strip, str
+
+### src.nexu.cinema_policy._process_proposed_contracts
+> Process proposed contracts from a ledger entry.
+- **Output to**: entry.get, src.nexu.cinema_policy._proposal_kind_and_element, isinstance
+
+### src.nexu.cinema_policy.validate_intract_artifact
+- **Output to**: validate_artifact_with_proposals, src.nexu.cinema_policy.ensure_intract_on_path, src.nexu.cinema_policy.ensure_intract_on_path, Path, str
+
+### src.nexu.cinema_options_cache.invalidate_options_cache
+- **Output to**: cache_root.is_dir, shutil.rmtree
+
+### src.nexu.cinema_publish._validate_service_id
+- **Output to**: None.strip, _SERVICE_ID_RE.fullmatch
+
+### src.nexu.cinema_llm_contracts._format_contract_params
+- **Output to**: src.nexu.cinema_llm_contracts._compact, src.nexu.cinema_llm_contracts._compact, src.nexu.cinema_llm_contracts._compact, None.join, None.join
+
 ## Behavioral Patterns
+
+### recursion__append_policy_entry
+- **Type**: recursion
+- **Confidence**: 0.90
+- **Functions**: examples.web_app_calculator.cinema.server._IterateHandler._append_policy_entry
+
+### recursion__validate_intract_artifact
+- **Type**: recursion
+- **Confidence**: 0.90
+- **Functions**: examples.web_app_calculator.cinema.server._IterateHandler._validate_intract_artifact
+
+### recursion__save_history_checkpoint
+- **Type**: recursion
+- **Confidence**: 0.90
+- **Functions**: examples.web_app_calculator.cinema.server._IterateHandler._save_history_checkpoint
 
 ### state_machine_RepatchSDK
 - **Type**: state_machine
@@ -487,38 +482,38 @@ Functions exposed as public API (no underscore prefix):
 - `src.nexu.cinema.build_intract_policy_snapshot` - 32 calls
 - `src.nexu.report.build_capsule_report` - 32 calls
 - `src.nexu.orchestrate.build_capsule_orchestration` - 28 calls
-- `examples.run_examples.run_example` - 26 calls
 - `src.nexu.verify.verify_capsule` - 26 calls
+- `examples.runner.run_examples.run_example` - 26 calls
 - `src.nexu.cinema_baseline_contracts.ensure_capsule_intract_yaml` - 25 calls
 - `deploy.docker.cinema_serve.main` - 25 calls
 - `src.nexu.review.build_review_packet` - 24 calls
 - `src.nexu.cinema_offline_options.build_chemical_option_html` - 24 calls
 - `src.nexu.capsule.create_capsule` - 24 calls
-- `examples.scientific_calculator_demo.main` - 23 calls
 - `examples.web_app_calculator.run.main` - 23 calls
-- `examples.nexu_markpact_exporter.main` - 22 calls
+- `examples.calculator_demo.scientific_calculator_demo.main` - 23 calls
+- `examples.web_app_calculator.cinema.server.CustomHTTPRequestHandler.do_DELETE` - 23 calls
 - `src.nexu.orchestrate.offline_orchestration_from_context` - 22 calls
-- `src.nexu.cinema_markpact.build_markpact_readme` - 21 calls
-- `src.nexu.cinema_publish.start_published_service` - 21 calls
-- `scripts.check-doc-links.check_links` - 21 calls
+- `examples.markpact_integration.nexu_markpact_exporter.main` - 22 calls
 - `src.nexu.cinema_project_imports.import_http_project` - 21 calls
+- `src.nexu.cinema_markpact.build_markpact_readme` - 21 calls
+- `scripts.check-doc-links.check_links` - 21 calls
 - `src.nexu.cinema_html_validate.relocate_style_tags_to_head` - 20 calls
 - `src.nexu.cinema_html_validate.repair_html_structure` - 20 calls
 - `examples.web_app_calculator.cinema.nexu_hooks.append_goal_policy_entry` - 19 calls
 - `src.nexu.cli.capsule_diff` - 19 calls
-- `src.nexu.cinema_history.save_history_checkpoint` - 19 calls
 - `src.nexu.cinema_http_preprocess.extract_visual_css` - 19 calls
+- `src.nexu.cinema_history.save_history_checkpoint` - 19 calls
+- `examples.web_app_calculator.cinema.server._IterateHandler.handle` - 19 calls
 - `src.nexu.cinema.generate_cinema_player` - 18 calls
+- `src.nexu.cinema_http_preprocess.load_cinema_seed_preprocess_artifacts` - 18 calls
 - `src.nexu.cinema_traces.write_llm_trace` - 18 calls
+- `src.nexu.cinema_project_imports.import_markpact_project` - 18 calls
 - `src.nexu.cinema_history.restore_history_checkpoint` - 18 calls
 - `src.nexu.export_prompt.export_iteration_prompt` - 18 calls
-- `src.nexu.cinema_http_preprocess.load_cinema_seed_preprocess_artifacts` - 18 calls
-- `src.nexu.cinema_project_imports.import_markpact_project` - 18 calls
-- `examples.scientific_calculator_demo2.main` - 17 calls
 - `src.nexu.cli.capsule_status_command` - 17 calls
 - `src.nexu.cli.capsule_journal` - 17 calls
+- `src.nexu.cinema_project_imports.read_imported_markpact` - 17 calls
 - `src.nexu.cinema_projects.delete_example_project` - 17 calls
-- `src.nexu.cinema_goal_contracts.propose_goal_extension_contracts` - 17 calls
 - `src.nexu.cinema_publish.publish_project_service` - 17 calls
 
 ## System Interactions
@@ -527,36 +522,36 @@ How components interact:
 
 ```mermaid
 graph TD
+    _build_llm_context --> bool
+    _build_llm_context --> strip
+    _build_llm_context --> _load_policy_payload
+    _build_llm_context --> _load_cinema_ui_prof
+    _build_llm_context --> lower
+    _parse_request_data --> loads
+    _parse_request_data --> get
+    _parse_request_data --> int
+    _parse_request_data --> strip
     main --> print
     main --> Popen
     main --> exists
     main --> mkdir
     main --> copy
-    verify_capsule --> load_capsule
-    verify_capsule --> capsule_dir
-    verify_capsule --> _scan_capsule_contra
-    verify_capsule --> extend
-    verify_capsule --> collect_files
-    main --> resolve
-    main --> int
-    main --> get
-    main --> setdefault
-    main --> load_env_files
-    main --> write_text
-    main --> read_text
-    append_goal_policy_e --> strip
-    append_goal_policy_e --> append_goal_ledger_e
-    append_goal_policy_e --> resolve
-    append_goal_policy_e --> load_active_project
-    capsule_diff --> command
-    capsule_diff --> project_root
-    capsule_diff --> diff_capsule
-    capsule_diff --> Table
-    capsule_diff --> add_row
-    write_llm_trace --> mkdir
-    write_llm_trace --> isoformat
-    write_llm_trace --> redact_secrets
-    main --> print_code
+    _try_llm_patch_optio --> lower
+    _try_llm_patch_optio --> build_ui_patch_promp
+    _try_llm_patch_optio --> _ensure_api_key_env
+    _try_llm_patch_optio --> time
+    _handle_post_promote --> int
+    _handle_post_promote --> strip
+    _handle_post_promote --> send_response
+    _handle_post_promote --> send_header
+    _call_llm --> _ensure_api_key_env
+    _call_llm --> time
+    _call_llm --> _resolve_model
+    _call_llm --> _llm_network_allowed
+    _call_llm --> _write_llm_trace
+    _build_llm_prompt --> _effective_markpact_
+    _build_llm_prompt --> _llm_communication_c
+    _build_llm_prompt --> export_markpact_read
 ```
 
 ## Reverse Engineering Guidelines

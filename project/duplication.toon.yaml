@@ -1,27 +1,36 @@
-# redup/duplication | 8 groups | 79f 17364L | 2026-06-02
+# redup/duplication | 12 groups | 79f 17651L | 2026-06-03
 
 SUMMARY:
   files_scanned: 79
-  total_lines:   17364
-  dup_groups:    8
-  dup_fragments: 19
-  saved_lines:   128
-  scan_ms:       2721
+  total_lines:   17651
+  dup_groups:    12
+  dup_fragments: 33
+  saved_lines:   192
+  scan_ms:       2581
 
 HOTSPOTS[7] (files with most duplication):
+  examples/web_app_calculator/cinema/server.py  dup=88L  groups=4  frags=13  (0.5%)
   examples/web_app_calculator/cinema/nexu_hooks.py  dup=59L  groups=4  frags=10  (0.3%)
   examples/web_app_calculator/markpact_sandbox/sandbox/src/calculator.py  dup=37L  groups=1  frags=1  (0.2%)
   examples/web_app_calculator/src/calculator.py  dup=37L  groups=1  frags=1  (0.2%)
   examples/web_app_calculator/workspace/src/calculator.py  dup=37L  groups=1  frags=1  (0.2%)
   src/nexu/cinema_goal_contracts.py  dup=34L  groups=1  frags=2  (0.2%)
-  src/nexu/cinema_policy.py  dup=8L  groups=1  frags=2  (0.0%)
-  src/nexu/cinema_html_validate.py  dup=3L  groups=1  frags=1  (0.0%)
+  src/nexu/cinema_policy.py  dup=12L  groups=2  frags=3  (0.1%)
 
-DUPLICATES[8] (ranked by impact):
+DUPLICATES[12] (ranked by impact):
   [f3aa7c7e1fe24b1d] ! EXAC  render_calculator  L=37 N=3 saved=74 sim=1.00
       examples/web_app_calculator/markpact_sandbox/sandbox/src/calculator.py:2-38  (render_calculator)
       examples/web_app_calculator/src/calculator.py:2-38  (render_calculator)
       examples/web_app_calculator/workspace/src/calculator.py:2-38  (render_calculator)
+  [0a4df801016a597a] ! STRU  _delete_imported_project  L=6 N=8 saved=42 sim=1.00
+      examples/web_app_calculator/cinema/server.py:409-414  (_delete_imported_project)
+      examples/web_app_calculator/cinema/server.py:417-422  (_delete_project)
+      examples/web_app_calculator/cinema/server.py:425-430  (_imported_markpact)
+      examples/web_app_calculator/cinema/server.py:433-438  (_imported_llm_log)
+      examples/web_app_calculator/cinema/server.py:942-947  (_activate_project)
+      examples/web_app_calculator/cinema/server.py:1120-1125  (_start_service)
+      examples/web_app_calculator/cinema/server.py:1128-1133  (_stop_service)
+      examples/web_app_calculator/cinema/server.py:1136-1141  (_delete_service)
   [48ce0f91dd3f86de]   STRU  _detect_minimal_trait  L=17 N=2 saved=17 sim=1.00
       src/nexu/cinema_goal_contracts.py:143-159  (_detect_minimal_trait)
       src/nexu/cinema_goal_contracts.py:162-178  (_detect_expanded_trait)
@@ -33,9 +42,18 @@ DUPLICATES[8] (ranked by impact):
       examples/web_app_calculator/cinema/nexu_hooks.py:341-343  (start_service)
       examples/web_app_calculator/cinema/nexu_hooks.py:346-348  (stop_service)
       examples/web_app_calculator/cinema/nexu_hooks.py:351-353  (delete_service)
+  [2b45ba1e74408004]   STRU  _import_project_zip  L=9 N=2 saved=9 sim=1.00
+      examples/web_app_calculator/cinema/server.py:980-988  (_import_project_zip)
+      examples/web_app_calculator/cinema/server.py:1014-1022  (_import_project_markpact)
+  [b18aa5fd13ca53b4]   STRU  _parse_multipart_zip  L=9 N=2 saved=9 sim=1.00
+      examples/web_app_calculator/cinema/server.py:1069-1077  (_parse_multipart_zip)
+      examples/web_app_calculator/cinema/server.py:1080-1088  (_parse_multipart_markpact)
   [f434dfddb54cc94d]   STRU  import_project_from_zip  L=8 N=2 saved=8 sim=1.00
       examples/web_app_calculator/cinema/nexu_hooks.py:226-233  (import_project_from_zip)
       examples/web_app_calculator/cinema/nexu_hooks.py:251-263  (import_project_from_markpact)
+  [11e58559cb0f1b01]   STRU  _trace_slug  L=4 N=2 saved=4 sim=1.00
+      examples/web_app_calculator/cinema/server.py:331-334  (_trace_slug)
+      src/nexu/cinema_policy.py:196-199  (_normalize_html_body)
   [3e7f254259144cfa]   STRU  option_previews_are_distinct  L=4 N=2 saved=4 sim=1.00
       src/nexu/cinema_policy.py:206-209  (option_previews_are_distinct)
       src/nexu/cinema_policy.py:212-215  (stage_files_are_distinct)
@@ -46,52 +64,78 @@ DUPLICATES[8] (ranked by impact):
       src/nexu/cinema_html_validate.py:32-34  (_looks_like_html_document)
       src/nexu/cinema_llm.py:81-83  (looks_like_html_document)
 
-REFACTOR[8] (ranked by priority):
+REFACTOR[12] (ranked by priority):
   [1] ◐ extract_function   → examples/web_app_calculator/utils/render_calculator.py
       WHY: 3 occurrences of 37-line block across 3 files — saves 74 lines
       FILES: examples/web_app_calculator/markpact_sandbox/sandbox/src/calculator.py, examples/web_app_calculator/src/calculator.py, examples/web_app_calculator/workspace/src/calculator.py
-  [2] ○ extract_function   → src/nexu/utils/_detect_minimal_trait.py
+  [2] ○ extract_function   → examples/web_app_calculator/cinema/utils/_delete_imported_project.py
+      WHY: 8 occurrences of 6-line block across 1 files — saves 42 lines
+      FILES: examples/web_app_calculator/cinema/server.py
+  [3] ○ extract_function   → src/nexu/utils/_detect_minimal_trait.py
       WHY: 2 occurrences of 17-line block across 1 files — saves 17 lines
       FILES: src/nexu/cinema_goal_contracts.py
-  [3] ○ extract_function   → examples/web_app_calculator/cinema/utils/delete_imported.py
+  [4] ○ extract_function   → examples/web_app_calculator/cinema/utils/delete_imported.py
       WHY: 2 occurrences of 10-line block across 1 files — saves 10 lines
       FILES: examples/web_app_calculator/cinema/nexu_hooks.py
-  [4] ○ extract_function   → examples/web_app_calculator/cinema/utils/imported_markpact.py
+  [5] ○ extract_function   → examples/web_app_calculator/cinema/utils/imported_markpact.py
       WHY: 4 occurrences of 3-line block across 1 files — saves 9 lines
       FILES: examples/web_app_calculator/cinema/nexu_hooks.py
-  [5] ○ extract_function   → examples/web_app_calculator/cinema/utils/import_project_from_zip.py
+  [6] ○ extract_function   → examples/web_app_calculator/cinema/utils/_import_project_zip.py
+      WHY: 2 occurrences of 9-line block across 1 files — saves 9 lines
+      FILES: examples/web_app_calculator/cinema/server.py
+  [7] ○ extract_function   → examples/web_app_calculator/cinema/utils/_parse_multipart_zip.py
+      WHY: 2 occurrences of 9-line block across 1 files — saves 9 lines
+      FILES: examples/web_app_calculator/cinema/server.py
+  [8] ○ extract_function   → examples/web_app_calculator/cinema/utils/import_project_from_zip.py
       WHY: 2 occurrences of 8-line block across 1 files — saves 8 lines
       FILES: examples/web_app_calculator/cinema/nexu_hooks.py
-  [6] ○ extract_function   → src/nexu/utils/option_previews_are_distinct.py
+  [9] ○ extract_function   → utils/_trace_slug.py
+      WHY: 2 occurrences of 4-line block across 2 files — saves 4 lines
+      FILES: examples/web_app_calculator/cinema/server.py, src/nexu/cinema_policy.py
+  [10] ○ extract_function   → src/nexu/utils/option_previews_are_distinct.py
       WHY: 2 occurrences of 4-line block across 1 files — saves 4 lines
       FILES: src/nexu/cinema_policy.py
-  [7] ○ extract_function   → examples/web_app_calculator/cinema/utils/projects_catalog.py
+  [11] ○ extract_function   → examples/web_app_calculator/cinema/utils/projects_catalog.py
       WHY: 2 occurrences of 3-line block across 1 files — saves 3 lines
       FILES: examples/web_app_calculator/cinema/nexu_hooks.py
-  [8] ○ extract_function   → src/nexu/utils/_looks_like_html_document.py
+  [12] ○ extract_function   → src/nexu/utils/_looks_like_html_document.py
       WHY: 2 occurrences of 3-line block across 2 files — saves 3 lines
       FILES: src/nexu/cinema_html_validate.py, src/nexu/cinema_llm.py
 
-QUICK_WINS[4] (low risk, high savings — do first):
-  [2] extract_function   saved=17L  → src/nexu/utils/_detect_minimal_trait.py
+QUICK_WINS[7] (low risk, high savings — do first):
+  [2] extract_function   saved=42L  → examples/web_app_calculator/cinema/utils/_delete_imported_project.py
+      FILES: server.py
+  [3] extract_function   saved=17L  → src/nexu/utils/_detect_minimal_trait.py
       FILES: cinema_goal_contracts.py
-  [3] extract_function   saved=10L  → examples/web_app_calculator/cinema/utils/delete_imported.py
+  [4] extract_function   saved=10L  → examples/web_app_calculator/cinema/utils/delete_imported.py
       FILES: nexu_hooks.py
-  [4] extract_function   saved=9L  → examples/web_app_calculator/cinema/utils/imported_markpact.py
+  [5] extract_function   saved=9L  → examples/web_app_calculator/cinema/utils/imported_markpact.py
       FILES: nexu_hooks.py
-  [5] extract_function   saved=8L  → examples/web_app_calculator/cinema/utils/import_project_from_zip.py
+  [6] extract_function   saved=9L  → examples/web_app_calculator/cinema/utils/_import_project_zip.py
+      FILES: server.py
+  [7] extract_function   saved=9L  → examples/web_app_calculator/cinema/utils/_parse_multipart_zip.py
+      FILES: server.py
+  [8] extract_function   saved=8L  → examples/web_app_calculator/cinema/utils/import_project_from_zip.py
       FILES: nexu_hooks.py
 
-EFFORT_ESTIMATE (total ≈ 5.5h):
+DEPENDENCY_RISK[1] (duplicates spanning multiple packages):
+  _trace_slug  packages=2  files=2
+      examples/web_app_calculator/cinema/server.py
+      src/nexu/cinema_policy.py
+
+EFFORT_ESTIMATE (total ≈ 7.8h):
   hard   render_calculator                   saved=74L  ~222min
+  medium _delete_imported_project            saved=42L  ~84min
   medium _detect_minimal_trait               saved=17L  ~34min
   easy   delete_imported                     saved=10L  ~20min
   easy   imported_markpact                   saved=9L  ~18min
+  easy   _import_project_zip                 saved=9L  ~18min
+  easy   _parse_multipart_zip                saved=9L  ~18min
   easy   import_project_from_zip             saved=8L  ~16min
+  easy   _trace_slug                         saved=4L  ~16min
   easy   option_previews_are_distinct        saved=4L  ~8min
-  easy   projects_catalog                    saved=3L  ~6min
-  easy   _looks_like_html_document           saved=3L  ~6min
+  ... +2 more (~12min)
 
 METRICS-TARGET:
-  dup_groups:  8 → 0
-  saved_lines: 128 lines recoverable
+  dup_groups:  12 → 0
+  saved_lines: 192 lines recoverable
