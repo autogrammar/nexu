@@ -2,12 +2,18 @@
 
 app {
   name: nexu;
-  version: 0.5.36;
+  version: 0.5.37;
+  description: "Visual Intent Contract Orchestrator: freeze project slices, evolve capsules, verify intent contracts.";
+  license: Apache-2.0;
+  authors: "Tom Sapletta <tom@sapletta.com>";
+  keywords: "intent, contracts, llm, capsule, mock, static-analysis, workflow";
 }
 
 dependencies {
   runtime: "pyyaml>=6.0, typer>=0.12.0, rich>=13.0, litellm>=1.0, repatch[web] @ file:///home/tom/github/semcod/repatch";
   dev: "pytest>=7.0, ruff>=0.4, mypy>=1.8, goal>=2.1.0, costs>=0.1.20, pfix>=0.1.60";
+  mcp: mcp>=1.9.0;
+  watch: watchdog>=4.0;
 }
 
 interface[type="api"] {
@@ -19,7 +25,7 @@ interface[type="cli"] {
   framework: argparse;
 }
 interface[type="cli"] page[name="nexu"] {
-
+  entry: nexu.cli:app;
 }
 
 workflow[name="test"] {
@@ -190,6 +196,14 @@ workflow[name="publish"] {
   step-11: run cmd=echo "✓ Published to PyPI";
 }
 
+tests {
+  import: testql-scenarios/**/*.testql.toon.yaml;
+}
+
+env_vars {
+  keys: OPENROUTER_API_KEY, LLM_MODEL, PFIX_AUTO_APPLY, PFIX_AUTO_INSTALL_DEPS, PFIX_AUTO_RESTART, PFIX_MAX_RETRIES, PFIX_DRY_RUN, PFIX_ENABLED, PFIX_GIT_COMMIT, PFIX_GIT_PREFIX, PFIX_CREATE_BACKUPS, NEXU_MODEL, CINEMA_FORCE_LLM, CINEMA_FAST_SCOPE_OPTIONS, CINEMA_LLM_PATCH_OPTIONS, CINEMA_OPTIONS_CACHE, NEXU_CINEMA_NO_OPEN, OPENAI_API_KEY, ANTHROPIC_API_KEY, NEXU_SERVICE_URL_MODE, NEXU_SERVICE_DOMAIN, NEXU_SERVICE_SCHEME;
+}
+
 deploy {
   target: docker;
 }
@@ -197,5 +211,9 @@ deploy {
 environment[name="local"] {
   runtime: docker-compose;
   env_file: .env;
+  template_file: .env.example;
   python_version: >=3.10;
+  vars: LLM_MODEL, OPENROUTER_API_KEY, PFIX_AUTO_APPLY, PFIX_AUTO_INSTALL_DEPS, PFIX_AUTO_RESTART, PFIX_CREATE_BACKUPS, PFIX_DRY_RUN, PFIX_ENABLED, PFIX_GIT_COMMIT, PFIX_GIT_PREFIX, PFIX_MAX_RETRIES;
+  runtime_llm: OPENROUTER_API_KEY;
+  runtime_pfix: PFIX_AUTO_APPLY, PFIX_AUTO_INSTALL_DEPS, PFIX_AUTO_RESTART, PFIX_CREATE_BACKUPS, PFIX_DRY_RUN, PFIX_ENABLED, PFIX_GIT_COMMIT, PFIX_GIT_PREFIX, PFIX_MAX_RETRIES;
 }
