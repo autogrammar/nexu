@@ -1,12 +1,12 @@
-# redup/duplication | 12 groups | 79f 17651L | 2026-06-03
+# redup/duplication | 12 groups | 79f 17706L | 2026-06-03
 
 SUMMARY:
   files_scanned: 79
-  total_lines:   17651
+  total_lines:   17706
   dup_groups:    12
   dup_fragments: 33
   saved_lines:   192
-  scan_ms:       2581
+  scan_ms:       2599
 
 HOTSPOTS[7] (files with most duplication):
   examples/web_app_calculator/cinema/server.py  dup=88L  groups=4  frags=13  (0.5%)

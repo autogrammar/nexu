@@ -13,26 +13,27 @@ flowchart TD
     scripts__ci_cinema_smoke["scripts.ci-cinema-smoke<br/>1 funcs"]
     src__nexu["src.nexu<br/>495 funcs"]
     src__vico["src.vico<br/>17 funcs"]
-    examples__web_app_calculator ==>|90| src__nexu
+    examples__web_app_calculator ==>|89| src__nexu
     src__nexu ==>|53| src__vico
     examples__web_app_pactown_ecosystem ==>|22| scripts__ci_cinema_smoke
     examples__web_app_event_monitor ==>|19| scripts__ci_cinema_smoke
-    src__vico ==>|12| src__nexu
     examples__markpact_integration ==>|12| scripts__ci_cinema_smoke
     examples__calculator_demo ==>|12| scripts__ci_cinema_smoke
+    src__vico ==>|12| src__nexu
     examples__runner ==>|11| src__nexu
     examples__web_app_dashboard ==>|10| scripts__ci_cinema_smoke
-    examples__web_app_dashboard ==>|9| src__nexu
     examples__lane_integration ==>|9| scripts__ci_cinema_smoke
     examples__calculator_demo ==>|9| src__nexu
+    examples__web_app_dashboard ==>|9| src__nexu
     src__nexu ==>|6| examples__web_app_calculator
-    deploy__docker ==>|6| src__nexu
+    deploy__docker ==>|5| src__nexu
     examples__web_app_calculator ==>|4| scripts__ci_cinema_smoke
-    scripts__check_doc_links -->|3| scripts__ci_cinema_smoke
     examples__runner -->|3| src__vico
-    src__nexu -->|2| scripts__ci_cinema_smoke
+    scripts__check_doc_links -->|3| scripts__ci_cinema_smoke
     examples__calculator_demo -->|2| src__vico
+    src__nexu -->|2| scripts__ci_cinema_smoke
     examples__web_app_calculator -->|1| src__vico
-    examples__web_app_dashboard -->|1| src__vico
     examples__runner -->|1| examples__web_app_calculator
     examples__runner -->|1| scripts__ci_cinema_smoke
+    examples__web_app_dashboard -->|1| src__vico
+    deploy__docker -->|1| examples__web_app_calculator

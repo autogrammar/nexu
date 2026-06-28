@@ -10,12 +10,19 @@
 │   │   ├── app
 │   │   │   └── users.py
 │   │   └── README.md
+│   ├── calculator_demo
+│   │   ├── scientific_calculator_demo2.py
+│   │   └── scientific_calculator_demo.py
 │   ├── frontend_view
 │   │   ├── fixtures
 │   │   │   └── menu_items.yaml
 │   │   ├── README.md
 │   │   └── src
 │   │       └── menu_icons.py
+│   ├── lane_integration
+│   │   └── realtime_lane_nexu_sync.py
+│   ├── markpact_integration
+│   │   └── nexu_markpact_exporter.py
 │   ├── mcp_patch_demo
 │   │   ├── index.html
 │   │   ├── package.json
@@ -26,11 +33,8 @@
 │   │   ├── README.md
 │   │   └── src
 │   │       └── demo.py
-│   ├── nexu_markpact_exporter.py
-│   ├── realtime_lane_nexu_sync.py
-│   ├── run_examples.py
-│   ├── scientific_calculator_demo2.py
-│   ├── scientific_calculator_demo.py
+│   ├── runner
+│   │   └── run_examples.py
 │   ├── vertical_slice
 │   │   ├── README.md
 │   │   └── src
@@ -269,4 +273,4 @@
 ├── uv.lock
 └── VERSION
 
-55 directories, 215 files
+59 directories, 215 files

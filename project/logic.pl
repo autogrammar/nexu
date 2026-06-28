@@ -1,21 +1,21 @@
 % ── Project Metadata ─────────────────────────────────────
-project_metadata('nexu', '0.5.36', 'python').
+project_metadata('nexu', '0.5.37', 'python').
 
 % ── Project Files ────────────────────────────────────────
 project_file('app.doql.less', 202, 'less').
 project_file('deploy/docker/cinema_serve.py', 54, 'python').
 project_file('examples/backend_service/app/users.py', 9, 'python').
+project_file('examples/calculator_demo/scientific_calculator_demo.py', 62, 'python').
+project_file('examples/calculator_demo/scientific_calculator_demo2.py', 87, 'python').
 project_file('examples/frontend_view/src/menu_icons.py', 25, 'python').
+project_file('examples/lane_integration/realtime_lane_nexu_sync.py', 63, 'python').
+project_file('examples/markpact_integration/nexu_markpact_exporter.py', 96, 'python').
 project_file('examples/mcp_patch_demo/server.js', 88, 'javascript').
 project_file('examples/mcp_service/src/demo.py', 11, 'python').
-project_file('examples/nexu_markpact_exporter.py', 96, 'python').
-project_file('examples/realtime_lane_nexu_sync.py', 63, 'python').
-project_file('examples/run_examples.py', 80, 'python').
-project_file('examples/scientific_calculator_demo.py', 62, 'python').
-project_file('examples/scientific_calculator_demo2.py', 87, 'python').
+project_file('examples/runner/run_examples.py', 80, 'python').
 project_file('examples/vertical_slice/src/flow.py', 10, 'python').
 project_file('examples/web_app_calculator/cinema/nexu_hooks.py', 354, 'python').
-project_file('examples/web_app_calculator/cinema/server.py', 3423, 'python').
+project_file('examples/web_app_calculator/cinema/server.py', 3478, 'python').
 project_file('examples/web_app_calculator/markpact_sandbox/sandbox/src/calculator.py', 38, 'python').
 project_file('examples/web_app_calculator/run.py', 111, 'python').
 project_file('examples/web_app_calculator/src/calculator.py', 39, 'python').
@@ -128,15 +128,15 @@ project_file('tree.sh', 2, 'shell').
 % ── Python Functions ─────────────────────────────────────
 python_function('deploy/docker/cinema_serve.py', 'main', 0, 4, 20).
 python_function('examples/backend_service/app/users.py', 'list_users', 2, 4, 1).
+python_function('examples/calculator_demo/scientific_calculator_demo.py', 'main', 0, 2, 14).
+python_function('examples/calculator_demo/scientific_calculator_demo2.py', 'print_code', 2, 1, 4).
+python_function('examples/calculator_demo/scientific_calculator_demo2.py', 'main', 0, 2, 11).
 python_function('examples/frontend_view/src/menu_icons.py', 'preview_menu_icons', 1, 3, 2).
+python_function('examples/lane_integration/realtime_lane_nexu_sync.py', 'simulate_realtime_sync', 0, 2, 2).
+python_function('examples/markpact_integration/nexu_markpact_exporter.py', 'main', 0, 3, 10).
 python_function('examples/mcp_service/src/demo.py', 'plan_demo', 1, 1, 0).
-python_function('examples/nexu_markpact_exporter.py', 'main', 0, 3, 10).
-python_function('examples/realtime_lane_nexu_sync.py', 'simulate_realtime_sync', 0, 2, 2).
-python_function('examples/run_examples.py', 'run_example', 1, 2, 23).
-python_function('examples/run_examples.py', 'main', 0, 2, 1).
-python_function('examples/scientific_calculator_demo.py', 'main', 0, 2, 14).
-python_function('examples/scientific_calculator_demo2.py', 'print_code', 2, 1, 4).
-python_function('examples/scientific_calculator_demo2.py', 'main', 0, 2, 11).
+python_function('examples/runner/run_examples.py', 'run_example', 1, 2, 23).
+python_function('examples/runner/run_examples.py', 'main', 0, 2, 1).
 python_function('examples/vertical_slice/src/flow.py', 'run_flow', 1, 1, 0).
 python_function('examples/web_app_calculator/cinema/nexu_hooks.py', 'apply_manifest_from_ledger', 0, 1, 1).
 python_function('examples/web_app_calculator/cinema/nexu_hooks.py', 'verify_capsule', 0, 1, 1).
@@ -1092,7 +1092,7 @@ python_method('CustomHTTPRequestHandler', '_handle_post_projects_import_http', 1
 python_method('CustomHTTPRequestHandler', '_handle_post_projects_import_markpact', 1, 8, 14).
 python_method('CustomHTTPRequestHandler', '_handle_post_projects_delete', 1, 8, 14).
 python_method('CustomHTTPRequestHandler', '_handle_post_promote', 1, 14, 17).
-python_method('CustomHTTPRequestHandler', '_handle_post_iterate', 1, 174, 112).
+python_method('CustomHTTPRequestHandler', '_handle_post_iterate', 1, 1, 2).
 python_method('CustomHTTPRequestHandler', 'do_POST', 0, 9, 7).
 python_method('CustomHTTPRequestHandler', 'do_DELETE', 0, 9, 12).
 python_method('CustomHTTPRequestHandler', 'do_OPTIONS', 0, 1, 3).
