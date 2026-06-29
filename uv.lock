@@ -1905,7 +1905,7 @@ wheels = [
 
 [[package]]
 name = "nexu"
-version = "0.5.39"
+version = "0.5.40"
 source = { editable = "." }
 dependencies = [
     { name = "litellm" },
@@ -1941,7 +1941,7 @@ requires-dist = [
     { name = "pfix", marker = "extra == 'dev'", specifier = ">=0.1.60" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0" },
     { name = "pyyaml", specifier = ">=6.0" },
-    { name = "repatch", extras = ["web"], directory = "/home/tom/github/semcod/repatch" },
+    { name = "repatch", extras = ["web"], specifier = ">=0.2.18" },
     { name = "rich", specifier = ">=13.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.4" },
     { name = "typer", specifier = ">=0.12.0" },
@@ -3088,26 +3088,19 @@ wheels = [
 [[package]]
 name = "repatch"
 version = "0.2.18"
-source = { directory = "/home/tom/github/semcod/repatch" }
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "litellm" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/21/f1/0811f56bc8ad1653bbf329d4eed6575229d1178281f32f2601e0d7a33383/repatch-0.2.18.tar.gz", hash = "sha256:d19b8b7809ae44975f230024982247fdbc6429049ad6432af0f630ee8ce23f23", size = 52502, upload-time = "2026-06-28T23:14:34.85Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/00/23/c159b0702643f4b4fa49dd3661245c931f84462824bf4a29dbb0f7e335be/repatch-0.2.18-py3-none-any.whl", hash = "sha256:2f59beb619e068615744dbbab7385c13897449b35d37d4077fe734c06ae8795f", size = 47157, upload-time = "2026-06-28T23:14:33.431Z" },
 ]
 
 [package.optional-dependencies]
 web = [
     { name = "playwright" },
 ]
-
-[package.metadata]
-requires-dist = [
-    { name = "costs", marker = "extra == 'dev'", specifier = ">=0.1.20" },
-    { name = "goal", marker = "extra == 'dev'", specifier = ">=2.1.0" },
-    { name = "litellm", specifier = ">=1.40.0" },
-    { name = "pfix", marker = "extra == 'dev'", specifier = ">=0.1.60" },
-    { name = "playwright", marker = "extra == 'web'", specifier = ">=1.40" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0" },
-]
-provides-extras = ["web", "dev"]
 
 [[package]]
 name = "requests"
