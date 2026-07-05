@@ -22,6 +22,20 @@ def _digest(value: str) -> str:
     return hashlib.sha256(str(value or "").encode("utf-8")).hexdigest()[:16]
 
 
+def _is_noop_ledger_entry(entry: Any) -> bool:
+    """True for audit-only entries that carry no keep/delete/proposal signal.
+
+    Scope- or hint-only iterations append a ledger entry purely for audit
+    trail purposes (see server.py.tmpl), with empty keep/delete and no
+    proposed contracts. Such entries must not affect the options cache key,
+    or every one of them would invalidate the cache for the very next
+    identical request, defeating the cache entirely.
+    """
+    if not isinstance(entry, dict):
+        return False
+    return not (entry.get("keep") or entry.get("delete") or entry.get("proposed_contracts"))
+
+
 def options_cache_key(
     *,
     stage_html: str,
@@ -31,7 +45,10 @@ def options_cache_key(
     keep_els: list[str] | None = None,
     delete_els: list[str] | None = None,
 ) -> str:
-    ledger_blob = json.dumps(ledger or [], sort_keys=True, ensure_ascii=False, default=str)
+    meaningful_ledger = [
+        entry for entry in (ledger or []) if not _is_noop_ledger_entry(entry)
+    ]
+    ledger_blob = json.dumps(meaningful_ledger, sort_keys=True, ensure_ascii=False, default=str)
     parts = [
         _digest(stage_html),
         _digest(ledger_blob),

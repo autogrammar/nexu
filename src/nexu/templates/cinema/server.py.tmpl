@@ -3138,7 +3138,12 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
 
                 policy_entry = None
                 intract_validation = None
-                if keep_els or delete_els:
+                # keep_els/delete_els alone miss scope- or hint-only iterations that
+                # still rewrite alt_a/b/c.html (options_written) via apply_options —
+                # every workspace mutation from this route must leave a ledger entry.
+                # (options_cache_key ignores such no-op keep/delete entries, so this
+                # does not defeat the options cache on the next identical request.)
+                if keep_els or delete_els or options_written:
                     policy_entry = _append_policy_entry(
                         current_stage,
                         keep_els,

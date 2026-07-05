@@ -2,6 +2,21 @@
 
 ## [Unreleased]
 
+### Fixed
+- Cinema `/iterate`: scope- or hint-only iterations (e.g. `focus_scope: "colors"` with no
+  KEEP/DELETE marks) rewrote `alt_a/b/c.html` via `apply_options` without ever appending a
+  ledger entry — the ledger gate (`if keep_els or delete_els`) didn't account for this
+  write path, so those mutations left no audit trail. Fixed by also gating on
+  `options_written` (`server.py.tmpl`). This alone would have defeated the options cache
+  (`options_cache_key` hashes the raw ledger, so appending an entry after every request
+  would invalidate the very next identical request's cache lookup) — fixed first by
+  excluding audit-only, no-op entries (empty keep/delete/proposed_contracts) from the
+  cache-key computation (`cinema_options_cache.py`). Verified: a live subprocess Cinema
+  server now writes a ledger entry for a scope-only `/iterate` call, and a second
+  identical call still hits the options cache (`proposed_options_cached`); full test
+  suite (258 tests, including all 17 `test_cinema_server.py` subprocess/integration
+  tests) passes.
+
 ### Added
 - `verify_capsule_workspace` now runs a Cinema-specific distinctness validator
   (`cinema_policy/workspace_verify.py`) that flags stale Option A/B/C previews — when
@@ -73,6 +88,15 @@
 ### Test
 - `tests/test_cinema_policy.py`, `tests/test_export_prompt_ledger.py`, `tests/test_verify_intract.py`; `tests/conftest.py` adds sibling intract.
 - Full suite: `pytest -q` (16 passed); `make ci-cinema-smoke`.
+
+## [0.5.46] - 2026-07-05
+
+### Docs
+- Update CHANGELOG.md
+- Update README.md
+
+### Other
+- Update src/nexu/templates/cinema/server.py.tmpl
 
 ## [0.5.45] - 2026-07-05
 
