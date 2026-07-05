@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Refactor
+- Split `cinema_policy.py` (914 lines) into a `cinema_policy/` package of focused submodules
+  (`constraints`, `snapshot`, `ledger`, `proposals`, `llm_proposals`, `html_checks`,
+  `option_previews`, `intract_validation`, `workspace_verify`). No behavior change — all
+  original public and internal names remain importable from `nexu.cinema_policy` via the
+  package's `__init__.py`; full test suite (258 tests) passes unchanged.
+
 ### Added
 - Cinema Intract policy panel: ledger view, manifest apply (`project` / `capsule` / `both`), LLM propose, capsule verify.
 - `nexu/cinema_policy.py` and generated `cinema/nexu_hooks.py` for manifest merge, verify, LLM propose, and artifact validation.
@@ -26,6 +33,16 @@
 ### Test
 - `tests/test_cinema_policy.py`, `tests/test_export_prompt_ledger.py`, `tests/test_verify_intract.py`; `tests/conftest.py` adds sibling intract.
 - Full suite: `pytest -q` (16 passed); `make ci-cinema-smoke`.
+
+## [0.5.41] - 2026-07-05
+
+### Docs
+- Update CHANGELOG.md
+- Update README.md
+
+### Other
+- Update examples/mcp_patch_demo/local.dev.txt
+- Update local.dev.txt
 
 ## [0.5.40] - 2026-06-29
 
