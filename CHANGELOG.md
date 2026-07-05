@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+### Fixed
+- Declared `intract>=0.5.14` as a proper `dependencies` entry in `pyproject.toml`. Nexu's
+  contract checking (`verify_capsule`, cinema policy) previously relied on `intract` being
+  a sibling checkout on disk with a `sys.path` fallback if the plain `import intract` failed
+  — a fresh `pip install nexu` (e.g. in CI or on another machine) had no way to pull in
+  `intract` and would silently degrade to `"intract package required"` errors. Verified with
+  a fully isolated venv (no sibling `intract/` checkout): `pip install -e .` now pulls in
+  `intract` automatically, and both the full test suite and `nexu capsule verify` produce
+  identical results to the sibling-checkout dev setup.
+
 ### Refactor
 - Introduced `nexu.contracts` as the intent-contract engine boundary. Moved
   `intract_adapter.py` to `contracts/adapter.py` (sibling-package discovery +
@@ -43,6 +53,15 @@
 ### Test
 - `tests/test_cinema_policy.py`, `tests/test_export_prompt_ledger.py`, `tests/test_verify_intract.py`; `tests/conftest.py` adds sibling intract.
 - Full suite: `pytest -q` (16 passed); `make ci-cinema-smoke`.
+
+## [0.5.43] - 2026-07-05
+
+### Docs
+- Update CHANGELOG.md
+- Update README.md
+
+### Other
+- Update uv.lock
 
 ## [0.5.42] - 2026-07-05
 

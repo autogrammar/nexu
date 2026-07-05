@@ -1164,6 +1164,20 @@ wheels = [
 ]
 
 [[package]]
+name = "intract"
+version = "0.5.14"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pyyaml" },
+    { name = "rich" },
+    { name = "typer" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/4e/a2/2a457d85dbeae22162dac5183dabf65583e100d5b15f206312c5773ce3e5/intract-0.5.14.tar.gz", hash = "sha256:d2271f15d199f269443d9d75ed93fe331798b04106240821ecb23edeeaa13708", size = 2493225, upload-time = "2026-06-28T22:48:06.622Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0b/53/b433f6e47ea24b8ade0f53b2e9381946dc6e0d4cf26a0359a2ccbe48ab5f/intract-0.5.14-py3-none-any.whl", hash = "sha256:fef9dca9a8967d10db636bfbf078b591e6274d6c6b2e65384b4777c7ce45c6af", size = 95270, upload-time = "2026-06-28T22:48:02.092Z" },
+]
+
+[[package]]
 name = "ipython"
 version = "8.12.3"
 source = { registry = "https://pypi.org/simple" }
@@ -1905,9 +1919,10 @@ wheels = [
 
 [[package]]
 name = "nexu"
-version = "0.5.42"
+version = "0.5.43"
 source = { editable = "." }
 dependencies = [
+    { name = "intract" },
     { name = "litellm" },
     { name = "pyyaml" },
     { name = "repatch", extra = ["web"] },
@@ -1935,6 +1950,7 @@ watch = [
 requires-dist = [
     { name = "costs", marker = "extra == 'dev'", specifier = ">=0.1.20" },
     { name = "goal", marker = "extra == 'dev'", specifier = ">=2.1.0" },
+    { name = "intract", specifier = ">=0.5.14" },
     { name = "litellm", specifier = ">=1.0" },
     { name = "mcp", marker = "extra == 'mcp'", specifier = ">=1.9.0" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.8" },
