@@ -3,6 +3,15 @@
 ## [Unreleased]
 
 ### Added
+- `verify_capsule_workspace` now runs a Cinema-specific distinctness validator
+  (`cinema_policy/workspace_verify.py`) that flags stale Option A/B/C previews — when
+  `stage0/1/2.html` have diverged but `alt_a/b/c.html` haven't been refreshed to match.
+  Previously this exact staleness check (`stage_files_are_distinct` +
+  `option_previews_are_distinct`) only existed as an internal auto-fix trigger in
+  `cinema_projects.py`; it's now also a reportable finding (`option_previews_stale` warn /
+  `option_previews_distinctness` pass) surfaced through the same report the Cinema policy
+  panel already displays. Verified against a real example capsule (found genuinely stale
+  previews) and a synthetic one with matching previews (reports pass).
 - `CapsuleGoalCheck` (`contracts/verify/capsule_goal.py`): surfaces a capsule's own
   top-level `scope: capsule` contract (its overarching intent) and whether the
   sub-intents it `require`s are declared elsewhere in the manifest. Purely additive and
@@ -64,6 +73,12 @@
 ### Test
 - `tests/test_cinema_policy.py`, `tests/test_export_prompt_ledger.py`, `tests/test_verify_intract.py`; `tests/conftest.py` adds sibling intract.
 - Full suite: `pytest -q` (16 passed); `make ci-cinema-smoke`.
+
+## [0.5.45] - 2026-07-05
+
+### Docs
+- Update CHANGELOG.md
+- Update README.md
 
 ## [0.5.44] - 2026-07-05
 
