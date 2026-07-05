@@ -3,6 +3,16 @@
 ## [Unreleased]
 
 ### Refactor
+- Introduced `nexu.contracts` as the intent-contract engine boundary. Moved
+  `intract_adapter.py` to `contracts/adapter.py` (sibling-package discovery +
+  `check_intract_policy`; `intract_adapter.py` is now a compatibility re-export).
+- Split `verify.py`'s capsule verification into `contracts/verify/` — a `CapsuleCheck`
+  protocol (`context.py`) plus one small module per check (`contracts_presence`,
+  `source_files`, `baseline`, `forbidden_effects`, `outputs`, `requirements`,
+  `iterations`) and an `engine.py` that gathers contracts/sources and runs the checks.
+  `verify.py` is now a thin compatibility re-export of `verify_capsule`. No behavior
+  change — full test suite (258 tests) and a live `nexu capsule verify` run against the
+  `web_app_calculator` example both pass with identical findings/scores.
 - Split `cinema_policy.py` (914 lines) into a `cinema_policy/` package of focused submodules
   (`constraints`, `snapshot`, `ledger`, `proposals`, `llm_proposals`, `html_checks`,
   `option_previews`, `intract_validation`, `workspace_verify`). No behavior change — all
@@ -33,6 +43,12 @@
 ### Test
 - `tests/test_cinema_policy.py`, `tests/test_export_prompt_ledger.py`, `tests/test_verify_intract.py`; `tests/conftest.py` adds sibling intract.
 - Full suite: `pytest -q` (16 passed); `make ci-cinema-smoke`.
+
+## [0.5.42] - 2026-07-05
+
+### Docs
+- Update CHANGELOG.md
+- Update README.md
 
 ## [0.5.41] - 2026-07-05
 
