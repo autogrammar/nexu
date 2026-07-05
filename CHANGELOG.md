@@ -2,6 +2,17 @@
 
 ## [Unreleased]
 
+### Added
+- `CapsuleGoalCheck` (`contracts/verify/capsule_goal.py`): surfaces a capsule's own
+  top-level `scope: capsule` contract (its overarching intent) and whether the
+  sub-intents it `require`s are declared elsewhere in the manifest. Purely additive and
+  optional — a capsule without a `scope: capsule` contract gets no new finding and
+  verification/promotion behave exactly as before. Uses the same warn-not-fail severity
+  as the existing `required_intents` check, so it does not introduce a new promotion
+  blocker (promotion is already gated on overall `verification.status == "pass"` for
+  every capsule today). Verified with a capsule missing its declared sub-intents (warn)
+  and one satisfying them (pass).
+
 ### Fixed
 - Declared `intract>=0.5.14` as a proper `dependencies` entry in `pyproject.toml`. Nexu's
   contract checking (`verify_capsule`, cinema policy) previously relied on `intract` being
@@ -53,6 +64,12 @@
 ### Test
 - `tests/test_cinema_policy.py`, `tests/test_export_prompt_ledger.py`, `tests/test_verify_intract.py`; `tests/conftest.py` adds sibling intract.
 - Full suite: `pytest -q` (16 passed); `make ci-cinema-smoke`.
+
+## [0.5.44] - 2026-07-05
+
+### Docs
+- Update CHANGELOG.md
+- Update README.md
 
 ## [0.5.43] - 2026-07-05
 

@@ -11,6 +11,7 @@ from ...models import VerificationFinding, VerificationReport, write_yaml
 from ...paths import capsule_dir
 from ..adapter import check_intract_policy
 from .baseline import BaselineLockCheck
+from .capsule_goal import CapsuleGoalCheck
 from .context import CapsuleCheck, VerifyContext
 from .contracts_presence import ContractsPresenceCheck
 from .forbidden_effects import ForbiddenSecretCheck, ForbiddenWriteCheck
@@ -29,6 +30,7 @@ DEFAULT_CHECKS: list[CapsuleCheck] = [
     OutputPresenceCheck(),
     RequiredIntentsCheck(),
     IterationCountCheck(),
+    CapsuleGoalCheck(),
 ]
 
 
