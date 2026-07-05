@@ -14,8 +14,10 @@ from .baseline import BaselineLockCheck
 from .capsule_goal import CapsuleGoalCheck
 from .context import CapsuleCheck, VerifyContext
 from .contracts_presence import ContractsPresenceCheck
+from .duplicates import RedupDuplicatesCheck
 from .forbidden_effects import ForbiddenSecretCheck, ForbiddenWriteCheck
 from .iterations import IterationCountCheck
+from .llm_code_validation import VallmValidationCheck
 from .outputs import OutputPresenceCheck
 from .requirements import RequiredIntentsCheck
 from .source_files import SourceFilesPresenceCheck
@@ -31,6 +33,8 @@ DEFAULT_CHECKS: list[CapsuleCheck] = [
     RequiredIntentsCheck(),
     IterationCountCheck(),
     CapsuleGoalCheck(),
+    RedupDuplicatesCheck(),
+    VallmValidationCheck(),
 ]
 
 

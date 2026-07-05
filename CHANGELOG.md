@@ -2,6 +2,18 @@
 
 ## [Unreleased]
 
+### Added
+- `verify_capsule` now optionally runs `redup` (code duplication) and `vallm` (static
+  code validation: syntax/imports/complexity, no LLM calls by default) against a
+  capsule's source, via `RedupDuplicatesCheck`/`VallmValidationCheck`
+  (`contracts/verify/duplicates.py`, `contracts/verify/llm_code_validation.py`). Both are
+  purely additive and gracefully degrade to zero findings when the packages aren't
+  installed — neither is a core dependency; declared as a new `full` extra
+  (`pip install nexu[full]`). Verified: findings appear correctly against a real example
+  capsule when installed, and cleanly disappear (simulated via `sys.modules[name] = None`)
+  with no errors anywhere in the `verify_capsule` pipeline when absent; full test suite
+  (258 tests) passes both ways.
+
 ### Fixed
 - Cinema `/iterate`: scope- or hint-only iterations (e.g. `focus_scope: "colors"` with no
   KEEP/DELETE marks) rewrote `alt_a/b/c.html` via `apply_options` without ever appending a
@@ -88,6 +100,12 @@
 ### Test
 - `tests/test_cinema_policy.py`, `tests/test_export_prompt_ledger.py`, `tests/test_verify_intract.py`; `tests/conftest.py` adds sibling intract.
 - Full suite: `pytest -q` (16 passed); `make ci-cinema-smoke`.
+
+## [0.5.47] - 2026-07-05
+
+### Docs
+- Update CHANGELOG.md
+- Update README.md
 
 ## [0.5.46] - 2026-07-05
 
