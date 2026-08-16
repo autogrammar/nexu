@@ -1141,6 +1141,52 @@ def _delete_service(service_id: str) -> dict:
     return nexu_hooks.delete_service(service_id)
 
 
+def _request_list(data: dict, key: str) -> list:
+    value = data.get(key) or []
+    return value if isinstance(value, list) else []
+
+
+def _normalized_string_list(value) -> list[str]:
+    if not isinstance(value, list):
+        return []
+    return [str(item).strip() for item in value if str(item).strip()]
+
+
+def _request_hints(data: dict) -> tuple[str, list[str]]:
+    user_goal = str(data.get('user_goal', '') or '').strip()
+    element_hints = _normalized_string_list(data.get('element_hints', []))
+    legacy_hints = _normalized_string_list(data.get('user_hints', []))
+    if not user_goal and legacy_hints:
+        user_goal = legacy_hints[0]
+    if not element_hints and len(legacy_hints) > 1:
+        element_hints = legacy_hints[1:]
+    elif not element_hints and legacy_hints and legacy_hints[0] != user_goal:
+        element_hints = legacy_hints
+    return user_goal, element_hints
+
+
+def _normalized_prompt_hints(user_goal: str, element_hints: list[str], focus_display: str) -> list[str]:
+    hints = [user_goal] if user_goal else []
+    hints.extend(element_hints)
+    if focus_display:
+        hints.append(f"Focus scope {focus_display}")
+    return hints
+
+
+def _scope_prompt_block(
+    focus_display: str,
+    current_state: str,
+    expected_version: str,
+) -> str:
+    if not focus_display:
+        return "none selected"
+    return (
+        focus_display
+        + (f"\nCurrent slice: {current_state}" if current_state else "")
+        + (f"\nExpected version/actions: {expected_version}" if expected_version else "")
+    )
+
+
 class _IterateHandler:
     """Helper class to handle the /iterate endpoint logic, reducing cyclomatic complexity."""
     
@@ -1221,47 +1267,24 @@ class _IterateHandler:
         self.data = json.loads(self.post_data.decode('utf-8', errors='replace'))
         self.spatial_feedback = self.data.get('prompt', '')
         self.current_stage = int(self.data.get('current_stage', 0))
-        self.annotations = self.data.get('annotations', [])
-        if not isinstance(self.annotations, list):
-            self.annotations = []
-        self.selected_fragments = self.data.get('selected_fragments') or []
-        if not isinstance(self.selected_fragments, list):
-            self.selected_fragments = []
-        self.user_goal = str(self.data.get('user_goal', '') or '').strip()
+        self.annotations = _request_list(self.data, 'annotations')
+        self.selected_fragments = _request_list(self.data, 'selected_fragments')
+        self.user_goal, self.normalized_element_hints = _request_hints(self.data)
         self.focus_scope = str(self.data.get('focus_scope', '') or '').strip()
         self.focus_scope_label = str(self.data.get('focus_scope_label', '') or '').strip()
         self.focus_scope_display = self.focus_scope_label or (f"#{self.focus_scope}" if self.focus_scope else "")
         self.current_state = str(self.data.get('current_state', '') or '').strip()
         self.expected_version = str(self.data.get('expected_version', '') or '').strip()
-        element_hints_raw = self.data.get('element_hints', [])
-        if not isinstance(element_hints_raw, list):
-            element_hints_raw = []
-        self.normalized_element_hints = [
-            str(item).strip() for item in element_hints_raw if str(item).strip()
-        ]
-        user_hints = self.data.get('user_hints', [])
-        if not isinstance(user_hints, list):
-            user_hints = []
-        legacy_hints = [str(item).strip() for item in user_hints if str(item).strip()]
-        if not self.user_goal and legacy_hints:
-            self.user_goal = legacy_hints[0]
-        if not self.normalized_element_hints and len(legacy_hints) > 1:
-            self.normalized_element_hints = legacy_hints[1:]
-        elif not self.normalized_element_hints and legacy_hints and legacy_hints[0] != self.user_goal:
-            self.normalized_element_hints = legacy_hints
-        self.normalized_hints = []
-        if self.user_goal:
-            self.normalized_hints.append(self.user_goal)
-        self.normalized_hints.extend(self.normalized_element_hints)
-        if self.focus_scope_display:
-            self.normalized_hints.append(f"Focus scope {self.focus_scope_display}")
+        self.normalized_hints = _normalized_prompt_hints(
+            self.user_goal,
+            self.normalized_element_hints,
+            self.focus_scope_display,
+        )
         self.goal_block = self.user_goal if self.user_goal else "none provided"
-        self.scope_block = (
-            f"{self.focus_scope_display}"
-            + (f"\nCurrent slice: {self.current_state}" if self.current_state else "")
-            + (f"\nExpected version/actions: {self.expected_version}" if self.expected_version else "")
-            if self.focus_scope_display
-            else "none selected"
+        self.scope_block = _scope_prompt_block(
+            self.focus_scope_display,
+            self.current_state,
+            self.expected_version,
         )
         self.element_hints_block = (
             "\n".join(f"- {hint}" for hint in self.normalized_element_hints)
