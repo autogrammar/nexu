@@ -14,7 +14,7 @@ SERVER_PATH = (
 )
 
 
-def _iterate_handler_class():
+def _iterate_runtime():
     tree = ast.parse(SERVER_PATH.read_text(encoding="utf-8"))
     helper_names = {
         "_request_list",
@@ -23,6 +23,7 @@ def _iterate_handler_class():
         "_normalized_prompt_hints",
         "_scope_prompt_block",
         "_iteration_mode_flags",
+        "_annotation_ids",
     }
     selected = [
         node
@@ -38,7 +39,11 @@ def _iterate_handler_class():
     ]
     namespace = {"json": json}
     exec(compile(ast.Module(body=selected, type_ignores=[]), SERVER_PATH, "exec"), namespace)
-    return namespace["_IterateHandler"]
+    return namespace
+
+
+def _iterate_handler_class():
+    return _iterate_runtime()["_IterateHandler"]
 
 
 def test_request_parser_normalizes_explicit_goal_and_scope() -> None:
@@ -110,3 +115,16 @@ def test_iteration_mode_respects_explicit_and_automatic_signals() -> None:
     handler.pending_goal = False
     handler._determine_iteration_mode()
     assert (handler.apply_active, handler.apply_options) == (False, False)
+
+
+def test_annotation_ids_filter_type_and_blank_identifiers() -> None:
+    annotation_ids = _iterate_runtime()["_annotation_ids"]
+    annotations = [
+        {"type": "KEEP", "id": " header "},
+        {"type": "DELETE", "id": "submit"},
+        {"type": "KEEP", "id": " "},
+        "invalid",
+    ]
+
+    assert annotation_ids(annotations, "KEEP") == ["header"]
+    assert annotation_ids(annotations, "DELETE") == ["submit"]

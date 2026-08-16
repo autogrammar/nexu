@@ -1205,6 +1205,18 @@ def _iteration_mode_flags(
     return False, False
 
 
+def _annotation_ids(annotations: list, annotation_type: str) -> list[str]:
+    return [
+        str(annotation.get('id') or '').strip()
+        for annotation in annotations
+        if (
+            isinstance(annotation, dict)
+            and annotation.get('type') == annotation_type
+            and str(annotation.get('id') or '').strip()
+        )
+    ]
+
+
 class _IterateHandler:
     """Helper class to handle the /iterate endpoint logic, reducing cyclomatic complexity."""
     
@@ -1335,29 +1347,8 @@ class _IterateHandler:
             or self.data.get('refresh_options')
             or str(self.data.get('cache', '') or '').strip().lower() == 'refresh'
         )
-    
-    def _build_llm_context(self):
-        """Build LLM context from annotations and hints."""
-        self.pending_goal = bool(self.data.get('pending_goal', False))
-        self.requested_mode = str(self.data.get('iteration_mode', '') or '').strip()
-        self.session_keep = [
-            str(a.get('id') or '').strip()
-            for a in self.annotations
-            if isinstance(a, dict) and a.get('type') == 'KEEP' and str(a.get('id') or '').strip()
-        ]
-        self.session_delete = [
-            str(a.get('id') or '').strip()
-            for a in self.annotations
-            if isinstance(a, dict) and a.get('type') == 'DELETE' and str(a.get('id') or '').strip()
-        ]
-        if self.session_delete or self.session_keep:
-            self.pending_goal = False
-        self.policy_payload = _load_policy_payload(
-            stage=self.current_stage, focus_scope=self.focus_scope
-        )
-        self.goal_contract_lines = []
-        self.ui_profile = _load_cinema_ui_profile()
-        self.project_kind = str(self.ui_profile.get("kind") or "").lower()
+
+    def _load_goal_contract_lines(self) -> list:
         try:
             import nexu_hooks
             if self.user_goal:
@@ -1366,9 +1357,65 @@ class _IterateHandler:
                     self.user_goal,
                     **_goal_entry_kwargs(self.data),
                 )
-            self.goal_contract_lines = list(nexu_hooks.goal_contract_lines() or [])
+            return list(nexu_hooks.goal_contract_lines() or [])
         except Exception:
-            self.goal_contract_lines = []
+            return []
+
+    def _resolve_marked_context(self):
+        if not any((self.session_keep, self.session_delete, self.keep_els, self.delete_els)):
+            return None
+        try:
+            from repatch import resolve_marked_llm_context
+            return resolve_marked_llm_context(
+                self.current_html,
+                keep_els=self.keep_els,
+                delete_els=self.delete_els,
+                focus_scope=self.focus_scope or "",
+                project_kind=self.project_kind,
+                ui_profile=self.ui_profile,
+                client_fragments=self.selected_fragments,
+            )
+        except Exception:
+            return None
+
+    def _apply_fallback_llm_context(self):
+        try:
+            from nexu.cinema_scope import scoped_html_fragment
+            scoped = scoped_html_fragment(
+                self.current_html,
+                self.focus_scope,
+                self.project_kind,
+            )
+            if scoped:
+                self.current_html_for_prompt = _compact_html_for_llm(scoped)
+        except Exception:
+            pass
+        if self.ui_profile.get("llm_context_mode") != "patch":
+            return
+        if not any((self.ui_profile.get("html_outline"), self.ui_profile.get("visual_css"))):
+            return
+        try:
+            from nexu.cinema_http_preprocess import build_http_llm_context
+            patch_ctx = build_http_llm_context(self.ui_profile)
+            if patch_ctx:
+                self.current_html_for_prompt = patch_ctx
+        except Exception:
+            pass
+
+    def _build_llm_context(self):
+        """Build LLM context from annotations and hints."""
+        self.pending_goal = bool(self.data.get('pending_goal', False))
+        self.requested_mode = str(self.data.get('iteration_mode', '') or '').strip()
+        self.session_keep = _annotation_ids(self.annotations, 'KEEP')
+        self.session_delete = _annotation_ids(self.annotations, 'DELETE')
+        if self.session_delete or self.session_keep:
+            self.pending_goal = False
+        self.policy_payload = _load_policy_payload(
+            stage=self.current_stage, focus_scope=self.focus_scope
+        )
+        self.ui_profile = _load_cinema_ui_profile()
+        self.project_kind = str(self.ui_profile.get("kind") or "").lower()
+        self.goal_contract_lines = self._load_goal_contract_lines()
         self.ledger_ui = self.policy_payload.get("effective_ui") or {}
         self.ledger_keep = list(self.ledger_ui.get("keep") or [])
         self.ledger_delete = list(self.ledger_ui.get("delete") or [])
@@ -1377,41 +1424,11 @@ class _IterateHandler:
         )
         self.active_scope_name = (self.focus_scope or "").strip().lower()
         self.hard_delete_els = [] if self.active_scope_name in self.visual_redesign_scopes else self.delete_els
-        self.marked_llm_context = None
-        if self.session_keep or self.session_delete or self.keep_els or self.delete_els:
-            try:
-                from repatch import resolve_marked_llm_context
-                self.marked_llm_context = resolve_marked_llm_context(
-                    self.current_html,
-                    keep_els=self.keep_els,
-                    delete_els=self.delete_els,
-                    focus_scope=self.focus_scope or "",
-                    project_kind=self.project_kind,
-                    ui_profile=self.ui_profile,
-                    client_fragments=self.selected_fragments,
-                )
-            except Exception:
-                self.marked_llm_context = None
+        self.marked_llm_context = self._resolve_marked_context()
         if self.marked_llm_context:
             self.current_html_for_prompt = self.marked_llm_context
         else:
-            try:
-                from nexu.cinema_scope import scoped_html_fragment
-                scoped = scoped_html_fragment(self.current_html, self.focus_scope, self.project_kind)
-                if scoped:
-                    self.current_html_for_prompt = _compact_html_for_llm(scoped)
-            except Exception:
-                pass
-            if self.ui_profile.get("llm_context_mode") == "patch" and (
-                self.ui_profile.get("html_outline") or self.ui_profile.get("visual_css")
-            ):
-                try:
-                    from nexu.cinema_http_preprocess import build_http_llm_context
-                    patch_ctx = build_http_llm_context(self.ui_profile)
-                    if patch_ctx:
-                        self.current_html_for_prompt = patch_ctx
-                except Exception:
-                    pass
+            self._apply_fallback_llm_context()
     
     def _determine_iteration_mode(self):
         """Determine whether to apply active workspace or generate options."""
