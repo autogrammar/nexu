@@ -22,6 +22,7 @@ def _iterate_handler_class():
         "_request_hints",
         "_normalized_prompt_hints",
         "_scope_prompt_block",
+        "_iteration_mode_flags",
     }
     selected = [
         node
@@ -83,3 +84,29 @@ def test_request_parser_preserves_legacy_hint_mapping() -> None:
     assert handler.normalized_hints == ["Legacy goal", "header", "submit"]
     assert handler.goal_block == "Legacy goal"
     assert handler.scope_block == "none selected"
+
+
+def test_iteration_mode_respects_explicit_and_automatic_signals() -> None:
+    handler_class = _iterate_handler_class()
+    handler = handler_class(None, b"{}")
+
+    handler.requested_mode = "goal_options"
+    handler.user_goal = "Improve checkout"
+    handler._determine_iteration_mode()
+    assert (handler.apply_active, handler.apply_options) == (False, True)
+
+    handler.requested_mode = "active_workspace"
+    handler.user_goal = ""
+    handler.session_delete = ["button"]
+    handler._determine_iteration_mode()
+    assert (handler.apply_active, handler.apply_options) == (True, False)
+
+    handler.requested_mode = ""
+    handler.session_delete = []
+    handler.pending_goal = True
+    handler._determine_iteration_mode()
+    assert (handler.apply_active, handler.apply_options) == (False, True)
+
+    handler.pending_goal = False
+    handler._determine_iteration_mode()
+    assert (handler.apply_active, handler.apply_options) == (False, False)

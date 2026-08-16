@@ -1187,6 +1187,24 @@ def _scope_prompt_block(
     )
 
 
+def _iteration_mode_flags(
+    requested_mode: str,
+    goal_options_ready: bool,
+    automatic_goal_ready: bool,
+    session_active: bool,
+    workspace_active: bool,
+) -> tuple[bool, bool]:
+    if requested_mode == 'goal_options':
+        return False, goal_options_ready
+    if requested_mode == 'active_workspace':
+        return workspace_active, False
+    if automatic_goal_ready and not session_active:
+        return False, True
+    if session_active:
+        return True, False
+    return False, False
+
+
 class _IterateHandler:
     """Helper class to handle the /iterate endpoint logic, reducing cyclomatic complexity."""
     
@@ -1397,30 +1415,35 @@ class _IterateHandler:
     
     def _determine_iteration_mode(self):
         """Determine whether to apply active workspace or generate options."""
-        if self.requested_mode == 'goal_options':
-            self.apply_active = False
-            self.apply_options = bool(
-                self.user_goal
-                or self.normalized_element_hints
-                or self.session_keep
-                or self.session_delete
-                or self.ledger_keep
-                or self.ledger_delete
-                or self.pending_goal
-                or self.focus_scope
-            )
-        elif self.requested_mode == 'active_workspace':
-            self.apply_active = bool(self.session_delete or self.session_keep or self.delete_els or self.keep_els)
-            self.apply_options = False
-        elif (self.pending_goal or self.user_goal or self.normalized_element_hints) and not (self.session_delete or self.session_keep):
-            self.apply_active = False
-            self.apply_options = True
-        elif self.session_delete or self.session_keep:
-            self.apply_active = True
-            self.apply_options = False
-        else:
-            self.apply_active = False
-            self.apply_options = False
+        session_active = any((self.session_delete, self.session_keep))
+        goal_options_ready = any((
+            self.user_goal,
+            self.normalized_element_hints,
+            self.session_keep,
+            self.session_delete,
+            self.ledger_keep,
+            self.ledger_delete,
+            self.pending_goal,
+            self.focus_scope,
+        ))
+        automatic_goal_ready = any((
+            self.pending_goal,
+            self.user_goal,
+            self.normalized_element_hints,
+        ))
+        workspace_active = any((
+            self.session_delete,
+            self.session_keep,
+            self.delete_els,
+            self.keep_els,
+        ))
+        self.apply_active, self.apply_options = _iteration_mode_flags(
+            self.requested_mode,
+            goal_options_ready,
+            automatic_goal_ready,
+            session_active,
+            workspace_active,
+        )
     
     def _execute_iteration(self):
         """Execute the iteration based on the determined mode."""
