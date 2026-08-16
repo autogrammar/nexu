@@ -2258,7 +2258,19 @@ class _IterateHandler:
                 duration_ms=int((time.time() - started) * 1000),
             )
             return {}, err
-    
+
+    def _patch_source_context(self) -> str:
+        if self.marked_llm_context:
+            return self.marked_llm_context
+        if self.ui_profile.get("llm_context_mode") != "patch":
+            return self.current_html
+        try:
+            from nexu.cinema_http_preprocess import build_http_llm_context
+            patch_context = build_http_llm_context(self.ui_profile)
+            return patch_context or self.current_html
+        except Exception:
+            return self.current_html
+
     def _try_llm_patch_options(
         self, option_variants: list[tuple[str, str, str]]
     ) -> tuple[dict[str, str], list[str], str | None]:
@@ -2285,17 +2297,7 @@ class _IterateHandler:
                 return {}, [], None
         except Exception as exc:
             return {}, [], _compact_llm_error(str(exc))
-        patch_source_html = self.current_html
-        if self.marked_llm_context:
-            patch_source_html = self.marked_llm_context
-        elif self.ui_profile.get("llm_context_mode") == "patch":
-            try:
-                from nexu.cinema_http_preprocess import build_http_llm_context
-                patch_ctx = build_http_llm_context(self.ui_profile)
-                if patch_ctx:
-                    patch_source_html = patch_ctx
-            except Exception:
-                pass
+        patch_source_html = self._patch_source_context()
         prompt = build_ui_patch_prompt(
             patch_source_html,
             focus_scope=active_scope,

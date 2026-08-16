@@ -128,3 +128,16 @@ def test_annotation_ids_filter_type_and_blank_identifiers() -> None:
 
     assert annotation_ids(annotations, "KEEP") == ["header"]
     assert annotation_ids(annotations, "DELETE") == ["submit"]
+
+
+def test_patch_source_context_prefers_marked_then_current_html() -> None:
+    handler_class = _iterate_handler_class()
+    handler = handler_class(None, b"{}")
+    handler.current_html = "<main>current</main>"
+    handler.ui_profile = {}
+
+    handler.marked_llm_context = "<main>marked</main>"
+    assert handler._patch_source_context() == "<main>marked</main>"
+
+    handler.marked_llm_context = None
+    assert handler._patch_source_context() == "<main>current</main>"
