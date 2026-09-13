@@ -36,7 +36,7 @@ dev = ["pytest>=7.0", "ruff>=0.4", "mypy>=1.8",
     "costs>=0.1.20",
     "pfix>=0.1.60",
 ]
-mcp = ["mcp>=1.9.0"]
+mcp = ["mcp>=1.9.0,<2"]
 watch = ["watchdog>=4.0"]
 full = ["redup>=0.4.35", "vallm>=0.1.94"]
 
