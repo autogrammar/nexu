@@ -36,6 +36,16 @@ _HTTP_OPEN_TARGET = (
     if hasattr(_wf_module, "_SAFE_OPENER")
     else "repatch.web_fetch.urlopen"
 )
+import contextlib
+from unittest.mock import patch as _mock_patch
+_DNS_PATCH = (
+    _mock_patch(
+        "repatch.web_fetch.socket.getaddrinfo",
+        return_value=[(None, None, None, None, ("93.184.216.34", 0))],
+    )
+    if hasattr(_wf_module, "socket")
+    else contextlib.nullcontext(None)
+)
 
 
 def test_import_zip_project_creates_markpact_migration_and_options(tmp_path: Path):
@@ -500,10 +510,7 @@ def test_activate_http_import_regenerates_preprocess_when_missing(tmp_path: Path
     with (
         patch("repatch.web_fetch._render_with_playwright", return_value=None),
         patch(_HTTP_OPEN_TARGET, return_value=FakeResp()),
-        patch(
-            "repatch.web_fetch.socket.getaddrinfo",
-            return_value=[(None, None, None, None, ("93.184.216.34", 0))],
-        ),
+        _DNS_PATCH,
     ):
         imported = import_http_project(cinema, "https://legacy.example/", allow_network=True)
 
