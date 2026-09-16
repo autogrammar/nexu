@@ -5,6 +5,8 @@ from pathlib import Path
 from nexu.cinema_offline_options import write_goal_options_offline
 from nexu.cinema_project_imports import import_http_project
 from nexu.cinema_scope import (
+
+
     allowed_scope_ids,
     can_use_offline_fast_iterate,
     cinema_has_offline_baseline,
@@ -17,6 +19,14 @@ from nexu.cinema_scope import (
     scope_supports_offline_fast_path,
     scoped_html_fragment,
     strip_scope_style,
+)
+
+
+import repatch.web_fetch as _wf_module
+_HTTP_OPEN_TARGET = (
+    "repatch.web_fetch._SAFE_OPENER.open"
+    if hasattr(_wf_module, "_SAFE_OPENER")
+    else "repatch.web_fetch.urlopen"
 )
 
 
@@ -187,7 +197,7 @@ def test_http_import_offline_colors_keeps_site_markers(tmp_path: Path, monkeypat
             return False
 
     monkeypatch.setattr(
-        "repatch.web_fetch._SAFE_OPENER.open",
+        _HTTP_OPEN_TARGET,
         lambda req, timeout=0: FakeResp(),
     )
     monkeypatch.setattr(
