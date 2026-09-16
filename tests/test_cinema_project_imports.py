@@ -30,6 +30,23 @@ from nexu.cinema_project_imports import (
     restore_http_import_stages_if_needed,
 )
 
+import repatch.web_fetch as _wf_module
+_HTTP_OPEN_TARGET = (
+    "repatch.web_fetch._SAFE_OPENER.open"
+    if hasattr(_wf_module, "_SAFE_OPENER")
+    else "repatch.web_fetch.urlopen"
+)
+import contextlib
+from unittest.mock import patch as _mock_patch
+_DNS_PATCH = (
+    _mock_patch(
+        "repatch.web_fetch.socket.getaddrinfo",
+        return_value=[(None, None, None, None, ("93.184.216.34", 0))],
+    )
+    if hasattr(_wf_module, "socket")
+    else contextlib.nullcontext(None)
+)
+
 
 def test_import_zip_project_creates_markpact_migration_and_options(tmp_path: Path):
     archive = tmp_path / "demo.zip"
@@ -249,7 +266,7 @@ def test_import_http_project_fetches_and_migrates(tmp_path: Path):
 
     with (
         patch("repatch.web_fetch._render_with_playwright", return_value=None),
-        patch("repatch.web_fetch.urlopen", side_effect=fake_urlopen),
+        patch(_HTTP_OPEN_TARGET, side_effect=fake_urlopen),
     ):
         result = import_http_project(cinema, "https://example.com/demo", allow_network=True)
 
@@ -393,7 +410,7 @@ def test_import_http_project_uses_rendered_dom_snapshot(tmp_path: Path):
             "repatch.web_fetch._render_with_playwright",
             return_value=(rendered, "https://example.com/app"),
         ),
-        patch("repatch.web_fetch.urlopen", side_effect=fake_urlopen),
+        patch(_HTTP_OPEN_TARGET, side_effect=fake_urlopen),
     ):
         result = import_http_project(cinema, "https://example.com/app", allow_network=True)
 
@@ -437,7 +454,7 @@ def test_activate_http_import_regenerates_preview_stage0(tmp_path: Path):
 
     with (
         patch("repatch.web_fetch._render_with_playwright", return_value=None),
-        patch("repatch.web_fetch.urlopen", return_value=FakeResp()),
+        patch(_HTTP_OPEN_TARGET, return_value=FakeResp()),
     ):
         imported = import_http_project(cinema, "https://example.org/", allow_network=True)
 
@@ -492,7 +509,8 @@ def test_activate_http_import_regenerates_preprocess_when_missing(tmp_path: Path
 
     with (
         patch("repatch.web_fetch._render_with_playwright", return_value=None),
-        patch("repatch.web_fetch.urlopen", return_value=FakeResp()),
+        patch(_HTTP_OPEN_TARGET, return_value=FakeResp()),
+        _DNS_PATCH,
     ):
         imported = import_http_project(cinema, "https://legacy.example/", allow_network=True)
 
@@ -570,7 +588,7 @@ def test_activate_http_import_empty_subtitle_not_goal(tmp_path: Path):
 
     with (
         patch("repatch.web_fetch._render_with_playwright", return_value=None),
-        patch("repatch.web_fetch.urlopen", return_value=FakeResp()),
+        patch(_HTTP_OPEN_TARGET, return_value=FakeResp()),
     ):
         imported = import_http_project(cinema, "https://example.net/", allow_network=True)
 
