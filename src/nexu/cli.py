@@ -38,6 +38,15 @@ app.add_typer(mcp_app, name="mcp")
 console = Console()
 
 
+@app.callback()
+def _main_callback() -> None:
+    try:
+        from .autoupdate import check_for_updates
+        check_for_updates("nexu")
+    except Exception:
+        pass
+
+
 def _print_yaml(data: object) -> None:
     import yaml
 
