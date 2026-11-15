@@ -264,11 +264,13 @@ def _llm_network_allowed() -> bool:
 
 
 def _litellm_available() -> bool:
+    if "litellm" in sys.modules:
+        return sys.modules["litellm"] is not None
     try:
-        from nexu.cinema_llm import _litellm_completion
+        import importlib.util
 
-        _litellm_completion()
-        return True
+        # Check importability via find_spec so /llm/status never blocks on cold litellm import.
+        return importlib.util.find_spec("litellm") is not None
     except Exception:
         return False
 

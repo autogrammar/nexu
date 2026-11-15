@@ -1123,3 +1123,51 @@ def test_delete_imported_http_domain_id_via_api(tmp_path: Path) -> None:
             proc.wait(timeout=3)
         except subprocess.TimeoutExpired:
             proc.kill()
+
+
+def test_cinema_server_llm_status_avoids_eager_litellm_import(tmp_path: Path) -> None:
+    cinema = tmp_path / "cinema"
+    cinema.mkdir()
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    (workspace / "nexu.yaml").write_text("project:\n  name: demo\n", encoding="utf-8")
+    write_cinema_nexu_hooks(cinema, workspace, "demo")
+    llm = LLMConfig(allow_network_calls=False, model=CINEMA_LLM_MODEL)
+    script = _render_server_script(workspace, "demo", llm, CinemaConfig(), sys.executable)
+    assert 'find_spec("litellm")' in script
+    (cinema / "server.py").write_text(script, encoding="utf-8")
+
+    port = _free_port()
+    nexu_src = str(Path(nexu.__file__).resolve().parent.parent)
+    proc = subprocess.Popen(
+        [sys.executable, str(cinema / "server.py"), str(port)],
+        cwd=cinema,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        env={**os.environ, "PYTHONPATH": nexu_src},
+    )
+    try:
+        status_payload = None
+        deadline = time.time() + 8.0
+        while time.time() < deadline:
+            try:
+                conn = HTTPConnection("127.0.0.1", port, timeout=0.5)
+                conn.request("GET", "/llm/status")
+                resp = conn.getresponse()
+                if resp.status == 200:
+                    status_payload = json.loads(resp.read().decode("utf-8"))
+                    conn.close()
+                    break
+                conn.close()
+            except OSError:
+                time.sleep(0.05)
+        else:
+            raise AssertionError("cinema server /llm/status timed out")
+        assert isinstance(status_payload, dict)
+        assert "litellm_available" in status_payload
+    finally:
+        proc.terminate()
+        try:
+            proc.wait(timeout=3)
+        except subprocess.TimeoutExpired:
+            proc.kill()
